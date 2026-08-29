@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CTI Library — snowpirate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:       #080c10;
+    --bg2:      #0d1219;
+    --bg3:      #111820;
+    --border:   #1e2e3e;
+    --border2:  #243344;
+    --teal:     #00c8a0;
+    --gold:     #f5c542;
+    --gold-dim: #7a5c08;
+    --red:      #ff4d4d;
+    --blue:     #5b9bd5;
+    --text:     #d0dde8;
+    --text-dim: #5a7080;
+    --text-mid: #8aa5bb;
+    --mono:     'Share Tech Mono', monospace;
+    --sans:     'Barlow Condensed', sans-serif;
+    --body:     'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 90% 100%, rgba(245,197,66,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.01) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.01) 40px);
+  }
+
+  /* ── SITE HEADER ── */
+  .site-header {
+    position: relative;
+    border-bottom: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 100%);
+    padding: 32px 40px 24px;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.014) 8px, rgba(0,200,160,0.014) 9px);
+    pointer-events: none;
+  }
+  .site-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--gold) 50%, transparent 100%);
+  }
+  .site-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    position: relative;
+  }
+  .site-title {
+    font-family: var(--sans);
+    font-size: 48px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .site-title .teal { color: var(--teal); }
+  .site-title .gold { color: var(--gold); }
+  .site-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-top: 8px;
+  }
+  .site-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .site-stat {
+    text-align: right;
+  }
+  .site-stat-val {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--teal);
+  }
+  .site-stat-val.gold { color: var(--gold); }
+  .site-stat-label {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+  }
+
+  /* ── SEARCH / FILTER BAR ── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 40px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 360px;
+  }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+  #search {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 7px 12px 7px 28px;
+    outline: none;
+    letter-spacing: 0.04em;
+  }
+  #search::placeholder { color: var(--text-dim); }
+  #search:focus { border-color: var(--teal); }
+
+  .filter-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 4px 10px;
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    background: var(--bg3);
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .chip:hover         { border-color: var(--text-dim); color: var(--text); }
+  .chip.active        { border-color: var(--teal); color: var(--teal); background: rgba(0,200,160,0.07); }
+  .chip.active.gold   { border-color: var(--gold); color: var(--gold); background: rgba(245,197,66,0.07); }
+  .filter-count {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    padding: 24px 40px;
+    max-width: 1400px;
+  }
+
+  /* ── SECTION HEADER ── */
+  .lib-section { margin-bottom: 32px; }
+  .lib-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border2);
+  }
+  .lib-section-icon {
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .lib-section-title {
+    font-family: var(--sans);
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #fff;
+  }
+  .lib-section-title.teal { color: var(--teal); }
+  .lib-section-title.gold { color: var(--gold); }
+  .lib-section-count {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-left: auto;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── CARD GRID ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 10px;
+  }
+
+  /* ── LIBRARY CARD ── */
+  .lib-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    position: relative;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s, background 0.15s;
+    overflow: hidden;
+  }
+  .lib-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--teal);
+    transition: width 0.15s;
+  }
+  .lib-card.incident::before { background: var(--gold); }
+  .lib-card:hover { border-color: var(--border2); background: var(--bg3); }
+  .lib-card:hover::before { width: 4px; }
+
+  .lib-card-inner { padding: 14px 16px 14px 20px; }
+
+  .lib-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .lib-card-name {
+    font-family: var(--sans);
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .lib-card-badges {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+  .badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    padding: 2px 6px;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge.tlp-clear  { background: #d0dde8; color: #080c10; }
+  .badge.tlp-green  { background: #2d7a2d; color: #fff; }
+  .badge.tlp-amber  { background: var(--gold); color: #080c10; }
+  .badge.tlp-red    { background: var(--red); color: #fff; }
+  .badge.type       { border: 1px solid var(--border2); color: var(--text-dim); background: var(--bg3); }
+  .badge.threat-crit { border: 1px solid rgba(255,77,77,0.4); color: var(--red); background: rgba(255,77,77,0.08); }
+  .badge.threat-high { border: 1px solid rgba(245,197,66,0.4); color: var(--gold); background: rgba(245,197,66,0.08); }
+
+  .lib-card-sub {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .lib-card-desc {
+    font-family: var(--body);
+    font-size: 11px;
+    color: var(--text-mid);
+    line-height: 1.5;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .lib-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid rgba(30,46,62,0.5);
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .lib-card-footer .date { color: var(--text-dim); }
+  .lib-card-footer .open {
+    color: var(--teal);
+    letter-spacing: 0.06em;
+  }
+  .lib-card.incident .lib-card-footer .open { color: var(--gold); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    border: 1px dashed var(--border2);
+    background: var(--bg2);
+  }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    margin-top: 40px;
+    padding: 14px 40px;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+
+  /* ── HIDDEN (filter) ── */
+  .lib-card.hidden { display: none; }
+  .lib-section.hidden { display: none; }
+
+  @media (max-width: 700px) {
+    .site-header, .filter-bar, .main, .site-footer { padding-left: 16px; padding-right: 16px; }
+    .site-title { font-size: 32px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .site-stats { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SITE HEADER ══ -->
+<div class="site-header">
+  <div class="site-header-inner">
+    <div>
+      <div class="site-title"><span class="teal">CTI</span> <span class="gold">Library</span></div>
+      <div class="site-meta">// snowpirate · cti-cards · Threat Actor Profiles &amp; Incident Case Files</div>
+    </div>
+    <div class="site-stats">
+      <div class="site-stat">
+        <div class="site-stat-val" id="actor-count">0</div>
+        <div class="site-stat-label">Actor Profiles</div>
+      </div>
+      <div class="site-stat">
+        <div class="site-stat-val gold" id="incident-count">0</div>
+        <div class="site-stat-label">Incident Cases</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ FILTER BAR ══ -->
+<div class="filter-bar">
+  <div class="search-wrap">
+    <span class="search-icon">//</span>
+    <input id="search" type="text" placeholder="Search actors, incidents, TTPs..."/>
+  </div>
+  <div class="filter-chips">
+    <div class="chip active" data-filter="all">All</div>
+    <div class="chip" data-filter="actor">Actors</div>
+    <div class="chip gold" data-filter="incident">Incidents</div>
+    <div class="chip" data-filter="nation-state">Nation-State</div>
+    <div class="chip" data-filter="ecrime">eCrime</div>
+    <div class="chip" data-filter="ics">ICS / OT</div>
+  </div>
+  <div class="filter-count" id="filter-count"></div>
+</div>
+
+<!-- ═══════════════════════ MAIN ══ -->
+<div class="main">
+
+  <!-- ── ACTOR PROFILES ── -->
+  <div class="lib-section" id="section-actors">
+    <div class="lib-section-header">
+      <span class="lib-section-icon" style="color:var(--teal)">◈</span>
+      <span class="lib-section-title teal">Threat Actor Profiles</span>
+      <span class="lib-section-count" id="actor-section-count"></span>
+    </div>
+    <div class="card-grid" id="actor-grid">
+      <!-- ACTOR CARDS — agent maintains this block -->
+      <!-- FORMAT:
+      <a class="lib-card" href="output/actors/YYYY-MM-DD_ACTOR-NAME.html"
+         data-name="ACTOR NAME"
+         data-type="nation-state|ecrime|ics|hacktivism"
+         data-tags="KEYWORD KEYWORD KEYWORD">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">ACTOR NAME</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge threat-crit">CRITICAL</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">NATION-STATE · IRAN (IRGC-CEC) · ACTIVE SINCE 2020</div>
+          <div class="lib-card-desc">One or two sentence summary of the actor and their most significant activity.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: YYYY-MM-DD</span>
+            <span class="open">OPEN PROFILE →</span>
+          </div>
+        </div>
+      </a>
+      -->
+
+      <!-- ↓↓↓ AGENT-MAINTAINED ACTOR CARDS BEGIN ↓↓↓ -->
+
+      <a class="lib-card" href="output/2026-08-29_LAPSUS.html"
+         data-name="LAPSUS$"
+         data-type="ecrime"
+         data-tags="LAPSUS scattered spider shinyhunters scattered-lapsus-hunters the-com extortion vishing mfa-fatigue social-engineering microsoft nvidia samsung okta uber">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">LAPSUS$</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge threat-high">HIGH</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">ECRIME · INDEPENDENT COLLECTIVE (THE COM) · ACTIVE SINCE MID-2021</div>
+          <div class="lib-card-desc">Loosely organized eCrime extortion collective that breached Microsoft, Nvidia, Samsung, and Okta in 2022 using social engineering rather than malware, and remains active in 2026 under the "Scattered LAPSUS$ Hunters" brand.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: 2026-08-29</span>
+            <span class="open">OPEN PROFILE →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- ↑↑↑ AGENT-MAINTAINED ACTOR CARDS END ↑↑↑ -->
+
+    </div>
+    <div class="empty-state" id="actor-empty" style="display:none">// NO ACTOR PROFILES ON FILE</div>
+  </div>
+
+  <!-- ── INCIDENT CASE FILES ── -->
+  <div class="lib-section" id="section-incidents">
+    <div class="lib-section-header">
+      <span class="lib-section-icon" style="color:var(--gold)">◈</span>
+      <span class="lib-section-title gold">Incident Case Files</span>
+      <span class="lib-section-count" id="incident-section-count"></span>
+    </div>
+    <div class="card-grid" id="incident-grid">
+      <!-- INCIDENT CARDS — agent maintains this block -->
+      <!-- FORMAT:
+      <a class="lib-card incident" href="output/incidents/YYYY-MM-DD_INCIDENT-NAME.html"
+         data-name="INCIDENT NAME"
+         data-type="nation-state|ecrime|ics|worm|ransomware"
+         data-tags="KEYWORD KEYWORD KEYWORD">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">INCIDENT NAME</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge type">NATION-STATE ESPIONAGE</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">DATE RANGE · ATTRIBUTED TO: ACTOR NAME · DWELL TIME: X DAYS</div>
+          <div class="lib-card-desc">One or two sentence summary of what happened and why it matters.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: YYYY-MM-DD</span>
+            <span class="open">OPEN CASE FILE →</span>
+          </div>
+        </div>
+      </a>
+      -->
+
+      <!-- ↓↓↓ AGENT-MAINTAINED INCIDENT CARDS BEGIN ↓↓↓ -->
+
+      <a class="lib-card incident" href="output/incidents/2026-08-29_MORRIS-WORM.html"
+         data-name="Morris Worm"
+         data-type="worm"
+         data-tags="morris worm 1988 robert tappan morris cfaa internet-worm self-propagating cornell mit">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">Morris Worm</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge type">WORM / SELF-PROPAGATING</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">1988-11-02 TO 1988-11-04 · ATTRIBUTED TO: ROBERT TAPPAN MORRIS · DWELL TIME: HOURS</div>
+          <div class="lib-card-desc">The first self-propagating worm to achieve mass spread across the early Internet, infecting ~6,000 of ~60,000 connected hosts in under 24 hours and producing the first felony conviction under the CFAA.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: 2026-08-29</span>
+            <span class="open">OPEN CASE FILE →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- ↑↑↑ AGENT-MAINTAINED INCIDENT CARDS END ↑↑↑ -->
+
+    </div>
+    <div class="empty-state" id="incident-empty" style="display:none">// NO INCIDENT CASE FILES ON FILE</div>
+  </div>
+
+</div><!-- end main -->
+
+<!-- ═══════════════════════ FOOTER ══ -->
+<div class="site-footer">
+  <div>// CTI LIBRARY · snowpirate/cti-cards · GitHub Pages</div>
+  <div id="footer-updated"></div>
+  <div>All products TLP:CLEAR unless marked otherwise · DRAFT — requires human review before dissemination</div>
+</div>
+
+<script>
+  // ── COUNT & INIT ──
+  function updateCounts() {
+    const actors    = document.querySelectorAll('#actor-grid .lib-card').length;
+    const incidents = document.querySelectorAll('#incident-grid .lib-card').length;
+    document.getElementById('actor-count').textContent    = actors;
+    document.getElementById('incident-count').textContent = incidents;
+    document.getElementById('actor-section-count').textContent    = actors + ' PROFILES';
+    document.getElementById('incident-section-count').textContent = incidents + ' CASES';
+    document.getElementById('actor-empty').style.display    = actors    === 0 ? 'block' : 'none';
+    document.getElementById('incident-empty').style.display = incidents === 0 ? 'block' : 'none';
+    updateFilterCount();
+  }
+
+  // ── FILTER COUNT ──
+  function updateFilterCount() {
+    const visible = document.querySelectorAll('.lib-card:not(.hidden)').length;
+    const total   = document.querySelectorAll('.lib-card').length;
+    document.getElementById('filter-count').textContent =
+      visible === total ? total + ' CARDS' : visible + ' / ' + total + ' CARDS';
+  }
+
+  // ── SEARCH ──
+  document.getElementById('search').addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.lib-card').forEach(card => {
+      const name = (card.dataset.name || '').toLowerCase();
+      const tags = (card.dataset.tags || '').toLowerCase();
+      const text = card.textContent.toLowerCase();
+      card.classList.toggle('hidden', q !== '' && !name.includes(q) && !tags.includes(q) && !text.includes(q));
+    });
+    updateFilterCount();
+  });
+
+  // ── FILTER CHIPS ──
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      const f = this.dataset.filter;
+      document.getElementById('search').value = '';
+      document.querySelectorAll('.lib-card').forEach(card => {
+        if (f === 'all') {
+          card.classList.remove('hidden');
+        } else if (f === 'actor') {
+          card.classList.toggle('hidden', card.classList.contains('incident'));
+        } else if (f === 'incident') {
+          card.classList.toggle('hidden', !card.classList.contains('incident'));
+        } else {
+          const t = (card.dataset.type || '') + ' ' + (card.dataset.tags || '');
+          card.classList.toggle('hidden', !t.toLowerCase().includes(f));
+        }
+      });
+      updateFilterCount();
+    });
+  });
+
+  // ── FOOTER DATE ──
+  document.getElementById('footer-updated').textContent =
+    'LAST UPDATED: ' + new Date().toISOString().slice(0,10).replace(/-/g,'-');
+
+  updateCounts();
+</script>
+</body>
+</html>
