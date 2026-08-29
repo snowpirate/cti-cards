@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Morris Worm — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-19881102-MORRIS<br/>
+    NOV 2–4, 1988
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Worm / Self-Propagating</div>
+  <h1><span class="gold">MORRIS</span> WORM</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-29 &nbsp;|&nbsp; INCIDENT DATE: 1988-11-02 to 1988-11-04 &nbsp;|&nbsp;
+    SOURCES: FBI · Purdue CERIAS · U.S. Federal Court Records · Wikipedia · Dark Reading · Rapid7 · LLNL
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>Worm / Self-Propagating</span></div>
+    <div>Attribution: <span class="green">ROBERT T. MORRIS [HIGH]</span></div>
+    <div>Severity: <span class="red">HIGH (Historical)</span></div>
+    <div>Era: <span>Pre-CERT / Pre-ATT&amp;CK</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise (Retrospective)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">~6,000</div>
+    <div class="stat-label">Hosts Infected (~10% of the Internet)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">$100K–$10M</div>
+    <div class="stat-label">GAO Damage Estimate Range (USD)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">48–72 HRS</div>
+    <div class="stat-label">Time to Widespread Eradication</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">1ST</div>
+    <div class="stat-label">Felony Conviction Under the U.S. CFAA (1986)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="none">No companion actor card on file — single-perpetrator historical incident, not a tracked MITRE G-ID or ongoing cluster</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">The Morris Worm ("Internet Worm of 1988")</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">1988-11-02 (~20:30 ET launch) to 1988-11-04/05 (eradication)</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Worm / Self-Propagating</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Robert Tappan Morris (individual, Cornell University graduate student)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">HIGH</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Internet-connected VAX (BSD 4.2/4.3) and Sun-3 Unix hosts, untargeted</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">~6,000 of ~60,000 hosts then connected to the Internet</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">1988-11-02, evening — abnormal load/process counts noticed independently at multiple sites</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Distributed — Berkeley, MIT, Purdue, Harvard system staff (near-simultaneous)</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">Hours, not days — self-limiting due to resource exhaustion, not stealth</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Denial of service via uncontrolled process reinfection; no data destruction</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise — retrospective mapping</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">N/A — predates ATT&amp;CK (2013); no G-ID/C-ID assigned</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Minimal — pre-dates domain-based C2; see Section 06</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On the evening of November 2, 1988, a self-replicating program was released onto the fledgling Internet from a computer at the Massachusetts Institute of Technology. Within roughly 24 hours it had propagated to an estimated 6,000 of the network's approximately 60,000 connected hosts — around one in ten of every machine then online (FBI, 2018; Tom's Hardware, 2025). It was written by Robert Tappan Morris, a 23-year-old Cornell University graduate student, and it remains the first worm to achieve mass, self-propagating spread across the Internet and the first cyber incident to draw sustained mainstream media coverage.</p>
+      <p>The worm carried no destructive payload — it did not delete files, steal data, or install a backdoor for later use. Its damage was almost entirely a side effect of a coding error: a reinfection-suppression check that Morris built to make the worm resilient against defenders faking infection status was miscalibrated, causing many hosts to run dozens of simultaneous worm processes until they exhausted memory and process-table capacity and ground to a halt (Kaspersky, 2013; Medium/Marmik Soni). What began as, by Morris's own account relayed through a friend to a reporter, an attempt to gauge the size of the Internet became a network-wide denial-of-service event.</p>
+      <p>The incident matters today less for its payload than for what it exposed and what it built. It demonstrated — for the first time, at scale — that a handful of chained software flaws and sloppy trust configurations could bring down a meaningful fraction of a national research network in hours, with no human operator directing each intrusion. It is also the founding case of modern cyber-incident response: DARPA's direct response was to fund the creation of the CERT Coordination Center at Carnegie Mellon's Software Engineering Institute within the month (Group-IB; Wikipedia, "CERT Coordination Center"), and the ensuing federal prosecution of Morris became the first test of the 1986 Computer Fraud and Abuse Act (CFAA) in a U.S. courtroom (Justia, <em>United States v. Morris</em>, 928 F.2d 504 (2d Cir. 1991)).</p>
+      <p>Nearly four decades on, the Morris Worm remains a mandatory case study in security curricula because its component techniques — public-facing service exploitation, credential reuse across trusted hosts, unsanitized-buffer memory corruption, and self-propagation without operator control — are still the load-bearing techniques behind worms studied today, from Code Red and SQL Slammer through WannaCry and NotPetya. This card treats it as a historical case file: a fully public-record incident with no ongoing operational relevance to detection engineering, but significant instructional and doctrinal relevance to how the security field organizes itself.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>In November 1988 the Internet was still substantially the ARPANET/NSFNET research and academic community — roughly 60,000 hosts, dominated by university, government-laboratory, and defense-contractor systems, most running variants of BSD Unix on DEC VAX and Sun-3 hardware (LLNL, "1988 Morris Worm"). Administrative culture across this community assumed good faith among peers: `.rhosts` and `/etc/hosts.equiv` trust files routinely granted password-free remote shell access between machines on the reasonable-at-the-time premise that everyone on the network was a known, cooperative researcher.</p>
+      <p>Several of the flaws the worm exploited were already informally known within the systems community before November 1988. Sendmail's DEBUG command — a legacy diagnostic hook left enabled in most production installations — had circulated as a known weak point; the finger daemon's unchecked use of the C library's `gets()` function was a common, unremarked pattern rather than a recognized vulnerability class, since the stack-smashing buffer-overflow technique it enabled had not yet been formally documented or widely understood as an attack primitive (Rapid7, 2019). No CVE system existed (it would not be created until 1999), no CERT existed, and no standing incident-coordination channel existed between institutions — vulnerability information, where it existed at all, moved informally through mailing lists and personal contacts.</p>
+      <p>There is no evidence of any pre-incident indicator specific to this event: no prior reconnaissance reports, no threat reporting, and no warning that a worm of this kind was imminent. The closest analog was general professional awareness, expressed informally among systems staff, that the trust model underpinning `rsh`/`rexec` and the persistence of legacy debug hooks in production mail software were latent risks — risks nobody had yet been forced to reckon with operationally.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Host Enumeration</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">On each newly compromised host, the worm harvested lists of candidate next-hop targets using entirely legitimate, unlogged local information: the contents of <strong>/etc/hosts.equiv</strong> and users' <strong>.rhosts</strong> files (trusted-host relationships), <strong>/etc/passwd</strong> (account names for password guessing), and interface/routing information reachable via standard Unix utilities such as <strong>netstat</strong>. No component of this process resembled what would later be recognized as reconnaissance activity, and 1988-era Unix systems had no baseline logging of local file reads that could have flagged it after the fact.</div>
+        <div class="kc-pivot"><em>Host lists harvested here fed directly into the next compromise attempt, giving the worm a self-renewing target queue on every machine it touched.</em></div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Initial Access — Multi-Vector Exploitation</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">The worm attempted three independent entry paths against each candidate host, trying whichever succeeded first. It sent a crafted SMTP session to <strong>sendmail</strong> that abused the program's non-standard DEBUG command to pipe a shell command directly into the mail daemon, bypassing normal message delivery. In parallel, it targeted the <strong>fingerd</strong> daemon with a 536-byte input against a 512-byte fixed stack buffer read via the unsafe C function <strong>gets()</strong>, overflowing the buffer and hijacking execution to run injected shellcode — one of the first documented real-world exploitations of a stack buffer overflow (Rapid7, 2019). Where neither service was vulnerable, it fell back to <strong>rsh</strong>, relying on harvested `.rhosts`/`hosts.equiv` trust relationships to execute commands with no authentication at all. None of these techniques produced any alert; intrusion detection did not yet exist as a discipline, and none of the three services logged failed or successful use in a way any site was actively reviewing.</div>
+        <div class="kc-pivot"><em>A successful exploit against any of the three vectors handed the worm a remote shell, which it used to bootstrap and compile its full payload on the new host.</em></div>
+      </div>
+
+      <div class="kc-phase visible">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Bootstrap, Credential Harvesting &amp; Lateral Propagation</span>
+          <span class="vis-badge vis-unreviewed">VISIBLE — UNREVIEWED</span>
+        </div>
+        <div class="kc-body">Once it had shell access, the worm transferred a small 99-line bootstrap program (the "grappling hook," <strong>l1.c</strong>) to the target, compiled it locally with the host's own C compiler, and used it to pull across the main worm binaries — pre-built object code for both VAX and Sun-3 architectures, since the worm could not know in advance which platform it had landed on. In parallel with propagation, each worm instance ran a password-cracking routine against the local <strong>/etc/passwd</strong> file using a built-in 432-word dictionary plus permutations of usernames and real names; roughly one in three passwords on a typical host fell to this simple approach (Appcanary, "A tale of two worms"). Cracked credentials were then reused against <strong>rexec</strong> on other hosts on the reasonable bet — validated repeatedly — that users reused passwords across machines. Elevated CPU load, unusual outbound connection attempts on ports 25 (SMTP), 79 (finger), and 512/514 (exec/shell), and rising process counts were all technically observable during this phase, but no site was monitoring for exactly this pattern, and the activity was mistaken for a local performance problem at several institutions before it was understood as a network-wide event.</div>
+        <div class="kc-pivot"><em>Every successful crack and every successful lateral hop multiplied the worm's active process count exponentially across the connected research network.</em></div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Uncontrolled Reinfection &amp; Denial of Service</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Morris had built a check so the worm would recognize a host it had already infected and, most of the time, decline to reinfect it — intended to limit runaway spread and to blunt a defensive trick of running a fake worm process to repel the real one. That check was deliberately set to fail roughly one time in seven so the worm could not be trivially shut out; in practice this rate was far too high, and hosts routinely ended up running dozens of simultaneous worm processes, each independently scanning, cracking, and forking (Kaspersky, 2013; Grokipedia, "Robert Tappan Morris"). Machines slowed to a crawl or became entirely unresponsive as process tables and swap space filled. This was the point at which the incident became unmistakably visible: administrators at Berkeley, MIT, Harvard, and elsewhere independently noticed the same symptoms within hours of each other the night of November 2–3 and began comparing notes. A Harvard systems programmer, Andy Sudduth, posted an anonymous warning with mitigation steps to a mailing list just after midnight, but it was delayed roughly two days after the gateway carrying it was itself shut down as a containment measure — an inadvertent illustration of how fragile the community's coordination channels still were (eWeek, "Who Let The Worms Out?").</div>
+        <div class="kc-pivot"><em>Recognition that this was a single coordinated event, not scattered local outages, triggered emergency reverse-engineering efforts at multiple institutions simultaneously.</em></div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Community Response &amp; Eradication</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Teams at UC Berkeley and MIT captured and disassembled the worm binary overnight; Berkeley engineers had workable containment steps — disabling the sendmail DEBUG command, patching fingerd, and renaming compilers to deny the worm a build toolchain — within roughly twelve hours (MIT CSAIL, "The Robert Morris Internet Worm"). Purdue's Eugene Spafford independently produced what became the definitive technical dissection, <em>The Internet Worm Program: An Analysis</em> (Purdue CSD-TR-823), within weeks. Many sites disconnected from the network entirely as an emergency containment measure while patches were distributed informally by email and word of mouth — itself constrained since sendmail, the primary channel for such distribution, was the very service under attack. RFC 1135 subsequently reported the worm eliminated from most affected hosts within roughly 48 to 72 hours of the initial outbreak.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>All cells retrospective — incident predates ATT&amp;CK (2013) by 25 years</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1592</div>
+        <div class="mitre-name">Gather Victim Host Information</div>
+        <div class="mitre-note">[HIGH] Enumerated .rhosts, /etc/hosts.equiv, and /etc/passwd on each compromised host to build the next wave of targets.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Chained the sendmail DEBUG command and a fingerd stack buffer overflow (gets() over-read) as two independent remote code execution vectors.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">[HIGH] Used cracked credentials via rexec on the assumption of password reuse across hosts, in lieu of exploit where trust files were absent.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1110.002</div>
+        <div class="mitre-name">Brute Force: Password Cracking</div>
+        <div class="mitre-note">[HIGH] Offline dictionary attack against /etc/passwd using a built-in 432-word list plus username/real-name permutations; cracked roughly one-third of accounts on a typical host.</div>
+      </div>
+
+      <div class="mitre-cell blue">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021</div>
+        <div class="mitre-name">Remote Services</div>
+        <div class="mitre-note">[HIGH] Abused rsh trust relationships (.rhosts / hosts.equiv) to execute commands on peer hosts with no authentication.</div>
+      </div>
+
+      <div class="mitre-cell blue">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.004</div>
+        <div class="mitre-name">Unix Shell</div>
+        <div class="mitre-note">[HIGH] Used /bin/sh on the target to compile and launch the transferred bootstrap program (l1.c, the "grappling hook") and subsequent worm binaries.</div>
+      </div>
+
+      <div class="mitre-cell blue">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1105</div>
+        <div class="mitre-name">Ingress Tool Transfer</div>
+        <div class="mitre-note">[HIGH] Pulled pre-compiled worm object files for both VAX and Sun-3 architectures across the exploited connection, since target architecture was unknown in advance.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">[MEDIUM] Encrypted internal strings, zeroed argv[0], and periodically forked/renamed its own process (e.g., to "sh") to blend into normal process listings.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1070.004</div>
+        <div class="mitre-name">Indicator Removal: File Deletion</div>
+        <div class="mitre-note">[MEDIUM] Unlinked its own source and intermediate object files from disk immediately after compilation to minimize forensic artifacts.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1499</div>
+        <div class="mitre-name">Endpoint Denial of Service</div>
+        <div class="mitre-note">[HIGH] A miscalibrated 1-in-7 reinfection-suppression check caused uncontrolled process proliferation, exhausting CPU, memory, and process-table capacity on infected hosts.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">RECONNAISSANCE<br/>MISSED</div>
+        <div class="pm-detail"><strong>No detection was possible in principle.</strong> 1988-era Unix systems had no standard mechanism for logging reads of .rhosts, hosts.equiv, or /etc/passwd, and no site had any concept of "reconnaissance" as a distinct, alertable phase. This gap was not a process failure so much as a discipline that did not yet exist.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">INITIAL ACCESS<br/>MISSED</div>
+        <div class="pm-detail">The sendmail DEBUG command and fingerd's unbounded gets() call had circulated informally as risky within the systems community, but <strong>neither had been treated as an active vulnerability requiring urgent patching</strong> before November 1988 — there was no coordinated disclosure process, no CVE identifiers, and no vendor patch-notification channel to act on informal awareness even if it had been taken seriously.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">PROPAGATION<br/>PARTIALLY DETECTED</div>
+        <div class="pm-detail">Elevated load and process counts were observed by administrators at multiple sites within hours, but <strong>initial coordination failed</strong>: several institutions first treated the symptoms as a local performance issue, and Andy Sudduth's mailing-list warning was delayed roughly two days after the relay gateway carrying it was shut down as an (understandable, if unlucky) containment measure — a direct illustration of how thin cross-institutional incident coordination still was.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">DARPA directed and funded the creation of the <strong>CERT Coordination Center</strong> at Carnegie Mellon's Software Engineering Institute within weeks of the outbreak, establishing the first standing, cross-institutional body for coordinating vulnerability disclosure and incident response — the direct ancestor of every national CERT/CSIRT operating today.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">Sendmail's DEBUG feature was disabled by default in subsequent releases, unbounded gets()-style buffer handling began to be recognized as a defect class worth auditing for (though systematic stack-smashing exploitation research would not mature until the mid-1990s), and the incident materially accelerated professional interest in eliminating default password-free .rhosts/hosts.equiv trust configurations and enforcing stronger password policy.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Morris Worm (l1.c bootstrap + main worm binary)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">WORM</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Two-stage: a 99-line C "grappling hook" bootstrap (l1.c) compiled in place on each newly compromised host, which then pulled down pre-built worm object files for both VAX (BSD 4.2/4.3) and Sun-3 architectures — the worm shipped both since it could not determine target architecture in advance. Encrypted internal string constants, deleted its own source/object files post-compile, and periodically forked and renamed its process image to resist casual process-list inspection. No network C2; propagation and control were entirely peer-to-peer over exploited services.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Sendmail DEBUG Command Abuse</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">VULNERABILITY (PRE-CVE)</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">A non-standard debugging hook in sendmail allowed a remote SMTP session to pipe a message body directly into a shell rather than delivering it as mail, giving remote code execution with no authentication. Predates the CVE system (est. 1999); fixed by disabling DEBUG in default sendmail configurations following the incident.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">fingerd Stack Buffer Overflow</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">VULNERABILITY (PRE-CVE)</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">fingerd read network input with the unbounded C library function gets(), which performs no bounds checking. A crafted 536-byte input overflowed the daemon's 512-byte fixed stack buffer on VAX/BSD targets, overwriting the return address to redirect execution into worm-supplied shellcode — one of the first practical, in-the-wild exploitations of a stack-smashing buffer overflow, years before the technique was formally documented (e.g., Aleph One, 1996).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">.rhosts / hosts.equiv Trust Abuse (rsh/rexec)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">TRUST MISCONFIGURATION</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Not a software bug but a systemic Unix administrative pattern: hosts and users routinely granted each other password-free remote shell access via .rhosts and /etc/hosts.equiv. The worm harvested and exploited these files directly, and separately reused cracked passwords against rexec on the assumption — repeatedly validated — that users reused credentials across machines.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are archival. The worm predates domain-based C2 entirely and used no persistent infrastructure. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">PROTOCOL</td><td class="val historical">Anomalous SMTP session on TCP/25 invoking sendmail DEBUG mode with a shell-command payload in place of a recipient address</td><td>Purdue CSD-TR-823 (Spafford)</td><td>1988</td></tr>
+          <tr><td class="type-label">PROTOCOL</td><td class="val historical">Oversized (536-byte) request to finger daemon on TCP/79, exceeding the 512-byte input buffer</td><td>Rapid7 Blog</td><td>2019 (retrospective)</td></tr>
+          <tr><td class="type-label">PROTOCOL</td><td class="val historical">Unauthenticated rsh/rexec connections on TCP/512 and TCP/514 from hosts not previously observed in that trust relationship</td><td>MIT CSAIL Archive</td><td>1988</td></tr>
+          <tr><td class="type-label">BEHAVIORAL</td><td class="val historical">Sudden proliferation of multiple concurrently running, near-identical child processes (periodically renamed, e.g. to "sh") consuming CPU/memory on a single host</td><td>Purdue CSD-TR-823 (Spafford)</td><td>1988</td></tr>
+          <tr><td class="type-label">FILE</td><td class="val historical">Transient files named "l1.c" (bootstrap source, self-deleted post-compile) observed during early forensic capture at Berkeley/MIT</td><td>MIT CSAIL Archive</td><td>1988</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No IP addresses or domains are recorded as IOCs — the worm used no command-and-control infrastructure and propagated host-to-host directly over the exploited services above.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">No nation-state or geopolitical dimension — this was an individual actor's unintentional escalation, not state action. Its strategic significance was domestic and institutional: it prompted U.S. congressional hearings and a General Accounting Office (GAO) review, and became the founding case for treating network security as a matter requiring standing federal-adjacent coordination rather than ad hoc, per-institution response (DARPA's creation of CERT/CC).</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body"><strong>CERT Coordination Center</strong> established at Carnegie Mellon SEI, becoming a founding member of FIRST and the template for national CERTs worldwide. Sendmail's DEBUG mode disabled by default; fingerd's unbounded gets() usage flagged for remediation. The incident is widely credited as the catalytic event for the emergence of computer security as a distinct professional and academic discipline, and for early recognition of buffer overflows and credential/trust abuse as attack classes.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">Robert Morris became the <strong>first person convicted under the Computer Fraud and Abuse Act of 1986</strong> (<em>United States v. Morris</em>, 928 F.2d 504, 2d Cir. 1991), sentenced to three years' probation, 400 hours of community service, and a $10,050 fine — no jail time. The case established early judicial interpretation of "unauthorized access" under the CFAA and is frequently cited in subsequent CFAA litigation and the statute's 1994/1996 amendments broadening its scope.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: HIGH</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Robert Tappan Morris</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">None — individual actor, no state or organizational sponsorship</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Yes — federal indictment and jury conviction, upheld on appeal</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">United States v. Morris, indicted 1989, convicted 1990, affirmed 2d Cir. 1991</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file — see Section 00</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Binary disassembly traced to Morris's Cornell account; source-code stylistic analysis (Spafford, Purdue CSD-TR-823); Morris's own account relayed via a friend to a journalist prior to arrest; trial testimony and physical evidence</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">None on authorship. The genuine dispute at trial was over <em>intent</em> — whether Morris intended the worm's runaway resource-exhaustion effect, or only its release and self-propagation; the jury and appellate court found the CFAA did not require intent to cause the specific harm, only intent to access computers without authorization</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Not applicable — attribution is settled by conviction, contemporaneous forensic analysis, and the actor's own account; no plausible alternative-actor hypothesis exists in the public record</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution in this case is unusually solid for a 1988-era incident precisely because it was resolved through a formal judicial process rather than inferred from technical artifacts alone. Berkeley and MIT teams traced the worm's origin to a Cornell account within days via disassembly and network logs; Eugene Spafford's Purdue report added independent stylistic analysis of the code. Morris was identified publicly within about a week, indicted in 1989, and convicted in 1990 in a verdict upheld on appeal in 1991. The only genuinely contested question — settled by the court, not left open in the historical record — was whether Morris's culpability under the CFAA required him to have intended the scale of damage the worm caused, given his stated purpose was to measure the Internet's size rather than disable it. The court held that intent to gain unauthorized access was sufficient; intent to cause the resulting damage was not required for conviction.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The Morris Worm is taught not because its techniques remain operationally relevant — sendmail DEBUG and unauthenticated .rhosts trust have been extinct for decades — but because it is the first complete demonstration, at national-network scale, of a pattern that has recurred in every major worm event since: chained exploitation of ordinary software defects and administrative trust assumptions, combined with self-propagation logic that outran its author's ability to control it. Code Red (2001), SQL Slammer (2003), Conficker (2008), and WannaCry (2017) each reproduce this same basic shape — technical vulnerability plus uncontrolled replication logic producing damage disproportionate to the author's stated or apparent intent.</p>
+      <p>It is also the founding case of institutional incident response. Before November 1988, there was no standing body responsible for coordinating a cross-organizational response to a network-wide security event; DARPA's creation of the CERT Coordination Center in direct response to this incident established the template — now replicated as national CERTs/CSIRTs worldwide — for how the security community organizes vulnerability disclosure, incident coordination, and community alerting. The worm's exploitation of ambient, unauthenticated trust between "cooperative" hosts is also frequently cited as an early, informal argument for what would later be formalized as Zero Trust architecture: the assumption that a host's mere presence on a private or academic network implies it should be trusted was directly falsified by this incident.</p>
+      <p>Finally, <em>United States v. Morris</em> is the foundational case in U.S. computer-crime law. It was the first prosecution and conviction under the CFAA, and its holding on intent — that a defendant need not have intended the specific harm caused, only the unauthorized access itself — shaped how the statute has been applied (and criticized) in every major CFAA case since, from <em>United States v. Nosal</em> to the ongoing debate over the statute's scope in security research and red-teaming contexts. A case study built on a single accidental incident from 1988 remains, unusually, still load-bearing for how the field defines its central crime today.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/history/cases-and-criminals/morris-worm" target="_blank">Morris Worm — Case File</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/news/stories/morris-worm-30-years-since-first-major-attack-on-internet-110218" target="_blank">The Morris Worm: 30 Years Since First Major Attack on Internet</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Purdue CERIAS</div>
+        <div>
+          <div class="ref-detail"><a href="https://spaf.cerias.purdue.edu/tech-reps/823.pdf" target="_blank">Eugene H. Spafford, "The Internet Worm Program: An Analysis," Purdue Technical Report CSD-TR-823</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 1988</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">UNC / Donn Seely</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cs.unc.edu/~jeffay/courses/nidsS05/attacks/seely-RTMworm-89.html" target="_blank">Donn Seely, "A Tour of the Worm"</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 1989</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Justia / U.S. Courts</div>
+        <div>
+          <div class="ref-detail"><a href="https://law.justia.com/cases/federal/appellate-courts/F2/928/504/452673/" target="_blank">United States v. Robert Tappan Morris, 928 F.2d 504 (2d Cir. 1991)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Morris_worm" target="_blank">Morris Worm</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/United_States_v._Morris_(1991)" target="_blank">United States v. Morris (1991)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Robert_Tappan_Morris" target="_blank">Robert Tappan Morris</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/CERT_Coordination_Center" target="_blank">CERT Coordination Center</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Rapid7</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.rapid7.com/blog/post/2019/01/02/the-ghost-of-exploits-past-a-deep-dive-into-the-morris-worm/" target="_blank">The Ghost of Exploits Past: A Deep Dive into the Morris Worm</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/cyberattacks-data-breaches/25-years-after-the-legacy-of-the-morris-internet-worm" target="_blank">25 Years After: The Legacy of the Morris Internet Worm</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/vulnerabilities-threats/the-morris-worm-turns-30" target="_blank">The Morris Worm Turns 30</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Tom's Hardware</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.tomshardware.com/tech-industry/cyber-security/on-this-day-in-1988-the-morris-worm-slithered-out-and-sparked-a-new-era-in-cybersecurity-10-percent-of-the-internet-was-infected-within-24-hours" target="_blank">On This Day in 1988: The Morris Worm Slithered Out and Sparked a New Era in Cybersecurity</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">LLNL</div>
+        <div>
+          <div class="ref-detail"><a href="https://st.llnl.gov/news/look-back/1988-morris-worm-internets-first-cyberattack" target="_blank">The 1988 Morris Worm, the Internet's First Cyberattack</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">eWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.eweek.com/security/who-let-the-worms-out/" target="_blank">Who Let The Worms Out?</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MIT CSAIL</div>
+        <div>
+          <div class="ref-detail"><a href="https://groups.csail.mit.edu/mac/classes/6.805/articles/morris-worm.html" target="_blank">The Robert Morris Internet Worm</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Kaspersky</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.kaspersky.com/blog/morris-worm-turns-25/3065/" target="_blank">Morris Worm Turns 25</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Appcanary</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.appcanary.com/2016/tale-of-two-worms.html" target="_blank">A Tale of Two Worms, Three Vulnerabilities, and One National Security Agency</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 19 sources, all publicly available</div>
+  <div>No companion actor card · Attribution confidence: HIGH · ATT&amp;CK: 10 techniques, all retrospective</div>
+</div>
+
+</body>
+</html>
