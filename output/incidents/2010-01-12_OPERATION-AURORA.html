@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Operation Aurora — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-20100112-AURORA<br/>
+    MID-2009 – JAN 2010
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Nation-State Cyber Espionage / Zero-Day Intrusion Campaign</div>
+  <h1><span class="gold">OPERATION</span> AURORA</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-29 &nbsp;|&nbsp; INCIDENT DATE: MID-2009 (initial intrusions) to 2010-01-12 (public disclosure) &nbsp;|&nbsp;
+    SOURCES: Google Official Blog · McAfee Labs · Symantec · MITRE ATT&amp;CK (G0066) · Dark Reading · Wired · The New York Times · CFR Cyber Operations Tracker · Wikipedia · SecurityWeek · Security Affairs · CVE/NVD records
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>Nation-State Cyber Espionage — Zero-Day Intrusion Campaign</span></div>
+    <div>Attribution: <span class="gold">ELDERWOOD GROUP (CHINA-NEXUS) [MEDIUM]</span></div>
+    <div>Severity: <span class="red">CRITICAL (Historical)</span></div>
+    <div>Era: <span>Pre-ATT&amp;CK / Early Public-Attribution Era</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise (Retrospective)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">34+</div>
+    <div class="stat-label">Organizations Reportedly Targeted Across Tech, Defense &amp; Chemical Sectors</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">CVE-2010-0249</div>
+    <div class="stat-label">Zero-Day Internet Explorer Use-After-Free Exploited As Entry Vector</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">~6 Months</div>
+    <div class="stat-label">Estimated Attacker Presence In Google's Network Prior To Detection</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">2010</div>
+    <div class="stat-label">Year Google Withdrew Censored Search From Mainland China</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="none">No companion actor card on file — tracked as MITRE ATT&amp;CK G0066 "Elderwood"; attribution confidence MEDIUM, has not reached indictment-level certainty</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">Operation Aurora</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Mid-2009 (initial intrusions) – 2010-01-12 (Google's public disclosure)</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Nation-State Cyber Espionage / Zero-Day Intrusion Campaign</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Elderwood Group (aka Beijing Group, Elderwood Gang, Sneaky Panda) — assessed China-nexus</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">MEDIUM — compelling circumstantial and technical evidence; never reached indictment-level certainty</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Google Inc. corporate infrastructure (source code, Gaia SSO system, Gmail activist accounts); 30+ additional companies</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">20 confirmed in Google's initial disclosure; subsequent reporting places the total at 30–34+ organizations</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">Mid-December 2009 (approx. Dec 14) — anomalous access detected on Google's internal network</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Google's internal security team; McAfee Labs engaged during incident response and named the campaign</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">Estimated several months — activity reportedly began mid-2009, undetected until December</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Theft of intellectual property/source code; attempted compromise of Gmail accounts of Chinese human-rights activists; Google's exit from mainland Chinese search</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise (Retrospective) — predates ATT&amp;CK's 2013 introduction</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">Not catalogued as a distinct Campaign — tracked at group level only (G0066, Elderwood)</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">C2 infrastructure and file hashes from 2009–2010 are long defunct; retained for research/retrospective value only</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On January 12, 2010, Google took an extraordinary step for the era: it published a blog post stating that it — along with at least 20 other major companies — had been the target of "a highly sophisticated and targeted attack on our corporate infrastructure originating from China" (Google Official Blog, Jan 2010). The intrusion, later dubbed "Operation Aurora" by McAfee Labs after a file-path string ("Aurora") found embedded in the attackers' binaries (McAfee Labs, Jan 2010), had begun months earlier and gone undetected until Google's internal security team noticed anomalous access to corporate systems in mid-December 2009.</p>
+      <p>The attackers' objectives were twofold and, in retrospect, unusually candid about intent: steal intellectual property, and gain access to the Gmail accounts of Chinese human-rights activists. Google stated that source code had been accessed and that at least two Gmail accounts saw unauthorized access limited to header and account-creation-date metadata rather than message content (Google Official Blog, Jan 2010). Reporting later indicated that among the systems reached was Gaia, Google's single sign-on authentication infrastructure — a target whose compromise would have carried implications well beyond one company's stolen code.</p>
+      <p>Operation Aurora is remembered less for technical novelty — a spear-phish/instant-message lure delivering an Internet Explorer zero-day (CVE-2010-0249) was sophisticated for its time but not unprecedented — than for what its disclosure broke open. It was one of the first instances of a major U.S. technology company publicly and directly attributing an intrusion to China rather than quietly remediating, and it used that disclosure to justify a consequential business decision: ending censorship of search results on google.cn and, in effect, withdrawing from operating a censored search engine on the mainland.</p>
+      <p>The campaign is attributed with medium confidence to a persistent China-based espionage cluster later named "Elderwood" by Symantec (from a source-code variable it used), and independently tracked as the "Beijing Group" by Dell SecureWorks and "Sneaky Panda" by CrowdStrike — now catalogued by MITRE ATT&amp;CK as G0066. That same infrastructure and tradecraft reportedly persisted for years afterward, targeting defense contractors, NGOs, and supply-chain software vendors, meaning Aurora was not an isolated event but the first publicly visible instance of an operation that continued long after Google made it famous.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Google's censored Chinese search engine, google.cn, had operated since 2006 under an arrangement with Beijing that drew sustained criticism from free-speech and human-rights advocates in the U.S. Congress and abroad. That tension was already live for Google well before December 2009; the discovery that the same intrusion had targeted Gmail accounts belonging to Chinese human-rights activists gave the company both a security rationale and a values-based one to revisit the arrangement (Google Official Blog, Jan 2010).</p>
+      <p>Internet Explorer 6 remained the dominant enterprise browser in 2009–2010 despite being eight years old and carrying substantial accumulated legacy vulnerabilities, and "advanced persistent threat" was a term barely a few years into public use (popularized by U.S. Air Force officials around 2006). The notion that a nation-state might run a sustained, multi-victim espionage campaign against private industry — rather than against government or military targets — was still met with public skepticism ahead of Google's disclosure. Commercial antivirus of the era was overwhelmingly signature-based and had no meaningful visibility into a novel zero-day payload like Hydraq.</p>
+      <p>Retrospective research published by Symantec in 2012 ("The Elderwood Project") found forensic evidence tying the same toolset and delivery infrastructure used in Aurora to intrusions predating the Google case by as much as three years, indicating the cluster later blamed for Aurora had likely been operating against other, undisclosed victims well before it became famous. None of that earlier activity had been publicly connected until Google's disclosure prompted retrospective threat-hunting across other victim organizations' logs.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Targeted Lure Delivery</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Attackers approached at least one employee at a targeted organization through Microsoft Messenger instant-chat software, sending a link framed to appear as though it came from a trusted contact. Similar targeted emails and IM-based lures were used across the wider victim set, tailored per organization rather than mass-distributed (McAfee Labs, Jan 2010).</div>
+        <div class="kc-pivot">Because the lure arrived through a channel largely outside the email security controls of the time, most victim organizations had no logging or detection capability covering the initial contact.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Zero-Day Exploitation (CVE-2010-0249)</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Clicking the link directed the victim's browser — running an unpatched Internet Explorer 6, 7, or 8 — to a server hosting JavaScript that triggered a use-after-free memory-corruption flaw in IE's layout engine (<strong>mshtml.dll</strong>), achieving arbitrary code execution with no further user action required. The exploit had genuine zero-day status: no patch existed anywhere until Microsoft's out-of-band update on January 21, 2010 (Microsoft MS10-002; CVE-2010-0249).</div>
+        <div class="kc-pivot">Because this was a true zero-day, no signature- or patch-based defense could have stopped exploitation at this stage — a gap common to Elderwood's later campaigns as well, per Symantec's follow-on research.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Hydraq Backdoor Deployment &amp; Persistence</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Successful exploitation dropped and executed <strong>Trojan.Hydraq</strong> (also referred to as the "Aurora" backdoor), a data-theft trojan that established persistence by riding on the Windows <strong>svchost.exe</strong> service process, and downloaded additional components including a VNC-based module capable of streaming a live view of the victim's desktop to the attackers (Symantec, 2010). Command-and-control traffic was styled to resemble ordinary HTTP/HTTPS web traffic to blend into normal network flows.</div>
+        <div class="kc-pivot">Hydraq's persistence and evasion techniques were individually unremarkable but combined to defeat the endpoint and network monitoring typical of large enterprises at the time.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Internal Reconnaissance &amp; Lateral Movement</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Once inside, operators used harvested credentials and internal access to move toward higher-value targets — engineers and systems tied to source-code repositories. At Google specifically, reporting indicates the intrusion reached systems associated with <strong>Gaia</strong>, the company's single sign-on/password-authentication infrastructure, as well as broader source-code repositories (Wired, 2010; New York Times, 2010).</div>
+        <div class="kc-pivot">The multi-month dwell time before detection indicates lateral movement went uncaught by contemporaneous internal monitoring — Google, like most victims, discovered the intrusion after the theft had already occurred, not during it.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Exfiltration &amp; Gmail Access Attempts</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Attackers exfiltrated portions of source code from at least some victims, and separately attempted to access the Gmail accounts of Chinese human-rights activists. Google stated the Gmail-related access was limited — for two accounts, attackers appeared to have accessed only account-creation-date and subject-line metadata rather than message content (Google Official Blog, Jan 2010) — but the intent was unambiguous given the political sensitivity of the target list.</div>
+        <div class="kc-pivot">Neither the source-code theft nor the Gmail access attempts were detected as they happened; both were reconstructed after the fact during Google's investigation.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Detection &amp; Public Disclosure</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">In mid-December 2009, Google's internal security team detected anomalous activity on its corporate network and opened an investigation that, over the following weeks, uncovered the wider campaign against dozens of other companies. On January 12, 2010, Google published its findings on its official blog — an unusually direct public attribution to China for a major U.S. company at the time — and announced it would stop censoring search results on google.cn. McAfee Labs, brought in during the response, named the campaign "Operation Aurora" after a string found in the attackers' file paths.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Pre-ATT&CK incident (2009–2010); all techniques are retrospective mappings</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1591</div>
+        <div class="mitre-name">Gather Victim Org Information</div>
+        <div class="mitre-note">[MEDIUM] Identified specific employees at each target organization with access to source-code repositories or sensitive systems, enabling per-victim tailored lures rather than mass phishing.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.002</div>
+        <div class="mitre-name">Phishing: Spearphishing Link</div>
+        <div class="mitre-note">[HIGH] Delivered a malicious link via Microsoft Messenger IM (and email at other victims), framed to appear as coming from a trusted contact.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1189</div>
+        <div class="mitre-name">Drive-by Compromise</div>
+        <div class="mitre-note">[MEDIUM] Victims were redirected to an attacker-controlled site hosting the CVE-2010-0249 exploit chain, requiring only a page visit to trigger.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1203</div>
+        <div class="mitre-name">Exploitation for Client Execution</div>
+        <div class="mitre-note">[HIGH] Use-after-free vulnerability in Internet Explorer's mshtml.dll layout engine (CVE-2010-0249) achieved arbitrary code execution with no patch available at time of use.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1543.003</div>
+        <div class="mitre-name">Create or Modify System Process: Windows Service</div>
+        <div class="mitre-note">[HIGH] Trojan.Hydraq installed itself dependent on the svchost.exe service host process to survive reboots and blend with legitimate Windows services.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">[MEDIUM] Packed and encrypted the Hydraq payload and its configuration/communications to hinder static analysis and signature detection.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">[MEDIUM] Used credentials and internal access harvested post-compromise to reach source-code systems and, per reporting, components of Google's Gaia SSO infrastructure.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1071.001</div>
+        <div class="mitre-name">Application Layer Protocol: Web Protocols</div>
+        <div class="mitre-note">[HIGH] C2 traffic was styled to resemble ordinary HTTP/HTTPS web traffic to blend into normal enterprise network flows.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1114</div>
+        <div class="mitre-name">Email Collection</div>
+        <div class="mitre-note">[LOW] Attempted access to Gmail accounts of Chinese human-rights activists; Google reported access limited to account metadata for the accounts it could confirm, not message content.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1041</div>
+        <div class="mitre-name">Exfiltration Over C2 Channel</div>
+        <div class="mitre-note">[MEDIUM] Source code and related intellectual property were removed from victim networks over the same channel used for command and control.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">INITIAL ACCESS &amp;<br/>EXPLOITATION<br/>MISSED</div>
+        <div class="pm-detail">No victim organization detected the IM-based lure or the CVE-2010-0249 exploitation at the point of compromise. No patch or reliable signature existed until Microsoft's out-of-band fix (MS10-002) shipped on January 21, 2010 — over a month <strong>after</strong> Google's public disclosure of the campaign.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">LATERAL MOVEMENT &amp;<br/>EXFILTRATION<br/>PARTIALLY DETECTED</div>
+        <div class="pm-detail">Google's security team identified the intrusion only after attackers had already operated inside the network for months and reached source-code systems. Detection came from retrospective anomaly review of internal access logs, not a real-time alert tied to the exploit, the Hydraq backdoor, or the exfiltration itself.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">The incident directly catalyzed Google's multi-year shift toward what became the <strong>BeyondCorp</strong> zero-trust architecture, broader industry adoption of default two-factor authentication, and the later creation of Google's <strong>Project Zero</strong> vulnerability-research team.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">INDUSTRY-WIDE<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">Symantec's and McAfee's public technical write-ups on Hydraq and the wider Elderwood cluster produced one of the earliest widely shared, cross-vendor case studies of a nation-state intrusion, accelerating the adoption of formal indicator-of-compromise sharing as a standard threat-intelligence practice.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Trojan.Hydraq (aka "Aurora" Backdoor)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">RAT / Backdoor</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Windows backdoor delivered via the CVE-2010-0249 exploit chain; persisted as a service riding on svchost.exe, encrypted its configuration, and communicated over HTTP/HTTPS-styled C2 channels designed to blend with legitimate traffic. Downloaded secondary modules including a VNC-based remote-desktop-streaming component. Later Hydraq variants were observed years after Aurora in unrelated China-nexus campaigns, tracked by MITRE ATT&amp;CK as Software S0203 (Symantec, 2010; MITRE ATT&amp;CK).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">CVE-2010-0249 — Internet Explorer Use-After-Free</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Zero-Day Exploit</span>
+            <span class="artifact-tag historical">[HISTORICAL — Patched since 2010]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Use-after-free vulnerability in Internet Explorer's mshtml.dll layout engine affecting IE 6, 6 SP1, 7, and 8 on Windows 2000 through Windows 7; exploited by manipulating object references during page rendering to achieve arbitrary code execution. Patched out-of-band by Microsoft in security bulletin MS10-002, released January 21, 2010 (CVE-2010-0249; Microsoft MSRC).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Elderwood Exploit-Delivery Platform</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Exploit Framework</span>
+            <span class="artifact-tag historical">[HISTORICAL — Infrastructure retired]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Symantec's 2012 "Elderwood Project" research described a shared exploit-delivery platform reused across multiple zero-days (Flash, Internet Explorer, PDF readers) by the same actor cluster over several years, indicating sustained access to a pipeline of unpatched vulnerabilities rather than one-off tool development — a hallmark used to distinguish well-resourced state-linked operators from typical criminal groups (Symantec, 2012; Security Affairs).</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are archival. Infrastructure has long since rotated. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">CVE</td><td class="val historical">CVE-2010-0249 (MS10-002) — IE mshtml.dll use-after-free</td><td>Microsoft MSRC / NVD</td><td>2010-01-21</td></tr>
+          <tr><td class="type-label">MALWARE</td><td class="val historical">Trojan.Hydraq / "Aurora" backdoor sample family</td><td>Symantec</td><td>2010-01</td></tr>
+          <tr><td class="type-label">BUILD ARTIFACT</td><td class="val historical">"Aurora" string embedded in attacker build-path metadata (origin of the campaign name)</td><td>McAfee Labs</td><td>2010-01-14</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No consistently corroborated public list of C2 domains or IP addresses specific to Operation Aurora was identified in open-source reporting for this card. Later-generation Elderwood infrastructure (2010–2012) is catalogued in Symantec's "Elderwood Project" whitepaper; consult that source directly rather than treating any domain as an Aurora-specific IOC.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">Directly triggered Google's decision to stop censoring search results on google.cn and redirect mainland Chinese users to the uncensored google.hk site — a rare instance of a major U.S. company taking a public, human-rights-driven stance against Beijing. On January 21, 2010, U.S. Secretary of State Hillary Clinton delivered an "Internet Freedom" speech directly referencing the intrusion and calling on China to investigate, elevating a corporate security incident to inter-state diplomatic friction.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Accelerated Google's internal work that became the <strong>BeyondCorp</strong> zero-trust architecture, treating internal network location as untrusted and shifting toward identity- and device-based access control. Widely credited, alongside subsequent incidents, as a catalyst for Google's later creation of <strong>Project Zero</strong> and for the broader industry's move toward default two-factor authentication.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">No indictments were filed in connection with Operation Aurora specifically — attribution never reached the evidentiary standard needed to support criminal charges, unlike later cases (e.g., the 2014 U.S. indictment of PLA Unit 61398 members). The incident nonetheless fed into a broader U.S. policy and congressional focus on Chinese state-linked economic cyber-espionage that shaped later, more formal responses.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-medium">ATTRIBUTION CONFIDENCE: MEDIUM</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Elderwood Group (aka Elderwood Gang, Beijing Group [Dell SecureWorks], Sneaky Panda [CrowdStrike]) — MITRE ATT&amp;CK G0066</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">Assessed ties to the Chinese People's Liberation Army; not officially confirmed via indictment</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">No formal U.S. government attribution or indictment specific to this campaign; Google's January 2010 disclosure named China as point of origin without naming a specific group or state entity</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">None filed in connection with this specific campaign</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file — Elderwood / G0066 not yet profiled separately in this library</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Malware code-reuse and infrastructure overlap linking Hydraq/Aurora tooling to later Elderwood campaigns (Symantec's 2012 Elderwood Project research); New York Times reporting citing investigators who traced attack traffic to Shanghai Jiaotong University and the Lanxiang Vocational School</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">Both named Chinese schools publicly and vigorously denied involvement; the Lanxiang school's dean disputed that its students had the technical sophistication attributed to them, and some researchers have noted it would be operationally unusual for a state-directed campaign to launch visibly from institutions with traceable government ties — raising an alternative possibility of compromised or staging infrastructure at those institutions rather than direct involvement</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">A formal indictment (as later occurred for APT1/PLA Unit 61398) naming specific individuals or a PLA unit tied to the Aurora-era Hydraq toolset and infrastructure would raise confidence to HIGH; verifiable evidence that the Jiaotong/Lanxiang traffic was itself compromised third-party infrastructure rather than direct involvement would lower it further</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution confidence for Operation Aurora sits at MEDIUM. The forensic case for a coherent, persistent China-based actor cluster is strong: Symantec's follow-on "Elderwood Project" research traced shared malware code, exploit-delivery infrastructure, and targeting logic across years of intrusions before and after Aurora. The case for direct Chinese state sponsorship, while widely assumed at the time and since, never reached the indictment-level evidentiary standard later applied to cases such as the 2014 PLA Unit 61398 charges. The New York Times' contemporaneous reporting connecting the intrusion to two China-based schools added a specific, disputed data point rather than definitive proof — both institutions denied involvement, and the claim has never been independently corroborated in public record. The defensible characterization is "China-nexus, assessed state-tied"; treating this as attribution to a specific PLA unit or named individuals is not supported by public evidence.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Operation Aurora is widely credited as one of the first publicly disclosed, high-profile nation-state cyber-espionage campaigns against Western private industry, and the first in which a major technology company chose public attribution and transparency over quiet remediation. That choice — made by Google in January 2010 — reset the norm: within a few years, public attribution of state-linked intrusions by both companies and governments became a standard part of the incident-response and policy toolkit rather than a rare exception.</p>
+      <p>It also produced one of the earliest well-documented "APT ecosystems" in open-source reporting. The Elderwood cluster's multi-year reuse of a shared zero-day delivery platform, first connected to Aurora and later mapped across dozens of additional intrusions by Symantec's 2012 research, demonstrated that a single actor could sustain access to a pipeline of unpatched vulnerabilities — a capability signature analysts still use today to distinguish well-resourced state-linked groups from opportunistic criminal actors.</p>
+      <p>Finally, Aurora is a foundational case study in how a single security incident can reshape corporate strategy and international relations simultaneously: it drove Google's exit from mainland Chinese search, informed the design of the BeyondCorp zero-trust model, and prompted a sitting U.S. Secretary of State to give a major policy speech naming a specific corporate intrusion. Few incidents before or since have connected a browser use-after-free bug this directly to geopolitics, which is why it remains a mandatory case study in CTI, incident-response, and cyber-policy curricula alike.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Operation_Aurora" target="_blank">Operation Aurora</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0066/" target="_blank">Elderwood, Elderwood Gang, Beijing Group, Sneaky Panda — Group G0066</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/software/S0203/" target="_blank">Hydraq, Software S0203</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">McAfee Labs</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.mcafee.com/blogs/other-blogs/mcafee-labs/operation-aurora-leading-to-other-threats/" target="_blank">"Operation Aurora" Leading to Other Threats</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2010-01</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">McAfee Labs</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.mcafee.com/blogs/other-blogs/mcafee-labs/more-details-on-operation-aurora/" target="_blank">More Details on "Operation Aurora"</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2010-01</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/cyberattacks-data-breaches/google-aurora-attackers-still-on-loose-symantec-says" target="_blank">Google Aurora Attackers Still On Loose, Symantec Says</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/threat-intelligence/9-years-after-from-operation-aurora-to-zero-trust" target="_blank">9 Years After: From Operation Aurora to Zero Trust</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/cyber-risk/researchers-believe-they-ve-identified-aurora-exploit-code-author" target="_blank">Researchers Believe They've Identified Aurora Exploit Code Author</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Security Affairs</div>
+        <div>
+          <div class="ref-detail"><a href="https://securityaffairs.com/8528/hacking/elderwood-project-who-is-behind-op-aurora-and-ongoing-attacks.html" target="_blank">Elderwood Project: Who Is Behind Op. Aurora and Ongoing Attacks?</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/rsa-not-enough-proof-china-behind-elderwood-gang/" target="_blank">RSA: Not Enough Proof That China Is Behind the Elderwood Gang</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NVD / CVE Details</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cvedetails.com/cve/CVE-2010-0249/" target="_blank">CVE-2010-0249 — Internet Explorer Use-After-Free</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Exploit-DB</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.exploit-db.com/exploits/16599" target="_blank">Microsoft Internet Explorer 'Aurora' Memory Corruption (MS10-002)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NBC News</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nbcnews.com/tech/tech-news/internet-explorer-zero-day-exploit-linked-china-flna1B7830850" target="_blank">Internet Explorer Zero-Day Exploit Linked to China</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2010-01</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Infosecurity Magazine</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.infosecurity-magazine.com/news/school-linked-to-operation-aurora-attack-is-tied/" target="_blank">School Linked to Operation Aurora Attack Is Tied Indirectly to Hacktivist Group</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Shandong_Lanxiang_Vocational_School" target="_blank">Shandong Lanxiang Vocational School</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Virtru</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.virtru.com/blog/compliance/operation-aurora-and-the-path-to-googles-zero-trust-model" target="_blank">Operation Aurora and the Path to Google's Zero Trust Model</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Google (Keyword Blog)</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.google/innovation-and-ai/technology/safety-security/the-past-present-and-future-of-authentication/" target="_blank">The Past, Present and Future of Authentication</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CFR</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cfr.org/index.php/cyber-operations/operation-aurora" target="_blank">Cyber Operations Tracker — Operation Aurora</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 19 sources, all publicly available</div>
+  <div>No companion actor card · Attribution confidence: MEDIUM · ATT&amp;CK: 10 techniques, all retrospective</div>
+</div>
+
+</body>
+</html>
