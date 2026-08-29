@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sony BMG XCP Rootkit — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 54px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 140px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 34px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-20051031-SONYXCP<br/>
+    APR 2005 – JAN 2007
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Supply Chain — Vendor Negligence</div>
+  <h1><span class="gold">SONY BMG</span><span class="dim"> XCP</span><br/>ROOTKIT</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-29 &nbsp;|&nbsp; INCIDENT DATE: APR 2005 – JAN 2007 &nbsp;|&nbsp;
+    SOURCES: 40+ public sources — contemporaneous reporting, academic teardown, regulatory filings
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>Supply Chain — Vendor Negligence</span></div>
+    <div>Attribution: <span class="green">First4Internet / SunnComm (vendors) [HIGH]</span></div>
+    <div>Severity: <span class="red">HIGH</span></div>
+    <div>Era: <span>Pre-ATT&amp;CK (2005)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise (Retrospective)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">52</div>
+    <div class="stat-label">XCP-Protected CD Titles Shipped</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">~4.7M</div>
+    <div class="stat-label">CDs Recalled by Sony, Nov 2005</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">~22M</div>
+    <div class="stat-label">Total Discs Distributed (XCP + MediaMax)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">$150</div>
+    <div class="stat-label">Max FTC-Mandated Consumer Reimbursement</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="none">No companion actor card on file — First4Internet and SunnComm are commercial DRM vendors, not adversarial threat actors. See Attribution, Section 08.</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">Sony BMG XCP ("Sony Rootkit") Copy-Protection Scandal</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Apr 2005 (first ship) – Jan 2007 (FTC settlement)</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Supply Chain — Vendor Negligence</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">First4Internet (XCP) / SunnComm (MediaMax) — vendors; Sony BMG — distributor</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">HIGH (vendor identity) — see Section 08 for downstream malware</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Windows PC users who played affected audio CDs</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">No single authoritative figure; widely-cited estimates of hundreds of thousands of infected hosts are not traced to a confirmed primary study — treated as a genuine gap, not a hard number</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">Oct 31, 2005</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Mark Russinovich, independent researcher (Sysinternals co-founder)</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">~6–7 months undetected in the wild before public disclosure</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Undisclosed kernel-level cloaking installed via consumer audio CDs; mechanism weaponized by criminal malware within ~10 days of disclosure</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise (Retrospective)</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None assigned — pre-dates ATT&amp;CK; not a tracked adversary campaign</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Historical — file/registry artifacts only, no current network detection value</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On the night of October 31, 2005, Mark Russinovich — co-founder of Sysinternals and author of the rootkit-detection tool RootkitRevealer — ran a beta build of his own utility against his personal workstation after playing Van Zant's <em>Get Right with the Man</em>. He found cloaked files, a hidden device driver, and a set of registry keys invisible to Windows Explorer, Task Manager, and his antivirus software. He traced all of it to a piece of commercial software that had installed itself the moment he inserted the CD: Extended Copy Protection (XCP), a digital rights management system Sony BMG had licensed from a small UK firm, First4Internet, and shipped on tens of millions of retail audio discs. His post, "Sony, Rootkits and Digital Rights Management Gone Too Far," used the word "rootkit" to describe a Fortune-500-adjacent media company's own product — and the term stuck (Russinovich, Sysinternals Blog, Oct 31 2005).</p>
+      <p>What Russinovich had found was not a hypothetical risk. XCP installed a kernel-mode driver that hooked the Windows API used to enumerate files (<strong>NtQueryDirectoryFile</strong>) so that anything named with the prefix <strong>"$sys$"</strong> — files, registry keys, and running processes — became invisible to the operating system and to most antivirus engines of the era. It did this by design, to hide its own DRM-enforcement components from the user. The problem, as security researchers immediately pointed out, was that the cloak did not check who owned the $sys$-prefixed object before hiding it. Ten days later, on November 10, 2005, the first malware built to exploit exactly that flaw — a backdoor trojan later tracked as Breplibot/Ryknos — appeared in the wild, renaming itself to inherit Sony's own invisibility cloak (Slashdot; TechSpot; F-Secure v-desc, Nov 2005).</p>
+      <p>What followed was less a single "hack" than a cascading vendor-negligence crisis: a second, independently broken DRM system (MediaMax, from SunnComm) shipped on roughly half of the affected titles; Sony's own emergency uninstaller introduced an even more severe remote-code-execution hole than the rootkit it was meant to remove; and a wave of state attorney-general suits, consumer class actions, and a landmark Federal Trade Commission enforcement action followed through 2006 and into early 2007. Sony BMG ultimately recalled roughly 4.7 million CDs, settled with regulators in nearly every jurisdiction that sued, and permanently abandoned CD-based copy protection.</p>
+      <p>The incident endures as a case study for a reason distinct from its scale: it collapsed the assumption that "rootkit" tradecraft implies malicious intent, forced the antivirus industry to evaluate software by behavior rather than vendor provenance, and produced the first regulatory precedent — the FTC's 2007 consent order — treating undisclosed, security-degrading consumer software as an unfair trade practice regardless of the installer's commercial legitimacy. In shape, it is a direct ancestor of later software-supply-chain incidents: a widely-trusted distributor shipping a small, under-scrutinized third-party component that carried unreviewed security-relevant capability at scale, immediately exploited by unrelated actors once exposed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>By the mid-2000s, the major record labels were in open crisis over CD ripping and peer-to-peer distribution. Napster's shutdown in 2001 had done little to slow the practice; consumer CD burners and MP3 players had made ripping trivial, and earlier label experiments with copy-control watermarking (e.g., Macrovision's Cactus Data Shield, deployed by other labels earlier in the decade) had already drawn criticism for degrading playback on some devices. Sony BMG — itself a 2004 joint venture between Sony Music and Bertelsmann's BMG — moved to deploy more aggressive copy-restriction technology across its catalog rather than develop it in-house, licensing two competing systems from small third-party vendors: XCP from First4Internet (Bracknell, UK) and MediaMax from SunnComm Technologies (Phoenix, Arizona, later renamed The Amergence Group).</p>
+      <p>Neither First4Internet nor SunnComm had a substantial security-engineering track record, and the public record indicates Sony BMG did not subject either product to the kind of independent security review that a kernel-mode software component installed on tens of millions of consumer machines would warrant. A November 30, 2005 Freedom to Tinker report — based on internal correspondence that surfaced after disclosure — found that Sony and First4Internet had been aware of "issues" with the rootkit-style cloaking mechanism well before the October 2005 public disclosure, without escalating it as a security concern (Freedom to Tinker/CITP, Nov 30 2005). The sole "consent" mechanism for either DRM system was a clickthrough End User License Agreement — a document few consumers read, and one that, per Sony BMG's own later lawsuit against SunnComm, MediaMax did not fully honor: the background monitoring process installed regardless of whether the user accepted or declined the EULA.</p>
+      <p>The technical vector these products relied on was itself a default-on Windows feature: AutoRun, enabled by default on Windows XP for optical media, which silently launched each disc's installer the moment it was inserted. Combined with a lack of code-signing scrutiny for kernel drivers at the time and an antivirus industry that implicitly trusted software distributed by major commercial vendors, the conditions were in place for cloaking software to run undetected at scale for months before independent research — rather than any vendor telemetry — surfaced it.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Vendor Development &amp; Distribution</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">First4Internet built XCP around a kernel-mode filter driver that would hook Windows' directory-enumeration API to hide any file, process, or registry key prefixed "$sys$." SunnComm built MediaMax as a background monitoring and playback-restriction process. Sony BMG licensed both, embedding XCP on 52 titles and MediaMax on a larger share of its 2005 release slate, beginning in approximately April 2005, without subjecting either component to independent security review commensurate with kernel-level, mass-market deployment (Wikipedia, "Extended Copy Protection"; Halderman &amp; Felten, USENIX Sec 2006). Internal correspondence later showed Sony and First4Internet were aware of concerns with the cloaking approach prior to release (Freedom to Tinker, Nov 30 2005).</div>
+        <div class="kc-pivot"><em>This phase placed rootkit-class cloaking capability on a mass-market retail product with zero user-facing disclosure — the raw material for everything that followed.</em></div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Silent Installation via Windows AutoRun</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">A consumer inserting an affected CD into a Windows XP machine (AutoRun enabled by default) triggered an automatic installer. XCP's installer dropped a kernel-mode device driver and a set of components under the "$sys$" naming convention (e.g., in the <code>$sys$filesystem</code> directory), then hooked <strong>NtQueryDirectoryFile</strong> so that Explorer, Task Manager, and most contemporary antivirus scanners could no longer see anything with that prefix (Mark Russinovich, Sysinternals Blog, Oct 31 &amp; Nov 4, 2005; Virus Bulletin, "Inside Sony's Rootkit," Dec 2005). On titles carrying MediaMax instead, SunnComm's software installed a background process irrespective of whether the user accepted or declined the EULA — a point Sony BMG itself later alleged in a 2007 suit against SunnComm (iTnews, "Sony BMG sues DRM software supplier"). No telemetry, alerting, or user notification accompanied any of this.</div>
+        <div class="kc-pivot"><em>Within months, an unknown but substantial population of Windows hosts carried an active, undetected kernel-level cloaking mechanism — a capability about to be discovered by an outside researcher rather than the vendor.</em></div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Independent Discovery &amp; Public Disclosure</span>
+          <span class="vis-badge vis-detected">DETECTED (by independent researcher, Oct 31 2005)</span>
+        </div>
+        <div class="kc-body">Mark Russinovich discovered the cloaked driver and components on his own machine using a beta build of RootkitRevealer, published a technical teardown on October 31, 2005 identifying the API hook and the "$sys$" prefix mechanism, and followed up on November 1 and November 4 with further detail — explicitly warning that any third party who named their own malicious files or processes with the "$sys$" prefix would inherit Sony's cloak on any already-infected machine (Schneier on Security, Nov 2005; Russinovich, Sysinternals Blog). The post went viral within the security community and mainstream tech press within days.</div>
+        <div class="kc-pivot"><em>Public disclosure handed criminal actors a ready-made blueprint and a live, pre-cloaked population of hosts to exploit — and they moved faster than Sony could respond.</em></div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Criminal Exploitation — Breplibot / Ryknos</span>
+          <span class="vis-badge vis-detected">DETECTED (F-Secure et al., ~Nov 10–14, 2005)</span>
+        </div>
+        <div class="kc-body">Approximately ten days after Russinovich's disclosure, a backdoor trojan — tracked by different vendors as Breplibot, Ryknos, and Stinx-E — appeared in the wild, distributed via email disguised as a notice from a business magazine. On execution, it copied its own components using the "$sys$" naming prefix, so that on any machine already running the XCP rootkit, the trojan itself became invisible to Explorer, Task Manager, and most antivirus products — the exact abuse scenario Russinovich had warned about days earlier. The trojan opened an IRC-based backdoor channel for remote attacker control (Slashdot, Nov 10 2005; TechSpot; NBC News, "Viruses exploit Sony CD anti-piracy scheme"; F-Secure, "Backdoor:W32/Breplibot.C"). F-Secure, Symantec, and Microsoft rapidly added detection and removal signatures for both the underlying XCP rootkit and the exploiting malware.</div>
+        <div class="kc-pivot"><em>A DRM controversy became an active malware-enablement crisis almost overnight, converting reputational risk into an urgent security emergency and forcing Sony's hand on remediation.</em></div>
+      </div>
+
+      <div class="kc-phase visible">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Vendor Remediation — Patch, Recall, and a Second Vulnerability</span>
+          <span class="vis-badge vis-unreviewed">VISIBLE — UNREVIEWED</span>
+        </div>
+        <div class="kc-body">Sony suspended production of XCP-protected CDs on November 12, 2005 and released a web-based uninstaller. Three days later, Ed Felten and J. Alex Halderman of Princeton's Center for Information Technology Policy found that Sony's uninstaller silently installed a First4Internet ActiveX control ("CodeSupport") that, due to a design flaw, allowed <strong>any website the user subsequently visited</strong> to direct the control to download and execute arbitrary code — a materially worse remote-code-execution hole than the rootkit it was meant to remove, and one that persisted even after the "uninstall" completed (Freedom to Tinker, Nov 15 2005; The Register, "Sony DRM uninstaller 'worse than rootkit,'" Nov 17 2005). Two days later, a second and independently discovered flaw was found in MediaMax's own separate uninstaller (Freedom to Tinker, "Not Again!," Nov 17 2005). Follow-up testing by CITP in January 2006 found the CodeSupport hole still not fully closed (Freedom to Tinker, "Update: Sony Uninstaller Hole Stays Open," Jan 2006).</div>
+        <div class="kc-pivot"><em>Sony's own emergency fix, shipped without adequate security testing, became a second publicly-documented vulnerability in its own right — compounding the reputational and legal exposure that drove the recall and settlement phase.</em></div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Recall, Litigation &amp; Regulatory Settlement</span>
+          <span class="vis-badge vis-detected">DETECTED — full resolution</span>
+        </div>
+        <div class="kc-body">Sony disclosed the complete 52-title XCP list on November 18, 2005 (BetaNews). Texas Attorney General Greg Abbott filed suit on November 21, 2005 — the first case brought under the state's newly enacted Consumer Protection Against Computer Spyware Act — followed by more than a dozen consolidated consumer class actions, three of which the Electronic Frontier Foundation helped bring (The Register, Nov 22 2005; EFF, "Sony BMG Litigation Info"). Sony recalled roughly 4.7 million CDs (about 2.6 million unsold) at a cost of approximately $6.5 million, reached a preliminary consumer settlement in late December 2005, settled with a multistate coalition of attorneys general led by Texas and California in December 2006, and entered a Federal Trade Commission consent order on January 30, 2007 requiring clear disclosure of DRM limitations, a ban on future undisclosed software installs, functioning removal tools, and reimbursement of up to $150 per consumer for computer-repair costs (FTC.gov agreement, filed 2007-01-30; EFF Deeplinks, Dec 2006; CSO Online, "10 Years Later," 2015). In July 2007, Sony BMG itself sued SunnComm/The Amergence Group for $12 million, alleging negligence over MediaMax.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Retrospective mapping — incident predates ATT&amp;CK's public release by ~8 years</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1204.002</div>
+        <div class="mitre-name">User Execution: Malicious File</div>
+        <div class="mitre-note">[MEDIUM] XCP/MediaMax installers launched automatically via Windows AutoRun on CD insertion; EULA clickthrough served as the only user gate before kernel driver installation. Adapted from ATT&amp;CK's typical malicious-file scoping to a vendor-shipped installer with undisclosed capability.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1547.006</div>
+        <div class="mitre-name">Boot or Logon Autostart Execution: Kernel Modules and Extensions</div>
+        <div class="mitre-note">[MEDIUM] XCP installed a kernel-mode filter driver that loaded at boot to maintain its API-hooking cloak across restarts (Virus Bulletin, Dec 2005).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1014</div>
+        <div class="mitre-name">Rootkit</div>
+        <div class="mitre-note">[HIGH] Core mechanism: kernel-mode hook of NtQueryDirectoryFile hid any file, process, or registry key prefixed "$sys$" from the OS shell and most AV engines (Russinovich, Sysinternals Blog, Oct 31 2005).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1036.005</div>
+        <div class="mitre-name">Masquerading: Match Legitimate Name or Location</div>
+        <div class="mitre-note">[HIGH] The "$sys$" naming convention doubled as both the cloak trigger and a masquerading pattern later copied verbatim by Breplibot/Ryknos to inherit the cloak (Slashdot, Nov 10 2005).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">[MEDIUM] Component naming and driver placement were deliberately structured to evade casual inspection by users and signature-based antivirus of the era.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1203</div>
+        <div class="mitre-name">Exploitation for Client Execution</div>
+        <div class="mitre-note">[MEDIUM] Sony's web-based uninstaller left a First4Internet ActiveX control (CodeSupport) resident and exploitable, allowing any subsequently visited website to trigger arbitrary code execution on the host (Freedom to Tinker, Nov 15 2005).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.001</div>
+        <div class="mitre-name">Phishing: Spearphishing Attachment</div>
+        <div class="mitre-note">[HIGH] Breplibot/Ryknos was distributed via email disguised as a notice from a business magazine to induce execution (TechSpot, Nov 2005).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1071</div>
+        <div class="mitre-name">Application Layer Protocol</div>
+        <div class="mitre-note">[MEDIUM] Breplibot/Ryknos opened an IRC-based backdoor channel for remote attacker control once cloaked by the XCP rootkit (F-Secure v-desc, Nov 2005). ATT&amp;CK has no dedicated IRC sub-technique; mapped to the generic parent.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1005</div>
+        <div class="mitre-name">Data from Local System</div>
+        <div class="mitre-note">[MEDIUM] MediaMax collected usage/listening telemetry and transmitted it to SunnComm servers regardless of EULA acceptance, per Sony BMG's own 2007 negligence suit against SunnComm (iTnews).</div>
+      </div>
+      <!-- Note for card author: process injection (T1055) was explicitly ruled out — no evidence XCP injected into other processes; it filtered API enumeration results rather than injecting code. -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">VENDOR QA / PRE-RELEASE<br/>SECURITY REVIEW<br/>MISSED</div>
+        <div class="pm-detail">Neither First4Internet, SunnComm, nor Sony BMG's own internal review process caught that shipping a kernel-mode, API-hooking cloaking driver to the general public constituted rootkit-class capability. Surfaced internal correspondence indicates Sony and First4Internet were aware of "issues" with the approach before release without escalating it as a security defect (Freedom to Tinker, Nov 30 2005).</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">CONSUMER AV DETECTION<br/>(2005-ERA)<br/>PARTIALLY DETECTED</div>
+        <div class="pm-detail">Signature-based antivirus of the era did not flag XCP because it was legitimately vendor-distributed commercial software rather than known malware — it took a general-purpose <strong>rootkit-detection</strong> tool (Russinovich's RootkitRevealer), not conventional AV, to surface it. Once disclosed, F-Secure, Symantec, and Microsoft added detection/removal signatures for both XCP and the exploiting Breplibot/Ryknos trojan within days.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">SONY'S OWN REMEDIATION<br/>(NOV 2005 UNINSTALLER)<br/>PARTIALLY DETECTED — MADE WORSE</div>
+        <div class="pm-detail">Sony's emergency fix — the web-based uninstaller — shipped without adequate security testing and introduced a second, more severe vulnerability (a persistent ActiveX control enabling arbitrary remote code execution from any website), which independent researchers found was still not fully resolved as of January 2006 (Freedom to Tinker/CITP).</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">The incident established that antivirus vendors must evaluate software by <strong>behavior</strong> rather than vendor provenance — commercial signing or distribution by a major company was no longer an implicit reason to whitelist rootkit-class techniques from detection. It also became the reference case behind the FTC's 2007 willingness to treat undisclosed, security-degrading consumer software as an unfair trade practice, and behind Halderman &amp; Felten's USENIX methodology, still cited as a template for independent public-interest security teardown of consumer software.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">XCP (Extended Copy Protection)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">DRM / Kernel Rootkit</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Developed by First4Internet (UK); installed automatically via Windows AutoRun on CD insertion. Deployed a kernel-mode device driver hooking NtQueryDirectoryFile to hide any file, process, or registry key beginning with the string "$sys$" from Explorer, Task Manager, and most contemporary antivirus scanners. Limited playback sessions and blocked ripping to portable devices per label licensing terms. Shipped on 52 titles beginning ~2005.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">MediaMax</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">DRM / Background Process</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Developed by SunnComm Technologies (later "The Amergence Group"); shipped on the larger share of Sony BMG's 2005 affected catalog. Installed a background monitoring process regardless of whether the user accepted or declined the EULA. Per Sony BMG's own 2007 lawsuit against SunnComm, transmitted usage/listening telemetry to SunnComm servers without adequate disclosure. Shipped with its own independently broken uninstaller (see below).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Breplibot / Ryknos (aka Stinx-E)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Backdoor Trojan — third-party, unaffiliated</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">First observed ~Nov 10, 2005, roughly ten days after public disclosure of the XCP rootkit. Distributed via email disguised as a notice from a business magazine. On execution, copies itself using the "$sys$" naming convention so that any host already running XCP automatically cloaks the trojan from Explorer, Task Manager, and most AV. Opens an IRC-based backdoor for remote attacker control. Detected and removed by F-Secure, Symantec, and Microsoft within days of the rootkit's disclosure.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">CodeSupport ActiveX Control (Uninstaller Vulnerability)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">RCE Vulnerability — vendor remediation defect</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Sony's November 2005 web-based XCP uninstaller silently installed a First4Internet ActiveX control ("CodeSupport") marked safe-for-scripting. A design flaw allowed any subsequently visited website to direct the control to download and execute arbitrary code on the host; the flaw persisted after the "uninstall" completed and was reported as still not fully resolved as of January 2006. No public CVE identifier was assigned (pre-dates routine CVE assignment for consumer software vulnerabilities of this class). A separate, independently discovered flaw existed in MediaMax's own uninstaller.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs (2005) — These artifacts are archival. Infrastructure has long since rotated. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">FILE PATH</td><td class="val historical">%WINDIR%\System32\$sys$filesystem\ (and other "$sys$"-prefixed component paths — exact names varied by release build)</td><td>Mark Russinovich, Sysinternals Blog</td><td>2005-10-31</td></tr>
+          <tr><td class="type-label">REGISTRY</td><td class="val historical">HKLM\SYSTEM\CurrentControlSet\Services\$sys$&lt;driver/service name&gt; (naming pattern; exact key names varied by title)</td><td>Virus Bulletin, "Inside Sony's Rootkit"</td><td>2005-12</td></tr>
+          <tr><td class="type-label">DRIVER</td><td class="val historical">Kernel-mode filter driver hooking NtQueryDirectoryFile (component file names varied by release build)</td><td>Halderman &amp; Felten, USENIX Sec 2006</td><td>2006</td></tr>
+          <tr><td class="type-label">MALWARE NAME</td><td class="val historical">Backdoor:W32/Breplibot.C (aka Ryknos, Stinx-E)</td><td>F-Secure v-descs</td><td>2005-11-10</td></tr>
+          <tr><td class="type-label">NAMING PATTERN</td><td class="val historical">Any process/file/registry object prefixed "$sys$" — automatically cloaked on infected hosts</td><td>Mark Russinovich, Sysinternals Blog</td><td>2005-11-04</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No IP or domain C2 indicators for Breplibot/Ryknos' IRC backdoor infrastructure were identified in the public reporting reviewed for this card; contemporaneous vendor write-ups described the mechanism without publishing specific network indicators. Flagged as a genuine sourcing gap rather than omitted.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body consequence-na">Not applicable — this was a consumer-market vendor scandal involving commercial DRM software, not a nation-state or ideologically motivated event. No geopolitical dimension is documented in available sourcing.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Became the canonical demonstration that legitimately-signed, commercially-distributed software can carry rootkit-class capability, ending informal antivirus-industry practice of implicitly trusting major-vendor software during rootkit scans. Catalyzed a shift toward behavior-based detection over provenance-based trust. Halderman &amp; Felten's USENIX Security 2006 paper, "Lessons from the Sony CD DRM Episode," became a widely cited methodological template for independent public-interest security review of consumer software. Sony BMG and the broader recording industry abandoned CD-based copy protection entirely following the scandal, with the practice largely disappearing industry-wide by 2007–2008.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">Produced a landmark FTC enforcement action (consent order, Jan 30 2007) establishing that undisclosed, security-degrading software installation and an inadequate removal tool constitute an unfair trade practice under Section 5 of the FTC Act. Was the first case brought under Texas's then-newly enacted Consumer Protection Against Computer Spyware Act (2005). Produced a multistate attorneys-general settlement (Dec 2006, led by Texas and California) and more than a dozen consolidated consumer class actions, three of which EFF helped bring. Also produced Sony BMG's own $12 million negligence suit against SunnComm/The Amergence Group (2007) — an early instance of inter-vendor supply-chain liability litigation following a shared security failure.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE (VENDOR IDENTITY): HIGH — SEE NARRATIVE FOR DOWNSTREAM MALWARE</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">First4Internet (XCP developer); SunnComm / The Amergence Group (MediaMax developer); Sony BMG (distributor)</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">N/A — commercial vendors under contract to Sony BMG, not a state or ideological sponsor</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Confirmed via public corporate record, contemporaneous reporting, and Sony BMG's own admissions in the FTC consent order and its 2007 suit against SunnComm</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">None against First4Internet, SunnComm, or Sony BMG (civil settlements only). Three individuals were reportedly arrested in mid-2006 in a related "Sony rootkit-enabled virus" case (MIT Technology Review, Jun 27 2006), but a direct, confirmed link between those arrests and Breplibot/Ryknos authorship specifically was not established in available sourcing.</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None — First4Internet and SunnComm are DRM vendors, not adversarial threat actors; no actor card applicable</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Sony's own Nov 18 2005 disclosure of the 52-title list; Freedom to Tinker's Nov 30 2005 report that Sony/First4Internet were aware of the rootkit issue pre-release; FTC and state AG legal findings and settlement terms</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">None on vendor identity — undisputed and effectively admitted in settlements. The only open question is whether the mid-2006 arrestees were specifically the Breplibot/Ryknos authors [UNATTRIBUTED / LOW]</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">A primary-source court record or law-enforcement press release directly naming the 2006 arrestees and tying them to Breplibot/Ryknos authorship would resolve the one remaining attribution gap</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>This case file has no "threat actor" in the conventional CTI sense of an adversarial group pursuing a campaign. The rootkit-class capability at the center of the incident was <strong>vendor-embedded</strong>: designed and coded by First4Internet (XCP) and SunnComm (MediaMax), and distributed at scale by Sony BMG as a commercial copy-protection mechanism. Confidence in this identity chain is <strong>[HIGH]</strong> — it rests on public corporate record, contemporaneous investigative reporting, and Sony BMG's own admissions embedded in its FTC consent order and its later lawsuit against SunnComm.</p>
+        <p>Separately, the malware that weaponized the rootkit's cloaking mechanism — Breplibot/Ryknos — was authored by unknown, financially or criminally motivated individual(s) with no established connection to Sony BMG, First4Internet, or SunnComm. Reported arrests in a related case in mid-2006 have not been confirmed by this desk as tied specifically to that malware family; this line is treated as <strong>[UNATTRIBUTED]</strong> pending a primary source that closes the gap.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The Sony BMG XCP scandal was the first mass-scale demonstration that a major commercial vendor would ship literal rootkit tradecraft — kernel-level API hooking to conceal files, processes, and registry keys — to enforce commercial policy against ordinary consumers. It permanently collapsed the assumption that the mere presence of rootkit-class cloaking implied malicious intent, forcing the antivirus industry toward behavior-based detection rather than provenance-based trust: after 2005, "who shipped it" stopped being a sufficient reason to exempt software from rootkit scanning.</p>
+      <p>It directly produced the first Federal Trade Commission enforcement precedent treating undisclosed, security-degrading consumer software installation as an unfair trade practice — a legal template regulators and litigants have referenced in later software-consent enforcement actions — and was the first case brought under a then-brand-new state anti-spyware statute (Texas, 2005). J. Alex Halderman and Edward Felten's academic teardown, presented at the 15th USENIX Security Symposium in 2006, remains a widely taught methodological reference for how to conduct rigorous, public-interest security analysis of consumer software under legal and commercial pressure.</p>
+      <p>Structurally, the incident previews the shape of later software-supply-chain compromises: a widely trusted distributor (Sony BMG) shipping an externally-sourced, under-scrutinized component (from small vendors most of the organization had limited technical insight into) that carried unreviewed, security-relevant capability at scale — immediately weaponized by unrelated criminal actors once the flaw became public. It differs from incidents like SolarWinds or XZ Utils in one crucial respect: there was no deliberate adversarial intent at the point of origin, only negligence — which is precisely why it remains the canonical case study for "vendor negligence" as its own distinct incident category, separate from both nation-state supply-chain compromise and conventional malware campaigns.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+
+      <div class="ref-item">
+        <div class="ref-source">Sysinternals / Russinovich</div>
+        <div>
+          <div class="ref-detail"><a href="https://learn.microsoft.com/en-us/sysinternals/" target="_blank">Sony, Rootkits and Digital Rights Management Gone Too Far (Sysinternals Blog)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-10-31</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Schneier on Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.schneier.com/blog/archives/2005/11/sonys_drm_rootk.html" target="_blank">Sony's DRM Rootkit: The Real Story</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Freedom to Tinker / CITP</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.citp.princeton.edu/2005/11/15/sonys-web-based-uninstaller-opens-big-security-hole-sony-recall-discs/" target="_blank">Sony's Web-Based Uninstaller Opens a Big Security Hole; Sony to Recall Discs</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-15</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Freedom to Tinker / CITP</div>
+        <div>
+          <div class="ref-detail"><a href="https://freedom-to-tinker.com/2005/11/17/not-again-uninstaller-iotheri-sony-drm-also-opens-huge-security-hole/" target="_blank">Not Again! Uninstaller for Other Sony DRM Also Opens Huge Security Hole</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-17</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Freedom to Tinker / CITP</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.citp.princeton.edu/2005/11/30/sony-first4-knew-about-rootkit-issue-advance/" target="_blank">Sony, First4 Knew About Rootkit Issue in Advance</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-30</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Freedom to Tinker / CITP</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.citp.princeton.edu/?p=928" target="_blank">Update: Sony Uninstaller Hole Stays Open</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2006-01</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Virus Bulletin</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.virusbulletin.com/virusbulletin/2005/12/inside-sony-s-rootkit" target="_blank">Inside Sony's Rootkit</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2005/11/12/sony_suspends_rootkit_drm/" target="_blank">Sony Suspends Rootkit DRM</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2005/11/17/sony_drm_uninstaller_peril/" target="_blank">Sony DRM Uninstaller "Worse Than Rootkit"</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-17</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2005/11/22/texas_sues_sony_bmg/" target="_blank">Texas Sues Sony BMG</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-22</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2005/12/29/sony_settles_rootkit/" target="_blank">Sony Settles Rootkit Suits</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-12-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2006/01/16/sony_bmg_rootkit_still_widespread/" target="_blank">Sony BMG Rootkit Still Widespread</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2006-01-16</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2007/07/16/sony_bmg_sues_amergence/" target="_blank">Sony BMG Sues Amergence</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007-07-16</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">BetaNews</div>
+        <div>
+          <div class="ref-detail"><a href="https://betanews.com/2005/11/18/sony-discloses-list-of-rootkit-cds/" target="_blank">Sony Discloses List of Rootkit CDs</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-18</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">BetaNews</div>
+        <div>
+          <div class="ref-detail"><a href="https://betanews.com/2005/11/21/texas-sues-sony-bmg-over-cd-rootkit/" target="_blank">Texas Sues Sony BMG Over CD Rootkit</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-21</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Slashdot</div>
+        <div>
+          <div class="ref-detail"><a href="https://it.slashdot.org/story/05/11/10/1615239/trojan-using-sony-drm-rootkit-spotted" target="_blank">Trojan Using Sony DRM Rootkit Spotted</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-10</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">TechSpot</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.techspot.com/news/19368-sony-drm-used-for-malware.html" target="_blank">Sony DRM Used for Malware!</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NBC News</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nbcnews.com/id/wbna9991596" target="_blank">Viruses Exploit Sony CD Anti-Piracy Scheme</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">F-Secure</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.f-secure.com/v-descs/breplibot-c.shtml" target="_blank">Backdoor:W32/Breplibot.C (Virus Description)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-10</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">MIT Technology Review</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.technologyreview.com/2006/06/27/100773/three-arrested-in-sony-rootkit-virus-case/" target="_blank">Three Arrested in Sony Rootkit Virus Case</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2006-06-27</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">MIT Technology Review</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.technologyreview.com/2006/05/01/229261/inside-the-spyware-scandal/" target="_blank">Inside the Spyware Scandal</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2006-05-01</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Techdirt</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.techdirt.com/2005/11/21/texas-sues-sony-bmg-over-rootkits/" target="_blank">Texas Sues Sony BMG Over Rootkits</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2005-11-21</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Techdirt</div>
+        <div>
+          <div class="ref-detail"><a href="https://techdirt.com/articles/20070712/101538.shtml" target="_blank">Sony BMG Hits Rootkit Providers With Lawsuit</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007-07-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">EFF</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.eff.org/cases/sony-bmg-litigation-info" target="_blank">Sony BMG Litigation Info</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">EFF</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.eff.org/pages/sony-bmg-settlement-faq" target="_blank">Sony BMG Settlement FAQ</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">EFF Deeplinks</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.eff.org/deeplinks/2006/12/state-ags-reach-settlement-sony-bmg-rootkit-debacle" target="_blank">State AGs Reach Settlement on Sony BMG Rootkit Debacle</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2006-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Federal Trade Commission</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ftc.gov/sites/default/files/documents/cases/2007/01/070130agreement0623019.pdf" target="_blank">Agreement Containing Consent Order — Sony BMG Music Entertainment</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007-01-30</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Network World</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.networkworld.com/article/838644/lan-wan-sony-settles-with-ftc-over-cd-rootkits.html" target="_blank">Sony Settles with FTC Over CD Rootkits</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007-01</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">InfoWorld</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.infoworld.com/article/2322085/sony-settles-with-ftc-on-rootkit-fracas.html" target="_blank">Sony Settles with FTC on Rootkit Fracas</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007-01</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CIO.com</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cio.com/article/265172/it-strategy-sony-to-settle-texas-calif-rootkit-suits-for-1-5m.html" target="_blank">Sony to Settle Texas, Calif. Rootkit Suits for $1.5M</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2006</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">iTnews</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.itnews.com.au/news/sony-bmg-sues-drm-software-supplier-86400" target="_blank">Sony BMG Sues DRM Software Supplier</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Forbes</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.forbes.com/2007/08/29/sony-rootkit-security-tech-cx_ag_0829spyware.html" target="_blank">Sony's Spyware Strikes Back</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">USENIX / Princeton CITP</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.usenix.org/legacy/event/sec06/tech/full_papers/halderman/halderman.pdf" target="_blank">J. Alex Halderman &amp; Edward W. Felten, "Lessons from the Sony CD DRM Episode" (15th USENIX Security Symposium, 2006)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">University of Michigan Law</div>
+        <div>
+          <div class="ref-detail"><a href="https://repository.law.umich.edu/cgi/viewcontent.cgi?article=3620&context=articles" target="_blank">Reconstructing the Sony BMG Rootkit Incident (academic retrospective)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CSO Online</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csoonline.com/article/553369/sony-bmg-rootkit-scandal-10-years-later.html" target="_blank">Sony BMG Rootkit Scandal: 10 Years Later</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Network World</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.networkworld.com/article/2194292/sony-bmg-rootkit-scandal--5-years-later.html" target="_blank">Sony BMG Rootkit Scandal: 5 Years Later</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Cybereason</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cybereason.com/blog/malicious-life-podcast-sony-bmgs-rootkit-fiasco" target="_blank">Malicious Life Podcast: Sony BMG's Rootkit Fiasco</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Sony_BMG_copy_protection_rootkit_scandal" target="_blank">Sony BMG Copy Protection Rootkit Scandal</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Extended_Copy_Protection" target="_blank">Extended Copy Protection</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 38 sources, all publicly available</div>
+  <div>No companion actor card · Attribution confidence: HIGH (vendor) / UNATTRIBUTED (downstream malware) · ATT&amp;CK: 9 techniques, all retrospective</div>
+</div>
+
+</body>
+</html>
