@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LAPSUS$ — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── SANCTIONS ── */
+  .sanctions-list { display: flex; flex-direction: column; gap: 5px; }
+  .sanctions-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 6px 0; border-bottom: 1px solid rgba(30,46,62,0.4); }
+  .sanctions-row:last-child { border-bottom: none; }
+  .sanctions-name { font-family: var(--body); font-size: 11.5px; color: var(--text); font-weight: 500; }
+  .sanctions-role { font-family: var(--body); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+  .sanctions-badge { font-family: var(--mono); font-size: 8.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — eCrime Extortion Collective / Social-Engineering &amp; Data-Theft Specialist</div>
+  <h1><span class="accent">LAPSUS</span><span class="accent2">$</span></h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-08-29 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK, Microsoft MSTIC, CISA Cyber Safety Review Board, Krebs on Security, Resecurity, City of London Police court record, 10+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE — RESURGENT (2026)</span></div>
+    <div>Threat Level: <span class="danger">HIGH</span></div>
+    <div>Primary Motive: <span class="warn">Financial Extortion &amp; Notoriety</span></div>
+    <div>Active Since: <span>Mid-2021</span></div>
+    <div>MITRE ATT&amp;CK: <span>G1004</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ THREAT UPDATE — AUG 2026</div>
+  <div class="alert-headline">Scattered LAPSUS$ Hunters resurgence — active extortion campaign despite 2025 law-enforcement action</div>
+  <div class="alert-body">Following UK arrests of a suspected key member and associate (Sep 2025) and a joint US/French seizure of extortion-site and BreachForums infrastructure (Oct 2025), the LAPSUS$ brand has re-emerged in 2026 as part of the "Scattered LAPSUS$ Hunters" collective — a public alliance combining LAPSUS$, Scattered Spider, and ShinyHunters branding and tradecraft. The collective is actively claiming victims in 2026, asserting theft of 60M+ records from organizations including SoundCloud, Betterment, Crunchbase, and Match Group (Resecurity, CYFIRMA, Aug 2026). Claimed scope is not independently verified and should be treated with caution consistent with the group's documented history of exaggerating breach impact for extortion leverage.</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">10+</div>
+    <div class="stat-label">Household-Name Enterprises Breached, 2021–22 Flagship Campaign</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">190GB</div>
+    <div class="stat-label">Samsung Source Code &amp; Biometric Algorithm Data Exfiltrated</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">71,000+</div>
+    <div class="stat-label">Nvidia Employee Credentials Stolen</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">60M+</div>
+    <div class="stat-label">Records Claimed by Successor Brand "Scattered LAPSUS$ Hunters," 2026</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>LAPSUS$ is a loosely organized, financially and reputation-motivated eCrime extortion collective, first observed in mid-2021, that became one of the most disruptive threat actors of 2022 despite relying almost entirely on social engineering rather than custom malware or zero-day exploits. In under six months it publicly breached Microsoft, Nvidia, Samsung, Okta, Vodafone, Ubisoft, T-Mobile, Uber, and Rockstar Games (Krebs on Security; Microsoft MSTIC, Mar–Apr 2022), stealing source code, employee credentials, and internal data, and using the threat of public leak — not ransomware encryption — as its extortion lever. Core members, several of them minors based in the UK and Brazil, were identified and prosecuted by 2023, yet the tradecraft and brand did not die with the arrests.</p>
+      <p>LAPSUS$ matters now because it functions less as a single static group and more as a durable playbook and brand within a broader, largely English-speaking cybercriminal ecosystem known as "The Com." Its signature techniques — help-desk vishing to reset credentials, MFA-prompt bombing, and recruitment of insiders and contractors via direct payment offers — were subsequently adopted near-verbatim by Scattered Spider (UNC3944) in the 2023 MGM/Caesars casino intrusions and the 2025 UK retail attacks against Marks &amp; Spencer, Co-op, and Harrods, illustrating rapid TTP diffusion across affiliated clusters (Resecurity, Aug 2025). In 2025–2026, remnants and affiliates of LAPSUS$ merged branding with Scattered Spider and ShinyHunters to form "Scattered LAPSUS$ Hunters," which remains active as of this writing despite a wave of arrests and infrastructure seizures in late 2025.</p>
+      <p>Operationally, the group's defining characteristic is that it consistently defeated some of the best-resourced security organizations in the world (Microsoft, Okta, Nvidia) using techniques any mature identity and access management program should be able to detect or prevent — MFA fatigue, help-desk impersonation, and purchased or leaked credentials — rather than sophisticated exploitation. This makes LAPSUS$ and its successor collectives a disproportionate risk indicator for organizational identity-hygiene and third-party/BPO access-control maturity rather than a purely technical detection problem.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">LAPSUS$</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">None identified — independent criminal collective, loosely affiliated with "The Com"</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">eCrime — Extortion / Data-Theft Collective</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial extortion and community notoriety/status (mixed motive, per CISA CSRB)</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">Mid-2021 (first confirmed intrusions, Brazil/Portugal)</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">2026 — active under "Scattered LAPSUS$ Hunters" branding</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G1004</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">Multiple prosecutions; core UK members convicted 2023; further arrests Sep 2025</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">LAPSUS$</span>
+          <span class="alias-chip">DEV-0537 (Microsoft, legacy)</span>
+          <span class="alias-chip">Strawberry Tempest (Microsoft, current taxonomy)</span>
+          <span class="alias-chip">G1004 (MITRE ATT&amp;CK)</span>
+          <span class="alias-chip">Scattered LAPSUS$ Hunters (2025–26 successor brand)</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p><strong>[HIGH]</strong> confidence that the 2021–2022 LAPSUS$ core was a loosely organized, non-state-sponsored collective of young hackers based principally in the UK and Brazil — supported by City of London Police arrests (Mar 2022) and a seven-week Southwark Crown Court trial that convicted two UK teenagers, including alleged ringleader Arion Kurtaj (BleepingComputer; The Register, 2023). <strong>[MEDIUM]</strong> confidence regarding continuity between that original core and the 2025–2026 "Scattered LAPSUS$ Hunters" brand — vendor reporting (Resecurity, DataBreach.io) treats the latter as a rebrand/alliance of personas across LAPSUS$, Scattered Spider, and ShinyHunters rather than a confirmed reconstitution of the original membership; law enforcement has not publicly confirmed specific individual overlap.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">MID–LATE 2021</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Formation &amp; Early Intrusions</div>
+          <div class="timeline-desc">First confirmed activity against Brazil's Ministry of Health and Portuguese media conglomerate Impresa, establishing the group's early pattern of high-profile, publicity-driven targeting outside the US/UK before expanding globally (Picus Security; Wikipedia, compiled 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JAN 2022</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Okta Supply-Chain Compromise</div>
+          <div class="timeline-desc">Gained remote control of a workstation belonging to a support engineer at Sitel, an Okta sub-processor, for approximately 25 minutes, viewing limited Okta customer-support data via Slack and Jira; disclosed publicly only in March 2022 via leaked screenshots (TechCrunch, Mar 2022).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">FEB 2022</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Nvidia Breach &amp; Extortion Demand</div>
+          <div class="timeline-desc">Exfiltrated over 1TB of data including source code, GPU driver documentation, and NTLM hashes for 71,000+ employees; demanded Nvidia remove its Lightweight Hash Rate (LHR) mining limiter and open-source GPU drivers. Nvidia counter-attacked the actors' own systems; LAPSUS$ released an 18GB dump regardless (The Hacker News; BankInfoSecurity, Mar 2022).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAR 2022</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Peak Campaign — Samsung, Microsoft, Vodafone, Ubisoft</div>
+          <div class="timeline-desc">Leaked 190GB (402GB unzipped) of Samsung data including Galaxy bootloader source, TrustZone Trusted Applet code, and biometric unlock algorithms; separately breached Microsoft's internal Azure DevOps server and leaked 37GB of source code for Bing, Cortana, and other products via a compromised employee account (AppleInsider; Microsoft MSTIC, Mar 2022).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAR 2022</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">UK Law Enforcement Takedown</div>
+          <div class="timeline-desc">City of London Police arrested seven individuals aged 16–21 in connection with the group's activity; Arion Kurtaj and a 17-year-old co-defendant were subsequently charged (TechCrunch, Apr 2022).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">APR 2022</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">T-Mobile Breach</div>
+          <div class="timeline-desc">Used T-Mobile VPN credentials purchased on the dark web to access the "Atlas" customer-account management tool and internal Slack and Bitbucket, downloading over 30,000 source-code repositories; T-Mobile stated customer PII was not accessed (Krebs on Security, Apr 2022).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">SEP 2022</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Uber &amp; Rockstar Games Breaches</div>
+          <div class="timeline-desc">An affiliated actor used stolen contractor credentials and an MFA-fatigue attack to breach Uber, accessing Slack, Google Workspace, and AWS (BleepingComputer, Sep 2022). Days later, Arion Kurtaj — while on bail and using only a hotel-room Amazon Fire TV Stick, phone, and keyboard — accessed Rockstar Games' Slack and cloud storage to leak early Grand Theft Auto VI gameplay footage (TechRadar, 2023).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">AUG–DEC 2023</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Convictions &amp; Sentencing</div>
+          <div class="timeline-desc">A seven-week trial at Southwark Crown Court found Arion Kurtaj (assessed unfit to stand trial due to autism) responsible for the Rockstar, Uber, and other hacks; he was sentenced to indefinite detention in a secure hospital. A second, then-17-year-old defendant was separately convicted (BleepingComputer; The Register, 2023).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">SEP–OCT 2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Second-Wave Disruption</div>
+          <div class="timeline-desc">UK authorities arrested a 19-year-old suspected key member and an associate (Sep 2025). In October 2025, a joint US/French law-enforcement operation seized the group's extortion leak site and portions of BreachForums infrastructure, displaying a joint seizure notice (DataBreach.io, 2025).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026 — ONGOING</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">"Scattered LAPSUS$ Hunters" Resurgence</div>
+          <div class="timeline-desc">Despite the 2025 disruption, LAPSUS$-affiliated actors rebuilt operational footing under a combined "Scattered LAPSUS$ Hunters" brand with Scattered Spider and ShinyHunters, building on a mid-2025 Salesforce data-theft campaign against 91 organizations and claiming, as of Aug 2026, over 60 million breached records from victims including SoundCloud, Betterment, Crunchbase, and Match Group (Resecurity; CYFIRMA, 2026).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Human-driven access acquisition over custom malware</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Entry vectors.</strong> LAPSUS$ almost never relies on exploit development. Its preferred entry points are: (1) commodity infostealer logs (chiefly RedLine Stealer) purchased or scraped from underground marketplaces, containing already-valid VPN, Citrix, and SSO session credentials; (2) direct recruitment of insiders, contractors, and BPO/help-desk staff via public Telegram ads offering payment for VPN or remote-access credentials; and (3) telephone- and chat-based social engineering of an organization's own IT help desk, impersonating an employee to trigger a password or MFA reset (CISA CSRB, Aug 2023; Microsoft MSTIC, Mar 2022). The Okta (via Sitel) and Uber (via an EXT contractor) intrusions are direct examples of the BPO/contractor vector; T-Mobile and Nvidia are examples of the purchased-credential vector.</p>
+      <p><strong>Toolchain &amp; C2.</strong> The group is notable for its almost total absence of bespoke malware. Post-access, operators use Mimikatz and native Windows utilities (ntdsutil, ntds.dit extraction via DCSync) to dump domain credentials, and the legitimate Sysinternals utility AD Explorer to enumerate Active Directory for privileged accounts. Command-and-control is achieved not through custom implants but through legitimate remote-access software (e.g., AnyDesk) and direct interactive logon with stolen credentials, which blends with normal administrative activity and defeats malware-signature-based defenses.</p>
+      <p><strong>Lateral movement &amp; persistence.</strong> Once inside, the group systematically targets internal collaboration and development platforms — SharePoint, Confluence, Jira, Slack, Microsoft Teams, GitHub, and Bitbucket — searching for hardcoded credentials, API keys, and secrets that enable movement to higher-value systems (Microsoft MSTIC, Mar 2022). Where cloud tenant administrative access (Azure AD/Microsoft 365 or AWS) is obtained, LAPSUS$'s signature persistence move is to create a new Global Administrator account, add a tenant-wide mail transport rule forwarding all inbound and outbound mail to that account, and then remove every other legitimate Global Admin — achieving sole, durable control of the tenant and locking out the victim's own IT staff.</p>
+      <p><strong>Exfiltration &amp; extortion.</strong> Data is exfiltrated directly via bulk downloads from the compromised collaboration and code-repository platforms (e.g., 30,000+ Bitbucket repositories at T-Mobile) rather than through covert channels. LAPSUS$ does not deploy ransomware to encrypt victim data; its leverage is purely the threat — and follow-through — of public release via its Telegram channel, combined in several cases with destructive actions (deleting victim systems/resources) once extortion demands are rejected or access is revoked, consistent with T1485/T1490 impact behavior.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise ATT&amp;CK — G1004</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1589.001</div>
+        <div class="mitre-name">Gather Victim Identity Info: Credentials</div>
+        <div class="mitre-note">[HIGH] Purchases or harvests employee credentials and phone numbers from criminal marketplaces and stealer-log traders prior to intrusion (CISA CSRB, 2023).</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1591.002</div>
+        <div class="mitre-name">Gather Victim Org Info: Business Relationships</div>
+        <div class="mitre-note">[HIGH] Mapped target help-desk workflows and BPO/supply-chain relationships (e.g., Okta↔Sitel) to identify the weakest link for access (Microsoft MSTIC, 2022).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1656</div>
+        <div class="mitre-name">Impersonation</div>
+        <div class="mitre-note">[HIGH] Impersonated employees in phone/chat contact with help desks to socially engineer password and MFA resets (CISA CSRB, 2023).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">[HIGH] Authenticated with purchased/leaked VPN and SSO credentials (T-Mobile Atlas access via dark-web-purchased VPN creds) rather than exploiting vulnerabilities.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1621</div>
+        <div class="mitre-name">Multi-Factor Authentication Request Generation</div>
+        <div class="mitre-note">[HIGH] MFA-fatigue/prompt-bombing against Uber and Microsoft targets until an exhausted user approved a push request.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.006</div>
+        <div class="mitre-name">OS Credential Dumping: DCSync</div>
+        <div class="mitre-note">[HIGH] Used ntdsutil/Mimikatz to perform DCSync, replicating AD password hashes from a domain controller.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1552.001</div>
+        <div class="mitre-name">Unsecured Credentials: Credentials In Files</div>
+        <div class="mitre-note">[HIGH] Used AD Explorer to search SharePoint, Confluence, Jira, and code repos for hardcoded secrets and additional credentials.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1136.003</div>
+        <div class="mitre-name">Create Account: Cloud Account</div>
+        <div class="mitre-note">[HIGH] Created new Global Administrator accounts inside compromised Azure AD/Microsoft 365 tenants for durable control.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1098.003</div>
+        <div class="mitre-name">Account Manipulation: Additional Cloud Roles</div>
+        <div class="mitre-note">[HIGH] Granted attacker-controlled accounts Global Admin permissions across cloud tenants (Microsoft MSTIC, 2022).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion / Impact</div>
+        <div class="mitre-id">T1531</div>
+        <div class="mitre-name">Account Access Removal</div>
+        <div class="mitre-note">[HIGH] Removed all pre-existing legitimate Global Admin accounts after seizing tenant control, locking out victim IT staff.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Used stolen VPN/Citrix access to move into corporate networks as an apparently legitimate remote user.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1114.003</div>
+        <div class="mitre-name">Email Collection: Email Forwarding Rule</div>
+        <div class="mitre-note">[HIGH] Configured tenant-wide O365 mail-transport rules forwarding all in/outbound mail to attacker-controlled mailboxes.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1213.003</div>
+        <div class="mitre-name">Data from Information Repositories: Code Repositories</div>
+        <div class="mitre-note">[HIGH] Bulk-downloaded 30,000+ source repositories from T-Mobile's Bitbucket; 37GB from Microsoft's Azure DevOps.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1219</div>
+        <div class="mitre-name">Remote Access Software</div>
+        <div class="mitre-note">[MEDIUM] Installed commercial remote-desktop tools (e.g., AnyDesk) for hands-on-keyboard access that blends with legitimate admin traffic.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1485</div>
+        <div class="mitre-name">Data Destruction</div>
+        <div class="mitre-note">[MEDIUM] Reported deletion of victim systems/cloud resources following failed extortion or after access was revoked.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] Leak-site publication threats used as direct extortion leverage against victims in lieu of ransomware encryption.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Technology / Software</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Telecommunications</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">BPO / IT-Managed Service Providers</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Media &amp; Gaming</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Government</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Financial Services / Fintech</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Primarily US and UK targets from 2022 onward; earliest activity in Brazil and Portugal; global reach under the 2025–26 successor brand.</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Large, brand-name organizations with high public profile and valuable IP, source code, or PII — ranging from mid-size BPOs (Sitel) to trillion-dollar technology firms (Microsoft, Nvidia, Samsung).</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Third-party/BPO help-desk and contractor access; purchased or leaked VPN/remote-access credentials from criminal marketplaces; direct insider recruitment via Telegram payment offers.</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Opportunistic, notoriety-driven selection of household-name targets for maximum extortion leverage and reputational impact, rather than a fixed target list.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">REDLINE STEALER</span>
+          <span class="tool-tag">COTS INFOSTEALER · T1555 / T1539</span>
+        </div>
+        <div class="tool-desc">Commodity, subscription-based infostealer purchased on cybercrime marketplaces (not developed by LAPSUS$). Harvests browser-stored passwords, session/authentication cookies, cryptocurrency wallets, and VPN client credentials, exfiltrating logs to operator-controlled infrastructure. LAPSUS$ used bulk RedLine logs — including a documented LATAM-focused campaign — to source the valid credentials that seeded several intrusions (Metabase Q, 2022).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">MIMIKATZ</span>
+          <span class="tool-tag">CREDENTIAL DUMPER · T1003.001</span>
+        </div>
+        <div class="tool-desc">Well-known open-source post-exploitation utility used to extract plaintext passwords, NTLM hashes, and Kerberos tickets from LSASS memory once a foothold with sufficient privilege was established, enabling escalation to domain-level access (Vectra AI, 2022).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">AD EXPLORER (SYSINTERNALS)</span>
+          <span class="tool-tag">LOLBIN — LEGITIMATE ADMIN TOOL · T1087.002 / T1213</span>
+        </div>
+        <div class="tool-desc">Legitimate Microsoft Sysinternals Active Directory viewer/search utility, repurposed to enumerate privileged accounts and group memberships, and to search internal collaboration platforms (SharePoint, Confluence, Jira, GitHub) for hardcoded secrets — evading detections tuned for malicious tooling since the binary itself is trusted.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">NTDSUTIL / DCSYNC</span>
+          <span class="tool-tag">NATIVE WINDOWS UTILITY · T1003.006</span>
+        </div>
+        <div class="tool-desc">Native Windows administrative utility abused to perform directory-replication (DCSync) requests, pulling password hashes for all domain accounts from a domain controller without requiring code execution on the DC itself — a technique that is difficult to distinguish from legitimate replication traffic without dedicated monitoring.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">ANYDESK / COMMERCIAL REMOTE-ACCESS SOFTWARE</span>
+          <span class="tool-tag">LOLBIN — LEGITIMATE RMM TOOL · T1219</span>
+        </div>
+        <div class="tool-desc">Commercial remote-desktop software installed post-compromise to sustain hands-on-keyboard access. Traffic blends with legitimate IT administrative activity, and the tool's dual-use nature means allow-listed or unmonitored deployments provide durable, low-visibility access.</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">TELEGRAM (VICTIM COMMS / LEAK CHANNEL)</span>
+          <span class="tool-tag">INFRASTRUCTURE — 3RD-PARTY PLATFORM · T1102</span>
+        </div>
+        <div class="tool-desc">Public Telegram channel used as the group's primary extortion, negotiation, and leak-publication venue, and as a recruitment board advertising direct payment to employees/contractors of named target organizations in exchange for VPN or remote-access credentials — an insider-recruitment vector distinct from technical intrusion.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>Behavioral indicators predominate — see note below</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">NOTE</td><td class="val">No persistent, publicly attributable C2 IP addresses, domains, or malware file hashes are durably associated with LAPSUS$ core operations as of 2026-08-29. The group relies on commodity stealer logs, purchased/leaked credentials, and living-off-the-land or legitimate remote-access tooling rather than fixed, custom infrastructure — consistent with CISA CSRB's finding that the group used "primarily simple techniques."</td><td>CISA CSRB</td><td>2023-08-10</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">Burst of 10+ MFA push notifications to a single user within minutes, often outside normal business hours ("MFA fatigue" / prompt-bombing pattern)</td><td>Microsoft MSTIC</td><td>2022-03-22</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">Help-desk contact requesting password or MFA-method reset for a privileged account without standard out-of-band identity verification</td><td>CISA CSRB</td><td>2023-08-10</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">New Global Administrator account created in an Azure AD / Microsoft 365 tenant, followed shortly by removal of pre-existing Global Admin accounts</td><td>Microsoft MSTIC</td><td>2022-03-22</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">New Exchange Online mail-transport/forwarding rule created that routes all inbound and outbound mail to an external or newly created mailbox</td><td>Microsoft MSTIC</td><td>2022-03-22</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">Bulk, scripted-pattern cloning or download activity against source-code repositories (Bitbucket / GitHub / Confluence / Jira) from a single account within a short time window</td><td>Krebs on Security</td><td>2022-04-22</td></tr>
+        <tr><td class="type-label">PROTOCOL</td><td class="val">Outbound sessions to consumer/commercial remote-access software domains (e.g., AnyDesk) initiated from privileged administrative workstations shortly after anomalous authentication</td><td>NCC Group</td><td>2022</td></tr>
+        <tr><td class="type-label">PROTOCOL</td><td class="val">Directory-replication (DCSync-pattern) LDAP/RPC requests to a domain controller originating from a non-domain-controller host</td><td>Vectra AI</td><td>2022</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">HIGH</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (2021–22 core) / MEDIUM (2025–26 continuity)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val red">Escalating — active resurgence under Scattered LAPSUS$ Hunters brand</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Help-desk social engineering + MFA-fatigue chain for privileged access acquisition</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Verified membership overlap between original LAPSUS$ core and the 2025–26 successor brand; true scale of 2026 breach claims</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Scattered Spider / UNC3944</span>
+          <span class="alias-chip">ShinyHunters</span>
+          <span class="alias-chip">The Com (umbrella community)</span>
+          <span class="alias-chip">Scattered LAPSUS$ Hunters (2025–26 alliance brand)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>LAPSUS$'s core significance is that it demonstrated — repeatedly, against some of the best-resourced security organizations in the world — that unsophisticated, socially engineered tradecraft executed quickly and without regard for operational security could outpace technically sophisticated ransomware crews. <strong>[HIGH]</strong> confidence assessment, grounded in UK court proceedings against Arion Kurtaj and a co-defendant, is that the operational core was young (several members minors), UK/Brazil-based, and motivated by a mixed blend of financial gain and community status within "The Com" rather than financial gain alone — a profile the CISA Cyber Safety Review Board explicitly flagged as complicating deterrence, since notoriety-seeking actors are less responsive to purely financial disincentives.</p>
+      <p>The group's most dangerous capability is not any piece of malware but its help-desk-vishing-plus-MFA-fatigue chain for acquiring privileged access, which exploits human and process trust rather than a technical control gap, leaving conventional endpoint and network defenses with limited direct purchase on the initial-access stage. This exact playbook has since proliferated well beyond LAPSUS$ itself — most visibly in Scattered Spider's near-identical help-desk vishing campaigns against MGM and Caesars (2023) and the 2025 UK retail wave (M&amp;S, Co-op, Harrods) — which raises a competing hypothesis worth stating explicitly: it is not yet established whether Scattered Spider directly learned this tradecraft from LAPSUS$ operators, or whether both groups independently converged on the same techniques as a natural product of shared origin within the same underground forums and Discord/Telegram communities. <strong>[MEDIUM]</strong> confidence is assigned to a direct tradecraft lineage rather than parallel evolution.</p>
+      <p>On forward trajectory: the emergence of "Scattered LAPSUS$ Hunters" in 2025–2026 — persisting despite UK arrests (Sep 2025) and a joint US/French seizure of extortion-site and BreachForums infrastructure (Oct 2025) — demonstrates that arrests of individual members do not reliably kill the underlying brand or tradecraft within Com-affiliated collectives; the community, playbook, and "brand equity" of the LAPSUS$ name outlive any specific defendant. <strong>[LOW–MEDIUM]</strong> confidence should be placed on the raw scale of 2026 claims (e.g., "60 million records," the earlier "91 organizations" Salesforce-campaign figure) absent independent victim confirmation, consistent with the group's established pattern of inflating breach scope for extortion leverage — Okta's confirmed impact of two customer tenants versus LAPSUS$'s initial public claims of a much broader compromise is the clearest historical precedent for this gap. What would raise attribution confidence for the 2025–26 continuity question: law-enforcement charging documents or forensic overlap (shared infrastructure, negotiation writing style, or leak-site TTPs) explicitly tying named 2025–26 arrestees to verified 2021–22 LAPSUS$ core membership.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Deploy phishing-resistant MFA.</strong> Replace push- and SMS-based MFA with FIDO2/WebAuthn hardware security keys for all privileged, remote-access, and help-desk-facing accounts.</div>
+            <div class="cm-ttp">Counters: T1621, T1078</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Eliminate raw push-approval MFA.</strong> Where hardware keys are not yet feasible, enforce number-matching and context-rich (location/app-name) push approval to neutralize MFA-fatigue/prompt-bombing.</div>
+            <div class="cm-ttp">Counters: T1621</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Harden help-desk identity verification.</strong> Require callback to a pre-registered number, supervisor co-approval, or video verification before any password/MFA reset on a privileged account.</div>
+            <div class="cm-ttp">Counters: T1656, T1078</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Enforce just-in-time privileged access.</strong> Remove standing Global Admin/Domain Admin accounts in favor of time-bound, approval-gated privileged access management (PAM), and alert on any new Global Admin creation.</div>
+            <div class="cm-ttp">Counters: T1136.003, T1098.003</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Monitor mail-transport rule changes.</strong> Alert in real time on creation of any Exchange Online/O365 transport or forwarding rule matching "all mail" or external-domain forwarding patterns.</div>
+            <div class="cm-ttp">Counters: T1114.003</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Restrict and monitor directory replication.</strong> Limit DCSync-capable replication rights to actual domain controllers and alert on replication requests from any other host.</div>
+            <div class="cm-ttp">Counters: T1003.006</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Deploy risk-based conditional access.</strong> Block or step-up-challenge authentication from unmanaged devices, impossible-travel geographies, or anonymizing infrastructure even when credentials are valid.</div>
+            <div class="cm-ttp">Counters: T1078, T1133</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Extend controls to third-party/BPO staff.</strong> Apply the same identity-verification, MFA, and monitoring requirements to contractor and outsourced help-desk personnel with access to customer-support tooling as to employees.</div>
+            <div class="cm-ttp">Counters: T1656, supply-chain initial access</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">09</span>
+          <div>
+            <div class="cm-text"><strong>Run secrets-scanning on internal repositories.</strong> Continuously scan SharePoint, Confluence, Jira, GitHub, and Bitbucket for hardcoded credentials/API keys, and apply least-privilege repository access.</div>
+            <div class="cm-ttp">Counters: T1213.003, T1552.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">10</span>
+          <div>
+            <div class="cm-text"><strong>Control remote-access tooling.</strong> Allow-list approved RMM/remote-desktop software and alert on installation or use of unauthorized tools (e.g., AnyDesk) on privileged endpoints.</div>
+            <div class="cm-ttp">Counters: T1219</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G1004/" target="_blank">LAPSUS$, DEV-0537, Strawberry Tempest — Group G1004</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2022/03/22/dev-0537-criminal-actor-targeting-organizations-for-data-exfiltration-and-destruction/" target="_blank">DEV-0537 criminal actor targeting organizations for data exfiltration and destruction</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / CSRB</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/sites/default/files/2023-08/CSRB_Lapsus$_508c.pdf" target="_blank">Review of the Attacks Associated with LAPSUS$ and Related Threat Groups</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TechCrunch</div>
+        <div>
+          <div class="ref-detail"><a href="https://techcrunch.com/2022/03/28/lapsus-passwords-okta-breach/" target="_blank">Lapsus$ found a spreadsheet of accounts as they breached Okta, documents show</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/uber-links-breach-to-lapsus-group-blames-contractor-for-hack/" target="_blank">Uber links breach to Lapsus$ group, blames contractor for hack</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Krebs on Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://krebsonsecurity.com/2022/04/leaked-chats-show-lapsus-stole-t-mobile-source-code/" target="_blank">Leaked Chats Show LAPSUS$ Stole T-Mobile Source Code</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">AppleInsider</div>
+        <div>
+          <div class="ref-detail"><a href="https://appleinsider.com/articles/22/03/06/hackers-leak-190gb-of-data-taken-in-alleged-samsung-breach" target="_blank">Hackers leak 190GB of data taken in alleged Samsung breach</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2022/03/hackers-who-broke-into-nvidias-network.html" target="_blank">Hackers Who Broke Into NVIDIA's Network Leak DLSS Source Code Online</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/lapsus-teen-hackers-convicted-of-high-profile-cyberattacks/" target="_blank">Lapsus$ teen hackers convicted of high-profile cyberattacks</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2023/12/21/lapsus_teens_sentenced/" target="_blank">Lapsus$ teen sentenced to indefinite detention in hospital</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TechRadar</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.techradar.com/gaming/teenager-involved-with-hack-which-led-to-gta-6-leak-court-finds" target="_blank">Teenager involved with hack which led to GTA 6 leak, court finds</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Resecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.resecurity.com/blog/article/trinity-of-chaos-the-lapsus-shinyhunters-and-scattered-spider-alliance-embarks-on-global-cybercrime-spree" target="_blank">Trinity of Chaos: The LAPSUS$, ShinyHunters, and Scattered Spider Alliance</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DataBreach.io</div>
+        <div>
+          <div class="ref-detail"><a href="https://databreach.io/news/scattered-lapsus-hunters-timeline-and-reported-arrests/" target="_blank">Scattered LAPSUS$ Hunters Timeline and Reported Arrests</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CYFIRMA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cyfirma.com/research/resurgence-of-scattered-lapsus-hunters/" target="_blank">Resurgence of Scattered Lapsus$ Hunters</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Metabase Q</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.metabaseq.com/threat/redline-the-infostealer-used-by-lapsus-in-latam/" target="_blank">Redline, the infostealer used by LAPSUS$ in LATAM</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Vectra AI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.vectra.ai/modern-attack/threat-actors/lapsus" target="_blank">Is Your Organization Safe from LAPSUS$ Attacks?</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 16 sources, 15 web searches</div>
+  <div>eCrime / Extortion Collective — G1004</div>
+</div>
+
+</body>
+</html>
