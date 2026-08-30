@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>APT1 — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge">⚠ NATION-STATE · PLA GENERAL STAFF DEPT, 3RD DEPT, 2ND BUREAU (UNIT 61398) · CHINA</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Military Cyber Espionage Unit / Intellectual-Property Theft (Historical)</div>
+  <h1><span class="accent">APT</span><span class="accent2">1</span></h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-08-29 &nbsp;|&nbsp;
+    SOURCES: Mandiant "APT1: Exposing One of China's Cyber Espionage Units" (2013), MITRE ATT&amp;CK (G0006), U.S. DOJ, FBI, CFR Cyber Operations Tracker, Lawfare, SecurityWeek, Wikipedia, 10+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">DORMANT / LIKELY ABSORBED INTO RESTRUCTURED PLA CYBER UNITS SINCE 2015–16</span></div>
+    <div>Threat Level: <span class="danger">HIGH (Historical)</span></div>
+    <div>Primary Motive: <span>State-Directed Economic &amp; Political Espionage</span></div>
+    <div>Active Since: <span>At least 2006 (per Mandiant forensic evidence)</span></div>
+    <div>MITRE ATT&amp;CK: <span>G0006</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">141+</div>
+    <div class="stat-label">Organizations Compromised Across 20+ Strategic Industries, 2006–2013+</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">356 Days</div>
+    <div class="stat-label">Average Dwell Time — Longest Documented Intrusion: 1,764 Days (~4.8 Years)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">937</div>
+    <div class="stat-label">Identified C2 Servers Across 13 Countries Supporting 40+ Custom Tools</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">2014</div>
+    <div class="stat-label">Year DOJ Indicted 5 Named PLA Officers — First-Ever US State-Actor Indictment</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>In February 2013, Mandiant published "APT1: Exposing One of China's Cyber Espionage Units," a report that did something no commercial security company had done before at that scale: it named a specific unit of a specific country's military — the People's Liberation Army's Unit 61398 — attributed a multi-year cyber-espionage campaign to a specific 12-story building in Shanghai's Pudong New Area, and published network infrastructure, photographs, and even named individual operators. The group Mandiant called APT1 (also tracked as Comment Crew, Comment Group, and Comment Panda) had, since at least 2006, systematically compromised at least 141 organizations across 20 major industries, stealing hundreds of terabytes of intellectual property.</p>
+      <p>APT1 is widely regarded as the single most consequential public attribution in the history of commercial cyber threat intelligence. Rather than relying on novel malware, APT1 achieved its scale and persistence primarily through fluent, well-crafted spear-phishing and a large but largely homegrown malware ecosystem (WEBC2 backdoors, BISCUIT, and dozens of other custom tools), maintained through more than 937 identified command-and-control servers across 13 countries. Average dwell time inside a victim network was 356 days; the longest documented single intrusion lasted 1,764 days — nearly five years.</p>
+      <p>The report's impact extended well beyond APT1 itself. It is widely credited with helping create the modern commercial cyber threat intelligence industry, establishing the "APTn" naming convention still used across the field today, and directly shaping U.S. government policy: in May 2014 the Department of Justice indicted five named PLA officers — the first criminal indictment of state-sponsored hackers by any government — and the group's exposure is assessed by analysts as one contributing factor in China's 2015 PLA restructuring, which folded military cyber capability into the newly created Strategic Support Force.</p>
+      <p>APT1 today is best treated as a historical case file rather than an active tracked threat: public reporting and Mandiant's own follow-on observations describe the group rapidly curtailing operations and shutting down exposed infrastructure within weeks of the 2013 report's release. Its lasting relevance is doctrinal and historical — as the first large-scale, publicly documented demonstration that a nation-state's economic-espionage apparatus could be identified, named, and disrupted through open-source and forensic investigation by a private company, and as the direct ancestor of nearly every public nation-state attribution report published since.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">APT1</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">People's Liberation Army (PLA), General Staff Department, 3rd Department, 2nd Bureau — Military Unit Cover Designator (MUCD) "Unit 61398" (pre-2015 restructuring designation)</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Nation-State — Military Cyber Espionage Unit</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">State-directed economic espionage (intellectual property theft); secondarily political/state-secret collection</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">At least 2006 (per Mandiant's forensic evidence); some indicators suggest earlier origins</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Operations sharply curtailed after February 2013 exposure; no significant activity publicly attributed to this designation since the PLA's 2015–16 Strategic Support Force restructuring</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G0006</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">Five named PLA officers (Wang Dong "UglyGorilla," Sun Kailiang, Wen Xinyu, Huang Zhenyu, Gu Chunhui) indicted by US DOJ, May 2014, on 31 counts; FBI issued public wanted posters; no arrests or extraditions to date absent a US–China extradition treaty</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">APT1</span>
+          <span class="alias-chip">Comment Crew</span>
+          <span class="alias-chip">Comment Group</span>
+          <span class="alias-chip">Comment Panda</span>
+          <span class="alias-chip">PLA Unit 61398</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>Attribution is HIGH — among the highest-confidence nation-state attributions ever published. Mandiant's 2013 report combined operational-security failures by individual operators (reused personas, registration email addresses, and forum handles) with physical infrastructure evidence (IP address blocks routed through the same telecommunications infrastructure serving the Unit 61398 facility) and was subsequently corroborated by the US Department of Justice's independent investigation, which resulted in a formal criminal indictment naming specific individuals in May 2014 — a level of corroboration (private-sector forensic attribution followed by independent government indictment) rarely achieved for nation-state cyber activity before or since.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2006</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Earliest Observed Activity</div>
+          <div class="timeline-desc">Mandiant's forensic timeline places the earliest confirmed APT1 intrusions in 2006, though some registered infrastructure and operator personas suggest the group or its precursor elements may have been active earlier.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2006 –<br/>2010</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Establishing Scale — Custom Malware &amp; C2 Infrastructure</div>
+          <div class="timeline-desc">Builds a large, largely homegrown malware ecosystem (WEBC2-family backdoors, BISCUIT, and dozens of other custom tools) and registers hundreds of domains supporting more than 937 identified command-and-control servers across 13 countries.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2010 –<br/>2013</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Peak Operational Tempo</div>
+          <div class="timeline-desc">Compromises the majority of its documented 141+ victim organizations during this window, systematically targeting 20 industries identified as strategic in China's 12th Five-Year Plan, with aerospace and IT firms as leading targets; individual intrusions average 356 days of dwell time, with the longest lasting 1,764 days.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">FEB 2013</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Mandiant "APT1" Report Publication</div>
+          <div class="timeline-desc">Mandiant publishes its 74-page report publicly attributing the group to PLA Unit 61398, naming the Shanghai facility, publishing IP infrastructure, and identifying individual operator personas (UglyGorilla, SuperHard, DOTA). The group rapidly shuts down exposed C2 infrastructure and curtails operations within weeks.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAY 2014</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">US DOJ Indictment</div>
+          <div class="timeline-desc">Department of Justice unseals a 31-count indictment against five named PLA officers (Wang Dong, Sun Kailiang, Wen Xinyu, Huang Zhenyu, Gu Chunhui) — the first criminal indictment of state-sponsored hackers by any national government. FBI issues public wanted posters.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2015 –<br/>2016</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">PLA Restructuring &amp; Apparent Dissolution of the Unit 61398 Cyber Function</div>
+          <div class="timeline-desc">China undertakes sweeping PLA reforms creating the Strategic Support Force, consolidating military cyber, space, and electronic-warfare capability. Activity linked to APT1/Unit 61398's specific infrastructure and toolset does not resurface under this designation; analysts assess personnel and capability were likely absorbed into restructured PLA cyber units.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Scale and persistence, not technical novelty</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>APT1's operational model favored breadth and persistence over technical sophistication. Initial access relied overwhelmingly on spear-phishing — emails crafted in fluent, idiomatic English, tailored to a specific recipient's role, carrying malicious attachments or links designed to trigger backdoor installation (T1566.001, T1566.002). The group registered hundreds of its own domains and periodically hijacked legitimate FQDNs to serve as staging and command infrastructure, giving it enormous operational depth and the ability to rotate infrastructure faster than defenders of the era could blocklist it.</p>
+      <p>Once inside a victim environment, APT1 relied on a mix of custom-built backdoors — most notably the WEBC2 family, which retrieved attacker commands embedded in ordinary-looking web pages, and BISCUIT, used from as early as 2007 — alongside publicly available tools like Poison Ivy and Gh0st RAT when convenient. Credential theft leaned on tools such as Mimikatz for in-memory credential extraction and pass-the-hash techniques for lateral movement, while native Windows utilities (net, tasklist, ipconfig) handled the bulk of internal reconnaissance, minimizing the group's custom-tooling footprint during discovery and blending into normal administrative activity.</p>
+      <p>Data collection and exfiltration were methodical and large-scale: purpose-built tools like GETMAIL (targeting local Outlook .pst files) and MAPIGET (targeting Exchange servers directly) allowed bulk email harvesting, and collected data was typically compressed with RAR before exfiltration. The group's defining operational characteristic was not stealth in the sense of avoiding all detection, but persistence — average dwell times measured in the better part of a year gave operators time to methodically map an organization's file shares, identify high-value intellectual property, and exfiltrate it repeatedly over months, in several documented cases returning to the same victim organization across multiple, non-contiguous intrusion windows.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; mapped against G0006</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1583.001</div>
+        <div class="mitre-name">Acquire Infrastructure: Domains</div>
+        <div class="mitre-note">[HIGH] Registered hundreds of domains supporting a large, redundant C2 footprint of 937+ identified servers across 13 countries.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1584.001</div>
+        <div class="mitre-name">Compromise Infrastructure: Domains</div>
+        <div class="mitre-note">[MEDIUM] Hijacked FQDNs belonging to legitimate, unrelated websites to serve as covert staging and hop points.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.001</div>
+        <div class="mitre-name">Phishing: Spearphishing Attachment</div>
+        <div class="mitre-note">[HIGH] Sent fluent, role-tailored spear-phishing emails with malicious attachments as the group's primary initial-access vector.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.002</div>
+        <div class="mitre-name">Phishing: Spearphishing Link</div>
+        <div class="mitre-note">[HIGH] Used malicious hyperlinks embedded in phishing emails as an alternate initial-access method.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1036.005</div>
+        <div class="mitre-name">Masquerading: Match Legitimate Name or Location</div>
+        <div class="mitre-note">[MEDIUM] Named malware payloads (e.g., AcroRD32.exe) to mimic legitimate software such as Adobe Acrobat Reader.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.001</div>
+        <div class="mitre-name">OS Credential Dumping: LSASS Memory</div>
+        <div class="mitre-note">[HIGH] Used Mimikatz to extract credentials from LSASS memory to support lateral movement.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1550.002</div>
+        <div class="mitre-name">Use Alternate Authentication Material: Pass the Hash</div>
+        <div class="mitre-note">[HIGH] Employed pass-the-hash techniques to move laterally without needing plaintext credentials.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.001</div>
+        <div class="mitre-name">Remote Services: Remote Desktop Protocol</div>
+        <div class="mitre-note">[MEDIUM] Used RDP to move between compromised hosts within victim networks.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1087.001</div>
+        <div class="mitre-name">Account Discovery: Local Account</div>
+        <div class="mitre-note">[MEDIUM] Used native commands (net localgroup, net user, net group) for account enumeration to blend with normal admin activity.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1135</div>
+        <div class="mitre-name">Network Share Discovery</div>
+        <div class="mitre-note">[MEDIUM] Enumerated connected network shares to locate valuable file repositories and intellectual property.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1114</div>
+        <div class="mitre-name">Email Collection</div>
+        <div class="mitre-note">[HIGH] Used custom tools GETMAIL (Outlook .pst extraction) and MAPIGET (direct Exchange server theft) for bulk email harvesting.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection / Exfiltration Prep</div>
+        <div class="mitre-id">T1560.001</div>
+        <div class="mitre-name">Archive Collected Data: Archive via Utility</div>
+        <div class="mitre-note">[HIGH] Compressed staged data with RAR utilities prior to exfiltration to reduce transfer footprint.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Information Technology</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Aerospace &amp; Satellite (15+ known victims)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Telecommunications (10+ intrusions)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Energy, Engineering &amp; Manufacturing</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Public Administration &amp; International Orgs</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Overwhelmingly United States-based victims (including all entities named in the 2014 indictment); also observed against organizations in Canada, the UK, and other industrialized economies</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Large enterprises and government-adjacent organizations holding high-value intellectual property, trade secrets, or engineering data; frequent repeat targeting of the same organizations across multiple, non-contiguous intrusion windows</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Fluent, role-tailored spear-phishing (attachments and links) as the near-universal initial-access vector; minimal reliance on exploit-based initial access relative to contemporaries</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Systematic harvesting aligned to explicit Chinese industrial-policy priorities (the 12th Five-Year Plan's seven strategic emerging industries) rather than opportunistic or purely military targeting — one of the clearest documented examples of cyber-espionage directly in service of stated economic-development goals</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">WEBC2 Backdoor Family</span>
+          <span class="tool-tag">Custom Backdoor · APT1-Developed</span>
+        </div>
+        <div class="tool-desc">The tool family that gave rise to the "Comment Crew" nickname: retrieves a web page from an attacker-controlled C2 server and interprets attacker commands embedded within specially formatted HTML comments/tags — a design that let C2 traffic resemble ordinary web browsing to network defenders of the era.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">BISCUIT</span>
+          <span class="tool-tag">Custom Backdoor · APT1-Developed</span>
+        </div>
+        <div class="tool-desc">One of APT1's longest-running custom backdoors, in use since at least 2007; provided persistent remote access and was one of dozens of bespoke tools within the group's roughly 40-tool custom malware arsenal.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">GETMAIL / MAPIGET</span>
+          <span class="tool-tag">Custom Data-Theft Utilities</span>
+        </div>
+        <div class="tool-desc">Purpose-built tools for bulk email theft: GETMAIL extracted local Outlook .pst archive files, while MAPIGET queried Exchange servers directly — reflecting the group's systematic, industrial-scale approach to harvesting victim communications.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Mimikatz / Pass-the-Hash Tooling</span>
+          <span class="tool-tag">Credential Theft · Publicly Available</span>
+        </div>
+        <div class="tool-desc">Used for in-memory credential extraction (LSASS) and pass-the-hash lateral movement, allowing operators to move through Windows domains without needing plaintext passwords.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">Poison Ivy / Gh0st RAT</span>
+          <span class="tool-tag">Publicly Available RATs · Occasional Use</span>
+        </div>
+        <div class="tool-desc">Used occasionally alongside APT1's custom toolset when convenient; the group's overwhelming preference for bespoke backdoors over these common commodity RATs was itself a distinguishing forensic signature Mandiant used in its attribution analysis.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>Historical — archival only, all IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use. HISTORICAL: this infrastructure was torn down within weeks of the February 2013 report; treat all entries as archival/research references only, not actionable current detection content. Reference URLs in Section 10 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">MALWARE</td><td class="val">WEBC2 backdoor family (multiple variants)</td><td>Mandiant "APT1" report</td><td>2013-02-19</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">BISCUIT backdoor</td><td>Mandiant "APT1" report</td><td>2013-02-19</td></tr>
+        <tr><td class="type-label">INFRA</td><td class="val">937+ identified C2 servers across 13 countries — full historical IP/domain/certificate appendix published separately by Mandiant</td><td>Mandiant "APT1" report appendix</td><td>2013-02-19</td></tr>
+        <tr><td class="type-label">PERSONA</td><td class="val">"UglyGorilla" (Wang Dong), "SuperHard" (Mei Qiang) — named operator handles identified via forensic/OPSEC analysis</td><td>Mandiant; US DOJ indictment</td><td>2013-02 / 2014-05</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">Mandiant's original report included one of the largest public indicator releases of its time — MD5 hashes, FQDNs, X.509 certificates, and IP ranges — as a separate published appendix. Given the intervening 13 years and the group's confirmed 2013 infrastructure teardown, treat all of it as archival/historical. Consult the original Mandiant APT1 report and its appendix directly for the complete historical indicator set rather than any single indicator reproduced secondhand.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">HIGH (Historical) — not currently an active tracked threat under this designation</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Assessed dormant/absorbed — no activity publicly attributed to this designation since 2013 exposure and the 2015–16 PLA restructuring</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability (Historical)</span><span class="kv-val red">Sustained, multi-year persistence enabling systematic harvesting of an entire economy's worth of strategic intellectual property rather than single high-value targets</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Which currently tracked Chinese APT clusters, if any, directly inherited Unit 61398 personnel, tooling, or mission after the 2015–16 restructuring — no public reporting definitively maps this succession</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">PLA Unit 61398 (legacy designation)</span>
+          <span class="alias-chip">PLA Strategic Support Force (post-2015 successor structure)</span>
+          <span class="alias-chip">Other China-nexus APT clusters (no confirmed operational linkage)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>APT1's most important legacy is not any specific ongoing capability but the model it established: that a private company, using forensic malware analysis, infrastructure correlation, and operators' own OPSEC failures, could publicly and credibly attribute cyber-espionage activity to a specific unit of a specific nation's military — and that doing so could carry real policy consequences, up to and including a first-of-its-kind criminal indictment. Every subsequent high-confidence nation-state attribution report, and the entire "APTn"/vendor-designation naming ecosystem used industry-wide today, traces its lineage directly to this report.</p>
+      <p>Confidence that APT1 "went dark" rather than simply rebranded is moderate-to-high but not absolute: the group's rapid infrastructure teardown within weeks of exposure is well documented, and the 2015–2016 PLA restructuring that created the Strategic Support Force provides a plausible institutional explanation for a change in tracking designation rather than a cessation of capability. No public reporting, however, definitively traces Unit 61398 personnel or toolset lineage into a specific currently tracked Chinese APT cluster — this is a genuine, acknowledged intelligence gap rather than an assumption analysts have resolved.</p>
+      <p>The forward risk this profile represents is almost entirely historical and doctrinal rather than operational: organizations are not at meaningful risk from APT1's specific 2007–2013-era toolset or infrastructure today. Its ongoing relevance is as the foundational case study for understanding Chinese state-directed economic cyber-espionage doctrine, for training analysts in forensic attribution methodology, and as the direct historical antecedent of the modern public/private cyber-attribution ecosystem — including the 2014 indictment model the U.S. government has since repeated against other nation-state actors.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Deploy advanced anti-phishing controls with attachment detonation/sandboxing.</strong> APT1's near-total reliance on spear-phishing for initial access means link/attachment-based defenses remain the single highest-leverage control against this style of tradecraft.</div>
+            <div class="cm-ttp">Counters: T1566.001, T1566.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Restrict and monitor LSASS access.</strong> Enable Credential Guard and LSASS protection (RunAsPPL) to blunt Mimikatz-style in-memory credential dumping.</div>
+            <div class="cm-ttp">Counters: T1003.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Detect and block pass-the-hash lateral movement.</strong> Enforce restricted-admin RDP, disable NTLM where feasible, and monitor for authentication patterns consistent with pass-the-hash.</div>
+            <div class="cm-ttp">Counters: T1550.002, T1021.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Monitor for masquerading executables.</strong> Alert on binaries with mismatched digital signatures or hashes relative to their claimed identity (e.g., a file named AcroRD32.exe that does not match Adobe's signed binary).</div>
+            <div class="cm-ttp">Counters: T1036.005</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Baseline and alert on native-tool reconnaissance chains.</strong> Correlate sequences of net.exe, tasklist, ipconfig, and similar built-in commands run in unusual order or volume, since APT1-style operators deliberately minimize custom tooling during discovery to blend in.</div>
+            <div class="cm-ttp">Counters: T1087.001, T1135</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Monitor mail-store access patterns for bulk extraction.</strong> Alert on anomalous, high-volume access to Exchange mailboxes or local .pst files outside normal user behavior — the signature of GETMAIL/MAPIGET-style bulk email theft.</div>
+            <div class="cm-ttp">Counters: T1114</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Enforce data-loss prevention on outbound archive traffic.</strong> Flag or block large RAR/ZIP archives being staged and transferred to external destinations, particularly from file-share or engineering-document repositories.</div>
+            <div class="cm-ttp">Counters: T1560.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Assume long dwell times and hunt accordingly.</strong> Given APT1's average 356-day (and up to 1,764-day) dwell times, threat-hunting programs should include retrospective log analysis reaching back a full year or more, not just recent-activity alerting.</div>
+            <div class="cm-ttp">Counters: General dwell-time/persistence posture</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Mandiant</div>
+        <div>
+          <div class="ref-detail"><a href="https://services.google.com/fh/files/misc/mandiant-apt1-report.pdf" target="_blank">APT1: Exposing One of China's Cyber Espionage Units (Original Report)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary" style="font-family: var(--mono); font-size: 8px; color: var(--accent3); margin-top: 2px;">CONTEMPORANEOUS REPORTING — 2013-02-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0006/" target="_blank">APT1, Comment Crew, Comment Group, Comment Panda — Group G0006</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/PLA_Unit_61398" target="_blank">PLA Unit 61398</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">US DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/archives/opa/pr/us-charges-five-chinese-military-hackers-cyber-espionage-against-us-corporations-and-labor" target="_blank">U.S. Charges Five Chinese Military Hackers for Cyber Espionage</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary" style="font-family: var(--mono); font-size: 8px; color: var(--accent3); margin-top: 2px;">CONTEMPORANEOUS REPORTING — 2014-05-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/news/stories/five-chinese-military-hackers-charged-with-cyber-espionage-against-us" target="_blank">Five Chinese Military Hackers Charged with Cyber Espionage Against U.S.</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/wanted/cyber/wang-dong/wang-dong_chinese-poster_simplified.pdf/view" target="_blank">FBI Wanted Poster — Wang Dong</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CFR</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cfr.org/cyber-operations/pla-unit-61398" target="_blank">Cyber Operations Tracker — PLA Unit 61398</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Lawfare</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.lawfaremedia.org/article/the-pla's-cyber-operations-go-dark" target="_blank">The PLA's Cyber Operations Go Dark</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Lawfare</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.lawfaremedia.org/article/mandiant-report-apt1" target="_blank">Mandiant Report on "APT1"</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/lockheed-attackers-went-quiet-after-apt1-report-exposed-chinese-hackers/" target="_blank">Lockheed: Attackers Went Quiet After APT1 Report Exposed Chinese Hackers</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/whats-threat-group-name-inside-look-intricacies-nation-state-attribution/" target="_blank">What's in a Threat Group Name? Nation-State Attribution</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/vulnerabilities-threats/one-year-later-the-apt1-report" target="_blank">One Year Later: The APT1 Report</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Nat'l Security Archive</div>
+        <div>
+          <div class="ref-detail"><a href="https://nsarchive.gwu.edu/document/21484-document-83" target="_blank">Mandiant, APT 1: Exposing One of China's Cyber Espionage Units (Archived Document)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Zetter Zero Day</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.zetter-zeroday.com/how-the-infamous-apt-1-report-exposing-chinas-pla-hackers-came-to-be/" target="_blank">How the Infamous APT-1 Report Exposing China's PLA Hackers Came to Be</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Foreign Policy</div>
+        <div>
+          <div class="ref-detail"><a href="https://foreignpolicy.com/2015/09/02/the-u-s-hoped-indicting-5-chinese-hackers-would-deter-beijings-cyberwarriors-it-hasnt-worked/" target="_blank">The U.S. Hoped Indicting 5 Chinese Hackers Would Deter Beijing's Cyberwarriors. It Hasn't Worked.</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Wang_Dong_(hacker)" target="_blank">Wang Dong (hacker)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Hedgehog Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.hedgehogsecurity.co.uk/blog/apt1-the-persistent-data-hoarder" target="_blank">APT1: The Persistent Data Hoarder — Threat Profile</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">EuRepoC</div>
+        <div>
+          <div class="ref-detail"><a href="https://eurepoc.eu/publication/apt-profile-apt-1/" target="_blank">APT Profile — APT 1</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 18 sources, 11 web searches</div>
+  <div>Status: Historical/dormant — no active operations under this designation since 2013–16 · Attribution confidence: HIGH · ATT&amp;CK: 12 techniques mapped</div>
+</div>
+
+</body>
+</html>
