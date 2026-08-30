@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spectre / Meltdown — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  /* Patch status badge */
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  /* KEV badge */
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 58px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  /* ── CVSS SCORE CALLOUT ── */
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--amber);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  /* ── CWE BLOCK ── */
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── LIFECYCLE TRACK ── */
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── CVSS VECTOR BREAKDOWN ── */
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  /* ── AFFECTED VERSIONS TABLE ── */
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  /* ── EXPLOITATION TIMELINE ── */
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── KEV BLOCK ── */
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ── PURPLE TEAM TABS ── */
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  /* Query blocks */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── CROSS-REFERENCE LINKS ── */
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  /* ── CVE METADATA BLOCK ── */
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO / THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 34px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-resolved">RESOLVED · HISTORICAL</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — CPU Side-Channel / Information Disclosure (Speculative Execution) · Intel · AMD · ARM · IBM</div>
+  <h1><span class="cyan">SPECTRE</span> / MELTDOWN</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    CVE: CVE-2017-5753 · CVE-2017-5715 · CVE-2017-5754 (original three; see Section 09 for the wider family) &nbsp;|&nbsp;
+    CWE: CWE-1303 (modern classification) · CWE-200 / CWE-203 (original per-CVE assignment) &nbsp;|&nbsp;
+    SOURCES: 17
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="amber">5.6 (MEDIUM, per NVD — see analytical note)</span></div>
+    <div>Affected: <span>Virtually all Intel x86 CPUs since 1995; many AMD and ARM cores; IBM Power</span></div>
+    <div>Disclosed: <span>2018-01-03 (embargo broken early; coordinated date was 2018-01-09)</span></div>
+    <div>Patch Date: <span>2018-01-03 onward (OS/microcode/compiler — no single patch)</span></div>
+    <div>KEV Added: <span class="dim">Not listed — see Section 06</span></div>
+    <div>EPSS: <span>0.74 – 0.94 across the three CVEs</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score medium">5.6</div>
+    <div class="cvss-label">CVSS v3 Base Score (NVD, all three CVEs)</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2017-5754 (Meltdown)</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">+ CVE-2017-5753 (Spectre v1) · CVE-2017-5715 (Spectre v2) — all scored identically by NVD</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.0/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">20+</div>
+    <div class="stat-label">Named transient-execution attack variants disclosed since 2018 (Foreshadow, MDS, Retbleed, Downfall, and more)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">8 YRS</div>
+    <div class="stat-label">And counting — years this weakness class has continued producing new CVEs</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">0</div>
+    <div class="stat-label">Confirmed real-world breaches publicly attributed to Spectre/Meltdown-class exploitation, as of this compile</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">≤30%</div>
+    <div class="stat-label">Peak throughput loss on I/O-heavy workloads from early 2018 KPTI mitigations</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Meltdown and Spectre are the founding members of an entire vulnerability class — transient execution attacks — disclosed on January 3, 2018 (early, and simultaneously) after roughly seven months of coordinated, multi-vendor secrecy. Unlike a software bug confined to one library or one product, these are hardware design flaws in the speculative-execution and branch-prediction logic that virtually every modern high-performance CPU relies on for speed. Meltdown (CVE-2017-5754) let an unprivileged process read arbitrary kernel memory on affected Intel (and some ARM) processors; Spectre (CVE-2017-5753, Variant 1, "Bounds Check Bypass," and CVE-2017-5715, Variant 2, "Branch Target Injection") let an attacker trick almost any modern CPU's branch predictor into speculatively executing code paths that leak data across security boundaries — including, critically, from inside a web browser's JavaScript sandbox.</p>
+      <p>The scale of exposure was without precedent for a CPU-level bug: virtually every Intel x86 processor shipped since 1995, many ARM Cortex-A cores used in smartphones and embedded devices, and IBM Power processors were affected — meaning nearly every laptop, desktop, server, smartphone, and cloud instance running any mainstream operating system in early 2018 required some combination of OS, microcode, and compiler-level mitigation. Because cloud computing depends on strong isolation between co-tenant virtual machines sharing physical CPUs, Spectre and Meltdown were treated as an existential threat to the multi-tenant cloud model specifically — a VM on a shared host could, in principle, read data belonging to a different customer's VM on the same physical processor.</p>
+      <p>Spectre/Meltdown matter to a CTI practice in 2026 not because of documented breaches — there remains no confirmed public case of criminal or espionage exploitation, discussed candidly in Section 06 — but because they permanently changed the threat model for hardware. They created an entire, still-active academic and red-team research subfield (transient execution / microarchitectural side-channel attacks) that has produced upward of twenty additional named variants since 2018 (Foreshadow, the MDS family, SWAPGS, Retbleed, Downfall, Zenbleed, Inception, and others), several as recently as 2023–2024. Any organization operating shared/multi-tenant compute, high-assurance isolation boundaries (hypervisors, SGX-style enclaves, browser sandboxes), or long-lifecycle hardware should treat this as a permanent category of residual risk rather than a closed 2018 incident.</p>
+      <p>Who is at risk today: primarily cloud providers and any organization relying on hardware-enforced isolation between mutually distrusting workloads on shared silicon. For general enterprise endpoints and servers, the original three CVEs have been mitigated for years through routine OS, browser, and firmware updates; the residual risk sits almost entirely with unpatched legacy/embedded systems and with the ongoing discovery of new variants against which today's mitigations were not designed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-1303</span>
+        <span class="cwe-name">Non-Transparent Sharing of Microarchitectural Resources</span>
+      </div>
+      <div class="cwe-body">Hardware structures shared across execution contexts — caches, branch predictors, execution ports, internal buffers — can violate the architectural isolation an operating system or hypervisor believes it is enforcing, if the extent of that sharing is not accounted for in the security model (MITRE CWE-1303). This weakness class was defined by MITRE specifically in response to Spectre/Meltdown-style attacks; the original 2018 CVE records predate CWE-1303 and were filed under the more generic CWE-200 (Exposure of Sensitive Information) and CWE-203 (Observable Discrepancy) instead.</div>
+      </div>
+    <div class="prose">
+      <p>Modern CPUs execute far ahead of the program's true control flow to hide memory latency: they guess which way a branch will go (branch prediction) and begin executing instructions along the guessed path before the guess is confirmed (speculative execution), and they let independent instructions run out of program order when their inputs are ready (out-of-order execution). If the guess is wrong, the CPU architecturally discards the speculative results — but it does not undo their microarchitectural side effects, chiefly what got pulled into the CPU cache during the speculative window. Spectre and Meltdown both exploit this gap between "architecturally invisible" and "microarchitecturally observable."</p>
+      <p><strong>Spectre</strong> (CVE-2017-5753 / CVE-2017-5715) works by mistraining a CPU's branch predictor: an attacker repeatedly executes a branch with in-bounds, harmless inputs until the predictor learns to expect that branch to be taken, then supplies an out-of-bounds or attacker-chosen input on the next call. The CPU speculatively executes the mispredicted path — briefly touching memory the program was never supposed to access — before rolling back the architectural state. The touched memory's address leaves a measurable trace in cache timing, which the attacker recovers with a cache side-channel (classically, Flush+Reload).</p>
+      <p><strong>Meltdown</strong> (CVE-2017-5754) is narrower but more severe on affected Intel processors: it exploits the fact that some out-of-order cores perform a memory access speculatively before checking whether the requesting process is actually permitted to read that address. By the time the permission-check exception fires and the CPU discards the result, the accessed kernel-memory byte has already been used to influence a subsequent, attacker-controlled memory access — again leaving a cache-timing trace an unprivileged user-mode process can read out, effectively bypassing the hardware-enforced user/kernel memory boundary entirely.</p>
+      <p>Both are hardware design flaws, not implementation bugs in a specific piece of software — which is why there is no single authoritative "patch" the way there is for Heartbleed. Every mitigation (Section 05, Section 08) works around the underlying microarchitecture rather than fixing it, and true architectural fixes only arrived in later CPU generations that redesigned the affected prediction/execution logic.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>2017-06</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>2018-01-03</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">03</div>
+        <div class="lc-label">Patch Chaos<br/>2018-01 → 02</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">Variant Cascade<br/>2018 → present</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node dim">05</div>
+        <div class="lc-label">Resolution<br/>Partial / ongoing</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Google Project Zero researcher Jann Horn discovered the underlying speculative-execution issue independently around June 2017; academic teams at Graz University of Technology (Meltdown) and a separate multi-institution group led by Paul Kocher (Spectre) arrived at closely related findings around the same period. Intel, AMD, ARM, and the major cloud and OS vendors were brought into a coordinated disclosure process under strict embargo beginning mid-2017, with a planned joint public disclosure date of January 9, 2018.</p>
+      <p>The embargo broke six days early. Observers—including this repository's own review of contemporaneous reporting—traced the leak to public Linux kernel mailing-list activity: patches implementing Kernel Page Table Isolation (KPTI, initially called KAISER) began appearing in the open Linux kernel tree in November–December 2017 without public explanation, drawing pointed speculation from security researchers about what critical, hardware-level issue could require such an invasive and performance-costly fix. The Register published a story on January 2, 2018 naming the likely CPU flaw; Google and the Graz team published full technical details and named the vulnerabilities the next day, January 3, forcing every vendor in the coordination group to accelerate their own advisories and patches simultaneously and without their planned lead time.</p>
+      <p>What followed was an unusually public vendor-response failure. Initial OS-level (KPTI) and firmware-level (microcode) mitigations shipped within days, but by January 22, 2018, Intel was forced to advise OEMs, cloud providers, and end users to stop deploying its own Spectre microcode updates after widespread reports of spontaneous reboots on Broadwell, Haswell, Sandy Bridge, Ivy Bridge, Skylake, and Kaby Lake systems — a rare case of a vendor publicly retracting its own emergency security patch due to stability regressions, in the middle of the highest-profile CPU vulnerability disclosure in the industry's history. Revised, stable microcode did not fully roll out across the affected product lines for several more months. Since then, the "lifecycle" has never fully closed: the same underlying speculative-execution/branch-prediction weakness (CWE-1303) has continued to yield new named variants and CVEs from 2018 through at least 2024 (Section 07), making Spectre/Meltdown better understood as the opening chapter of an ongoing research area than as a single closed incident.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Coordinated multi-vendor — embargo broken early by external speculation</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Jann Horn (Google Project Zero); Graz UT team; Paul Kocher et al.</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val">~2017-06 (Google to Intel); coordination group formed by mid-2017</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val amber">Concurrent with disclosure — academic PoCs, no pre-patch weaponized exploit observed</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val green">Mitigations available at disclosure, though incomplete and later partially retracted</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val red">Fast but unstable — Intel told customers to stop installing its own patch within 3 weeks</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val red">Alarm plus scrutiny of vendor conduct — CEO stock-sale controversy, 32+ lawsuits</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val amber">Largely — but the coordination window was cut short by external leaks, not by the participants</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Beyond the technical embargo break, the Spectre/Meltdown disclosure is inseparable from a serious corporate-governance controversy. Intel CEO Brian Krzanich sold approximately $24 million of Intel stock — reducing his holdings to the minimum required under his compensation plan — in late November 2017, months after Intel had been notified of the flaws (around June 2017) and shortly after adopting a 10b5-1 trading plan on October 30, 2017. Because the trading plan was adopted after Intel already knew about the vulnerabilities, U.S. senators publicly called on the SEC and Department of Justice to investigate the timing, and Intel faced its first shareholder lawsuit over the matter within days of public disclosure; the company was ultimately named in more than thirty class-action lawsuits related to Meltdown and Spectre, including securities claims alleging Intel made misleading statements about product security. This repository's confidence in the timeline of Intel's internal knowledge versus the stock sale is high (corroborated by Intel's own SEC filings and multiple independent outlets); confidence in whether the timing constituted actionable insider trading is low — that question was for regulators and courts to determine, and this card does not take a position on it.</p>
+      <p>The technical disclosure itself is a strong example of coordinated vulnerability disclosure under real-world pressure: the participating vendors maintained silence for roughly seven months, a genuinely difficult feat across dozens of organizations, and the eventual six-day-early release was a reaction to outside speculation rather than a breakdown among the coordinating parties. The subsequent patch-quality failure (Intel's own mitigation causing reboots) is the more instructive disclosure-adjacent lesson: an emergency, under-tested hardware-adjacent fix rushed out under public pressure introduced a second, self-inflicted reliability crisis on top of the original security one.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>A practical Spectre (Variant 1) attack against, for example, a web browser's JavaScript engine trains a bounds-check branch with in-range array indices in a tight loop, then supplies an out-of-range index. The CPU speculatively executes the array read using the attacker-chosen out-of-range index before the bounds check resolves, loading an out-of-bounds byte into a cache line whose address depends on the leaked byte's value. The attacker then times reads across a large probe array (Flush+Reload) to determine which cache line was populated, recovering the secret byte one bit-pattern at a time — entirely through the browser's JavaScript sandbox, with no native code execution required, which is what made Spectre relevant to literally every internet user's web browser rather than only to specialized local-access scenarios.</p>
+      <p>Meltdown's exploitation path against affected Intel CPUs is more direct: an unprivileged process attempts to read a kernel-memory address it has no permission to access. The out-of-order core begins the read and uses the (privileged, and therefore normally inaccessible) result to index into an attacker-allocated probe array — entirely inside the speculative execution window — before the delayed permission-check exception aborts the instruction. The now-cached probe-array entry, again recovered via cache-timing analysis, reveals the byte of kernel memory the process should never have been able to read, at rates fast enough (originally reported around 120KB/s, later PoCs went faster) to dump substantial kernel memory in minutes.</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3 Vector Breakdown — CVSS:3.0/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N (as scored by NVD for all three original CVEs)</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val amber">LOCAL</div>
+          <div class="cvss-comp-meaning">NVD scores this as requiring local code execution — but in practice, "local" is trivially satisfied by a cloud VM tenant, or by JavaScript in a browser tab, understating real-world reach.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val amber">HIGH</div>
+          <div class="cvss-comp-meaning">Requires precise cache-timing measurement and branch-predictor manipulation — nontrivial to engineer, though public tooling has since made this routine for researchers.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val amber">LOW</div>
+          <div class="cvss-comp-meaning">Any unprivileged local process or sandboxed script can attempt exploitation — no elevated OS privileges needed.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No victim action beyond running the attacker's code/script is required once that code is running.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val red">CHANGED</div>
+          <div class="cvss-comp-meaning">Impact crosses the security boundary the CPU is supposed to enforce (process/VM/kernel isolation) — the defining characteristic of this vulnerability class.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Can leak arbitrary process/kernel/co-tenant memory, including cryptographic keys and credentials held in memory.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val amber">NONE</div>
+          <div class="cvss-comp-meaning">A read-only information-disclosure primitive — it does not itself modify data or system state.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val amber">NONE</div>
+          <div class="cvss-comp-meaning">No direct denial-of-service effect; the targeted system continues normal operation throughout exploitation.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Platforms</div>
+      <table class="versions-table">
+        <thead><tr><th>Vendor</th><th>Affected</th><th>Variant(s)</th><th>Primary Mitigation</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Intel</td><td>Virtually all x86 CPUs since 1995 (excl. pre-2013 Atom, Itanium)</td><td class="vuln">Spectre v1, v2, Meltdown</td><td class="fixed">KPTI + microcode (IBRS/IBPB) + retpoline</td><td>Mitigated — routine since 2018</td></tr>
+          <tr><td>AMD</td><td>Most CPU families (not vulnerable to classic Meltdown, per AMD's original statement)</td><td class="partial">Spectre v1, v2</td><td class="fixed">Retpoline + microcode</td><td>Mitigated — routine since 2018</td></tr>
+          <tr><td>ARM</td><td>Cortex-A75 and other high-performance cores</td><td class="partial">Spectre v1, v2</td><td class="fixed">Firmware/OS mitigations per ARM whitepaper</td><td>Mitigated — routine since 2018</td></tr>
+          <tr><td>IBM</td><td>Power7+ processors</td><td class="partial">Spectre v1, v2</td><td class="fixed">Firmware + OS mitigations</td><td>Mitigated — routine since 2018</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block not-listed">
+      <div class="kev-header">
+        <span class="kev-tag not-listed">NOT LISTED IN CISA KEV</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Checked against the current KEV catalog as of 2026-08-30</span>
+      </div>
+      <div class="kev-body">None of CVE-2017-5753, CVE-2017-5715, or CVE-2017-5754 appear in the CISA Known Exploited Vulnerabilities catalog. This is a genuine and notable data point, not an oversight: eight years after disclosure, and despite an entire subsequent research field building on the same underlying weakness, there remains no public evidence meeting KEV's bar of confirmed, in-the-wild criminal or espionage exploitation. Dell's own January 26, 2018 advisory stated plainly that "no 'real-world' exploits of these vulnerabilities have been reported to date, though researchers have produced proof-of-concepts" — and this repository found no credible, corroborated report changing that assessment as of this compile.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Family Timeline — Original Disclosure Through the Ongoing Variant Cascade</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">2018-01-03</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Meltdown &amp; Spectre Disclosed</div>
+            <div class="et-desc">Academic PoCs published; no weaponized exploit code released alongside disclosure, unusual for a vulnerability of this profile.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2018-05-21</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Spectre-NG — Variants 3a &amp; 4</div>
+            <div class="et-desc">CVE-2018-3640 (Rogue System Register Read) and CVE-2018-3639 (Speculative Store Bypass) disclosed by Microsoft Security Response Center and Google Project Zero, extending the same underlying class to new mechanisms.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2018-08-14</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Foreshadow / L1TF</div>
+            <div class="et-desc">CVE-2018-3615, CVE-2018-3620, CVE-2018-3646 — a Meltdown-type attack against Intel SGX enclaves and L1 cache, defeating hardware-isolated "secure enclave" protections specifically.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2019-05-14</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">MDS Family — ZombieLoad, RIDL, Fallout</div>
+            <div class="et-desc">CVE-2018-12130 and related Microarchitectural Data Sampling CVEs leak data from internal CPU buffers rather than the cache directly, requiring a new mitigation generation (microcode + buffer-clearing instructions).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2022 → 2024</div>
+          <div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Retbleed, Downfall, Zenbleed, Inception/SRSO</div>
+            <div class="et-desc">Successive discoveries showed that retpoline (Retbleed, 2022, AMD/Intel), AVX-512 gather instructions (Downfall, 2023, Intel), register-file handling (Zenbleed, 2023, AMD), and return-stack prediction (Inception/SRSO, 2023, AMD) each reopened variations of the same fundamental weakness against supposedly-hardened CPUs.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2024 → present</div>
+          <div class="et-track"><div class="et-dot dim"></div></div>
+          <div class="et-content">
+            <div class="et-event">Active Research Area, No Confirmed Breach</div>
+            <div class="et-desc">GhostRace, SLAM, TikTag, Indirector, and other 2024-era findings continue the pattern: active, credible academic/red-team research with no publicly documented real-world criminal exploitation of the class to date.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>No card currently on file in this repository documents an actor or incident tied to Spectre/Meltdown-class exploitation, and — unlike Heartbleed or PrintNightmare — this repository is not aware of a credible candidate incident to flag for future creation, precisely because no confirmed real-world breach has been publicly attributed to this vulnerability class. This absence is itself the most important analytical fact in this section; see Section 08 for why that does not mean the risk is negligible for the specific population (cloud multi-tenancy, hardware enclaves) it actually threatens.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Spectre and Meltdown are the clearest demonstration on record that a performance optimization can be a permanent, structural security liability rather than a bug to be patched away. Speculative execution and branch prediction exist because they deliver real, substantial performance gains that the entire high-performance computing industry has depended on for over two decades; removing them outright would sacrifice a significant fraction of a modern CPU's throughput. Every mitigation shipped since 2018 — KPTI, retpoline, microcode barriers, buffer-clearing instructions — is consequently a workaround that trades some of that performance back for security, not a fix that restores the original design's safety at no cost. This is architecturally different from PrintNightmare (a fixable software logic error) or Heartbleed (a fixable missing bounds check): here, the "bug" is an inherent property of how the hardware was designed to be fast, discovered only after that design had shipped in billions of units already in the field.</p>
+      <p>The eight-year, twenty-plus-variant cascade that followed the original disclosure is the strongest evidence available that this is a genuine, open-ended weakness class (CWE-1303) rather than a pair of one-off bugs. Foreshadow defeated Intel's own hardware-isolated SGX enclaves — the very feature marketed as a defense against this class of attack. Retbleed, four years later, defeated retpoline — the mitigation the industry had settled on as retpoline's namesake defense against Spectre v2. Downfall and Zenbleed found entirely new leakage paths through vector-instruction and register-renaming logic nobody had scrutinized in the original 2018 analysis. Each new variant follows the same pattern: researchers find a microarchitectural resource (a buffer, a predictor, a register file) that is shared across security contexts in a way the CPU's documentation never made explicit, exactly matching CWE-1303's definition. There is no reason to expect this pattern to stop; CPU vendors continue shipping new speculative and out-of-order optimizations, and each one is a candidate for the next variant.</p>
+      <p>The durable lesson for defenders is to treat hardware-enforced isolation boundaries — hypervisor tenant separation, secure enclaves, browser process sandboxes, TrustZone/SGX-style trusted execution environments — as probabilistic rather than absolute, particularly where genuinely mutually-distrusting parties share physical silicon. Cloud providers responded to this reality with additional software-level isolation layers (stronger VM scheduling isolation, disabling simultaneous multithreading on sensitive workloads, dedicated-host offerings) precisely because they concluded the CPU alone could not be fully trusted to enforce the boundary its marketing had promised. Organizations building new trust boundaries on top of shared hardware today should assume this pattern continues rather than assume 2018's mitigations were the last word.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <!-- A: DETECTION -->
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <div class="prose" style="margin-bottom:12px;">
+        <p>Detecting active exploitation of a cache-timing side channel from host or network telemetry alone is a fundamentally different problem than detecting a network exploit or a malicious file: there is no packet, no payload, and no syscall that is unambiguously "a Spectre attack" versus legitimate high-performance code. Realistic detection focuses on compliance/exposure verification and anomalous performance-counter patterns rather than a signature match.</p>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Mitigation-presence verification (host inventory query, illustrative)</div>
+        <div class="query-code">GET /sys/devices/system/cpu/vulnerabilities/{meltdown,spectre_v1,spectre_v2}
+# Expect: "Mitigation: PTI" (Meltdown), "Mitigation: usercopy/swapgs barriers" (Spectre v1),
+#         "Mitigation: Retpolines, IBPB, IBRS_FW" (Spectre v2) on Linux hosts.
+# Any host returning "Vulnerable" for a mainline CVE 6+ years post-patch is a hygiene finding, not a live-attack signal.</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Anomalous cache-timing / performance-counter activity (research-grade, high false-positive rate)</div>
+        <div class="query-code">SELECT host, process, AVG(llc_misses), AVG(branch_mispredicts)
+FROM perf_counter_telemetry
+WHERE process NOT IN (approved_hpc_workloads)
+GROUP BY host, process
+HAVING AVG(llc_misses) > baseline_p99 AND AVG(branch_mispredicts) > baseline_p99
+# Flags processes with statistically abnormal cache/branch-predictor activity worth manual review;
+# NOT a reliable standalone detector — legitimate cryptographic and HPC code trips this routinely.</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>The most actionable "detection" available to most organizations is exposure verification, not attack detection: confirm every host, hypervisor, and browser reports the expected mitigation state for its CPU generation, and treat any host still reporting "Vulnerable" for a mainline CVE this many years post-disclosure as a hygiene failure requiring remediation, not as evidence of an ongoing attack.</p>
+      </div>
+    </div>
+
+    <!-- B: HUNTING -->
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis 1 — Mitigations silently disabled for performance.</strong> Because KPTI, retpoline, and related mitigations carry a real, measurable performance cost, hunt for hosts where mitigations were deliberately disabled (via kernel boot parameters such as <code>mitigations=off</code>, or BIOS/UEFI options) to reclaim throughput, particularly on database, storage, or HPC-tuned systems where administrators are most incentivized to trade security for speed.</p>
+        <p><strong>Hypothesis 2 — Unpatched legacy hypervisor/firmware exposing multi-tenant risk.</strong> For any organization running its own virtualization infrastructure (rather than a major public cloud), verify hypervisor and CPU microcode versions specifically for tenant-isolation-relevant mitigations (L1TF/Foreshadow flush-on-VM-entry, MDS buffer clearing) — these are easy to miss because they are not part of routine OS patching and require separate hypervisor and firmware updates.</p>
+        <p><strong>Hypothesis 3 — SGX/enclave or TEE-dependent applications assuming absolute isolation.</strong> Identify any application whose security design assumes an Intel SGX enclave, ARM TrustZone, or similar hardware TEE provides an unconditional confidentiality boundary, and confirm the design has been reassessed against Foreshadow-class attacks — several early SGX-dependent architectures (e.g., certain confidential-computing and DRM schemes) were designed before this class of attack was known and may still carry unstated risk in their threat model.</p>
+      </div>
+    </div>
+
+    <!-- C: PATCH GUIDANCE -->
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Mitigation</span><span class="kv-val green">OS kernel update (KPTI) + compiler/binary retpoline + CPU microcode — all three, not one</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2018-01-03 onward; microcode revisions continued through mid-2018</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val red">High historically — Intel's own Jan 2018 microcode caused spontaneous reboots and was withdrawn</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">For any legacy system just now being remediated: stage microcode/firmware updates before fleet-wide rollout, given the documented 2018 stability history</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisories</span><span class="kv-val cyan">Intel, AMD, ARM, IBM, and every major OS/hypervisor vendor issued independent advisories</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val">Yes — accelerated by 6 days due to the embargo break</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val">Not fully — later variants (Foreshadow, MDS, Retbleed, etc.) each required their own, separate mitigation on top of the original three</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>For virtually all currently-supported hardware and operating systems in 2026, the original three CVEs are fully mitigated by default in any maintained OS and current microcode/firmware. The residual patch-guidance work that remains relevant is: (1) confirming any long-lived legacy system (embedded, industrial, unsupported OS) that has never received post-2018 updates actually has the mitigations applied, and (2) confirming the full, later variant lineage (Foreshadow, MDS, Retbleed, Downfall, Zenbleed, and current-year findings) has also been addressed via hypervisor and firmware updates specifically, since OS patching alone does not cover every layer these later variants touch.</p>
+      </div>
+    </div>
+
+    <!-- D: COMPENSATING CONTROLS -->
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>For unpatchable legacy/embedded systems, avoid co-locating mutually distrusting workloads on the same physical CPU entirely</strong> — dedicated hardware is the most reliable compensating control where software mitigation is unavailable.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Disable simultaneous multithreading (SMT/Hyper-Threading)</strong> on hosts running highly sensitive or multi-tenant workloads where several MDS-class variants specifically leak data across sibling hyperthreads.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Keep browsers current</strong> as the single highest-leverage control for the general population of end-user devices — modern browser engines implement site isolation and array-bounds hardening specifically to blunt Spectre-style JavaScript exploitation, independent of OS/CPU patch status.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div class="cm-text"><strong>For cloud/hosting providers still running older hypervisor versions,</strong> verify VM-exit cache-flushing and buffer-clearing mitigations (for L1TF and MDS specifically) are enabled — these are frequently a separate hypervisor configuration flag, not bundled automatically with guest OS patches.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div class="cm-text"><strong>Do not disable mitigations for performance</strong> without an explicit, documented risk acceptance — the temptation to run with <code>mitigations=off</code> on performance-sensitive infrastructure reintroduces the entire vulnerability class for a measurable but generally modest throughput gain on modern hardware.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block — original three + representative family members</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:14px;">
+      <p>The Spectre/Meltdown family has produced well over two dozen distinct CVEs across Intel, AMD, and ARM since 2018. A complete per-CVE accounting of every named variant (Foreshadow's 3 CVEs, the MDS family's 6+ CVEs, and a dozen more since) is out of scope for this card; the table below covers the three foundational CVEs in full and lists representative follow-on variants for reference and further research.</p>
+    </div>
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2017-5754 (Meltdown)</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3 Score</span><span class="kv-val amber">5.6 (Medium)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.0/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-200 (original); CWE-1303 (modern)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val">0.826 (99.65th percentile)</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-5754" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2017-5754</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not listed</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2017-5753 (Spectre v1)</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3 Score</span><span class="kv-val amber">5.6 (Medium)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-203 (original); CWE-1303 (modern)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val red">0.938 (99.84th percentile)</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-5753" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2017-5753</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not listed</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2017-5715 (Spectre v2)</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3 Score</span><span class="kv-val amber">5.6 (Medium)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-203 (original); CWE-1303 (modern)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val">0.740 (99.46th percentile)</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-5715" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2017-5715</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not listed</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">Representative Family Members</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Spectre-NG v3a / v4</span><span class="kv-val mono">CVE-2018-3640 / CVE-2018-3639</span></div>
+          <div class="kv-row"><span class="kv-key">Foreshadow / L1TF</span><span class="kv-val mono">CVE-2018-3615 / -3620 / -3646</span></div>
+          <div class="kv-row"><span class="kv-key">MDS (ZombieLoad/RIDL)</span><span class="kv-val mono">CVE-2018-12130 (+5 related)</span></div>
+          <div class="kv-row"><span class="kv-key">Retbleed (2022)</span><span class="kv-val mono">CVE-2022-29900 / -29901</span></div>
+          <div class="kv-row"><span class="kv-key">Downfall (2023, Intel)</span><span class="kv-val mono">CVE-2022-40982</span></div>
+          <div class="kv-row"><span class="kv-key">Zenbleed (2023, AMD)</span><span class="kv-val mono">CVE-2023-20593</span></div>
+          <div class="kv-row"><span class="kv-key">Inception / SRSO (2023, AMD)</span><span class="kv-val mono">CVE-2023-20569</span></div>
+          <div class="kv-row"><span class="kv-key">Note</span><span class="kv-val dim">List is illustrative, not exhaustive — treat each as a separate research target if directly relevant to your fleet</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <div class="xref-none">No companion actor cards on file, and none are expected — no threat actor is publicly documented as having weaponized Spectre/Meltdown-class attacks in an operational campaign as of 2026-08-30 (see Section 06).</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <div class="xref-none">No companion incident cards on file, and none are known to be warranted — no publicly attributed breach incident has cited Spectre/Meltdown-class exploitation as an initial access vector as of 2026-08-30.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div><div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-5754" target="_blank">CVE-2017-5754 Detail (Meltdown)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div><div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-5753" target="_blank">CVE-2017-5753 Detail (Spectre v1)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div><div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-5715" target="_blank">CVE-2017-5715 Detail (Spectre v2)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE CWE</div>
+        <div><div class="ref-detail"><a href="https://cwe.mitre.org/data/definitions/1303.html" target="_blank">CWE-1303: Non-Transparent Sharing of Microarchitectural Resources</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/alerts/2018/01/04/meltdown-and-spectre-side-channel-vulnerability-guidance" target="_blank">Meltdown and Spectre Side-Channel Vulnerability Guidance</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA KEV Catalog</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json" target="_blank">Known Exploited Vulnerabilities Catalog (full feed, checked for absence)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FIRST.org</div>
+        <div><div class="ref-detail"><a href="https://api.first.org/data/v1/epss?cve=CVE-2017-5753,CVE-2017-5754,CVE-2017-5715" target="_blank">EPSS API — Spectre/Meltdown CVEs</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Google Project Zero / Original Research</div>
+        <div><div class="ref-detail"><a href="https://spectreattack.com/spectre.pdf" target="_blank">Spectre Attacks: Exploiting Speculative Execution</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia (secondary, corroborating)</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Meltdown_(security_vulnerability)" target="_blank">Meltdown (security vulnerability)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TechTarget</div>
+        <div><div class="ref-detail"><a href="https://www.techtarget.com/searchsecurity/news/252446638/Meltdown-and-Spectre-disclosure-suffered-extraordinary-miscommunication" target="_blank">Meltdown and Spectre Disclosure Suffered "Extraordinary Miscommunication"</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Infosec Institute</div>
+        <div><div class="ref-detail"><a href="https://www.infosecinstitute.com/resources/malware-analysis/meltdown-spectre-patches-story-delays-lies-failures/" target="_blank">Meltdown and Spectre Patches: A Story of Delays, Lies, and Failures</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DataCenterDynamics</div>
+        <div><div class="ref-detail"><a href="https://www.datacenterdynamics.com/en/news/intel-admits-meltdownspectre-patches-cause-server-reboots/" target="_blank">Intel Admits Meltdown/Spectre Patches Cause Server Reboots</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bloomberg Law</div>
+        <div><div class="ref-detail"><a href="https://news.bloomberglaw.com/business-and-practice/intel-faces-first-shareholder-suit-on-spectre-ceo-stock-sale" target="_blank">Intel Faces First Shareholder Suit on Spectre, CEO Stock Sale</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Washington Post</div>
+        <div><div class="ref-detail"><a href="https://www.washingtonpost.com/news/business/wp/2018/01/11/24-million-stock-sale-by-intel-ceo-draws-fire/" target="_blank">Timing of $24 Million Stock Sale by Intel CEO Draws Scrutiny</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">IT Pro</div>
+        <div><div class="ref-detail"><a href="https://www.itpro.com/exploits/30245/intel-faces-32-lawsuits-over-the-meltdown-and-spectre-flaws" target="_blank">Intel Faces 32 Lawsuits Over the Meltdown and Spectre Flaws</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA (Variants 3a/4)</div>
+        <div><div class="ref-detail"><a href="https://us-cert.cisa.gov/ncas/alerts/TA18-141A" target="_blank">Side-Channel Vulnerability Variants 3a and 4</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia — Foreshadow</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Foreshadow" target="_blank">Foreshadow</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia — Microarchitectural Data Sampling</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Microarchitectural_Data_Sampling" target="_blank">Microarchitectural Data Sampling</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GitHub (speed47/spectre-meltdown-checker)</div>
+        <div><div class="ref-detail"><a href="https://github.com/speed47/spectre-meltdown-checker" target="_blank">spectre-meltdown-checker — Family Vulnerability/Mitigation Checker</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 20 sources, all open-source/public</div>
+  <div>CPU Speculative Execution / CWE-1303 · Original three CVEs resolved; the underlying weakness class remains open-ended — see Section 07</div>
+</div>
+
+</body>
+</html>
