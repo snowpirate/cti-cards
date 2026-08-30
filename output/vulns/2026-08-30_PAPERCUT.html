@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PaperCut — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  /* Patch status badge */
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  /* KEV badge */
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  /* ── CVSS SCORE CALLOUT ── */
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  /* ── CWE BLOCK ── */
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── LIFECYCLE TRACK ── */
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── CVSS VECTOR BREAKDOWN ── */
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  /* ── AFFECTED VERSIONS TABLE ── */
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  /* ── EXPLOITATION TIMELINE ── */
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── KEV BLOCK ── */
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ── PURPLE TEAM TABS ── */
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  /* Query blocks */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── CROSS-REFERENCE LINKS ── */
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  /* ── CVE METADATA BLOCK ── */
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO / THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-now">PATCH NOW</div>
+      <div class="kev-badge">KEV LISTED (2023 GENERATION)</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — Pre-Auth RCE Chain, Two Generations · PaperCut MF / NG Print Management Software</div>
+  <h1><span class="cyan">PAPER</span>CUT</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    CVE: CVE-2023-27350 · CVE-2023-27351 · CVE-2026-81578 · CVE-2026-82078 &nbsp;|&nbsp;
+    CWE: CWE-284 (2023 auth bypass) · CWE-287/303 (2023 info disclosure, tentative) · CWE-306 (2026 access control) · CWE-470 (2026 unsafe reflection) &nbsp;|&nbsp;
+    SOURCES: 26
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">9.8 (CRITICAL) — CVE-2023-27350</span></div>
+    <div>Affected: <span>PaperCut NG/MF 8.0–26.x — exact vulnerable ranges vary per CVE, see Section 05</span></div>
+    <div>First Disclosed: <span>2023-03-14 (coordinated) / Second Chain: 2026-08-27 (post-exploitation)</span></div>
+    <div>Patch Date: <span>2023-03-08 → 2026-08-28 (Emergency Patch Release 2)</span></div>
+    <div>KEV Added: <span class="cyan">2023-04-21 (CVE-2023-27350)</span></div>
+    <div>EPSS: <span>~0.94–0.9999 (2023 gen.) · not yet established (2026 gen., 3 days old)</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">9.8</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2023-27350</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">+ CVE-2026-82078 (9.4) · CVE-2026-81578 (8.8) · CVE-2023-27351 (8.2)</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">2</div>
+    <div class="stat-label">Separate pre-auth RCE chains, 3 years apart, same product family</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">47%</div>
+    <div class="stat-label">Of ~2,500 tracked PaperCut installs still on v23 or earlier — no patch exists for them (Huntress, 2026-08-27)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">2</div>
+    <div class="stat-label">Emergency patch releases in 48 hours for the 2026 chain after watchTowr found bypasses</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">4+</div>
+    <div class="stat-label">Distinct threat actors/crews confirmed weaponizing the 2023 chain (Bl00dy, Cl0p, LockBit, Iranian state actors)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>PaperCut MF and PaperCut NG are widely deployed print-management platforms used by schools, universities, government agencies, healthcare systems, and enterprises to meter, bill, and control network printing. Because print servers are treated as low-priority infrastructure, they are routinely exposed to the internet for remote print release and mobile printing, rarely hardened, and infrequently patched — a profile that makes PaperCut's web-based administration console an unusually attractive target whenever a pre-authentication vulnerability surfaces in it. That has now happened twice, three years apart, via two structurally similar but technically distinct vulnerability chains.</p>
+      <p>The first generation — CVE-2023-27350 (CVSS 9.8) and CVE-2023-27351 (CVSS 8.2) — was disclosed in March 2023 and became one of the most consequential mass-exploitation events of that year: the FBI and CISA jointly attributed active exploitation to the Bl00dy Ransomware Gang against the U.S. Education Facilities Subsector, and Microsoft separately confirmed the Cl0p and LockBit ransomware ecosystems, the TrueBot-linked "Lace Tempest" cluster, and Iranian state-sponsored groups tracked as Mango Sandstorm (MuddyWater) and Mint Sandstorm all independently weaponized the same flaw within weeks of disclosure (CISA/FBI AA23-131A, 2023; Microsoft Threat Intelligence, 2023).</p>
+      <p>The second generation — CVE-2026-81578 (CVSS 8.8) and CVE-2026-82078 (CVSS 9.4) — is not history; it is unfolding as this card is compiled. PaperCut published an urgent security bulletin on 2026-08-27 after Huntress confirmed exploitation in two customer environments, shipped an emergency patch the same day, and then shipped a <em>second</em> emergency patch just 24 hours later (2026-08-28, 2:45 PM ET) after independent researchers at watchTowr Labs reproduced the chain and found the first patch could still be bypassed. As of this compile, roughly 47% of the ~2,500 PaperCut installations Huntress tracks are running version 23 or earlier — versions for which no patch exists at all, meaning nearly half of the visible install base has no remediation path short of a version upgrade.</p>
+      <p>PaperCut matters right now because the two generations share the same underlying design pattern despite being technically unrelated bugs: an unauthenticated request against the web management interface that the server's authorization logic mis-trusts, chained into a privileged, code-execution-capable feature that the console exposes to authenticated admins by design (Print/Device Scripting in 2023; unsafe dynamic database-driver class loading in 2026). Any environment running PaperCut and reachable from the internet or an untrusted network segment should treat this as an active, not historical, risk.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-284 / CWE-306</span>
+        <span class="cwe-name">Improper Access Control / Missing Authentication for Critical Function</span>
+      </div>
+      <div class="cwe-body">The product does not restrict or incorrectly restricts access to a resource from an unauthorized actor (CWE-284), or fails to require authentication before performing an operation that should be restricted (CWE-306). Both PaperCut generations reduce to the same shape at the architectural level: the web management interface's authorization layer can be induced to treat an unauthenticated or under-privileged request as though it were an authenticated administrative one.</div>
+      </div>
+    <div class="prose">
+      <p><strong>2023 generation (CVE-2023-27350).</strong> PaperCut's web console ships a first-run setup flow ending at the <code>SetupCompleted</code> page (<code>/app?service=page/SetupComplete</code>, implemented in <code>pcng-server-web-19.2.7.jar</code>). Security researcher Caleb Stewart, working independently to replicate the ZDI-reported flaw, found that visiting this page post-installation and submitting its form triggers a "Session Puzzling" condition: the application accidentally validates an anonymous session and internally calls <code>performLogin()</code> for the administrator account without verifying a password. The attacker is now an authenticated admin with zero credentials. From there, the built-in <strong>Device/Print Scripting</strong> feature — JavaScript hooks that PaperCut deliberately allows admins to attach to printer events, which execute under <code>NT AUTHORITY\SYSTEM</code> on Windows — becomes a code-execution primitive: modify a printer's script, and the next event fires attacker-controlled code with SYSTEM privileges (Horizon3.ai deep dive, 2023).</p>
+      <p><strong>2023 generation (CVE-2023-27351).</strong> A related but distinct flaw in the <code>SecurityRequestFilter</code> class stems from an improperly implemented authentication check, allowing an unauthenticated network attacker to bypass authentication and pull sensitive account data — usernames, full names, email addresses, department/office fields, payment-card information, and hashed passwords for PaperCut-internal accounts — directly from the server (SentinelOne Vulnerability Database, 2023). This card treats it as CWE-287/CWE-303 (Improper Authentication / Incorrect Implementation of Authentication Algorithm) based on vendor and researcher language describing the flaw; this has not been independently cross-checked against NVD's authoritative CWE tag during this compile and should be verified before citing with high confidence.</p>
+      <p><strong>2026 generation.</strong> The pattern recurs with different mechanics. CVE-2026-81578 is a request-routing "confused deputy": an attacker sends a crafted request that references one page for rendering while targeting a different page's backend component for execution. PaperCut's authorization check validates the page being <em>rendered</em>, not the privileged component actually being <em>invoked</em> — so a request can trigger an administrative configuration change while the authorization layer believes it is serving an unauthenticated, low-privilege page. That configuration-write capability is then chained into CVE-2026-82078, an unsafe dynamic class-loading flaw (CWE-470, Use of Externally-Controlled Input to Select Classes or Code) in PaperCut's database-connection utilities: the application instantiates a JDBC driver class using a driver-name string pulled from its own configuration, without validating that name against an allowlist. An attacker who can write to that configuration (via CVE-2026-81578) can point the "driver name" at an attacker-supplied Java class already reachable on the application's classpath — and the server loads and executes it (eSentire security advisory; Huntress, 2026).</p>
+      <p>The throughline across both generations: PaperCut's web console conflates "is this request permitted to reach this rendering path" with "is this request permitted to trigger this backend action," and separately treats internal configuration state (driver names, script bindings) as a trusted input channel for selecting executable code. Neither generation is a memory-safety bug or a novel exploitation primitive — both are authorization-boundary design defects in the same class of web-application architecture, which is precisely why the same vendor produced two unrelated instances of it three years apart.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>2023-01 / 2026-08</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>2023-03-14 / 2026-08-27</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">03</div>
+        <div class="lc-label">Patch(es)<br/>2023-03-08 → 2026-08-28</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">Exploitation<br/>2023-04 (mass) · 2026-08 (targeted)</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node dim">05</div>
+        <div class="lc-label">Resolution<br/>Partial — 47% install base still unpatchable</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p><strong>2023 generation.</strong> Trend Micro's Zero Day Initiative (ZDI-23-233) responsibly reported the vulnerability to PaperCut on 2023-01-10. PaperCut shipped a fix on 2023-03-08 (versions 20.1.7, 21.2.11, 22.0.9), and the coordinated public advisory followed on 2023-03-14. PaperCut's own investigation later identified the earliest suspicious activity possibly tied to CVE-2023-27350 as far back as 2023-04-14 — roughly five weeks after the patch shipped but well before most administrators had applied it. PaperCut publicly confirmed active exploitation on 2023-04-19. A working proof-of-concept was published publicly on GitHub around 2023-04-25, and mass exploitation — most visibly the Bl00dy Ransomware Gang's campaign against the U.S. Education Facilities Subsector — followed within days. CISA added CVE-2023-27350 to the KEV catalog on 2023-04-21, ahead of the PoC's public release, reflecting how quickly the exploitation signal outran the initial vendor advisory.</p>
+      <p><strong>2026 generation.</strong> This chain's public timeline is compressed to days rather than months. Huntress observed the first confirmed exploitation of CVE-2026-81578/CVE-2026-82078 in a customer environment on 2026-08-26. PaperCut published an urgent security bulletin and shipped an initial emergency patch on 2026-08-27 — the same day Huntress detected a second intrusion, this one against a server running version 24 before that branch's fix was available. Independent researchers at watchTowr Labs then fully reproduced the chain and identified multiple ways to bypass the initial patch, plus an additional authentication-bypass angle the first patch generation had not addressed. PaperCut responded with Emergency Patch Release 2 on 2026-08-28 at 2:45 PM ET — roughly 24 hours after the first patch — explicitly instructing customers to install Release 2 even if Release 1 was already applied. PaperCut has characterized in-the-wild attacks as "limited and targeted" as of this compile, in contrast to the mass-exploitation profile of the 2023 generation, though the 47%-unpatched install-base figure suggests the opportunity for broader exploitation remains wide open.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">2023 Disclosure Type</span><span class="kv-val cyan">Coordinated — via Trend Micro ZDI</span></div>
+        <div class="kv-row"><span class="kv-key">2023 Reported To Vendor</span><span class="kv-val">2023-01-10</span></div>
+        <div class="kv-row"><span class="kv-key">2023 Patch → Advisory Gap</span><span class="kv-val">6 days (patch 03-08, advisory 03-14) — advisory followed patch, unusually tight and well-managed</span></div>
+        <div class="kv-row"><span class="kv-key">2023 PoC vs Exploitation</span><span class="kv-val red">Active exploitation (04-14/04-19) preceded the public PoC (~04-25) — attackers reverse-engineered the patch diff before any researcher published working code</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">2026 Disclosure Type</span><span class="kv-val cyan">Post-exploitation emergency disclosure</span></div>
+        <div class="kv-row"><span class="kv-key">2026 Trigger</span><span class="kv-val red">Vendor learned of the flaw from Huntress's detection of live exploitation, not from a pre-release researcher report</span></div>
+        <div class="kv-row"><span class="kv-key">2026 Vendor Response</span><span class="kv-val">Same-day emergency patch (08-27); second emergency patch within 24 hours (08-28) after external bypass discovery</span></div>
+        <div class="kv-row"><span class="kv-key">2026 Community Reaction</span><span class="kv-val">watchTowr Labs publicly credited for finding patch bypasses and an additional auth-bypass angle within roughly a day of the first patch</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>The two generations sit at opposite ends of the disclosure-maturity spectrum. The 2023 process is close to a model coordinated-disclosure timeline: a researcher-to-vendor report through an established program (ZDI), a two-month remediation window, a patch that shipped before the public advisory, and an advisory that shipped before any known exploitation. What still went wrong was entirely on the deployment side — the population of internet-facing PaperCut servers patched too slowly relative to how fast ransomware affiliates could reverse-engineer the fix, a gap of roughly five weeks that a diverse set of financially motivated and state-sponsored actors all independently found and exploited before most administrators acted.</p>
+      <p>The 2026 process is the inverse: PaperCut had no advance warning from a researcher and found out about the flaw the same way most vendors least want to — from a security vendor detecting it being actively exploited in a customer's environment. Shipping a same-day patch under that pressure is a reasonably strong response, but the fact that watchTowr's independent reproduction effort found the patch bypassable within roughly a day is a meaningful signal: an emergency patch built under active-incident time pressure, without the multi-week validation window a coordinated disclosure affords, is measurably more likely to leave gaps. PaperCut's willingness to ship a second emergency patch within 24 hours and explicitly tell customers to reapply — rather than quietly patching the gap in a later release — is the right call operationally, but it also means any organization that patched on 2026-08-27 and considered the matter closed was, for roughly a day, still exposed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p><strong>2023 chain end-to-end (CVE-2023-27350 → RCE).</strong> An unauthenticated attacker with network access to a PaperCut Application Server's web interface navigates to the <code>SetupCompleted</code> page and submits its login form. Due to the Session Puzzling defect, the server treats this as a successful admin login without checking a password. The attacker, now holding an authenticated admin session, opens the Device/Print Scripting configuration for any printer and inserts JavaScript that spawns a system command. The next print event — or a manually triggered test — executes that script under SYSTEM privileges on the Windows host running the Application Server, or as the local service account on Linux/macOS deployments.</p>
+      <p><strong>2026 chain end-to-end (CVE-2026-81578 → CVE-2026-82078).</strong> An unauthenticated attacker sends a crafted HTTP request that names one URL path for the page-rendering logic to process while its actual parameters target a different, privileged backend component. Because PaperCut's authorization check validates the declared rendering path rather than the component that ultimately executes, the attacker can write to server configuration — specifically, the database-connection driver-name setting — without ever authenticating. The attacker then supplies a driver-name value that resolves to a malicious Java class already staged on the server's classpath (delivered, in Huntress's reproduction, via an SMB2 share hosting a crafted Apache Derby database archive). When PaperCut's database utility code next instantiates a JDBC driver using that unvalidated name (CVE-2026-82078), it loads and executes the attacker's class — achieving remote code execution under the PaperCut Application Server process (<code>pc-app.exe</code> on Windows) with no authentication at any stage.</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVE-2023-27350 · CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">Exploitable over HTTP against the PaperCut web management interface — no local access required.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">A single crafted HTTP request sequence against a known endpoint; no race conditions or special positioning needed.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">The Session Puzzling defect grants admin-equivalent access from a fully anonymous starting state.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No victim action required; the attacker drives the entire exploit chain directly.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">UNCHANGED</div>
+          <div class="cvss-comp-meaning">Impact is contained to the security authority of the PaperCut Application Server host itself.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">SYSTEM-level code execution grants complete read access to the print server and any data it touches.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Attacker can modify any file, configuration, or downstream system reachable from the compromised server.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">SYSTEM code execution enables full denial of service, including ransomware deployment, at attacker discretion.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions &amp; Variant Relationship</div>
+      <table class="versions-table">
+        <thead><tr><th>CVE</th><th>Component</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>CVE-2023-27350</td><td>SetupCompleted / Session Puzzling auth bypass</td><td class="vuln">8.0.0–19.2.7, 20.0.0–20.1.6, 21.0.0–21.2.10, 22.0.0–22.0.8</td><td class="fixed">20.1.7 / 21.2.11 / 22.0.9 (2023-03-08)</td><td>Fixed — no known bypass reported</td></tr>
+          <tr><td>CVE-2023-27351</td><td>SecurityRequestFilter authentication check</td><td class="vuln">15.0 or later, all OS platforms (pre-fix)</td><td class="fixed">20.1.7 / 21.2.11 / 22.0.9 (2023-03-08)</td><td>Fixed — no known bypass reported</td></tr>
+          <tr><td>CVE-2026-81578</td><td>Web management interface — request-routing authorization</td><td class="vuln">All NG/MF versions prior to 2026-08-27 fix, including 24, 25, 26</td><td class="partial">25.0.12 / 26.0.4 (v24 fix delayed) — Emergency Patch Release 2, 2026-08-28</td><td>Superseded — Release 1 (08-27) had reported bypasses</td></tr>
+          <tr><td>CVE-2026-82078</td><td>Database-connection utilities — unsafe dynamic class loading</td><td class="vuln">All NG/MF versions prior to 2026-08-27 fix, including 24, 25, 26; v23 and earlier have no available patch</td><td class="partial">NG 25.0.12.76497 / MF 25.0.12.76496 / 26.0.4 (Windows) — Release 2, 2026-08-28</td><td>Superseded — Release 1 had reported bypasses; v23-and-earlier remains unpatched by design (EOL branches)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block">
+      <div class="kev-header">
+        <span class="kev-tag">CISA KEV LISTED — CVE-2023-27350 ONLY</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2023-04-21 · Required Remediation: 2023-05-12 (federal civilian agencies, per BOD 22-01)</span>
+      </div>
+      <div class="kev-body">CVE-2023-27350 carries a confirmed "used in ransomware campaigns" flag in the CISA KEV catalog. CVE-2023-27351 was not independently confirmed on KEV during this compile — verify directly before relying on that status. Neither CVE-2026-81578 nor CVE-2026-82078 appears in the KEV catalog as of 2026-08-30; given the confirmed active exploitation Huntress observed, a KEV listing for the 2026 pair should be considered likely in the near term rather than treated as evidence of lower severity.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">2023-04-14</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Earliest Suspicious Activity (2023 chain)</div>
+            <div class="et-desc">PaperCut's own investigation later identified this as the earliest activity possibly tied to CVE-2023-27350, roughly five weeks after the patch shipped.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2023-04-19</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">PaperCut Confirms Active Exploitation</div>
+            <div class="et-desc">Vendor publicly confirms in-the-wild exploitation ahead of any public PoC.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2023-04-21</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">CISA KEV Listing</div>
+            <div class="et-desc">CVE-2023-27350 added to the KEV catalog with a 2023-05-12 federal remediation deadline.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2023-04-13 → 04-27</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Cl0p &amp; LockBit — TrueBot / Lace Tempest</div>
+            <div class="et-desc">Microsoft confirmed the actor it tracks as Lace Tempest began incorporating the PaperCut exploit into attacks as early as 2023-04-13, delivering TrueBot malware (linked to the Silence group and TA505/Cl0p ecosystem) via PowerShell, then confirmed on 2023-04-26/27 that both the Cl0p and LockBit ransomware-as-a-service operations used the flaw to steal corporate data from vulnerable servers.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2023-05 (early)</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Bl00dy Ransomware Gang — Education Sector</div>
+            <div class="et-desc">A group self-identifying as the Bl00dy Ransomware Gang exploited vulnerable PaperCut servers against the U.S. Education Facilities Subsector, exfiltrating data and encrypting victim systems (CISA/FBI AA23-131A).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2023-05 (early)</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Iranian State-Sponsored Groups Join</div>
+            <div class="et-desc">Microsoft reported Iranian groups tracked as Mango Sandstorm (MuddyWater/Mercury, linked to Iran's Ministry of Intelligence and Security) and Mint Sandstorm (Phosphorus/APT35, tied to the IRGC) began exploiting the same PaperCut flaw.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-08-26</div>
+          <div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">First Confirmed 2026-Chain Exploitation</div>
+            <div class="et-desc">Huntress detects the first confirmed exploitation of the CVE-2026-81578/CVE-2026-82078 chain in a customer environment; recon commands (<code>whoami</code>, <code>ver</code>, <code>tasklist</code>) executed in under two minutes.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-08-27</div>
+          <div class="et-track"><div class="et-dot purple"></div></div>
+          <div class="et-content">
+            <div class="et-event">Second Intrusion — Unpatched v24</div>
+            <div class="et-desc">A second confirmed intrusion targets a server running version 24, before that branch's fix was available, the same day PaperCut published its advisory and first emergency patch.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>No card currently on file in this repository documents Bl00dy Ransomware Gang, Cl0p, LockBit, Lace Tempest/TA505, MuddyWater/Mango Sandstorm, or Mint Sandstorm as named threat actors — see Section 10. The 2023 chain stands out even among mass-exploited CVEs for the sheer diversity of actor types that independently converged on it within roughly two weeks: financially motivated ransomware affiliates, an initial-access-broker-adjacent malware operator (TrueBot/Silence), and two distinct nation-state espionage services, all drawn to the same unauthenticated RCE primitive. The 2026 chain's exploitation is, as of this compile, narrower and more targeted — two confirmed customer intrusions rather than a mass campaign — but the historical pattern strongly suggests that window will not stay narrow for long once a public PoC circulates.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>PaperCut's two generations of pre-auth RCE, three years apart, are best read not as one vendor being unlucky twice but as a structural property of a specific application shape: a Java-based web console that (a) exposes both public/unauthenticated pages and privileged administrative actions behind a single, shared request-routing and authorization layer, and (b) deliberately offers admins a legitimate code-execution feature — scripting hooks, driver/plugin loading — as a product capability rather than an edge case. Every part of that shape is individually reasonable from a product-design standpoint: setup wizards need an unauthenticated entry point, admins legitimately need to script device behavior and configure database drivers. The vulnerability class emerges specifically from the seams between those reasonable features — the point where "this page doesn't need auth" logic and "this action needs auth" logic share enough code that a request can walk through the former and land in the latter.</p>
+      <p>This is architecturally the same lesson PrintNightmare taught about the Windows Print Spooler, applied to a different technology stack: a legitimate, admin-facing "install code that runs with elevated privilege" feature (Point-and-Print driver installation there; Device Scripting and JDBC driver loading here) is safe only as long as the authorization boundary in front of it is airtight, and airtight authorization boundaries are exactly the kind of property that is easy to state and hard to verify across a large, evolving codebase. The 2026 vulnerability's specific mechanism — validating the wrong artifact (the rendered page) instead of the artifact that matters (the invoked backend component) — is a textbook confused-deputy pattern, and it is precisely the kind of defect that unit tests focused on "does this page require login" will not catch, because the page in isolation does require login; the flaw only appears in how two independently-correct-looking checks compose.</p>
+      <p>The organizational lesson from the 2026 disclosure cadence is equally instructive: PaperCut's first emergency patch, built in roughly 24 hours under active-incident pressure with no advance coordinated-disclosure window, was bypassable within a comparable timeframe by an independent research team. This is not a criticism unique to PaperCut — it is a general property of emergency patching under public pressure — but it argues for a specific defensive posture: treat any same-day emergency patch for an actively-exploited authorization flaw as provisional rather than final, and expect a fast-follow. Organizations that applied only the first 2026 patch and stopped monitoring the vendor's advisory page were, for a real window, no safer than before it existed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <!-- A: DETECTION -->
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <div class="query-block">
+        <div class="query-label">2023 chain — SetupCompleted access post-installation · PaperCut server.log</div>
+        <div class="query-code">source="PaperCut/server.log" (uri="*SetupComplete*" OR uri="*page/SetupComplete*")
+| where install_age_days > 1
+| table _time, ClientIP, uri, User</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">2023 chain — anomalous admin login without prior credential use</div>
+        <div class="query-code">source="PaperCut/server.log" "logged into the administration interface"
+| join ClientIP [search source="PaperCut/server.log" "login failed" OR "authentication attempt"]
+| where NOT matched
+| table _time, ClientIP, AdminUser</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">2026 chain — base64/hex-encoded reconnaissance in server.log</div>
+        <div class="query-code">source="PaperCut/server.log" ("d2hvYW1pICYgdmVy" OR base64_decode_regex="whoami.*ver")
+| table _time, ClientIP, LogLine</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">2026 chain — Derby in-memory database anomaly / hex .class artifacts</div>
+        <div class="query-code">source="PaperCut/server.log" ("jdbc:derby:memory:pwn" OR "No suitable driver found for jdbc:no:x")
+OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_baseline_jars))
+| table _time, Host, LogLine, TargetFilename</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">2026 chain — pc-app.exe spawning shells or discovery utilities · Sysmon Event ID 1</div>
+        <div class="query-code">EventCode=1 ParentImage="*\\pc-app.exe" Image IN ("*\\cmd.exe","*\\powershell.exe","*\\whoami.exe","*\\tasklist.exe","*\\charmap.exe")
+| table _time, Computer, ParentImage, Image, CommandLine</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>Additional behavioral indicators independent of query tooling: files matching five-character random names under <code>server/data/content/</code>; a <code>.out</code> file (e.g. <code>Udydn.out</code>) appearing and then disappearing alongside a truncated or deleted <code>server.log</code> — attackers observed in the 2026 chain deleting both the output file and the log itself to cover tracks; and modification timestamps on <code>print.script.sandboxed</code> or <code>print-and-device.script.enabled</code> configuration keys outside a change-managed maintenance window.</p>
+      </div>
+    </div>
+
+    <!-- B: HUNTING -->
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis 1 — Historical 2023-chain compromise never detected.</strong> Environments that patched CVE-2023-27350/27351 without first checking for prior compromise may carry a dormant foothold. Hunt EDR telemetry as far back as retention allows (ideally covering April 2023 forward) for <code>pc-app.exe</code>/<code>pc-client.exe</code> process trees with unexpected child processes, and for admin-console logins with no corresponding failed-login history immediately before them.</p>
+        <p><strong>Hypothesis 2 — 2026-chain reconnaissance preceding a delayed second-stage payload.</strong> Both confirmed 2026 intrusions consisted of brief recon (under two minutes) rather than immediate ransomware deployment. Hunt for any host that exhibited the recon IOCs in Section A even if no destructive follow-on activity was observed — treat it as a live foothold requiring full incident response, not a false positive.</p>
+        <p><strong>Hypothesis 3 — Version-23-and-earlier hosts hiding in the fleet.</strong> Given that 47% of tracked installations run unpatchable versions, enumerate the full PaperCut fleet (via asset inventory, not just those under active vendor support contracts) for any Application Server or Site Server on version 23 or earlier. This is the single highest-value finding a hunt team can produce for this vulnerability family, since no patch exists for that population.</p>
+      </div>
+    </div>
+
+    <!-- C: PATCH GUIDANCE -->
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">2023 Chain Patch</span><span class="kv-val green">20.1.7 / 21.2.11 / 22.0.9 or later — fully resolved, no known bypass</span></div>
+          <div class="kv-row"><span class="kv-key">2026 Chain Patch</span><span class="kv-val amber">Emergency Patch Release 2 (2026-08-28) mandatory — Release 1 alone is insufficient</span></div>
+          <div class="kv-row"><span class="kv-key">Current Baseline</span><span class="kv-val">NG 25.0.12.76497 / MF 25.0.12.76496 (Windows); 26.0.4; v24 fix delayed — confirm current status with vendor before relying on v24</span></div>
+          <div class="kv-row"><span class="kv-key">Unpatchable Population</span><span class="kv-val red">v23 and earlier — no fix exists; upgrade to a supported branch is the only remediation</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">papercut.com/kb — PO-1216/PO-1219 (2023); Security Bulletin 27-Aug-2026 (2026)</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Low-Moderate — emergency patches historically limited in scope, but Release 1→2 supersession for the 2026 chain means re-testing is required even for already-patched hosts</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Validate Device/Print Scripting workflows and database driver connectivity after patching — both patched code paths intersect legitimate admin functionality</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Any organization that applied only the 2026-08-27 emergency patch must apply Emergency Patch Release 2 (2026-08-28) — the vendor has explicitly stated this is required even for hosts already patched once. For the population still running version 23 or earlier, there is no patch to apply; treat this as equivalent to a "NO FIX" status for that specific cohort and prioritize migration to a supported branch or, if migration cannot happen immediately, the compensating controls below.</p>
+      </div>
+    </div>
+
+    <!-- D: COMPENSATING CONTROLS -->
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>Restrict access to the PaperCut Application Server web interface to trusted, internal IP ranges only.</strong> Both generations require network reach to the web management interface; removing internet exposure closes the entire attack surface even for unpatchable versions.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Disable or tightly restrict Device/Print Scripting for any printer that does not require it</strong>, and audit existing scripts for unexpected content as an immediate compromise check.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Place a reverse proxy or WAF in front of the PaperCut web console</strong> with rules blocking direct requests to <code>SetupComplete</code> post-installation and blocking any request whose declared page path and invoked backend component appear mismatched, as an interim mitigation for CVE-2026-81578-style routing confusion.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div class="cm-text"><strong>Monitor <code>server.log</code> integrity</strong> — alert on the log file being truncated, rotated outside its normal schedule, or deleted, since both observed 2026 intrusions included attacker log deletion as a final step.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div class="cm-text"><strong>Segment PaperCut Application Servers from Active Directory-critical infrastructure</strong> and any file/print environment holding sensitive data, limiting blast radius given the SYSTEM-level code execution both generations grant.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div class="cm-text"><strong>Inventory and prioritize migration for any host on version 23 or earlier</strong> — this population has no available patch and should be treated as a standing critical-risk asset until upgraded.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2023-27350</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">9.8 (Critical)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-284 (Improper Access Control)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val red">~0.94–0.9999 depending on scoring date (near-certain exploitation probability)</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2023-27350" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2023-27350</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://www.papercut.com/kb/Main/PO-1216-and-PO-1219/" target="_blank" style="color:var(--cyan)">PaperCut KB — PO-1216 and PO-1219</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed — confirmed ransomware use</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2023-04-21 (due 2023-05-12)</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2023-27351</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.0 Score</span><span class="kv-val amber">8.2 (High)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-287/CWE-303 (tentative — see Section 02 caveat)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not independently retrieved for this compile</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2023-27351" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2023-27351</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://www.papercut.com/kb/Main/PO-1216-and-PO-1219/" target="_blank" style="color:var(--cyan)">PaperCut KB — PO-1216 and PO-1219</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not independently confirmed on KEV during this compile — verify directly before relying on this field</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2026-81578</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS Score</span><span class="kv-val amber">8.8 (High)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val dim">Full vector not published by vendor/advisory sources as of this compile — only the base score (8.8) was disclosed</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-306 (Missing Authentication for Critical Function)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not yet established — CVE assigned 2026-08, too recent for a stable score</span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://www.papercut.com/kb/Main/security-bulletin-27-aug-2026-urgent-security-advisory/" target="_blank" style="color:var(--cyan)">PaperCut Security Bulletin, 27-Aug-2026</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not listed as of 2026-08-30 — confirmed active exploitation reported by Huntress independent of KEV status</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2026-82078</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS Score</span><span class="kv-val red">9.4 (Critical)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val dim">Full vector not published by vendor/advisory sources as of this compile — only the base score (9.4) was disclosed</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-470 (Use of Externally-Controlled Input to Select Classes or Code — Unsafe Reflection)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not yet established — CVE assigned 2026-08, too recent for a stable score</span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://www.papercut.com/kb/Main/security-bulletin-27-aug-2026-urgent-security-advisory/" target="_blank" style="color:var(--cyan)">PaperCut Security Bulletin, 27-Aug-2026</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not listed as of 2026-08-30 — confirmed active exploitation reported by Huntress independent of KEV status</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <div class="xref-none">No companion actor cards on file for Bl00dy Ransomware Gang, Cl0p, LockBit, Lace Tempest/TA505/Silence, MuddyWater (Mango Sandstorm), or Mint Sandstorm as of 2026-08-30 — this repository's existing actor cards (APT1, Gonjeshke Darande, JadePuffer, Lapsus$, REvil, Salt Typhoon, Scattered Spider, TeamPCP) do not include any of the confirmed PaperCut operators from either generation. All six flagged as strong candidates for future actor cards given their confirmed, independently-sourced weaponization of this vulnerability family.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <div class="xref-none">No companion incident cards on file reference the PaperCut vulnerability chain as an initial access vector as of 2026-08-30. The 2023 Bl00dy/Education Facilities Subsector campaign and the 2026 Huntress-observed intrusions are candidates for future incident cards.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-131a" target="_blank">AA23-131A — Malicious Actors Exploit CVE-2023-27350 in PaperCut MF and NG</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Trend Micro ZDI</div>
+        <div><div class="ref-detail"><a href="https://www.zerodayinitiative.com/advisories/ZDI-23-233/" target="_blank">ZDI-23-233 — PaperCut NG/MF Advisory</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Trend Micro</div>
+        <div><div class="ref-detail"><a href="https://www.trendmicro.com/en_us/research/23/d/update-now-papercut-vulnerability-cve-2023-27350-under-active-ex.html" target="_blank">Update Now: PaperCut Vulnerability CVE-2023-27350 Under Active Exploitation</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Horizon3.ai</div>
+        <div><div class="ref-detail"><a href="https://horizon3.ai/attack-research/attack-blogs/papercut-cve-2023-27350-deep-dive-and-indicators-of-compromise/" target="_blank">CVE-2023-27350: PaperCut Deep Dive &amp; IOCs</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Huntress</div>
+        <div><div class="ref-detail"><a href="https://www.huntress.com/blog/critical-vulnerabilities-in-papercut-print-management-software" target="_blank">Critical Vulnerabilities in PaperCut Print Management Software (2023)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SentinelOne</div>
+        <div><div class="ref-detail"><a href="https://www.sentinelone.com/vulnerability-database/cve-2023-27350/" target="_blank">CVE-2023-27350: PaperCut MF Auth Bypass Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SentinelOne</div>
+        <div><div class="ref-detail"><a href="https://www.sentinelone.com/vulnerability-database/cve-2023-27351/" target="_blank">CVE-2023-27351: PaperCut Auth Bypass / Info Disclosure Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Rapid7</div>
+        <div><div class="ref-detail"><a href="https://www.rapid7.com/db/vulnerabilities/papercut-cve-2023-27351/" target="_blank">CVE-2023-27351: PO-1219: Improper Authentication</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Help Net Security</div>
+        <div><div class="ref-detail"><a href="https://www.helpnetsecurity.com/2023/04/25/cve-2023-27350-poc/" target="_blank">PoC exploit for abused PaperCut flaw is now public (CVE-2023-27350)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div><div class="ref-detail"><a href="https://thehackernews.com/2023/05/bl00dy-ransomware-gang-strikes.html" target="_blank">Bl00dy Ransomware Gang Strikes Education Sector with Critical PaperCut Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div><div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/microsoft-iranian-hacking-groups-join-papercut-attack-spree/" target="_blank">Microsoft: Iranian hacking groups join PaperCut attack spree</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ITPro</div>
+        <div><div class="ref-detail"><a href="https://www.itpro.com/security/cyber-attacks/microsoft-links-papercut-server-attacks-to-cl0p-lockbit-ransomware" target="_blank">Microsoft links PaperCut server attacks to Cl0p, LockBit ransomware</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div><div class="ref-detail"><a href="https://thehackernews.com/2023/04/microsoft-confirms-papercut-servers.html" target="_blank">Microsoft Confirms PaperCut Servers Used to Deliver LockBit and Cl0p Ransomware</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div><div class="ref-detail"><a href="https://www.securityweek.com/microsoft-cl0p-ransomware-exploited-papercut-vulnerabilities-since-april-13/" target="_blank">Microsoft: Cl0p Ransomware Exploited PaperCut Vulnerabilities Since April 13</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Malwarebytes / ThreatDown</div>
+        <div><div class="ref-detail"><a href="https://www.malwarebytes.com/blog/news/2023/04/lockbit-and-cl0p-are-actively-exploiting-papercut-vulnerabilities" target="_blank">LockBit and Cl0p ransomware gangs actively exploiting PaperCut vulnerabilities</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Nucleus Security</div>
+        <div><div class="ref-detail"><a href="https://nucleussec.com/blog/april-21-2023-cisa-kev-breakdown-papercut-google-minio/" target="_blank">CISA KEV Breakdown | April 21, 2023</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">PaperCut</div>
+        <div><div class="ref-detail"><a href="https://www.papercut.com/kb/Main/PO-1216-and-PO-1219/" target="_blank">URGENT MF/NG Vulnerability Bulletin (March 2023)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">eSentire</div>
+        <div><div class="ref-detail"><a href="https://www.esentire.com/security-advisories/apercut-discloses-zero-day-vulnerabilities-cve-2026-82078-and-cve-2026-81578" target="_blank">PaperCut Discloses Zero-Day Vulnerabilities (CVE-2026-82078 and CVE-2026-81578)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div><div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/papercut-releases-second-emergency-patch-for-exploited-flaws/" target="_blank">PaperCut releases second emergency patch for exploited flaws</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div><div class="ref-detail"><a href="https://thehackernews.com/2026/08/attackers-chain-two-papercut-flaws-to.html" target="_blank">Attackers Chain Two PaperCut Flaws to Execute Code Without Authentication</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Help Net Security</div>
+        <div><div class="ref-detail"><a href="https://www.helpnetsecurity.com/2026/08/27/papercut-ng-mf-vulnerability-attack/" target="_blank">Unknown PaperCut NG/MF vulnerability is under active attack</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Huntress</div>
+        <div><div class="ref-detail"><a href="https://www.huntress.com/blog/papercut-actively-exploited" target="_blank">PaperCut Zero-Day: Active Exploitation and Pre-Auth RCE</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">PaperCut</div>
+        <div><div class="ref-detail"><a href="https://www.papercut.com/kb/Main/security-bulletin-27-aug-2026-urgent-security-advisory/" target="_blank">URGENT Security Advisory: PaperCut NG/MF Security Bulletin (27 Aug 2026)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Security Affairs</div>
+        <div><div class="ref-detail"><a href="https://securityaffairs.com/198107/uncategorized/hackers-are-probing-papercut-servers-and-47-still-have-no-patch.html" target="_blank">Hackers Are Probing PaperCut Servers, and 47% Still Have No Patch</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SC Media / SC World</div>
+        <div><div class="ref-detail"><a href="https://www.scworld.com/news/papercut-issues-emergency-patches-for-actively-exploited-critical-vulnerability" target="_blank">PaperCut issues emergency patches for actively exploited critical vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cybersecurity Help (cybersecurity-help.cz)</div>
+        <div><div class="ref-detail"><a href="https://www.cybersecurity-help.cz/vdb/vulns/146037/" target="_blank">Unsafe reflection in PaperCut MF and PaperCut NG — CVE-2026-82078</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 26 sources, all open-source/public</div>
+  <div>PaperCut MF/NG · CVE-2023-27350 / CVE-2023-27351 / CVE-2026-81578 / CVE-2026-82078</div>
+</div>
+
+</body>
+</html>
