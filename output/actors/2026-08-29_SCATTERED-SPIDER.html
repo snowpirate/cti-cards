@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Scattered Spider — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge ecrime">⚠ ECRIME · INDEPENDENT / "THE COM" · US · UK · CANADA</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Social-Engineering-Driven Extortion &amp; Ransomware Affiliate Collective</div>
+  <h1><span class="accent">SCATTERED</span> SPIDER</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-08-29 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK (G1015), CISA/FBI Joint Advisory AA23-320A, Google Cloud/Mandiant (UNC3944), CrowdStrike, Microsoft Threat Intelligence, Krebs on Security, CyberScoop, DOJ press materials, 12+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE — HIGH TEMPO, EXPANDING SECTOR FOCUS</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL</span></div>
+    <div>Primary Motive: <span class="warn">Financial Extortion — Ransomware &amp; Data-Theft Extortion</span></div>
+    <div>Active Since: <span>May 2022</span></div>
+    <div>MITRE ATT&amp;CK: <span>G1015</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ THREAT UPDATE — AUG 2026</div>
+  <div class="alert-headline">UK sentencing of two leaders and "ShinySp1d3r" RaaS build show reach outlives arrests</div>
+  <div class="alert-body">In September 2025, the U.S. DOJ charged Thalha Jubair (19, London) with conspiracies tied to at least 120 intrusions and $115M+ in extortion payments extracted from 47 U.S. entities between May 2022 and September 2025; Jubair and co-defendant Owen Flowers (18, Walsall) were arrested by UK police, pleaded guilty, and were sentenced in the UK to 66 months for the August 2024 Transport for London attack (Krebs on Security; CyberScoop, 2025–2026). Despite these convictions, the broader "Scattered LAPSUS$ Hunters" collective — merging Scattered Spider, LAPSUS$, and ShinyHunters branding and personnel — has continued high-tempo operations into 2026, including claimed access to a CrowdStrike-related internal dashboard and public development of a dedicated "ShinySp1d3r" ransomware-as-a-service platform (CYFIRMA, 2026). Vendor 2026 outlooks (Sophos, Trend Micro) assess healthcare as a likely next concentrated target.</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">120+</div>
+    <div class="stat-label">Intrusions Alleged Against a Single Charged Member, May 2022 – Sep 2025</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">$115M+</div>
+    <div class="stat-label">Ransom Payments Attributed to Two Charged UK Members</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">6</div>
+    <div class="stat-label">Major Industry Verticals Struck in Successive Waves During 2025 Alone</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">May 2022</div>
+    <div class="stat-label">Earliest Confirmed Activity — Telecom/BPO SIM-Swap Operations</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Scattered Spider is a financially motivated, loosely affiliated eCrime collective active since at least May 2022, tracked across the industry under a sprawling list of aliases — UNC3944 (Mandiant/Google), Octo Tempest (Microsoft), Muddled Libra (Unit 42), Roasted 0ktapus and Scatter Swine (CrowdStrike and others) — and catalogued by MITRE ATT&amp;CK as G1015. Rather than relying primarily on malware or novel exploits, the group has built one of the most effective social-engineering operations in modern cybercrime: impersonating employees and IT help-desk staff by phone (vishing) to trigger password and multi-factor-authentication (MFA) resets, bypassing identity controls that stop most purely technical intrusions.</p>
+      <p>The group's target list has expanded relentlessly since its 2022 origins in telecom-focused SIM-swapping: financial-services firms in late 2023, food-services and hospitality organizations by mid-2024, UK retailers — Marks &amp; Spencer, Co-op, Harrods — in spring 2025, U.S. insurance carriers including Aflac in mid-2025, and the aviation sector — Qantas, Hawaiian Airlines, WestJet — in mid-2025. Each wave follows a similar pattern: concentrated targeting of a single vertical for several weeks before pivoting to the next, suggesting centralized target-selection despite the group's decentralized membership.</p>
+      <p>Scattered Spider is best understood as a persistent capability within a much larger cybercriminal ecosystem known as "The Com" — an English-speaking, largely Discord/Telegram-coordinated community of young hackers spanning the US, UK, and Canada that also produced LAPSUS$ and shares members, tooling, and tradecraft across brands (see companion profile: <em>LAPSUS$</em>). Since 2023 the group has operated as a flexible ransomware affiliate — deploying ALPHV/BlackCat, then RansomHub and Qilin, and by 2025 DragonForce — rather than building or maintaining its own leak infrastructure, and in 2025–2026 elements of Scattered Spider merged branding with LAPSUS$ and ShinyHunters under the "Scattered LAPSUS$ Hunters" umbrella.</p>
+      <p>The group matters now because arrests have proven only partially disruptive. U.S. and U.K. law enforcement charged and sentenced several alleged members through 2025 and into 2026, including a UK member linked to over 120 intrusions and $115M+ in ransom payments, yet the collective's loose, brand-fluid structure and deep bench within The Com have allowed activity to continue and even escalate — most notably a strategic pivot toward hijacking VMware ESXi/vSphere infrastructure to deploy ransomware directly from the hypervisor layer, a technique that bypasses most endpoint security entirely.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">Scattered Spider</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">None identified — independent criminal collective, loosely affiliated with "The Com"</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">eCrime — Social Engineering / Ransomware-as-a-Service Affiliate</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial extortion via ransomware deployment and data-theft extortion</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">May 2022 (initial telecom/BPO SIM-swap operations)</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">2026 — active under "Scattered LAPSUS$ Hunters" branding; ShinySp1d3r RaaS platform reported in development</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G1015</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">Multiple UK/US arrests and charges, 2024–2025; Thalha Jubair and Owen Flowers sentenced in UK (66 months, TfL attack); DOJ complaint alleges 120+ intrusions, $115M+ extorted</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">Scattered Spider</span>
+          <span class="alias-chip">UNC3944</span>
+          <span class="alias-chip">Octo Tempest</span>
+          <span class="alias-chip">Muddled Libra</span>
+          <span class="alias-chip">Roasted 0ktapus</span>
+          <span class="alias-chip">0ktapus</span>
+          <span class="alias-chip">Scatter Swine</span>
+          <span class="alias-chip">Storm-0875</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>Attribution to a loosely organized collective of primarily young, native-English-speaking individuals based in the US, UK, and Canada is HIGH, supported by multiple independent law-enforcement actions (UK NCA/police, US DOJ/FBI) resulting in named arrests, guilty pleas, and sentencing tied to specific intrusions. However, "Scattered Spider" functions more as a shared tradecraft brand within The Com than a fixed membership roster — individual campaigns may involve different, overlapping sets of operators, and clean separation from affiliated brands (LAPSUS$, ShinyHunters, individual DragonForce affiliates) is not always possible.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">MAY 2022 –<br/>EARLY 2023</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Telecom &amp; BPO SIM-Swap Origins</div>
+          <div class="timeline-desc">Emerges targeting telecommunications and business-process-outsourcing (BPO) firms, primarily to support SIM-swapping for cryptocurrency theft and account takeover. MITRE tracks this window as Campaign C0027 (Jun–Dec 2022), which included exploitation of CVE-2021-35464 in ForgeRock OpenAM against telecom victims.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">SEP 2023</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">MGM Resorts &amp; Caesars Entertainment</div>
+          <div class="timeline-desc">Vished a Caesars IT-support vendor and an MGM help desk to obtain credential/MFA resets; deployed ALPHV/BlackCat ransomware against MGM, triggering a week-long outage estimated to have cost the company roughly $100M; Caesars reportedly paid a ransom to avoid a data leak.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">LATE 2023 –<br/>2024</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Financial Services &amp; Food/Hospitality Waves</div>
+          <div class="timeline-desc">Shifts target focus to financial-services organizations in late 2023 and food-services/hospitality companies by mid-2024, continuing help-desk vishing as the primary initial-access vector. CISA and the FBI issue joint advisory AA23-320A (Nov 2023, later updated July 2025).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">AUG 2024</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Transport for London (TfL) Intrusion</div>
+          <div class="timeline-desc">Attack disrupts Transport for London systems and customer data; UK and US law enforcement later tie the intrusion to Owen Flowers and Thalha Jubair, both ultimately arrested and prosecuted.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">APR – JUL<br/>2025</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">UK Retail, US Insurance &amp; Aviation Waves</div>
+          <div class="timeline-desc">Concentrated campaigns hit UK retailers (Marks &amp; Spencer, Co-op, Harrods, plus Cartier, Victoria's Secret, Adidas), then US insurers (Aflac, Philadelphia Insurance, Erie Insurance) in June, then airlines (Qantas, Hawaiian Airlines, WestJet) in June–July. Parallel reporting describes a strategic pivot to hijacking VMware ESXi/vSphere infrastructure to deploy DragonForce ransomware directly from the hypervisor.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">SEP 2025 –<br/>2026</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Arrests, Sentencing &amp; "Scattered LAPSUS$ Hunters" Resurgence</div>
+          <div class="timeline-desc">UK arrests and US DOJ charges against Jubair and Flowers (Sep 2025); both plead guilty and are sentenced in the UK to 66 months. Despite this, the merged "Scattered LAPSUS$ Hunters" brand remains active into 2026, claiming access to CrowdStrike-related material and developing the "ShinySp1d3r" ransomware-as-a-service platform.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Social engineering as the entire kill chain — not just the entry point</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Scattered Spider's defining characteristic is that nearly its entire intrusion lifecycle can run through social engineering rather than malware. Initial access typically begins with reconnaissance on LinkedIn, breach-data marketplaces, and general OSINT to build a convincing profile of a real employee, followed by a phone call to the target organization's (or its MSP's) IT help desk in which an operator — often a native English speaker capable of mimicking regional accents — impersonates that employee to request a password reset or MFA re-enrollment (T1566.004, T1598.004, T1684.001). Where a live call is impractical, the group substitutes SMS phishing or fake corporate-login domains engineered to closely mirror the real single sign-on portal (T1583.001, T1598.003).</p>
+      <p>Once inside, the group avoids traditional malware wherever possible, instead abusing legitimate administrative tools and cloud consoles already present in the environment: registering its own MFA device to a compromised account (T1556.006), enumerating Active Directory and Azure AD/Entra ID via PowerShell and native tooling (T1087, T1069), and establishing remote access through commercial tools like TeamViewer, AnyDesk, and ngrok, or tunneling utilities such as Chisel and Teleport (T1219, T1572). Credential harvesting relies on tools like Mimikatz, LaZagne, and Raccoon Stealer, and where legitimate access alone is insufficient, the group has exploited specific vulnerabilities — CVE-2021-35464 in ForgeRock OpenAM, and a vulnerable-driver exploit chain (CVE-2015-2291) — for privilege escalation and EDR evasion.</p>
+      <p>Since 2024–2025, the group's most consequential evolution has been a pivot toward VMware vSphere/ESXi environments: after gaining Active Directory dominance, operators enumerate vCenter and ESXi hosts, deploy tools like RustScan and Impacket for lateral movement, and ultimately push ransomware — historically ALPHV/BlackCat, and by 2025, DragonForce — directly onto the hypervisor layer, encrypting virtual-machine datastores in bulk while bypassing guest-OS endpoint security almost entirely. Data exfiltration typically precedes encryption, using legitimate cloud-storage and transfer services (MEGA, Snowflake, AWS S3, Rclone) to support double extortion, and the group frequently harasses victim executives, employees, and even incident responders directly by phone and social media during negotiations — a psychological-pressure tactic distinct from most ransomware operators.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; mapped against G1015</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1589.001</div>
+        <div class="mitre-name">Gather Victim Identity Information: Credentials</div>
+        <div class="mitre-note">[HIGH] Collected OSINT and phished credentials via SMS to build convincing employee identity profiles ahead of vishing calls.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1583.001</div>
+        <div class="mitre-name">Acquire Infrastructure: Domains</div>
+        <div class="mitre-note">[HIGH] Registered lookalike domains spoofing corporate SSO/Okta login portals for credential harvesting.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.004</div>
+        <div class="mitre-name">Phishing: Spearphishing Voice</div>
+        <div class="mitre-note">[HIGH] Vished IT help-desk and MSP staff, impersonating employees to trigger password/MFA resets — the group's signature technique.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078.004</div>
+        <div class="mitre-name">Valid Accounts: Cloud Accounts</div>
+        <div class="mitre-note">[HIGH] Used compromised Microsoft Entra ID and Okta credentials obtained via social engineering for direct cloud-console access.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1098.005</div>
+        <div class="mitre-name">Account Manipulation: Device Registration</div>
+        <div class="mitre-note">[HIGH] Registered attacker-controlled devices for MFA and VPN access to survive password rotations.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1068</div>
+        <div class="mitre-name">Exploitation for Privilege Escalation</div>
+        <div class="mitre-note">[MEDIUM] Deployed a malicious signed kernel driver via a BYOVD chain (CVE-2015-2291) to terminate EDR/security processes ahead of ransomware deployment.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1564.008</div>
+        <div class="mitre-name">Hide Artifacts: Email Hiding Rules</div>
+        <div class="mitre-note">[MEDIUM] Created inbox rules and manually deleted security-alert emails to hide suspicious-activity notifications from victims.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.006</div>
+        <div class="mitre-name">OS Credential Dumping: DCSync</div>
+        <div class="mitre-note">[HIGH] Performed DCSync domain-replication requests to extract Active Directory credentials at scale.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1069</div>
+        <div class="mitre-name">Permission Groups Discovery</div>
+        <div class="mitre-note">[HIGH] Enumerated vSphere/ESX Admin groups and Active Directory/Azure AD privileged groups to identify high-value targets.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.004</div>
+        <div class="mitre-name">Remote Services: SSH</div>
+        <div class="mitre-note">[HIGH] Used SSH to reach and pivot through VMware vCenter Server Appliances after gaining AD-level access.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1567.002</div>
+        <div class="mitre-name">Exfiltration Over Web Service: Cloud Storage</div>
+        <div class="mitre-note">[HIGH] Exfiltrated victim data to MEGA, Snowflake, and AWS S3 ahead of encryption to support double-extortion negotiations.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[HIGH] Deployed ALPHV/BlackCat and, since 2025, DragonForce ransomware — including direct encryption of ESXi datastores from the hypervisor layer.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Retail, Hospitality &amp; Gaming</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Insurance &amp; Financial Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Aviation &amp; Transportation</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Telecommunications &amp; BPO</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Technology / SaaS / Identity Providers</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Primarily United States and United Kingdom; expanding activity against Australia (Qantas) and Canada-based organizations</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Large enterprises with outsourced or offshored IT help desks/MSPs; organizations with immature help-desk identity-verification procedures; heavy VMware vSphere/ESXi virtualization footprints</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">IT help-desk and MSP social engineering (vishing); SMS phishing; SIM swapping to intercept MFA/OTP; purchased or breach-derived employee PII used to pass identity verification</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Opportunistic within a chosen vertical — concentrates on one industry for several weeks to refine and reuse a working help-desk pretext, then pivots to a new sector once defenses adapt (retail → insurance → aviation pattern observed through 2025)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">DragonForce Ransomware</span>
+          <span class="tool-tag">Ransomware / RaaS Partner · Conti-Derived</span>
+        </div>
+        <div class="tool-desc">Adopted as Scattered Spider's primary ransomware payload since 2025 following disruption of ALPHV/BlackCat. Encrypts Windows, Linux, and VMware ESXi datastores directly from the hypervisor, and is frequently paired with BYOVD kernel drivers (e.g., truesight.sys, rentdrv2.sys) to terminate EDR/AV processes before encryption begins.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">Raccoon Stealer</span>
+          <span class="tool-tag">Infostealer · Commodity/Underground</span>
+        </div>
+        <div class="tool-desc">Used to harvest browser-stored credentials, session cookies, and autofill data from compromised endpoints, feeding subsequent session-hijacking and lateral-movement operations without needing fresh credential-phishing.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Teleport / Chisel / ngrok</span>
+          <span class="tool-tag">Tunneling &amp; Remote Access · Legitimate/Open-Source (Abused)</span>
+        </div>
+        <div class="tool-desc">Deployed on compromised VMware vCenter Server Appliances and endpoints to establish covert, encrypted tunnels for C2 and data exfiltration; blends with legitimate DevOps/remote-access traffic and evades detection tuned for known malware signatures.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Mimikatz / LaZagne / Impacket</span>
+          <span class="tool-tag">Credential Theft &amp; Lateral Movement · Open-Source</span>
+        </div>
+        <div class="tool-desc">Standard post-exploitation toolkit used to dump credentials from memory and password stores and to execute WMI/SMB-based lateral movement across Windows domains once initial access is established.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">aws_consoler / RustScan</span>
+          <span class="tool-tag">Cloud &amp; Network Reconnaissance · Open-Source</span>
+        </div>
+        <div class="tool-desc">aws_consoler converts stolen AWS API credentials into temporary federated console sessions; RustScan performs rapid port scanning of ESXi hosts and internal infrastructure to map attack surface ahead of lateral movement.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2021-35464 — ForgeRock OpenAM remote code execution, used for initial access against telecom victims</td><td>CISA AA23-320A</td><td>2023-11-16</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2024-37085 — VMware ESXi authentication-bypass, exploited to deploy rootkits and disable EDR</td><td>Google Cloud / Security Affairs</td><td>2025-07</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">DragonForce ransomware paired with BYOVD drivers truesight[.]sys and rentdrv2[.]sys to terminate security processes</td><td>Acronis TRU</td><td>2025</td></tr>
+        <tr><td class="type-label">TOOL</td><td class="val">ngrok, Chisel, Teleport, AnyDesk, TeamViewer used as dual-use C2/tunneling tools — flag by anomalous behavior, not by static signature</td><td>MITRE ATT&amp;CK G1015</td><td>2022–2026</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No durable static IP/domain indicator list exists for this actor: Scattered Spider rotates lookalike SSO/login domains per engagement and relies heavily on legitimate/dual-use services (MEGA, Snowflake, AWS S3) rather than fixed C2 infrastructure. Defenders should prioritize the behavioral and identity-based indicators in Sections 04 and 06 over static IOCs, and consult CISA AA23-320A and current vendor threat-intel feeds for the latest domain patterns.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (named-member level) / MEDIUM (ecosystem boundaries)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Escalating — sector pivots roughly every 1–2 months through 2025; continued operation into 2026 despite arrests; active RaaS-platform development (ShinySp1d3r)</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Defeating mature MFA/identity programs through pure social engineering, then pivoting directly to hypervisor-level ransomware deployment that bypasses most endpoint security</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">True current membership and overlap boundaries with LAPSUS$/ShinyHunters under the "Scattered LAPSUS$ Hunters" brand; extent of insider-recruitment success</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">LAPSUS$</span>
+          <span class="alias-chip">ShinyHunters</span>
+          <span class="alias-chip">"The Com"</span>
+          <span class="alias-chip">ALPHV/BlackCat</span>
+          <span class="alias-chip">RansomHub</span>
+          <span class="alias-chip">Qilin</span>
+          <span class="alias-chip">DragonForce</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Scattered Spider represents a category of risk that most enterprise security programs are not built to counter: a well-resourced, financially motivated adversary whose primary attack surface is human trust in IT support processes rather than software vulnerabilities. Arrests have demonstrably disrupted specific individuals — the September 2025 charges against Thalha Jubair and Owen Flowers, and their subsequent guilty pleas and sentencing, removed operators tied to a documented $115M+ in extortion payments — but have not visibly slowed the broader brand's operational tempo, which continued through the 2025 aviation and insurance waves and into the 2026 "Scattered LAPSUS$ Hunters" resurgence.</p>
+      <p>The group's pivot to VMware ESXi/vSphere as a direct ransomware deployment surface is the most significant recent capability shift: it converts a single compromised set of AD-domain-admin-equivalent credentials into the ability to encrypt an entire virtualized estate at once, sidestepping guest-OS endpoint detection almost entirely. Combined with the group's established willingness to harass victims and responders directly during negotiations, this makes Scattered Spider incidents unusually fast-moving and organizationally disruptive compared to a typical ransomware-affiliate intrusion.</p>
+      <p>Competing hypotheses persist about how tightly "Scattered Spider," "LAPSUS$," and "ShinyHunters" should be treated as one entity versus three overlapping-but-distinct brands sharing a talent pool within The Com; this profile treats them as a shared ecosystem rather than a single organization, consistent with vendor practice (Google/Mandiant, Microsoft, and CrowdStrike each retain separate tracking designations). Confidence in the near-term trajectory would increase with corroborated evidence that the claimed ShinySp1d3r RaaS platform has reached operational status, and would decrease if 2026 law-enforcement actions beyond Jubair and Flowers meaningfully reduce the pool of experienced vishing operators — the group's actual scarce resource, given how replicable its non-malware tradecraft otherwise is.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Harden help-desk identity verification.</strong> Require call-back verification to a pre-registered number, video verification, or manager co-sign for any password/MFA reset request; train help-desk and MSP staff specifically on Scattered Spider's impersonation patterns.</div>
+            <div class="cm-ttp">Counters: T1566.004, T1684.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Enforce phishing-resistant MFA.</strong> Move privileged and help-desk-resettable accounts to FIDO2/WebAuthn hardware keys, which are not vulnerable to MFA-fatigue prompt bombing or SIM-swap OTP interception.</div>
+            <div class="cm-ttp">Counters: T1621, Mobile T1451</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Restrict and monitor MFA/device re-registration.</strong> Alert on and require secondary approval for new MFA-device enrollments or VPN device registrations, especially outside normal onboarding workflows.</div>
+            <div class="cm-ttp">Counters: T1098.005, T1556.006</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Segment and harden vCenter/ESXi management planes.</strong> Isolate vSphere/vCenter management interfaces on dedicated, tightly access-controlled network segments; disable SSH on ESXi hosts by default and monitor for its activation.</div>
+            <div class="cm-ttp">Counters: T1021.004, T1046, T1486</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Detect and block known BYOVD driver abuse.</strong> Deploy Microsoft's vulnerable-driver blocklist (or equivalent) and monitor for attempts to load unsigned or known-vulnerable kernel drivers used to disable EDR.</div>
+            <div class="cm-ttp">Counters: T1068</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Monitor for legitimate-tool abuse, not just malware signatures.</strong> Alert on installation or execution of remote-access/tunneling tools (AnyDesk, TeamViewer, ngrok, Chisel) outside IT-managed baselines, and flag anomalous outbound traffic to MEGA, Snowflake, or personal cloud-storage endpoints from servers.</div>
+            <div class="cm-ttp">Counters: T1219, T1572, T1567.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Audit cloud/Entra ID privileged-role assignment and federation changes.</strong> Alert on new federated identity-provider trust relationships added to SSO tenants and on unexpected privileged-role grants.</div>
+            <div class="cm-ttp">Counters: T1484.002, T1098.003</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Maintain tested, offline/immutable backups covering hypervisor state, not just guest data.</strong> Ensure backup and recovery procedures explicitly cover ESXi/vCenter configuration, given the group's demonstrated hypervisor-layer encryption capability.</div>
+            <div class="cm-ttp">Counters: T1486, T1490</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G1015/" target="_blank">Scattered Spider, Roasted 0ktapus, Octo Tempest, Storm-0875, UNC3944 — Group G1015</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-320a" target="_blank">Joint Cybersecurity Advisory AA23-320A — Scattered Spider</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/sites/default/files/2025-08/aa23-320a-scattered-spider-508c.pdf" target="_blank">AA23-320A (Updated) — Scattered Spider, July 2025</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Google Cloud</div>
+        <div>
+          <div class="ref-detail"><a href="https://cloud.google.com/blog/topics/threat-intelligence/unc3944-proactive-hardening-recommendations" target="_blank">Defending Against UNC3944: Cybercrime Hardening Guidance from the Frontlines</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Krebs on Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://krebsonsecurity.com/2025/09/feds-tie-scattered-spider-duo-to-115m-in-ransoms/" target="_blank">Feds Tie 'Scattered Spider' Duo to $115M in Ransoms</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Krebs on Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://krebsonsecurity.com/2026/06/scattered-spider-hackers-plead-guilty-on-day-1-of-trial/" target="_blank">Scattered Spider Hackers Plead Guilty on Day 1 of Trial</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyberScoop</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberscoop.com/scattered-spider-leaders-sentenced-united-kingdom/" target="_blank">Leading Members of Scattered Spider Sentenced in UK to 66 Months in Jail</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyberScoop</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberscoop.com/scattered-spider-teenagers-arrested-uk/" target="_blank">UK Arrests Two Teen Scattered Spider Members Linked to TfL Attack</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TechCrunch</div>
+        <div>
+          <div class="ref-detail"><a href="https://techcrunch.com/2025/09/18/us-government-charges-british-teenager-accused-of-at-least-120-scattered-spider-hacks/" target="_blank">US Government Charges British Teenager Accused of at Least 120 'Scattered Spider' Hacks</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2025/07/scattered-spider-hijacks-vmware-esxi-to.html" target="_blank">Scattered Spider Hijacks VMware ESXi to Deploy Ransomware on Critical U.S. Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Security Affairs</div>
+        <div>
+          <div class="ref-detail"><a href="https://securityaffairs.com/180466/cyber-crime/scattered-spider-targets-vmware-esxi-in-using-social-engineering.html" target="_blank">Scattered Spider Targets VMware ESXi Using Social Engineering</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSO Online</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csoonline.com/article/4014787/scattered-spider-shifts-focus-to-airlines-as-strikes-hit-hawaiian-westjet-and-now-qantas.html" target="_blank">Scattered Spider Shifts Focus to Airlines as Strikes Hit Hawaiian, WestJet — and Now Qantas</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cybernews</div>
+        <div>
+          <div class="ref-detail"><a href="https://cybernews.com/security/mgm-caesars-ransomware-attack-timeline/" target="_blank">Titans in Crisis: Unraveling the MGM and Caesars Ransomware Timeline</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Acronis TRU</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.acronis.com/en/tru/posts/the-dragonforce-cartel-scattered-spider-at-the-gate/" target="_blank">The DragonForce Cartel: Scattered Spider at the Gate</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CYFIRMA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cyfirma.com/research/resurgence-of-scattered-lapsus-hunters/" target="_blank">Resurgence of Scattered LAPSUS$ Hunters</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">IT Pro</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.itpro.com/security/cyber-attacks/scattered-spider-evolved-massively-heres-what-to-expect" target="_blank">Scattered Spider Evolved Massively in 2025 — Here's What to Expect in 2026</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Infosecurity Magazine</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.infosecurity-magazine.com/news-features/how-uk-retail-responded-hack-wave/" target="_blank">How the UK Retail Sector Responded to the Scattered Spider Hack Wave</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cloudskope</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cloudskope.com/breaches/mgm-resorts-breach-2023" target="_blank">MGM Resorts Breach 2023: $100M Vishing Attack</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 18 sources, 13 web lookups</div>
+  <div>Attribution confidence: HIGH (named members) / MEDIUM (ecosystem boundaries) · ATT&amp;CK: 12 techniques mapped · Ecosystem: The Com / LAPSUS$ / ShinyHunters</div>
+</div>
+
+</body>
+</html>
