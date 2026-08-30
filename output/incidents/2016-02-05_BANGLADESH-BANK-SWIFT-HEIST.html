@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bangladesh Bank SWIFT Heist — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 50px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.92;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 32px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    FC-2016-001<br/>
+    2016-02-04 / 05
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Financial Crime (Nation-State, Sanctions-Evasion Motivated)</div>
+  <h1><span class="gold">BANGLADESH BANK</span> SWIFT HEIST</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-30 &nbsp;|&nbsp; INCIDENT DATE: 2016-02-04 / 2016-02-05 (fraudulent transfers) — preceded by intrusion from ~2015 &nbsp;|&nbsp;
+    SOURCES: 15
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>FINANCIAL CRIME</span></div>
+    <div>Attribution: <span class="green">Lazarus Group / APT38 [HIGH]</span></div>
+    <div>Severity: <span class="red">CRITICAL</span></div>
+    <div>Era: <span>2016 (Post-ATT&amp;CK launch, pre-CSP era)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">$81M</div>
+    <div class="stat-label">Stolen — of $951M+ requested across 35 fraudulent SWIFT transfers</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">35</div>
+    <div class="stat-label">Fraudulent SWIFT transfer requests issued in the batch</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">$20M</div>
+    <div class="stat-label">Blocked by one misspelled word ("fandation") in a single transfer</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">~20-25%</div>
+    <div class="stat-label">Of the stolen $81M recovered, as of most recent public reporting</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="name">Lazarus Group / APT38 (Bluenoroff) — <span class="none">No companion actor card on file</span></span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">Bangladesh Bank SWIFT Heist</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Intrusion: ~Jan 2015 – Jan 2016 · Theft: 2016-02-04/05</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Financial Crime (nation-state, sanctions-evasion)</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Lazarus Group / APT38 (North Korea, RGB Bureau 121)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[HIGH]</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Bangladesh Bank (central bank) — SWIFT Alliance Access terminal</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">1 primary (Bangladesh Bank); 2 correspondent institutions drawn in (NY Fed, RCBC)</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">2016-02-06 (Saturday, Dhaka) — printer failure noticed</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Bangladesh Bank IT staff (internally); BAE Systems (malware forensics, March 2016)</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">~13 months from likely initial compromise to theft execution</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">$81M stolen; ~$870M+ in further attempted transfers blocked</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None dedicated — tracked under Group G0032 (Lazarus Group) / G0082 (APT38)</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Yes — infrastructure and hashes are 10 years stale; archival value only</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On February 4–5, 2016, unidentified attackers used stolen SWIFT credentials belonging to Bangladesh's central bank to issue 35 fraudulent transfer instructions against the bank's foreign-reserve account at the Federal Reserve Bank of New York, attempting to move roughly $951 million to accounts across Sri Lanka and the Philippines. Automated sanctions-list screening, a correspondent bank's routine due diligence, and one attacker's misspelling of the word "foundation" combined to block all but five of those requests — but those five were enough. $101 million was authorized for release; $81 million of it reached a single branch of Rizal Commercial Banking Corporation (RCBC) in Manila and was laundered through the Philippine casino industry within days, largely beyond recovery.</p>
+      <p>The Bangladesh Bank heist remains the largest bank robbery ever conducted primarily through a computer network, and — depending on how one totals the fully attempted transfers — one of the largest attempted thefts of any kind in history. It is also the operation that definitively proved a state actor was willing and able to use offensive cyber capability not for espionage or sabotage but for direct, large-scale theft of hard currency, a distinction that reshaped how the U.S. Treasury, the SWIFT cooperative, and central banks worldwide model nation-state cyber risk.</p>
+      <p>The incident sits at the intersection of three distinct failure domains that, individually, might each have been survivable: Bangladesh Bank's own network security was exceptionally weak for an institution safeguarding sovereign foreign-currency reserves; the SWIFT messaging cooperative's security model assumed member banks would secure their own endpoints, an assumption this heist proved catastrophically optimistic; and the Philippine financial and gaming-industry regulatory regime at the time contained a gap — an anti-money-laundering exemption for casinos — that was almost perfectly shaped to launder exactly this kind of windfall. Understanding the heist requires understanding all three, not just the intrusion.</p>
+      <p>Nearly nine years later, the case remains a foundational teaching example precisely because so much of it was preventable at multiple, independent points along the chain — and because the actor responsible, subsequently tracked by U.S. authorities and private researchers as a specialized financially-motivated cluster (APT38) operating under the broader Lazarus Group umbrella, went on to apply the same playbook against dozens of other financial institutions and cryptocurrency exchanges in the years that followed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>By 2016, North Korea's Reconnaissance General Bureau had been operating offensive cyber units — publicly tracked later as Bureau 121 and its subordinate elements — for over a decade, historically oriented toward espionage and, following the 2014 Sony Pictures Entertainment attack, destructive sabotage. International sanctions imposed after North Korea's nuclear and missile tests had progressively cut the regime off from conventional international finance, creating strong incentive to develop hard-currency-generating capabilities that did not depend on legitimate trade. Cyber-enabled bank theft filled that gap: unlike espionage, it produced directly usable foreign currency; unlike conventional smuggling, it could be conducted from within North Korea's borders with plausible deniability.</p>
+      <p>Bangladesh Bank was not the actor's first target using this method. A nearly identical intrusion pattern — malware manipulating a SWIFT Alliance Access-equivalent local application to send unauthorized transfer instructions and falsify confirmation records — had already been used against Ecuador's Banco del Austro in January 2015 (approximately $12 million stolen, routed through Hong Kong) and attempted against Vietnam's Tien Phong Bank (TPBank) in December 2015, where it was caught before completion. Symantec and other researchers later identified shared code and technique overlap across all three intrusions, indicating Bangladesh Bank was the third — and by far most consequential — operation in an established campaign, not an isolated event (Symantec, 2016; CFR Cyber Operations Tracker).</p>
+      <p>Bangladesh Bank's own security posture compounded the risk. Investigators who examined the bank's network after the theft found it lacked a firewall segmenting the room housing its SWIFT terminals from the rest of the institution's IT environment, and that the network relied on secondhand, roughly $10 network switches rather than enterprise-grade hardware — for an institution with direct SWIFT access to global reserve accounts (Reuters, reported via multiple outlets, April 2016). SWIFT's own security model at the time placed nearly all responsibility for endpoint security on member institutions; the cooperative provided the messaging network and standard client software (Alliance Access) but did not mandate or audit the security controls surrounding it — a design assumption this incident exposed as insufficient for an increasingly targeted threat landscape.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Initial Access — Spear-Phishing Compromise</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Beginning as early as January 2015 per the DOJ's later criminal complaint, operators sent spear-phishing emails to Bangladesh Bank employees carrying malicious attachments disguised as job-application documents and résumés. At least one recipient opened an attachment, executing malware that established a foothold inside the bank's internal network. Bangladesh Bank had no email-gateway sandboxing or attachment-detonation capability at the time capable of catching a targeted, low-volume spear-phish of this kind, and no contemporaneous alert exists in the public record indicating this initial compromise was ever detected as it happened.</div>
+        <div class="kc-pivot">A single opened attachment gave the operators a durable internal foothold from which to begin months of quiet reconnaissance.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Internal Reconnaissance &amp; SWIFT Credential Theft</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Over roughly a year, the operators moved laterally through Bangladesh Bank's flat, unsegmented internal network — a network reachable from the compromised foothold with no firewall isolating it from the SWIFT terminal environment — mapping the bank's payment operations and ultimately obtaining valid operator credentials for the SWIFT Alliance Access application used to originate international transfer instructions. No SWIFT network component itself was ever penetrated; the compromise was entirely of the bank's own local environment and its legitimately-issued access credentials, a distinction SWIFT itself later emphasized publicly. The absence of network segmentation meant this phase generated no meaningful internal alerting — there was effectively nothing to trip.</div>
+        <div class="kc-pivot">Legitimate SWIFT operator credentials, not a SWIFT platform vulnerability, gave the operators the ability to originate authentic-looking transfer instructions at will.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Malware Staging — DYEPACK / evtdiag.exe Deployment</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">In the days before the theft, the operators deployed a custom malware toolset — publicly named DYEPACK by researchers, with a core binary identified as <code>evtdiag.exe</code> and compiled on February 4, 2016, the same day the fraudulent transfers were issued (BAE Systems, 2016). The malware was purpose-built for this environment: it could intercept and suppress the physical printer confirmations Alliance Access normally generates for every transaction, and could delete or alter specific rows in the local SWIFT transaction database corresponding to the fraudulent transfers, preventing bank staff from seeing evidence of the requests in their own logs. This is a hallmark of the actor's tradecraft across all three related SWIFT heists: anti-forensic tooling engineered specifically against the target institution's own audit trail, not generic malware.</div>
+        <div class="kc-pivot">With the audit trail neutralized in advance, the operators could execute the theft with confidence that the bank's own systems would not raise an alarm before the money moved.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Fraudulent Transaction Execution</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">On the evening of Thursday, February 4, 2016 (Dhaka time — the start of Bangladesh's weekend), the operators used the stolen credentials to submit 35 SWIFT transfer instructions against Bangladesh Bank's account at the Federal Reserve Bank of New York, requesting a combined total of roughly $951 million be moved to accounts in the Philippines and Sri Lanka. The timing was deliberate: Thursday evening in Dhaka falls on a Thursday afternoon in New York, immediately ahead of the U.S. weekend, and Friday is itself part of Bangladesh's weekend — creating a compressed window in which any problem discovered by either side would be very slow to reach the other. DYEPACK's printer-suppression function activated as designed, so Bangladesh Bank staff saw no confirmation printouts and had no reason to suspect anything was underway.</div>
+        <div class="kc-pivot">The requests were now in the Federal Reserve's processing queue, and the only remaining opportunities to stop them lay entirely outside Bangladesh Bank's own visibility.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">External Circuit-Breaker — Correspondent Screening &amp; the Typo</span>
+          <span class="vis-badge vis-detected">DETECTED (externally, not by the victim)</span>
+        </div>
+        <div class="kc-body">Detection, when it came, came from outside Bangladesh Bank entirely. The Federal Reserve Bank of New York's automated sanctions-compliance screening flagged one transfer request because it referenced "Jupiter" — matching the name of a vessel owned by a sanctioned Iranian shipping line — triggering manual review that held up a large share of the batch pending clarification. Separately, a $20 million transfer routed to the "Shalika Foundation" in Sri Lanka passed through Deutsche Bank as an intermediary correspondent; a Deutsche Bank compliance reviewer noticed the beneficiary was spelled "Shalika Fandation" and, treating the anomaly as suspicious, queried Bangladesh Bank directly for confirmation before releasing the funds (OCCRP, 2016; CNBC, 2016). That single query is widely credited with prompting Bangladesh Bank to instruct a halt on further transactions — by which point five requests, totaling $101 million, had already been authorized and released.</div>
+        <div class="kc-pivot">The intervention came too late to stop the theft, but early enough to prevent it from becoming the roughly billion-dollar loss the operators had actually attempted.</div>
+      </div>
+
+      <div class="kc-phase visible">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Delayed Discovery — The Weekend Gap</span>
+          <span class="vis-badge vis-unreviewed">VISIBLE — UNREVIEWED</span>
+        </div>
+        <div class="kc-body">On Saturday, February 6, 2016 — a working day in Bangladesh — bank staff noticed the SWIFT terminal's printer had stopped producing the routine confirmation slips it normally generated continuously, and discovered they could not access certain transaction records. Attempts to reach the Federal Reserve Bank of New York for clarification went unanswered, because Saturday in Dhaka is Saturday in New York too, and the Fed itself was closed for the weekend. By the time both institutions' business weeks overlapped again on Monday, February 8, the window in which the transfers might have been recalled had already closed for the funds that had reached Manila; the money was withdrawn from RCBC within the same window. The printer malfunction had, in effect, been visible to staff for over 48 hours before its significance was understood.</div>
+        <div class="kc-pivot">By the time the scale of the fraud was understood, the stolen funds had already entered the Philippine banking and casino system, where recovery jurisdictionally and practically became far harder.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Cash-Out — Philippine Money Laundering</span>
+          <span class="vis-badge vis-detected">DETECTED (post-facto, by Philippine AMLC investigation)</span>
+        </div>
+        <div class="kc-body">The $81 million that reached RCBC's Jupiter Street branch in Makati City was deposited into accounts, some reportedly opened using fabricated documentation, then rapidly converted and moved through the remittance company PhilRem and into the Philippine casino ecosystem — notably Solaire Resort and the Midas Hotel and Casino — via junket operators including Kim Wong's Eastern Hawaii Leisure Company. At the time, Philippine law exempted casinos from the country's Anti-Money Laundering Act reporting requirements, allowing large sums to be converted into casino chips, gambled or simply cashed out, and dispersed with minimal paper trail — a loophole the operators appear to have exploited by design rather than coincidence. RCBC branch manager Maia Santos Deguito was later convicted of money laundering for her role in processing the transactions and sentenced to decades in prison; junket operators Kim Wong and Weikang Xu were separately investigated but ultimately not convicted for lack of sufficient evidence.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise Framework — forward-mapped (post-dates ATT&amp;CK's 2015 launch)</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.001</div>
+        <div class="mitre-name">Phishing: Spearphishing Attachment</div>
+        <div class="mitre-note">Job-application/résumé-themed malicious attachments sent to Bangladesh Bank employees, ~Jan 2015.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1046</div>
+        <div class="mitre-name">Network Service Discovery</div>
+        <div class="mitre-note">Extended internal reconnaissance to map payment-operations systems and locate the SWIFT Alliance Access terminal environment.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">Operators obtained legitimate SWIFT operator credentials rather than exploiting a SWIFT platform vulnerability — the core enabling technique of the entire operation.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1053</div>
+        <div class="mitre-name">Scheduled Task/Job</div>
+        <div class="mitre-note">Reported use of persistence mechanisms to maintain access across the ~13-month dwell period between initial compromise and theft.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1070.004</div>
+        <div class="mitre-name">Indicator Removal: File Deletion</div>
+        <div class="mitre-note">DYEPACK/evtdiag.exe used targeted SQL operations to delete database rows recording the fraudulent SWIFT transactions.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1565.001</div>
+        <div class="mitre-name">Data Manipulation: Stored Data Manipulation</div>
+        <div class="mitre-note">Local Alliance Access transaction database records altered to mask evidence of the fraudulent transfer requests from bank staff.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1491</div>
+        <div class="mitre-name">Defacement (adapted: Output/Confirmation Manipulation)</div>
+        <div class="mitre-note">Malware intercepted and suppressed physical printer confirmations for the fraudulent SWIFT messages, denying staff their normal paper audit trail.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">Direct theft of $81M via authorized-looking, fraudulently-originated interbank SWIFT transfer instructions.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Exfiltration (of Funds)</div>
+        <div class="mitre-id">T1537</div>
+        <div class="mitre-name">Transfer Data to Cloud Account (adapted: Transfer Funds to External Accounts)</div>
+        <div class="mitre-note">Stolen funds moved to RCBC-held accounts, then rapidly laundered through remittance services and casino junket operators in Manila.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">INITIAL ACCESS<br/>MISSED</div>
+        <div class="pm-detail">No email-gateway detonation/sandboxing existed to catch the spear-phishing attachment before an employee opened it — a basic control that was standard at better-resourced financial institutions by 2015 but absent here.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">NETWORK SEGMENTATION<br/>MISSED — ARCHITECTURAL</div>
+        <div class="pm-detail">The absence of a firewall separating the SWIFT terminal environment from the general corporate network meant a single compromised workstation had an unobstructed path to the bank's most sensitive payment infrastructure — a design failure, not a detection failure.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">EXTERNAL SCREENING<br/>PARTIALLY EFFECTIVE</div>
+        <div class="pm-detail"><strong>This is the phase that actually worked, imperfectly.</strong> The Federal Reserve's sanctions-list screening and Deutsche Bank's manual compliance review both caught anomalies the victim institution's own systems could not — demonstrating that correspondent-bank controls, even generic ones not designed for fraud detection, can function as a last line of defense when the originating institution's own defenses fail completely.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">TIME-ZONE / WEEKEND GAP<br/>MISSED — PROCESS</div>
+        <div class="pm-detail">No 24/7 incident-communication channel existed between Bangladesh Bank and the Federal Reserve capable of surviving the mismatch between Bangladesh's Friday-Saturday weekend and the U.S. Saturday-Sunday weekend — a gap the operators appear to have deliberately timed the attack to exploit.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">SWIFT launched its Customer Security Programme (CSP) in 2016, introducing mandatory, annually-attested security controls for all member institutions — network segmentation, multi-factor authentication, and restricted operator privileges among them — effectively converting what had been optional guidance into a compliance requirement enforced across the entire cooperative (SWIFT, 2016; ISACA, 2022).</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">The Philippines amended its Anti-Money Laundering Act in 2017 to bring casinos within its AML reporting regime, directly closing the specific laundering pathway this operation exploited.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">evtdiag.exe / DYEPACK</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Custom malware — anti-forensic / SWIFT manipulation</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Core payload identified by BAE Systems, compiled February 4, 2016. Manipulated the local SWIFT Alliance Access database via targeted SQL operations to delete/alter rows corresponding to fraudulent transfer requests, and intercepted the local print spooler to suppress and forge physical confirmation printouts, preventing bank staff from noticing the unauthorized transactions through their normal paper-based audit process.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">NESTEGG</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Funds-transfer message forging tool</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Tool in the broader BeagleBoyz/APT38 toolset associated with forging and manipulating financial transfer messages, referenced across multiple US-CERT/CISA "HIDDEN COBRA" advisories covering the actor's SWIFT-targeting campaigns.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Spear-Phishing Lures (job-application themed)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Delivery mechanism</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Malicious documents disguised as résumés/job applications, per the DOJ's 2018 criminal complaint against Park Jin Hyok — a lure theme reused across multiple Lazarus Group operations of this era.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are archival, dating to 2016. Infrastructure has long since rotated. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">FILE HASH</td><td class="val historical">evtdiag.exe — specific SHA-256 not consistently published in open sources reviewed for this compile</td><td>BAE Systems</td><td>2016-04</td></tr>
+          <tr><td class="type-label">INFRASTRUCTURE</td><td class="val historical">Monitoring server reported located in Egypt, used to observe SWIFT terminal usage patterns at Bangladesh Bank prior to the theft</td><td>BAE Systems</td><td>2016-04</td></tr>
+          <tr><td class="type-label">BENEFICIARY (fraud)</td><td class="val historical">"Shalika Fandation" [sic] — Sri Lanka, misspelled beneficiary name that triggered the Deutsche Bank compliance query</td><td>OCCRP / CNBC</td><td>2016-03</td></tr>
+          <tr><td class="type-label">RECIPIENT BRANCH</td><td class="val historical">RCBC Jupiter Street branch, Makati City, Philippines</td><td>Multiple (Reuters, Rappler)</td><td>2016</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No further specific network IOCs (defanged IPs/domains for C2) were located in open-source reporting reviewed for this compile with sufficient corroboration to publish; BAE Systems' full indicator set was not fully republished in the secondary sources consulted.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">Confirmed, for the first time at this scale, that a nation-state was willing to use offensive cyber capability for direct hard-currency theft rather than espionage or sabotage — reframing North Korea's cyber program in Western threat models as a sanctions-evasion and revenue-generation instrument. The case directly informed subsequent U.S. Treasury OFAC sanctions designations against North Korean cyber actors, including the September 2019 designation of Lazarus Group, Bluenoroff, and Andariel as instruments of the North Korean government.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body"><strong>SWIFT's Customer Security Programme (CSP)</strong>, launched in 2016, converted previously optional security guidance into mandatory, annually self-attested controls for the entire SWIFT membership — network segmentation, restricted operator privileges, and multi-factor authentication chief among them. The heist also established the specific "local application manipulation + printer/log suppression" playbook as a recognized technique class, subsequently seen again in attacks against other regional banks.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">The Philippines amended its Anti-Money Laundering Act in 2017 to close the casino-reporting exemption exploited during laundering. RCBC was fined by the Philippine central bank (Bangko Sentral ng Pilipinas) — at the time a record penalty for a Philippine bank. RCBC branch manager Maia Santos Deguito was convicted of money laundering. The U.S. DOJ's 2018 criminal complaint against Park Jin Hyok formally tied the heist to North Korean state cyber operations within a single continuing conspiracy that also encompassed the Sony Pictures attack and WannaCry.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: HIGH</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Lazarus Group (broad); APT38 / Bluenoroff / BeagleBoyz (specific financially-motivated cluster)</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">Democratic People's Republic of Korea — Reconnaissance General Bureau (Bureau 121)</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Yes — US DOJ criminal complaint (2018); US Treasury OFAC designations (2019)</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">Park Jin Hyok charged 2018 (conspiracy to commit wire fraud and computer-related fraud)</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file for Lazarus Group / APT38 as of this compile</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Malware code-family overlap with Sony Pictures/WannaCry intrusions; shared infrastructure and tradecraft across the Ecuador/TPBank/Bangladesh SWIFT intrusion series; DOJ complaint's technical annex</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">Bangladesh Bank officials floated an insider-involvement theory early in the investigation; no public evidence has substantiated insider complicity as the primary vector, and it is not treated as a serious competing attribution today</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Credible new forensic evidence contradicting the malware code-overlap findings, or a demonstrated alternative actor with matching capability and motive</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution to North Korean state actors rests on convergent evidence from multiple independent sources: private-sector malware analysis (Symantec, BAE Systems) identifying code overlap between the Bangladesh Bank malware and tools used in the 2014 Sony Pictures attack and the WannaCry ransomware outbreak, both already attributed to North Korean operators; a formal U.S. Department of Justice criminal complaint (2018) charging a named North Korean individual, Park Jin Hyok, within a single conspiracy spanning all three incidents; and subsequent U.S. Treasury sanctions explicitly naming Lazarus Group, Bluenoroff, and Andariel as instruments of the North Korean government. MITRE ATT&CK further refines this picture by tracking the SWIFT-targeting, financially-motivated operations specifically under APT38/BeagleBoyz (G0082) — a narrower cluster within the broader Lazarus Group umbrella (G0032) distinguished by Mandiant/FireEye's research as specializing in bank theft rather than the destructive or espionage operations associated with other Lazarus sub-clusters. This layered, multi-source convergence is why this repository assesses attribution confidence as [HIGH] rather than [MEDIUM] — a rarer outcome for nation-state financial crime, where deniability is typically easier to maintain than in destructive or espionage operations that leave more forensic signature.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The Bangladesh Bank heist is the incident that moved "nation-state bank robbery" from a theoretical category into a documented, repeatable operational pattern. Before 2016, the working assumption among central banks and the SWIFT cooperative was that state-sponsored cyber capability was aimed at espionage, sabotage, or political signaling — not straightforward theft of hard currency at scale. The heist, combined with the preceding Ecuador and Vietnam operations, established that a state actor could and would treat direct financial theft as a legitimate instrument of statecraft, particularly under sanctions pressure, and that it could execute such theft using the same trusted-messaging infrastructure (SWIFT) that underpins the entire international banking system.</p>
+      <p>It is taught today primarily as a case study in distributed, cross-institutional failure rather than a single dramatic breach: no single control failure caused the loss, and no single control fix would have prevented it. Bangladesh Bank's absent network segmentation enabled the intrusion; SWIFT's endpoint-security assumptions enabled the fraudulent messages to look authentic; the Philippines' casino AML exemption enabled the laundering; and only a combination of unrelated, largely accidental external checks — a sanctions-screening name match and a compliance officer's eye for a spelling error — kept the loss from being roughly twelve times larger. This is precisely the analytical lesson the case is used to teach: resilience in interconnected financial systems has to be modeled across the entire chain of institutions a transaction touches, not just the originating one.</p>
+      <p>The incident's aftermath also reshaped SWIFT's own governance. The Customer Security Programme it produced remains, a decade later, the primary mechanism by which the cooperative enforces baseline security expectations across thousands of member institutions worldwide — arguably making this the most consequential single incident in SWIFT's operating history. And the actor's continued evolution — Bureau 121's financially-motivated cluster went on to pursue cryptocurrency exchanges with the same playbook throughout the following decade — demonstrates that the underlying incentive structure this case exposed (a sanctioned state needing hard currency, and finding cyber theft cheaper and lower-risk than the alternatives) has not gone away.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div><div class="ref-detail"><a href="https://attack.mitre.org/groups/G0032/" target="_blank">Lazarus Group, G0032</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div><div class="ref-detail"><a href="https://attack.mitre.org/groups/G0082/" target="_blank">APT38 / BeagleBoyz / Bluenoroff, G0082</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Department of Justice / FBI</div>
+        <div><div class="ref-detail"><a href="https://www.fbi.gov/wanted/cyber/park-jin-hyok/@@download.pdf" target="_blank">Park Jin Hyok — Wanted Poster / Criminal Complaint Summary</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BankInfoSecurity</div>
+        <div><div class="ref-detail"><a href="https://www.bankinfosecurity.com/report-swift-hacked-by-bangladesh-bank-attackers-a-9061" target="_blank">Bangladesh Bank Attackers Hacked SWIFT Software</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div><div class="ref-detail"><a href="https://www.securityweek.com/custom-malware-used-81-million-bangladesh-bank-heist/" target="_blank">Custom Malware Used in $81 Million Bangladesh Bank Heist</a></div><div class="ref-date">Accessed: 2026-08-30</div><div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2016-04</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">OCCRP</div>
+        <div><div class="ref-detail"><a href="https://www.occrp.org/en/news/bangladesh-typo-triggers-alarm-prevents-billion-dollar-bank-heist" target="_blank">Bangladesh: Typo Triggers Alarm, Prevents Billion Dollar Bank Heist</a></div><div class="ref-date">Accessed: 2026-08-30</div><div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2016-03</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CNBC</div>
+        <div><div class="ref-detail"><a href="https://www.cnbc.com/2016/03/10/how-a-hackers-typo-helped-stop-a-billion-dollar-bank-heist.html" target="_blank">How a Hacker's Typo Helped Stop a Billion Dollar Bank Heist</a></div><div class="ref-date">Accessed: 2026-08-30</div><div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2016-03</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Rappler</div>
+        <div><div class="ref-detail"><a href="https://www.rappler.com/business/127655-developments-rcbc-money-laundering-bangladesh-bank-heist/" target="_blank">6 Things We Know About RCBC Money-Laundering Scam</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia (secondary, corroborating)</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/2015%E2%80%932016_SWIFT_banking_hack" target="_blank">2015–2016 SWIFT Banking Hack</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Council on Foreign Relations</div>
+        <div><div class="ref-detail"><a href="https://www.cfr.org/cyber-operations/2016/05/26/swift-related-bank-heists/" target="_blank">SWIFT-Related Bank Heists — Cyber Operations Tracker</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ISACA Journal</div>
+        <div><div class="ref-detail"><a href="https://www.isaca.org/resources/isaca-journal/issues/2023/volume-6/lessons-learned-from-the-bangladesh-bank-heist" target="_blank">Lessons Learned From the Bangladesh Bank Heist</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ISACA Journal</div>
+        <div><div class="ref-detail"><a href="https://www.isaca.org/resources/isaca-journal/issues/2022/volume-1/swifts-customer-security-program-lessons-for-the-cybersecurity-community" target="_blank">SWIFT's Customer Security Program — Lessons for the Cybersecurity Community</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSO Online</div>
+        <div><div class="ref-detail"><a href="https://www.csoonline.com/article/4131864/10-years-later-bangladesh-bank-cyberheist-still-offers-cyber-resiliency-lessons.html" target="_blank">10 Years Later, Bangladesh Bank Cyberheist Still Offers Cyber-Resiliency Lessons</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">National Security Archive (GWU)</div>
+        <div><div class="ref-detail"><a href="https://nsarchive.gwu.edu/news/cyber-vault/2019-02-20/tainted-trove" target="_blank">Tainted Trove — Cyber Vault</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia — Atiur Rahman</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Atiur_Rahman" target="_blank">Atiur Rahman</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SPUZ (technical analysis)</div>
+        <div><div class="ref-detail"><a href="https://spuz.me/blog/zine/4P738DY3P4CK.html" target="_blank">APT38 DYEPACK Framework Analysis</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 16 sources, all open-source/public</div>
+  <div>No companion actor card on file for Lazarus Group / APT38 — flagged for future creation</div>
+</div>
+
+</body>
+</html>
