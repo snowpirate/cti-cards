@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gonjeshke Darande — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 58px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 36px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge">⚠ SUSPECTED NATION-STATE-ALIGNED (ISRAEL, UNCONFIRMED) · SELF-STYLED HACKTIVIST FRONT</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Destructive ICS &amp; Financial-System Sabotage Against Iranian Infrastructure</div>
+  <h1><span class="accent">GONJESHKE</span> DARANDE</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-08-29 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK (Software S0688 "Meteor"), Check Point Research, CyberScoop, NATO CCDCOE Cyber Law Toolkit, CNN, NBC News, TechCrunch, Picus Security, CloudSEK, Pylos, 8+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">LAST CONFIRMED ACTIVE JUN 2025 — SILENT THROUGH FEB 2026 ESCALATION</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL (Iran-Focused)</span></div>
+    <div>Primary Motive: <span class="warn">Political/Military Retaliation &amp; Signaling Against Iran</span></div>
+    <div>Active Since: <span>2021 (possible tooling lineage to 2019)</span></div>
+    <div>MITRE ATT&amp;CK: <span>No dedicated Group ID</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ THREAT UPDATE — 2026</div>
+  <div class="alert-headline">Unusual silence during Feb 2026 US-Israel-Iran war breaks the group's established pattern</div>
+  <div class="alert-body">Despite a six-year history of striking Iranian infrastructure in close coordination with military and political escalation (the 2021 railway attack, 2022 Khouzestan Steel sabotage, and June 2025 Bank Sepah/Nobitex operations during the "Twelve-Day War"), the group has been conspicuously silent since a joint US-Israel military campaign against Iran began in February 2026, per open-source monitoring (CloudSEK; Pylos, May 2026). Analysts have not reached consensus on why — possibilities range from operational security amid tightened Iranian internet controls, to a shift toward purely kinetic/military coordination that no longer requires a public hacktivist persona, to simple wartime reporting gaps. This unexplained pattern break is itself a notable intelligence gap, not evidence the group has ceased to exist or lost capability.</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">2021</div>
+    <div class="stat-label">First Major Public Claim — Iranian Railway System (Meteor Wiper)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">3</div>
+    <div class="stat-label">Largest Iranian Steel Producers Compromised in a Single 2022 Operation</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">$90M</div>
+    <div class="stat-label">Cryptocurrency Stolen and Permanently "Burned" in the 2025 Nobitex Attack</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">70%</div>
+    <div class="stat-label">Of Iran's Gas Stations Disrupted in the Dec 2023 Fuel-System Attack</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Gonjeshke Darande — Persian for "Predatory Sparrow" — is a self-styled hacktivist persona that has, since 2021, conducted a sustained campaign of destructive cyberattacks against Iranian critical infrastructure and financial systems, consistently timed to align with Israeli-Iranian military and political flashpoints. The group presents itself publicly as a coalition of Iranian dissidents opposed to the Islamic Republic, but is widely assessed by journalists, researchers, and anonymous Western officials to be linked to, or directly operated by, the Israeli government or military — an attribution the Israeli government has never confirmed and the group itself has never claimed.</p>
+      <p>What distinguishes this group from typical hacktivist collectives is the operational sophistication and physical consequence of its attacks: it has used custom wiper malware to disable Iran's national railway system and state broadcaster, disrupted the nationwide subsidized-fuel payment network not once but at least twice (2021 and again in 2023, the latter affecting an estimated 70% of gas stations), and — in its most consequential operation — compromised industrial control systems at three of Iran's largest steel producers in June 2022, triggering a molten-metal spill and fire at Khouzestan Steel Company that the group itself filmed and published. That steel mill attack is widely regarded as the first publicly documented cyber operation to cause visible physical damage to heavy industrial equipment since Stuxnet in 2010.</p>
+      <p>The group escalated further during the June 2025 "Twelve-Day War" between Israel and Iran, claiming responsibility for disrupting Iran's state-owned Bank Sepah (which it accused of financing the IRGC and Iran's missile programs) and, the following day, for compromising Nobitex, Iran's largest cryptocurrency exchange — stealing an estimated $90 million in crypto assets and then deliberately "burning" the funds by transferring them to addresses with no known private keys, rendering the money permanently unspendable rather than keeping it for financial gain. The group also published Nobitex's source code and internal infrastructure documentation.</p>
+      <p>Gonjeshke Darande has cultivated an unusual reputation for what some researchers term "ethical" or restrained destructive hacking: in the steel mill attack it claims to have timed the sabotage to occur after workers had cleared the area, and it frames its operations publicly as retaliation for specific regime actions rather than indiscriminate harm. Whether genuine restraint or calculated reputation management for a state-linked influence operation, this positioning — combined with a conspicuous silence since a joint US-Israel military campaign against Iran began in February 2026 — makes the group's true nature, chain of command, and current operational status among the most closely watched open questions in state-aligned cyber operations today.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">Gonjeshke Darande ("Predatory Sparrow")</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">Unconfirmed — widely suspected ties to the Israeli government or military (possibly an intelligence/cyber unit operating under a deniable hacktivist persona); Israel has never officially confirmed a relationship</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Suspected Nation-State-Aligned / Self-Styled Hacktivist — Destructive ICS &amp; Financial-System Sabotage</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Political/military signaling and retaliation against the Iranian government, IRGC, and entities assessed to fund Iranian military/proxy activity; psychological and symbolic impact appears deliberate alongside physical/financial disruption</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">At least 2021 (first major public claim); possible tooling lineage traces to the "Indra" persona active against Syrian targets since 2019</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">June 2025 (Bank Sepah / Nobitex operations during the Israel-Iran "Twelve-Day War"); no confirmed public activity since — notably quiet through the Feb 2026 US-Israel military campaign against Iran</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">Not currently tracked under a dedicated Group ID; associated wiper (Meteor, S0688) is catalogued under the related "Indra" persona</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">No indictments, sanctions, or formal legal action publicly disclosed against this persona or any named individual</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">Gonjeshke Darande</span>
+          <span class="alias-chip">Predatory Sparrow</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>LOW-MEDIUM on the specific question of Israeli state sponsorship, despite widespread journalistic and analytical consensus that this is the most likely explanation. The operational sophistication required to reach production-control systems at multiple industrial sites, the precise timing of operations with Israeli military and political developments, and anonymous statements from US defense officials naming Israel as responsible for at least the 2021 fuel-system attack all point toward state involvement. However, no government has ever officially confirmed a relationship, the group itself has never claimed state affiliation, and — as with many "hacktivist front" operations — the persona's design may be specifically intended to preserve plausible deniability indefinitely.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2019</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Possible Predecessor Activity — "Indra" Against Syria</div>
+          <div class="timeline-desc">A group calling itself Indra deploys early wiper tools ("Stardust," "Comet") against Syrian private companies from at least 2019; researchers later identify strong tooling similarities between Indra's malware and the "Meteor" wiper used in this group's first major Iran operation, suggesting possible shared origin without conclusive proof.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JUL 2021</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Iranian Railway System Attack</div>
+          <div class="timeline-desc">Publicly claims responsibility for deploying the Meteor wiper against Iranian Railways and the Ministry of Roads and Urban Development, disabling train-scheduling systems and displaying taunting messages on station departure boards directing frustrated passengers to call the office of Iran's Supreme Leader.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">OCT 2021</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">National Fuel-Card Payment System Attack</div>
+          <div class="timeline-desc">Disrupts Iran's nationwide subsidized-fuel smart-card payment network, stranding drivers at gas stations and displaying messages referencing the Supreme Leader's office on pump-station screens; Iranian officials publicly acknowledge the disruption as a cyberattack.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JAN 2022</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Iranian State Broadcaster (IRIB) Hack</div>
+          <div class="timeline-desc">Claims an attack disrupting state-run TV and radio channels; Check Point researchers find wiper malware and tooling similarities to the Indra/Meteor lineage but cannot technically confirm this group's direct involvement.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JUN 2022</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Khouzestan Steel Company Sabotage</div>
+          <div class="timeline-desc">Compromises industrial control systems at three of Iran's largest steel producers, triggering a molten-metal spill and fire at Khouzestan Steel that it films and publishes; widely cited as the first cyberattack to cause visible physical damage to heavy industrial equipment since Stuxnet.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">DEC 2023</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Second National Fuel-System Disruption</div>
+          <div class="timeline-desc">Claims responsibility for disabling an estimated 70% of Iran's gas station payment terminals nationwide, again disrupting the subsidized-fuel distribution system; Iran's oil minister publicly confirms a cyberattack as the cause.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JUN 2025</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Bank Sepah &amp; Nobitex Operations During the Twelve-Day War</div>
+          <div class="timeline-desc">Amid direct Israeli-Iranian military conflict, claims to have disrupted and erased data at state-owned Bank Sepah, then the next day claims responsibility for breaching Nobitex (Iran's largest crypto exchange), stealing and permanently "burning" an estimated $90 million in digital assets and publishing the exchange's source code and infrastructure documentation. Most recent publicly confirmed activity as of this writing.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>From IT wiping to OT physical sabotage — escalating impact across six years</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>This group's operations show a consistent pattern of gaining deep, often administrator-level access to victim networks well before executing a visible, deliberately public act of disruption — behavior more consistent with a well-resourced, patient intrusion than opportunistic hacktivism. Initial access methods have not been fully disclosed publicly for most operations, but the consistent presence of custom-built wiper malware (the Meteor family) tailored to specific Iranian government and industrial targets indicates dedicated malware-development resources and pre-operation reconnaissance, rather than off-the-shelf tooling.</p>
+      <p>Once inside IT environments, the group has favored destructive rather than covert techniques: the Meteor wiper overwrites files with zero-bytes, deletes Windows Event Viewer logs and shadow copies, disables or evades installed antivirus, changes local passwords, and modifies desktop wallpapers and lock screens to display its own messaging directly to victims and the public — treating compromised systems as a broadcast channel for psychological and political messaging rather than simply disabling them quietly.</p>
+      <p>The group's most consequential escalation came in 2022, when its intrusion reached beyond conventional IT systems into the production-control (OT/ICS) environment at Khouzestan Steel Company, manipulating an overhead crane's control system to discharge molten metal onto the factory floor — demonstrating the ability to translate a cyber intrusion into a physical, kinetic-equivalent industrial accident. In its 2025 financial-sector operations, the group again showed willingness to go beyond disruption into deliberate, irreversible destruction: rather than monetizing the $90 million stolen from Nobitex, it transferred the funds to blockchain addresses with no known private keys, permanently destroying the value rather than keeping it — a symbolic statement that the operation was punitive rather than financially motivated.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise + ATT&CK for ICS; mapped from Meteor (S0688) and public incident reporting</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1587.001</div>
+        <div class="mitre-name">Develop Capabilities: Malware</div>
+        <div class="mitre-note">[HIGH] Developed and iterated custom wiper malware (Meteor and the related Stardust/Comet lineage) purpose-built for specific Iranian government, transport, and broadcast targets.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1590</div>
+        <div class="mitre-name">Gather Victim Network Information</div>
+        <div class="mitre-note">[MEDIUM] Demonstrated detailed pre-operation knowledge of target network and, in the steel mill case, production-control system layout, consistent with extended reconnaissance before the visible attack.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.001</div>
+        <div class="mitre-name">Command and Scripting Interpreter: PowerShell</div>
+        <div class="mitre-note">[HIGH] Meteor wiper executed via PowerShell and batch scripts to disable network adapters, change passwords, and orchestrate destructive routines.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1484.001</div>
+        <div class="mitre-name">Domain or Tenant Policy Modification: Group Policy Modification</div>
+        <div class="mitre-note">[HIGH] Modified Group Policy Objects to distribute destructive scheduled tasks across networked machines, then removed compromised systems from the Active Directory domain post-attack.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1562.001</div>
+        <div class="mitre-name">Impair Defenses: Disable or Modify Tools</div>
+        <div class="mitre-note">[HIGH] Disabled or removed licensing for installed antivirus (Kaspersky) and added malicious files to Windows Defender exclusion lists.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1070.001</div>
+        <div class="mitre-name">Indicator Removal: Clear Windows Event Logs</div>
+        <div class="mitre-note">[HIGH] Deleted Security, System, and Application Event Viewer logs to hinder post-incident forensic investigation.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1485</div>
+        <div class="mitre-name">Data Destruction</div>
+        <div class="mitre-note">[HIGH] Overwrote victim files with zero-bytes before deletion via the Meteor wiper across railway, broadcast, and other IT targets.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1490</div>
+        <div class="mitre-name">Inhibit System Recovery</div>
+        <div class="mitre-note">[HIGH] Deleted boot configuration data and volume shadow copies (bcdedit, vssadmin) to prevent recovery of wiped systems.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1491.002</div>
+        <div class="mitre-name">Defacement: External Defacement</div>
+        <div class="mitre-note">[HIGH] Modified desktop wallpapers, lock screens, and public-facing station/pump displays to broadcast political messaging directly to victims.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impair Process Control</div>
+        <div class="mitre-id">T0831</div>
+        <div class="mitre-name">Manipulation of Control</div>
+        <div class="mitre-note">[HIGH] Manipulated production-control systems (HMI-visible) at Khouzestan Steel to trigger an unsafe overhead-crane discharge of molten metal.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0879</div>
+        <div class="mitre-name">Damage to Property</div>
+        <div class="mitre-note">[HIGH] Caused direct physical damage to industrial equipment and a factory fire as a deliberate outcome of the ICS intrusion, extending cyber impact into the physical domain.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[MEDIUM] Stole an estimated $90 million in cryptocurrency from Nobitex, then deliberately rendered the funds permanently unrecoverable rather than retaining them for financial gain.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Government / Transportation (Rail, Ministries)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Energy / Fuel Distribution</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Heavy Industry / Steel &amp; Manufacturing (ICS/OT)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Banking &amp; Financial Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">State Media / Broadcasting</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Exclusively Iran — every confirmed or claimed operation has targeted Iranian government, industrial, financial, or media entities; no operations against any other country have been publicly attributed to this persona</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Iranian state-owned or state-affiliated organizations with high symbolic or strategic value — national rail and fuel-distribution networks, the state broadcaster, major industrial employers, and financial institutions specifically accused of funding the IRGC or Iran's missile/proxy programs</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Not fully disclosed publicly; consistent evidence of deep, extended-duration access preceding each attack suggests deliberate, well-resourced intrusion campaigns rather than opportunistic compromise</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Operations consistently timed to Israeli-Iranian political and military flashpoints and explicitly framed as retaliatory and proportionate; targets chosen for maximum symbolic/psychological visibility to the Iranian public and government rather than financial gain or intelligence collection</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">Meteor</span>
+          <span class="tool-tag">Custom Wiper · MITRE S0688</span>
+        </div>
+        <div class="tool-desc">Purpose-built Windows wiper that overwrites files with zero-bytes, deletes boot configuration data and shadow copies, disables antivirus, clears event logs, changes local account passwords, and modifies desktop wallpaper/lock screens to display attacker messaging; masquerades as a "Windows Power Efficiency Diagnostics" tool. Used in the 2021 Iranian railway and Ministry of Roads attack; technically linked to the earlier "Stardust" and "Comet" wiper lineage attributed to the "Indra" persona.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">ICS/HMI Access Capability</span>
+          <span class="tool-tag">Bespoke ICS Intrusion Tooling · Uncatalogued</span>
+        </div>
+        <div class="tool-desc">Capability sufficient to reach and manipulate production-control systems and an overhead crane's control logic at Khouzestan Steel Company; specific malware or access tooling for this operation has not been publicly recovered or catalogued, but the demonstrated outcome (deliberate unsafe equipment operation) implies OT-specific engineering knowledge well beyond typical IT-focused wiper deployment.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">Custom Defacement / Messaging Payloads</span>
+          <span class="tool-tag">Public-Facing Display Manipulation</span>
+        </div>
+        <div class="tool-desc">Software components used to alter public-facing displays — railway departure boards, fuel-pump payment terminals, desktop lock screens — to broadcast the group's political messaging directly to Iranian civilians, functioning as much as a psychological-operations tool as a destructive one.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Blockchain "Burn Wallet" Technique</span>
+          <span class="tool-tag">Financial Destruction Methodology</span>
+        </div>
+        <div class="tool-desc">Rather than conventional cryptocurrency laundering, the group transferred an estimated $90 million stolen from Nobitex to blockchain addresses generated without corresponding private keys, permanently and verifiably destroying the funds — a technique that prioritizes demonstrable, irreversible punishment over financial gain.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">MALWARE</td><td class="val">Meteor wiper (MITRE Software S0688)</td><td>MITRE ATT&amp;CK; Check Point Research</td><td>2021-07</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">Stardust / Comet wipers (Indra lineage, possible tooling ancestor)</td><td>Check Point Research</td><td>2019–2021</td></tr>
+        <tr><td class="type-label">EVENT</td><td class="val">Khouzestan Steel Company HMI screenshot and CCTV footage (self-published proof)</td><td>Predatory Sparrow Telegram channel; CyberScoop</td><td>2022-06-27/28</td></tr>
+        <tr><td class="type-label">FINANCIAL</td><td class="val">~$90M in Nobitex crypto assets transferred to unrecoverable ("burn") blockchain addresses</td><td>Elliptic (via NBC News, CNBC)</td><td>2025-06-18</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No durable static IP/domain/hash indicator list is included here. This actor conducts infrequent, highly bespoke operations against a single country's infrastructure, self-publishes its own "proof" via Telegram/X rather than leaving conventional forensic trails in open reporting, and no consolidated public IOC feed exists. Consult MITRE ATT&amp;CK Software S0688 (Meteor) and named vendor incident reports (Check Point, and other Iran-focused researchers) for the limited technical indicators that have been published.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL (Iranian critical infrastructure specifically); not a global/enterprise threat given exclusively Iran-focused targeting</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">LOW-MEDIUM (state sponsorship) / HIGH (operations are genuine, sophisticated, and politically motivated)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Uncertain — escalated steadily from IT wiping (2021) to OT physical sabotage (2022) to financial destruction (2025), but no confirmed activity since June 2025 despite a major Feb 2026 US-Israel campaign against Iran fitting its historical pattern</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Demonstrated ability to translate cyber access into physical industrial damage (Khouzestan Steel) — one of a small number of publicly confirmed cyber-to-physical sabotage events in history alongside Stuxnet</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Definitive confirmation (or refutation) of Israeli state sponsorship, and the reason for the group's silence since June 2025 despite ongoing/escalating Israel-Iran conflict through 2026</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Indra (possible predecessor / tooling lineage)</span>
+          <span class="alias-chip">CyberAv3ngers (comparable Iran-aligned counterpart, opposing side)</span>
+          <span class="alias-chip">Unit 8200 (speculated, unconfirmed connection)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>This group occupies a distinctive position in the threat landscape: it is one of the very few publicly documented actors to have caused verified physical damage to industrial equipment through a cyber intrusion, placing it in the same rare category as Stuxnet in terms of demonstrated cyber-to-physical impact, but achieved with what appears to be a far smaller, more agile operation than the multi-year, multi-agency Stuxnet effort. This suggests either a highly capable, well-funded state cyber unit operating under a hacktivist cover identity, or a smaller but unusually skilled team with direct access to ICS engineering expertise — both possibilities carry serious implications for how OT-focused critical infrastructure operators everywhere assess their own exposure to similarly resourced, similarly motivated adversaries.</p>
+      <p>The group's consistent operational restraint — publicly claiming to time attacks to avoid civilian casualties, and destroying rather than keeping stolen cryptocurrency — is either genuine ethical calculation unusual among destructive threat actors, or a deliberate reputation-management strategy consistent with a state actor seeking to normalize destructive cyber operations as an acceptable tool of statecraft by demonstrating "responsible" use. Both interpretations should concern defenders: the first because it suggests a capable actor deliberately holding back further escalation that remains available to it, and the second because it suggests a state normalizing destructive cyberattacks against civilian-adjacent infrastructure as a legitimate policy tool.</p>
+      <p>The group's apparent silence since June 2025, spanning a major escalation in US-Israel military action against Iran beginning in February 2026, is the most significant open question in this profile. If it is genuinely dormant, that would mark an unexplained break from six years of consistent activity aligned precisely with this kind of escalation. If it remains active but unreported — plausible given wartime restrictions on Iranian internet access and information flow — then organizations tracking this actor should not interpret the current quiet period as evidence of reduced capability or intent. Confidence in either direction would improve significantly with corroborated reporting once full information about the 2026 conflict period becomes available.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Segment OT/ICS networks from IT networks and the internet.</strong> Ensure production-control systems (HMIs, PLCs, SCADA) have no direct or trivially bridgeable path from corporate IT networks, closing the pivot path this actor used to reach Khouzestan Steel's crane controls.</div>
+            <div class="cm-ttp">Counters: ICS T0831</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Enforce safety interlocks independent of the control network.</strong> Deploy hardwired or logically isolated safety-instrumented systems that cannot be overridden purely through HMI/PLC-level access, so a network intrusion alone cannot trigger an unsafe physical action.</div>
+            <div class="cm-ttp">Counters: ICS T0831, T0879</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Harden against wiper-style destructive malware.</strong> Maintain offline, immutable backups of critical system state and Active Directory; monitor for mass bcdedit/vssadmin execution, bulk file-overwrite activity, and unauthorized Group Policy changes distributing scheduled tasks.</div>
+            <div class="cm-ttp">Counters: T1485, T1490, T1484.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Protect and centralize security logging off-host.</strong> Forward Event Viewer (Security/System/Application) logs to a separate, access-controlled SIEM immediately, since on-host log deletion — a core Meteor capability — only works if logs remain solely on the compromised host.</div>
+            <div class="cm-ttp">Counters: T1070.001</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Monitor for antivirus/EDR tampering.</strong> Alert on AV license changes, service disablement, and additions to Windows Defender exclusion lists, which preceded destructive payload execution in documented Meteor deployments.</div>
+            <div class="cm-ttp">Counters: T1562.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Restrict and monitor public-facing display/kiosk systems.</strong> Treat payment-terminal, departure-board, and other public-facing display systems as high-value targets in their own right, and isolate their update/content-management pathways from general IT networks.</div>
+            <div class="cm-ttp">Counters: T1491.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Apply enhanced monitoring and cold-storage practices to high-value crypto holdings.</strong> Exchanges and custodians in politically exposed jurisdictions should assume destructive (not just theft-motivated) intrusions are possible, and architect hot-wallet exposure and withdrawal-approval workflows accordingly.</div>
+            <div class="cm-ttp">Counters: T1657</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Assume politically timed targeting.</strong> Critical-infrastructure operators in geopolitically contested states should increase monitoring posture and incident-response readiness around known escalation windows (military strikes, diplomatic crises), matching this actor's demonstrated pattern.</div>
+            <div class="cm-ttp">Counters: General targeting-doctrine posture</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Predatory_Sparrow" target="_blank">Predatory Sparrow</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/software/S0688/" target="_blank">Meteor, Software S0688</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyberScoop</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberscoop.com/iran-state-tv-hack-predatory-sparrow-indra/" target="_blank">Deep Dive Into Hack Against Iranian State TV Yields Wiper Malware, Other Custom Tools</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyberScoop</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberscoop.com/predatory-sparrow-israel-gaza-cyber/" target="_blank">Savvy Israel-Linked Hacking Group Reemerges Amid Gaza Fighting</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Check Point Research</div>
+        <div>
+          <div class="ref-detail"><a href="https://research.checkpoint.com/2022/evilplayout-attack-against-irans-state-broadcaster/" target="_blank">EvilPlayout: Attack Against Iran's State Broadcaster</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NATO CCDCOE</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberlaw.ccdcoe.org/wiki/Predatory_Sparrow_operation_against_Iranian_steel_maker_(2022)" target="_blank">Predatory Sparrow Operation Against Iranian Steel Maker (2022)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NATO CCDCOE</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberlaw.ccdcoe.org/wiki/Predatory_Sparrow%E2%80%99s_operations_against_Iranian_financial_cyber_infrastructure_(2025)" target="_blank">Predatory Sparrow's Operations Against Iranian Financial Cyber Infrastructure (2025)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ThreatDown</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.threatdown.com/blog/predatory-sparrow-massively-disrupts-steel-factories-while-keeping-workers-safe/" target="_blank">Predatory Sparrow Massively Disrupts Steel Factories While Keeping Workers Safe</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Picus Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.picussecurity.com/resource/blog/predatory-sparrow-inside-the-cyber-warfare-targeting-irans-critical-infrastructure" target="_blank">Predatory Sparrow: Inside the Cyber Warfare Targeting Iran's Critical Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSO Online</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csoonline.com/article/1266704/pro-israel-hacktivist-group-brings-down-70-of-gas-stations-in-iran.html" target="_blank">Pro-Israel Hacktivist Group Brings Down 70% of Gas Stations in Iran</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TechCrunch</div>
+        <div>
+          <div class="ref-detail"><a href="https://techcrunch.com/2025/06/17/pro-israel-hacktivist-group-claims-responsibility-for-alleged-iranian-bank-hack/" target="_blank">Pro-Israel Hacktivist Group Claims Responsibility for Alleged Iranian Bank Hack</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CNN</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cnn.com/2025/06/18/middleeast/pro-israel-hackers-iran-crypto" target="_blank">Pro-Israel Hackers Take Credit After $90 Million Stolen From Iran's Largest Crypto Exchange</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NBC News</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nbcnews.com/world/middle-east/hackers-attack-irans-largest-crypto-exchange-destroying-90-million-rcna213920" target="_blank">Hackers Attack Iran's Largest Crypto Exchange, Destroying $90 Million</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Al Jazeera</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.aljazeera.com/news/2023/12/18/iran-says-cyberattack-disrupts-petrol-stations-across-country" target="_blank">Iran Points at Israeli-Linked Group as Cyberattack Disrupts Fuel Network</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/2021_Iranian_fuel_cyberattack" target="_blank">2021 Iranian Fuel Cyberattack</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Binding Hook</div>
+        <div>
+          <div class="ref-detail"><a href="https://bindinghook.com/predatory-sparrow-cyber-sabotage-with-a-conscience/" target="_blank">Predatory Sparrow: Cyber Sabotage With a Conscience?</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CloudSEK</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cloudsek.com/blog/middle-east-escalation-israel-iran-us-cyber-war-2026" target="_blank">Situation Report: Middle East Escalation (Feb–Mar 2026)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Pylos</div>
+        <div>
+          <div class="ref-detail"><a href="https://pylos.co/2026/05/25/predatory-sparrow-out-in-the-cold/" target="_blank">Predatory Sparrow, Out in the Cold?</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 18 sources, 13 web lookups</div>
+  <div>Status: Last confirmed active Jun 2025, silent through Feb 2026 escalation · Attribution confidence: LOW-MEDIUM (state sponsorship) · ATT&amp;CK: 12 techniques mapped (Enterprise + ICS)</div>
+</div>
+
+</body>
+</html>
