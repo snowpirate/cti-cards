@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heartbleed — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  /* Patch status badge */
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  /* KEV badge */
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  /* ── CVSS SCORE CALLOUT ── */
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  /* ── CWE BLOCK ── */
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── LIFECYCLE TRACK ── */
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── CVSS VECTOR BREAKDOWN ── */
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  /* ── AFFECTED VERSIONS TABLE ── */
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  /* ── EXPLOITATION TIMELINE ── */
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── KEV BLOCK ── */
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ── PURPLE TEAM TABS ── */
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  /* Query blocks */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── CROSS-REFERENCE LINKS ── */
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  /* ── CVE METADATA BLOCK ── */
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO / THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-resolved">RESOLVED · HISTORICAL</div>
+      <div class="kev-badge">KEV LISTED</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — Information Disclosure (Memory Over-Read) · OpenSSL / TLS Heartbeat Extension</div>
+  <h1><span class="cyan">HEART</span>BLEED</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    CVE: CVE-2014-0160 &nbsp;|&nbsp;
+    CWE: CWE-125 (Out-of-bounds Read) &nbsp;|&nbsp;
+    SOURCES: 14
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="amber">7.5 (HIGH)</span></div>
+    <div>Affected: <span>OpenSSL 1.0.1 – 1.0.1f (and 1.0.2-beta1)</span></div>
+    <div>Disclosed: <span>2014-04-07 (coordinated)</span></div>
+    <div>Patch Date: <span>2014-04-07 (OpenSSL 1.0.1g)</span></div>
+    <div>KEV Added: <span class="cyan">2022-05-04 (8 years post-disclosure)</span></div>
+    <div>EPSS: <span>0.99999 (99.997th pct.)</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout" style="border-left-color: var(--amber);">
+  <div>
+    <div class="cvss-score medium">7.5</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2014-0160</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">Single CVE — originally scored CVSSv2 5.0 (Medium); rescored 7.5 (High) under v3.1 methodology</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">~500K</div>
+    <div class="stat-label">Internet-facing TLS servers vulnerable at disclosure (~17% of the secure web)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">25 MO</div>
+    <div class="stat-label">The bug shipped silently before discovery (Mar 2012 → Apr 2014)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">99.9%</div>
+    <div class="stat-label">EPSS — 30-day exploitation probability, still, a decade on</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">300K+</div>
+    <div class="stat-label">Servers still confirmed vulnerable months after the patch shipped</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Heartbleed is a buffer over-read vulnerability in OpenSSL's implementation of the TLS/DTLS Heartbeat Extension (RFC 6520) that allows a remote, unauthenticated attacker to read up to 64KB of a server's process memory per request, repeatable indefinitely, with no authentication and no trace in application logs. Because OpenSSL powered an estimated two-thirds of all TLS-secured web servers in 2014, and because the leaked memory could contain anything the process had recently handled — TLS private keys, session cookies, HTTP Basic Auth credentials, plaintext form submissions, other tenants' data on shared hosting — Heartbleed is widely regarded as one of the most consequential vulnerabilities in the history of the commercial internet (Electronic Frontier Foundation, 2014; Bruce Schneier, 2014).</p>
+      <p>The vulnerability is significant beyond its raw technical severity because of what it revealed and what it changed. It exposed that a piece of cryptographic infrastructure trusted by most of the internet — OpenSSL — was maintained by a two-person, effectively volunteer team surviving on roughly $2,000 a year in donations (Wikipedia; Core Infrastructure Initiative, 2014). It produced one of the first "branded" vulnerabilities, complete with a name, logo, and dedicated website (heartbleed.com), a media-relations pattern that shaped how the industry has communicated critical CVEs ever since. And it triggered a durable structural response: within weeks, twelve major technology companies funded the Linux Foundation's Core Infrastructure Initiative to pay full-time maintainers for critical open-source infrastructure, and two independent OpenSSL forks (LibreSSL, BoringSSL) were created specifically to harden the codebase.</p>
+      <p>Heartbleed is more than a decade old but remains directly relevant to a working CTI/vulnerability-research practice for three reasons: it is a canonical teaching example of an out-of-bounds read with catastrophic confidentiality impact from a single missing bounds check; its exploitation continued for years after the patch (Community Health Systems, Canada Revenue Agency) because "patch the library" and "the exposure is actually closed" are not the same claim when private key material may have leaked; and CISA added it to the KEV catalog in May 2022 — eight years after disclosure — a reminder that KEV listing dates track ongoing exploitation evidence, not vulnerability age.</p>
+      <p>Who remains at risk in 2026: any organization running end-of-life appliances, embedded devices, or unmaintained internal services built on an unpatched OpenSSL 1.0.1–1.0.1f build. Public scanning has continued to find on the order of 100,000–300,000 internet-facing devices with vulnerable or outdated OpenSSL version banners years after the patch, concentrated in exactly the categories — legacy embedded systems, forgotten internal infrastructure, unsupported network appliances — that most CTI programs should already be hunting for as part of general attack-surface hygiene.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-125</span>
+        <span class="cwe-name">Out-of-bounds Read</span>
+      </div>
+      <div class="cwe-body">The product reads data past the end, or before the beginning, of the intended buffer, typically allowing an attacker to read sensitive information from other memory locations or cause a crash (MITRE CWE-125). In Heartbleed's case, the read is remotely triggerable, requires no authentication, and returns the leaked memory directly to the attacker in a normal-looking protocol response — with no crash, and therefore no obvious signal that anything went wrong.</div>
+    </div>
+    <div class="prose">
+      <p>The TLS/DTLS Heartbeat Extension (RFC 6520) lets either side of a connection send a small "are you there" message containing an arbitrary payload and a declared payload length; the receiver is supposed to echo the exact same payload back. OpenSSL's implementation (in <code>ssl/t1_lib.c</code> / <code>ssl/d1_both.c</code>) read the attacker-supplied 2-byte length field from the incoming heartbeat request and used it directly — without checking it against the actual number of bytes received in the packet — as the length argument to a <code>memcpy()</code> call that copied the "payload" into a newly allocated response buffer sized to match the claimed length.</p>
+      <p>Because the claimed length could be up to 65,535 bytes regardless of how much data the client actually sent (as little as a single-byte payload), a malicious heartbeat request could claim a payload far larger than what was transmitted. OpenSSL would then <code>memcpy</code> that many bytes starting at the correctly-sized payload pointer — reading past the end of the small request buffer and into whatever adjacent heap memory happened to be there, then dutifully returning it to the attacker inside the heartbeat response. Repeating the request harvested a different ~64KB slice of process heap each time, since heap layout shifts between requests; enough repetitions could, and demonstrably did, surface TLS private keys, session tokens, and plaintext credentials that had transited the same process.</p>
+      <p>The code was authored by Robin Seggelmann as part of a legitimate RFC 6520 feature contribution, reviewed and merged by OpenSSL core team member Stephen N. Henson, and committed to the OpenSSL repository on December 31, 2011 — shipping in the 1.0.1 release on March 14, 2012. It is a textbook example of a missing bounds check surviving code review: the review process trusted that the length field would be validated somewhere, no automated fuzzing or memory-safety tooling was in the OpenSSL pipeline at the time to catch it, and — because OpenSSL is open source — the code was visible to anyone for over two years without anyone reporting the flaw before Google's and Codenomicon's simultaneous, independent discovery.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>2014-04-01</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>2014-04-07</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">03</div>
+        <div class="lc-label">Patch<br/>2014-04-07</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">Exploitation<br/>2014-04 → years</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node dim">05</div>
+        <div class="lc-label">Resolution<br/>2014–2015 (industry response)</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>The bug shipped in OpenSSL 1.0.1 on March 14, 2012, and sat in production code, unreported, for roughly 25 months. On April 1, 2014, Neel Mehta of Google's security team privately reported it to the OpenSSL team. Almost simultaneously and entirely independently, researchers at the Finnish security firm Codenomicon discovered the same flaw during routine testing of their own product around April 3, 2014, and notified Finland's national CERT (NCSC-FI) for coordination — a rare case of two unrelated teams finding the identical critical bug within days of each other, underscoring how mechanically discoverable the flaw was once someone looked in the right place.</p>
+      <p>OpenSSL, Codenomicon, and a coordinating group of major infrastructure operators (including Akamai, Cloudflare, Facebook, Google, Yahoo, and several Linux distribution maintainers) agreed a coordinated public disclosure date of April 7, 2014. On that date, three things happened almost simultaneously: OpenSSL published version 1.0.1g and a security advisory, Codenomicon's heartbleed.com site went live with the "Heartbleed" name, a purpose-designed bleeding-heart logo, and plain-language explanation — one of the first vulnerabilities to receive full marketing treatment — and CVE-2014-0160 was published. This branding choice proved consequential: it made an obscure cryptographic library bug comprehensible to a general audience overnight, driving both rapid patch adoption and a template later reused for Shellshock, POODLE, and subsequent branded vulnerabilities.</p>
+      <p>Patching, however, did not equal remediation. Because the bug could have leaked TLS private keys before anyone knew to look, the complete remediation chain required patching OpenSSL, then revoking and reissuing every potentially-exposed TLS certificate, then rotating every session token and credential that might have transited the vulnerable process — a three-step chain that many organizations completed only partially or not at all. This gap between "patched" and "actually safe" directly enabled continued exploitation for years, including breaches attributed to Heartbleed well after the April 2014 patch was publicly available.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Coordinated, multi-party — but contested</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Neel Mehta (Google) and Codenomicon, independently, days apart</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val">2014-04-01 (Mehta) / ~2014-04-03 (Codenomicon via NCSC-FI)</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val amber">Concurrent with disclosure — no meaningful pre-patch PoC window</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val green">Simultaneous — patch (1.0.1g) shipped at public disclosure</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val">Fast and complete for the code fix; industry-wide certificate/credential rotation lagged for years</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val red">Widespread alarm; EFF and Schneier called it "catastrophic"</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val amber">Mostly — but a tiered pre-notification to select large infrastructure providers drew criticism</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Unlike PrintNightmare, Heartbleed's disclosure was intentionally coordinated rather than accidental — but the coordination itself became controversial. Ahead of the April 7 public release, a subset of large infrastructure operators (Akamai, Cloudflare, Facebook, Google, and several others) received advance notice under embargo so they could patch before attackers had any opportunity to exploit the newly-public bug. Critics pointed out that this created a two-tier disclosure: well-resourced companies got a head start that smaller operators, other certificate authorities, and the general public did not, raising a fairness question about vulnerability coordination that remains debated in CVD policy circles today.</p>
+      <p>A second, more serious controversy followed within days: Bloomberg reported, citing two anonymous sources, that the NSA had known about and secretly exploited Heartbleed for approximately two years before public disclosure. The NSA and the White House both issued formal denials, stating the agency was not aware of the vulnerability until it became public and that the U.S. government's policy is to disclose vulnerabilities it discovers rather than stockpile them. The claim was never independently corroborated and was disputed by other outlets, but it materially shaped public and policy debate in 2014 about government vulnerability-disclosure practices (the debate that later produced the modern Vulnerabilities Equities Process framework). This repository's confidence in the underlying technical facts of Heartbleed is high; confidence in the NSA-foreknowledge claim specifically is low, and it is presented here as a disputed historical claim, not an established fact.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>Exploitation requires no authentication and a single TCP connection to any TLS or DTLS service linked against a vulnerable OpenSSL build. The attacker completes (or partially completes) a TLS handshake, then sends a heartbeat request record whose declared payload length field is set larger than the actual payload bytes included — for example, claiming a 65,535-byte payload while sending only a few bytes of actual data. The vulnerable server allocates a response buffer sized to the claimed length, <code>memcpy()</code>s that many bytes starting from the (small, correctly-received) payload location, and returns the result. The returned buffer contains the few legitimate payload bytes the attacker sent, followed by up to ~64KB of whatever else happened to occupy adjacent process heap memory — potentially including the server's own TLS private key, other clients' plaintext session data, HTTP request bodies containing credentials, or internal application secrets. Because the response is a syntactically valid heartbeat reply, nothing about the exchange looks anomalous to the server process itself; there is no crash and no error condition, only a successful-looking heartbeat round-trip that happens to contain far more data than it should.</p>
+      <p>Repeating the request with different declared lengths and at different times samples different regions of heap memory (as the heap's contents shift with normal server activity), which is why real-world exploitation typically involved hundreds to thousands of requests to reliably harvest specific secrets like a private key, rather than a single request producing the "jackpot."</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVE-2014-0160 · CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">Exploitable over any TLS/DTLS connection the vulnerable service accepts — no local access needed.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">A single malformed heartbeat record is sufficient; widely available scripts automated exploitation within hours of disclosure.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">Fully unauthenticated — the heartbeat extension operates before or independent of any application-layer authentication.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No victim action required; the attacker initiates the connection and request directly.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">UNCHANGED</div>
+          <div class="cvss-comp-meaning">Impact is confined to the vulnerable process's own memory space (though that space may itself hold the "keys to the kingdom").</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Can leak TLS private keys, credentials, and session data — a complete confidentiality failure for anything the process touched.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val amber">NONE</div>
+          <div class="cvss-comp-meaning">The bug is a read primitive only — it does not, by itself, let an attacker modify data or system state.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val amber">NONE</div>
+          <div class="cvss-comp-meaning">No direct denial-of-service impact; the process continues operating normally throughout exploitation.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
+      <table class="versions-table">
+        <thead><tr><th>Vendor</th><th>Component</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>OpenSSL Project</td><td>OpenSSL (TLS/DTLS Heartbeat)</td><td class="vuln">1.0.1 – 1.0.1f; 1.0.2-beta1</td><td class="fixed">1.0.1g (2014-04-07); 1.0.2-beta2</td><td>Fixed — patch complete, single generation</td></tr>
+          <tr><td>Downstream (all)</td><td>Any product statically/dynamically linking a vulnerable OpenSSL build</td><td class="vuln">Version-dependent — hundreds of vendor advisories issued 2014-04</td><td class="fixed">Vendor-specific rebuild against 1.0.1g+</td><td class="partial">Remediation required a full rebuild/redeploy, not just a library swap, for statically-linked binaries</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block">
+      <div class="kev-header">
+        <span class="kev-tag">CISA KEV LISTED</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2022-05-04 · Required Remediation: 2022-05-25</span>
+      </div>
+      <div class="kev-body">CISA added CVE-2014-0160 to the KEV catalog on May 4, 2022 — as part of a five-vulnerability batch that also included two other 2014-era CVEs — giving federal civilian agencies a three-week remediation window (Flashpoint, 2022). The eight-year gap between public disclosure and KEV listing does not mean exploitation stopped; it reflects that KEV entries track confirmed, ongoing exploitation evidence rather than vulnerability age, and Heartbleed continued to be actively probed and exploited against legacy systems well into the 2020s.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">2014-04-07</div>
+          <div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Mass Scanning Begins Within Hours</div>
+            <div class="et-desc">Working exploit scripts circulated publicly the same day as disclosure; internet-wide scanning for vulnerable hosts began almost immediately.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2014-04 (mid)</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Canada Revenue Agency — SIN Theft</div>
+            <div class="et-desc">Approximately 900 Canadian Social Insurance Numbers were stolen from the CRA's public-facing systems; suspect Stephen Solis-Reyes was arrested and charged. Broader Canadian federal departments were also reported affected in a subsequent CBC investigation.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2014-06 → 08</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Community Health Systems Breach — 4.5M Patients</div>
+            <div class="et-desc">Attackers harvested VPN credentials from a CHS-operated Juniper device via Heartbleed and used them to log into the corporate network, exfiltrating personal data on approximately 4.5 million patients — reported by TrustedSec/Mandiant as among the largest documented Heartbleed-enabled breaches (HealthcareInfoSecurity, 2014).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2014 → 2019</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Sustained Opportunistic Exploitation</div>
+            <div class="et-desc">Five years post-disclosure, Heartbleed was reported as the third-most-exploited vulnerability observed in the wild, reflecting the long tail of unpatched and unmaintained systems (Flashpoint, 2022, citing 2019 exploitation data).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2022-05-04</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">CISA KEV Listing</div>
+            <div class="et-desc">Formally added to the KEV catalog based on continued confirmed exploitation evidence, nearly a decade after disclosure.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2024–2026</div>
+          <div class="et-track"><div class="et-dot dim"></div></div>
+          <div class="et-content">
+            <div class="et-event">Long-Tail Legacy Exposure Persists</div>
+            <div class="et-desc">Internet-wide scans continue to find on the order of 100,000–300,000 devices running outdated or vulnerable OpenSSL version banners, concentrated in legacy embedded systems and unmaintained appliances (Network World; TechTarget).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>No card currently on file in this repository documents an actor or a specific incident case file tied to the Community Health Systems or Canada Revenue Agency compromises — see Section 10. Heartbleed's exploitation profile is unusual for a "famous" CVE: it was not associated with a single dominant threat actor or campaign but rather with broad, opportunistic scanning by a wide range of unrelated criminal and unknown actors, consistent with its nature as a low-skill, high-yield credential/key-theft primitive rather than a targeted exploit chain.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Heartbleed is the canonical case study for a structural failure mode distinct from PrintNightmare's "whack-a-mole patch cascade": it is what happens when critical internet infrastructure is maintained as an under-resourced volunteer effort. At the time of disclosure, OpenSSL — linked into a majority of the internet's TLS-secured traffic — was maintained by a two-person team receiving on the order of $2,000 per year in donations, with no dedicated funding for security auditing, fuzzing, or a formal code-review gate strong enough to catch a missing bounds check in a new feature (Core Infrastructure Initiative retrospectives, 2014–2016). The vulnerability itself — a single missing length validation — is trivial in isolation; what made it catastrophic was the mismatch between how critical the software was and how little organizational capacity existed to secure it.</p>
+      <p>The industry's response is itself an instructive architectural lesson, and a comparatively rare example of a systemic fix following a systemic failure. Within three weeks, the Linux Foundation's Core Infrastructure Initiative was announced with twelve major technology companies each committing $100,000 per year for three years, funding full-time OpenSSL maintainers and pushing the project from a two-person team to roughly fifteen contributors with a mandatory two-reviewer code-review policy. Independently, the OpenBSD project forked OpenSSL into LibreSSL within two weeks (stripping over 90,000 lines of legacy C code in its first week of work), and Google forked its own hardened variant, BoringSSL, two months later. Both forks were explicit acknowledgments that the existing codebase's engineering practices, not just this one bug, needed to change.</p>
+      <p>The lesson that has proven durable, and the one most relevant to a working security practice today, is that critical open-source dependencies inherit an organization's risk regardless of whether that organization pays for, audits, or even knows it depends on them. Heartbleed's persistence for years after patching — via embedded devices, unmaintained appliances, and statically-linked binaries nobody thought to rebuild — previews exactly the software-supply-chain dependency risk that later drove SBOM (Software Bill of Materials) mandates and the broader open-source-security funding movement. The Core Infrastructure Initiative's funding has since lapsed for many of the projects it originally supported, and OpenSSL and comparable projects continue to cite sustainable funding as an open problem — meaning the underlying structural risk Heartbleed exposed has been only partially, and not permanently, addressed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <!-- A: DETECTION -->
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <div class="query-block">
+        <div class="query-label">Suricata/Snort — TLS heartbeat length-mismatch signature (illustrative, based on public 2014-era rules)</div>
+        <div class="query-code">alert tls any any -> $HOME_NET any (msg:"SERVER-OTHER OpenSSL TLSv1 heartbeat information disclosure attempt (Heartbleed)"; \
+  flow:established,to_server; content:"|18 03|"; offset:0; depth:2; \
+  byte_test:2,>,3,3,relative; classtype:attempted-recon; \
+  reference:cve,2014-0160; sid:1000001; rev:1;)</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Protocol-analysis length-mismatch heuristic (as implemented by Wireshark/IDS heartbeat decoders)</div>
+        <div class="query-code">IF (heartbeat_record.declared_payload_length + 16) > (heartbeat_record.actual_tls_record_length - 3)
+  THEN flag "Heartbleed-style overread attempt" (severity: critical, direction: client-to-server)
+# Reference implementation logic per Errata Security / Inliniac Suricata detection notes, 2014-04</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>Behavioral indicators independent of a specific signature: any heartbeat request whose declared payload length exceeds the size of the TLS record actually received; repeated heartbeat requests from a single source in rapid succession (legitimate heartbeat traffic is infrequent and small); and, on the host itself, an OpenSSL process handling an unusually high volume of heartbeat records relative to normal keep-alive traffic. Because exploitation leaves no crash and no application-log trace, network-layer detection (packet capture, IDS/IPS with TLS protocol decoding) is the only reliable detection surface — host-based logging alone will not reveal historical exploitation.</p>
+      </div>
+    </div>
+
+    <!-- B: HUNTING -->
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis 1 — Legacy/embedded OpenSSL never rebuilt.</strong> Enumerate every network-facing device and appliance (VPN concentrators, load balancers, IoT/OT management interfaces, printers, IP cameras, older network gear) and fingerprint the OpenSSL version in use via TLS handshake analysis or vendor firmware inventory. Statically-linked binaries are the highest-risk finding here, since a host OS patch does not remediate them — the specific binary must be rebuilt and redeployed.</p>
+        <p><strong>Hypothesis 2 — Certificates never rotated after the 2014 patch.</strong> For any organization with TLS infrastructure that predates April 2014, verify that certificate/key rotation actually occurred at the time, rather than assuming a patched OpenSSL version implies a safe certificate. A certificate issued before the 2014 patch and never reissued is a standing risk regardless of current library version, since the original private key's exposure (if it occurred) was never remediated.</p>
+        <p><strong>Hypothesis 3 — Historical compromise via harvested credentials.</strong> For high-value environments that existed in April 2014, hunt for anomalous authentication activity in the weeks immediately following disclosure (2014-04-07 through roughly 2014-05-31) using any retained historical logs — credential-based intrusions following a Heartbleed-enabled harvest would show as successful logins using otherwise-valid credentials with no corresponding password-reset or phishing event, consistent with the Community Health Systems pattern.</p>
+      </div>
+    </div>
+
+    <!-- C: PATCH GUIDANCE -->
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Patch</span><span class="kv-val green">OpenSSL 1.0.1g or later (or migrate to a maintained fork/branch)</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2014-04-07</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val green">Low — the fix is a narrow bounds-check addition with no known functional regressions</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Minimal for the patch itself; the real work is certificate/credential rotation, which requires a coordinated maintenance window</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">OpenSSL Security Advisory, 2014-04-07</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val">Yes — released simultaneously with public disclosure</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val">Not superseded — this is the complete, final fix for CVE-2014-0160 itself</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Unlike PrintNightmare, Heartbleed does not have a patch-bypass lineage — 1.0.1g fully closes CVE-2014-0160. The residual risk in 2026 is entirely a deployment-hygiene problem: unpatched legacy/embedded devices, statically-linked binaries never rebuilt, and certificates/credentials that were never rotated after the original patch. For any newly-discovered legacy system still running vulnerable OpenSSL, the correct remediation sequence is: (1) patch or replace the OpenSSL build, (2) treat any TLS private key the device held as compromised and reissue the certificate, (3) rotate any credentials or session secrets that could plausibly have transited the vulnerable process, in that order — patching alone is an incomplete remediation for a confidentiality-impact vulnerability of this severity.</p>
+      </div>
+    </div>
+
+    <!-- D: COMPENSATING CONTROLS -->
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>Terminate TLS at a modern reverse proxy or load balancer in front of any legacy device that cannot be patched or rebuilt.</strong> This removes the vulnerable OpenSSL build from the network-facing attack surface entirely, at the cost of an additional infrastructure component to maintain.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Disable the TLS heartbeat extension</strong> at compile time (<code>OPENSSL_NO_HEARTBEATS</code>) or via configuration where the underlying stack supports it, if a full library upgrade is genuinely not possible in the short term.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Network-segment and restrict inbound access</strong> to any confirmed-legacy device pending replacement, minimizing the population of hosts that can reach it.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div class="cm-text"><strong>Deploy IDS/IPS heartbeat length-validation signatures</strong> (Section A) as a monitoring control while remediation of the underlying device is scheduled.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div class="cm-text"><strong>Formally retire end-of-life devices on a lifecycle schedule</strong> rather than treating "still hasn't been breached" as evidence the device is safe to leave in place — the multi-year tail of Heartbleed-vulnerable devices found by internet-wide scans is overwhelmingly a device-lifecycle failure, not a patching-technique failure.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2014-0160</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val amber">7.5 (High)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String (v3.1)</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N</span></div>
+          <div class="kv-row"><span class="kv-key">CVSS v2 Score (original)</span><span class="kv-val dim">5.0 (Medium)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String (v2)</span><span class="kv-val mono">AV:N/AC:L/Au:N/C:P/I:N/A:N</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-125 (Out-of-bounds Read)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val red">0.99999 (99.997th percentile)</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2014-0160" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2014-0160</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="http://www.openssl.org/news/secadv_20140407.txt" target="_blank" style="color:var(--cyan)">OpenSSL Security Advisory 20140407</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed — confirmed ongoing exploitation</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2022-05-04 (due 2022-05-25)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <div class="xref-none">No companion actor cards on file as of 2026-08-30 — Heartbleed's exploitation was broad and opportunistic rather than tied to a single tracked threat actor or group. This repository's existing actor cards (APT1, Gonjeshke Darande, JadePuffer, Lapsus$, REvil, Salt Typhoon, Scattered Spider, TeamPCP) do not include any confirmed Heartbleed operators.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <div class="xref-none">No companion incident cards on file as of 2026-08-30. The Community Health Systems breach (~4.5M patient records, 2014) and the Canada Revenue Agency SIN-theft incident (2014) are both documented, publicly-attributed candidates for future incident card creation.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div><div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2014-0160" target="_blank">CVE-2014-0160 Detail</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE / CVE.org</div>
+        <div><div class="ref-detail"><a href="https://www.cve.org/CVERecord?id=CVE-2014-0160" target="_blank">CVE Record: CVE-2014-0160</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">OpenSSL Project</div>
+        <div><div class="ref-detail"><a href="http://www.openssl.org/news/secadv_20140407.txt" target="_blank">OpenSSL Security Advisory, 2014-04-07</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Codenomicon</div>
+        <div><div class="ref-detail"><a href="https://heartbleed.com/" target="_blank">Heartbleed Bug (heartbleed.com)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/alerts/2014/04/08/openssl-heartbleed-vulnerability-cve-2014-0160" target="_blank">OpenSSL 'Heartbleed' Vulnerability (CVE-2014-0160)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA KEV Catalog</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve=CVE-2014-0160" target="_blank">Known Exploited Vulnerabilities Catalog — CVE-2014-0160</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FIRST.org</div>
+        <div><div class="ref-detail"><a href="https://api.first.org/data/v1/epss?cve=CVE-2014-0160" target="_blank">EPSS API — CVE-2014-0160</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Flashpoint</div>
+        <div><div class="ref-detail"><a href="https://flashpoint.io/blog/cisa-heartbleed-vulnerability/" target="_blank">CISA Adds Five "New" Exploits to KEV Catalog, Including 2014's Heartbleed Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia (secondary, corroborating)</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Heartbleed" target="_blank">Heartbleed</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Invicti</div>
+        <div><div class="ref-detail"><a href="https://www.invicti.com/blog/web-security/the-heartbleed-bug" target="_blank">The Heartbleed Bug: How a Forgotten Bounds Check Broke the Internet</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSO Online</div>
+        <div><div class="ref-detail"><a href="https://www.csoonline.com/article/562859/the-heartbleed-bug-how-a-flaw-in-openssl-caused-a-security-crisis.html" target="_blank">The Heartbleed Bug: How a Flaw in OpenSSL Caused a Security Crisis</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Errata Security</div>
+        <div><div class="ref-detail"><a href="https://blog.erratasec.com/2014/04/fun-with-ids-funtime-3-heartbleed.html" target="_blank">Fun with IDS Funtime #3: Heartbleed</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Inliniac (Suricata)</div>
+        <div><div class="ref-detail"><a href="https://blog.inliniac.net/2014/04/08/detecting-openssl-heartbleed-with-suricata/" target="_blank">Detecting OpenSSL Heartbleed with Suricata</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">HealthcareInfoSecurity</div>
+        <div><div class="ref-detail"><a href="https://www.healthcareinfosecurity.com/heartbleed-behind-healthcare-breach-a-7215" target="_blank">Is Heartbleed Behind Healthcare Breach?</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CBC News</div>
+        <div><div class="ref-detail"><a href="https://www.cbc.ca/news/politics/heartbleed-bug-cyberattack-canada-government-departments-1.3355993" target="_blank">Heartbleed Bug Hit More Government Departments Than Just Tax Agency</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NBC News</div>
+        <div><div class="ref-detail"><a href="https://www.nbcnews.com/tech/security/man-charged-heartbleed-attack-canada-tax-agency-n82391" target="_blank">Man Charged in 'Heartbleed' Attack on Canada Tax Agency</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia — Core Infrastructure Initiative</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Core_Infrastructure_Initiative" target="_blank">Core Infrastructure Initiative</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DarkReading</div>
+        <div><div class="ref-detail"><a href="https://www.darkreading.com/vulnerabilities-threats/after-heartbleed-tech-giants-fund-open-source-security" target="_blank">After Heartbleed, Tech Giants Fund Open Source Security</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia — LibreSSL</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/LibreSSL" target="_blank">LibreSSL</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div><div class="ref-detail"><a href="https://www.theregister.com/2014/06/21/boringssl/" target="_blank">Bored Yet? Now There's Another OpenSSL Fork — It's From Google (BoringSSL)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Network World</div>
+        <div><div class="ref-detail"><a href="https://www.networkworld.com/article/925950/microsoft-subnet-more-than-300-000-servers-still-unpatched-for-heartbleed.html" target="_blank">More Than 300,000 Servers Still Unpatched for Heartbleed</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NPR</div>
+        <div><div class="ref-detail"><a href="https://www.npr.org/2014/04/15/303391635/between-heartbleed-and-homeland-nsa-treads-cybersecurity-gray-area" target="_blank">Between Heartbleed and Homeland, NSA Treads Cybersecurity Gray Area</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 22 sources, all open-source/public</div>
+  <div>OpenSSL Heartbeat Extension · CVE-2014-0160 · NSA-foreknowledge claim presented as disputed, not established</div>
+</div>
+
+</body>
+</html>
