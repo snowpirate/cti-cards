@@ -19,6 +19,9 @@
     --gold-dim: #7a5c08;
     --red:      #ff4d4d;
     --blue:     #5b9bd5;
+    --cyan:     #00d4ff;
+    --purple:   #9b6dff;
+    --purple2:  #c9b8ff;
     --text:     #d0dde8;
     --text-dim: #5a7080;
     --text-mid: #8aa5bb;
@@ -63,7 +66,7 @@
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--teal), var(--gold) 50%, transparent 100%);
+    background: linear-gradient(90deg, var(--teal), var(--gold) 33%, var(--cyan) 66%, transparent 100%);
   }
   .site-header-inner {
     display: flex;
@@ -82,8 +85,8 @@
     letter-spacing: -0.01em;
     color: #fff;
   }
-  .site-title .teal { color: var(--teal); }
-  .site-title .gold { color: var(--gold); }
+  .site-title .purple  { color: var(--purple); }
+  .site-title .purple2 { color: var(--purple2); }
   .site-meta {
     font-family: var(--mono);
     font-size: 9px;
@@ -380,7 +383,7 @@
 <div class="site-header">
   <div class="site-header-inner">
     <div>
-      <div class="site-title"><span class="teal">CTI</span> <span class="gold">Library</span></div>
+      <div class="site-title"><span class="purple">CTI</span> <span class="purple2">Library</span></div>
       <div class="site-meta">// snowpirate · cti-cards · Threat Actor Profiles · Incident Case Files · Vulnerability Advisories</div>
     </div>
     <div class="site-stats">
@@ -393,7 +396,7 @@
         <div class="site-stat-label">Incident Cases</div>
       </div>
       <div class="site-stat">
-        <div class="site-stat-val" id="vuln-count" style="color:#00d4ff">0</div>
+        <div class="site-stat-val" id="vuln-count" style="color:var(--cyan)">0</div>
         <div class="site-stat-label">Vuln Advisories</div>
       </div>
     </div>
