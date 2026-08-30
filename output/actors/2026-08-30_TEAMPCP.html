@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TeamPCP — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge ecrime">⚠ ECRIME · INDEPENDENT · AU/ZA NEXUS</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Cloud-Native Software Supply Chain Compromise &amp; Ransomware-Enabled Extortion</div>
+  <h1><span class="accent">TEAM</span>PCP</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    SOURCES: Unit 42, Wiz, KELA, Bitsight, Malpedia, Krebs on Security, U.S. DOJ, FBI/IC3, TechCrunch, BleepingComputer, The Record, SOCRadar, Sophos, SANS ISC + 6 more (see §10)
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE — PARTIALLY DISRUPTED</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL</span></div>
+    <div>Primary Motive: <span>Financial Gain</span></div>
+    <div>Active Since: <span>Mid-2025</span></div>
+    <div>MITRE ATT&amp;CK: <span>No G-ID Assigned</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ AFP / FBI JOINT ACTION — 2026-08-27</div>
+  <div class="alert-headline">Two Alleged TeamPCP Operators Arrested and Federally Indicted in Australia</div>
+  <div class="alert-body">On August 27, 2026, the Australian Federal Police and Western Australia Police Force — supported by the FBI — executed search warrants in Cottesloe, Hamilton Hill, and Mandurah, WA, and arrested Ruben Ian Thomson (21, AU/ZA national) and Louis Michael Gaebler (23) on a combined 14 cybercrime charges (TechCrunch, Aug 27 2026; Krebs on Security, Aug 2026). A parallel U.S. federal indictment out of the Northern District of California charges Thomson with conspiracy to violate the Computer Fraud and Abuse Act (DOJ USAO-NDCA, Aug 2026). Both remain in custody pending a September 18, 2026 court appearance. Analysts caution this action addresses only a subset of a larger, Telegram-coordinated crew — active CipherForce/Vect extortion operations are not confirmed halted.</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">500K+</div>
+    <div class="stat-label">Credentials Stolen (EU Commission Breach Alone)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">2,500+</div>
+    <div class="stat-label">Organizations Compromised via LiteLLM Alone</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">10.0</div>
+    <div class="stat-label">CVSS — CVE-2025-55182 "React2Shell" Exploited for Access</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">3,800+</div>
+    <div class="stat-label">GitHub Repositories Compromised</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>TeamPCP is a financially motivated, cloud-native cybercriminal operation that in 2026 ran what several vendors independently describe as the most consequential open-source software supply chain campaign of the year (Flare, Feb 2026; SocRadar, 2026). Rather than attacking victims directly, the group compromises the trusted upstream software — security scanners, AI gateways, SDKs — that thousands of organizations pull into their build pipelines, converting a single maintainer's stolen credential into a cascading compromise of everyone downstream. Its defining trait is not technical novelty: initial access, credential theft, and typosquatting are all long-understood techniques. The distinguishing feature is industrialized <em>scale</em> — automated worm-driven scanning of exposed Docker APIs, Kubernetes clusters, and CI/CD endpoints, chained across five separate software ecosystems (GitHub Actions, Docker Hub, PyPI, npm, and OpenVSX) in a matter of weeks (Bitsight, Jul 2026).</p>
+      <p>TeamPCP matters right now because its trajectory illustrates where financially motivated cybercrime is heading: from a Telegram-based stolen-data brokerage in mid-2025 into a full-spectrum initial-access-broker-plus-ransomware operation. The group's March 2026 compromise of Aqua Security's Trivy, Checkmarx's KICS, and BerriAI's LiteLLM — an AI gateway with over 95 million monthly downloads — rippled outward to breach the European Commission's AWS environment (roughly 500,000 credentials and 300+ GB exfiltrated, per CERT-EU/The Record, 2026) and to touch automotive manufacturers including BMW, Audi, Honda, Mercedes-Benz, Volvo, and Toyota through their software supply chains (TechCrunch, Aug 2026).</p>
+      <p>Within the current eCrime landscape, TeamPCP sits at the convergence point of two trends analysts have flagged as accelerating through 2026: supply-chain compromise as a scalable initial-access vector, and the blurring line between access brokers and ransomware operators. Since a formal partnership announced in late March 2026, TeamPCP supplies stolen cloud and CI/CD access to the Vect ransomware operation for encryption and extortion, while simultaneously running its own CipherForce extortion brand for direct operations — a dual-track monetization model that maximizes return on every compromised credential (Sophos, 2026; Hard2Bit, 2026).</p>
+      <p>The critical operational context as of this compile date is the August 27, 2026 arrest of two alleged members in Western Australia and a parallel U.S. federal indictment (DOJ, N.D. Cal.) — a meaningful law-enforcement milestone, but one researchers assess as only partial disruption. TeamPCP is widely characterized as a loose confederation drawing from multiple cybercriminal circles rather than a single hierarchical cell (BleepingComputer, Aug 2026), and its decentralized, blockchain-backed C2 infrastructure was explicitly engineered for resilience against takedown.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">TeamPCP</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val">None identified — independent criminal enterprise</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Cloud-native eCrime / Initial Access Broker + Ransomware Operator</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial gain — credential monetization, extortion, ransomware-as-a-service partnerships</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">Mid-2025 (Telegram stolen-data brokerage); operationally visible as a supply-chain actor late 2025</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Aug 2026 (active dual-track CipherForce/Vect extortion at time of arrests)</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">Not assigned — emerging actor, not yet catalogued in ATT&amp;CK Groups as of 2026-08-30</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">INDICTED — 2 alleged members charged &amp; in custody (AU), federal CFAA conspiracy indictment (DOJ, N.D. Cal.), as of 2026-08-27; additional members assessed at large</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">TeamPCP</span>
+          <span class="alias-chip">UNC6780 (Mandiant/Google Cloud)</span>
+          <span class="alias-chip">Altered Spider (CrowdStrike)</span>
+          <span class="alias-chip">PCPcat</span>
+          <span class="alias-chip">ShellForce</span>
+          <span class="alias-chip">DeadCatx3</span>
+          <span class="alias-chip">PersyPCP</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p><strong>[HIGH]</strong> that the "TeamPCP" brand/cluster is responsible for the March–August 2026 supply-chain campaign: independently corroborated by Wiz, Unit 42, KELA (as UNC6780), Bitsight, and CrowdStrike (as Altered Spider) via consistent C2 infrastructure, malware, and TTPs, and reinforced by the August 2026 criminal indictment. <strong>[MEDIUM]</strong> on precise group structure and full membership — researchers describe TeamPCP as an amalgamation of individuals from multiple cybercriminal circles rather than one hierarchical group (BleepingComputer, Aug 2026); the two Telegram admin personas identified ("DMT"/BulkDMT and PersyPCP, ages ~20–21) are consistent with, but not conclusively matched to, the ages of the two individuals arrested (21 and 23). This would be upgraded to [HIGH] on structure with confirmed persona-to-defendant mapping from unsealed court filings.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">MID 2025</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Telegram Stolen-Data Brokerage</div>
+          <div class="timeline-desc">TeamPCP surfaces as a Telegram-based broker of stolen data and access, run by admin personas "DMT"/BulkDMT and PersyPCP. No supply-chain activity yet observed at this stage (KELA Cyber, 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">DEC 2025</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">React2Shell (CVE-2025-55182) Disclosed &amp; Exploited</div>
+          <div class="timeline-desc">A CVSS 10.0 unauthenticated RCE in React Server Components is disclosed and rapidly exploited in the wild by multiple threat clusters (Zscaler ThreatLabz, Microsoft, AWS, Dec 2025); TeamPCP later leverages it for cloud-hosted application access ahead of its 2026 campaign.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">FEB 2026</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Emerging Force — Cloud Scanning Campaigns</div>
+          <div class="timeline-desc">Flare publishes the first dedicated threat alert describing TeamPCP as "an emerging force in the cloud native and ransomware landscape," documenting large-scale automated scanning of exposed Docker APIs, Kubernetes clusters, and CI/CD pipelines (Flare, Feb 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAR 19–27, 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Cascading Supply Chain Compromise</div>
+          <div class="timeline-desc">Exploiting incomplete credential rotation, TeamPCP force-pushes malicious code to 76 of 77 tags on aquasecurity/trivy-action (Mar 19), poisons all tags of aquasecurity/setup-trivy (Mar 19), compromises Checkmarx KICS's GitHub Action (Mar 23), trojanizes BerriAI's LiteLLM PyPI packages v1.82.7–8 (Mar 24), and poisons the Telnyx Python SDK v4.87.1–2 (Mar 27) — ultimately touching 66+ npm packages and 3,800+ GitHub repositories (Unit 42, Apr 2026; TechCrunch, Aug 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">LATE MAR 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">European Commission Breach &amp; Vect Partnership</div>
+          <div class="timeline-desc">CERT-EU attributes a breach of over 1,000 SaaS environments, ~500,000 stolen credentials, and 300+ GB of exfiltrated data to TeamPCP (The Record, 2026). In parallel, TeamPCP and the Vect ransomware operation announce a formal partnership — TeamPCP supplies stolen access, Vect handles encryption and BreachForums-affiliate extortion (Sophos, 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAR 30, 2026</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Disputed Secondary Victim Claims</div>
+          <div class="timeline-desc">Claims circulate of Databricks and AstraZeneca compromise tied to the campaign; Databricks states it "found nothing" after investigation and requested further evidence, and the AstraZeneca leak (~3 GB, released for free after a failed sale) is separately linked by some researchers to LAPSUS$ rather than TeamPCP directly — both should be treated as [LOW] confidence pending independent confirmation (SANS ISC, Mar 2026; Cybersecurity News, 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">AUG 27, 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Arrests &amp; Federal Indictment</div>
+          <div class="timeline-desc">AFP and Western Australia Police Force, supported by the FBI, arrest Ruben Ian Thomson (21) and Louis Michael Gaebler (23) in Perth on 14 combined charges; the DOJ (N.D. Cal.) unseals a federal indictment charging Thomson with CFAA conspiracy (Krebs on Security, TechCrunch, DOJ USAO-NDCA, Aug 2026).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Supply Chain Compromise → Cloud Credential Harvesting → Dual-Track Extortion</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>TeamPCP's entry point is almost never the eventual victim organization — it is a trusted upstream maintainer or CI/CD credential. The group has repeatedly exploited incomplete credential rotation and stale GitHub Personal Access Tokens tied to security-tooling maintainers, most notably against the Aqua Security Trivy project (Unit 42, Apr 2026), alongside opportunistic exploitation of CVE-2025-55182 ("React2Shell"), a CVSS 10.0 unauthenticated RCE in React Server Components, to gain footholds in exposed cloud-hosted applications. Reconnaissance is largely automated and worm-driven, scanning for exposed Docker APIs, Kubernetes clusters, and CI/CD endpoints at internet scale (Flare, Feb 2026).</p>
+      <p>Once inside a maintainer's account or pipeline, the group force-pushes malicious commits across historical release tags — in the Trivy compromise, 76 of 77 version tags on <em>aquasecurity/trivy-action</em> were overwritten, alongside every tag on <em>aquasecurity/setup-trivy</em>, so any downstream consumer pinning to a "stable" tag silently pulled trojanized code (Unit 42, Apr 2026). A parallel technique injects malicious pre/post-install scripts into <em>package.json</em> across dozens of npm packages and drops <em>.pth</em> files into Python packages for automatic execution at interpreter startup — the mechanism used to trojanize LiteLLM (95M+ monthly downloads) and the Telnyx SDK. Persistence inside compromised infrastructure is sustained through <em>CanisterWorm</em>, a self-propagation module spreading laterally across the npm/PyPI ecosystem, and <em>kube.py</em>, a secondary-stage payload deployed as a Kubernetes DaemonSet that masquerades as systemd or a PostgreSQL monitor (pgmon) process.</p>
+      <p>TeamPCP's primary payload, the "kamikaze.sh" cloud stealer, bypasses GitHub's secret-masking controls by reading CI runner process memory directly (<em>/proc/&lt;pid&gt;/mem</em>) to recover plaintext tokens, then harvests AWS/GCP/Azure credentials via cloud Instance Metadata Service abuse, plus Kubernetes secrets, SSH keys, CI/CD tokens, and LLM API keys. Command and control is deliberately resilient: primary infrastructure includes typosquatted domains such as <em>scan.aquasecurtiy[.]org</em> and a decentralized Internet Computer Protocol (ICP) blockchain "canister" acting as a tamper-proof dead drop, backstopped by hidden GitHub repositories created inside victim organizations (e.g., <em>docs-tpcp</em>) as a fallback channel engineered to survive infrastructure takedown.</p>
+      <p>Stolen data is encrypted client-side with AES-256-CBC under an embedded 4096-bit RSA public key, then smuggled out via WAV-file steganography (<em>hangup.wav</em> on Windows, <em>ringtone.wav</em> on Linux) before landing on TeamPCP-controlled infrastructure. From there the group monetizes on two parallel tracks: direct extortion under its own CipherForce leak-site brand, and — since the March 2026 partnership — supplying stolen access to the Vect ransomware operation for encryption and BreachForums-affiliate-driven extortion, functioning as a de facto initial-access broker for a second criminal ecosystem.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>ENTERPRISE — 14 techniques mapped; ICS/ATLAS not applicable</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1593</div>
+        <div class="mitre-name">Search Open Websites/Domains</div>
+        <div class="mitre-note">[HIGH] Worm-driven, automated internet-scale scanning for exposed Docker APIs, Kubernetes clusters, and CI/CD endpoints (Flare, Feb 2026).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Exploitation of CVE-2025-55182 "React2Shell" (CVSS 10.0) in React Server Components for RCE against cloud-hosted apps (Zscaler ThreatLabz, Dec 2025).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1199</div>
+        <div class="mitre-name">Trusted Relationship</div>
+        <div class="mitre-note">[HIGH] Abuse of stale GitHub PATs / PyPI publishing credentials tied to trusted upstream maintainers (Trivy) to poison downstream consumers (Unit 42, Apr 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059</div>
+        <div class="mitre-name">Command and Scripting Interpreter</div>
+        <div class="mitre-note">[HIGH] Malicious install/pre-post-install scripts (kamikaze.sh) executed via npm/PyPI package lifecycle hooks.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1053.003</div>
+        <div class="mitre-name">Scheduled Task/Job: Cron</div>
+        <div class="mitre-note">[MEDIUM] kube.py secondary-stage payload establishes scheduled/recurring execution within compromised Kubernetes clusters.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1554</div>
+        <div class="mitre-name">Compromise Client Software Binary</div>
+        <div class="mitre-note">[HIGH] Force-pushed/re-tagged trojanized releases of Trivy, KICS, LiteLLM, and Telnyx SDK so pinned "stable" versions serve malicious code (Unit 42, Apr 2026).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1036.005</div>
+        <div class="mitre-name">Masquerading: Match Legitimate Name or Location</div>
+        <div class="mitre-note">[HIGH] kube.py payload masquerades as systemd or a PostgreSQL monitor (pgmon) process inside compromised clusters.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">[HIGH] Exfiltrated payloads hidden via WAV-file steganography (hangup.wav / ringtone.wav) and double base64-encoded secret-sweeper scripts.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.007</div>
+        <div class="mitre-name">OS Credential Dumping: Proc Filesystem</div>
+        <div class="mitre-note">[HIGH] Reads CI runner process memory via /proc/&lt;pid&gt;/mem to bypass GitHub's secret-masking and recover plaintext tokens (Unit 42, Apr 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1552.005</div>
+        <div class="mitre-name">Unsecured Credentials: Cloud Instance Metadata API</div>
+        <div class="mitre-note">[HIGH] IMDS abuse to harvest AWS/GCP/Azure credentials from compromised CI/CD and cloud-hosted workloads.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.007</div>
+        <div class="mitre-name">Remote Services: Cloud Services</div>
+        <div class="mitre-note">[MEDIUM] Pivots into victim AWS/GCP/Azure/Kubernetes environments using harvested cloud credentials and Kubernetes secrets.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1102</div>
+        <div class="mitre-name">Web Service</div>
+        <div class="mitre-note">[HIGH] Decentralized Internet Computer Protocol (ICP) blockchain "canister" used as a tamper-proof C2 dead drop; hidden GitHub repos (e.g. docs-tpcp) as fallback channel.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1567</div>
+        <div class="mitre-name">Exfiltration Over Web Service</div>
+        <div class="mitre-note">[HIGH] AES-256-CBC/RSA-4096-encrypted data staged and exfiltrated over ICP canister and hidden-repository channels.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[MEDIUM] Ransomware deployment on harvested access via the CipherForce brand and, since Mar 2026, the partnered Vect ransomware locker.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Software Supply Chain / DevSecOps Tooling</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Cloud &amp; SaaS Infrastructure</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Automotive &amp; Manufacturing (Downstream)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Government / Public Sector (EU Commission)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Pharma / Healthcare (Contested Attribution)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Global via downstream dependency exposure; direct confirmed activity in EU (European Commission), automotive OEMs headquartered in Germany/Japan/Sweden; operator base in Australia; earlier reconnaissance activity noted in Kenya, Somalia, South Africa (KELA, 2026)</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Any organization integrating open-source or commercial DevSecOps/AI tooling into CI/CD — victimization is largely indirect/downstream via poisoned dependencies rather than direct targeting</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Exposed Docker APIs, Kubernetes clusters, CI/CD pipelines; stale/incompletely-rotated GitHub PATs and PyPI publishing tokens; CVE-2025-55182 (React2Shell) RCE</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Opportunistic, scale-over-precision — one compromised dependency can cascade to thousands of downstream consumers (Bitsight, Jul 2026)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">KAMIKAZE.SH ("TeamPCP Cloud Stealer")</span>
+          <span class="tool-tag">STEALER · CUSTOM · Unit 42</span>
+        </div>
+        <div class="tool-desc">Primary credential-harvesting payload deployed via poisoned packages; at least 3 documented versions. Reads CI runner process memory via /proc/&lt;pid&gt;/mem to bypass GitHub secret masking, then extracts AWS/GCP/Azure tokens, SSH keys, Kubernetes configs, CI/CD secrets, and LLM API keys from .env files. Output is encrypted (AES-256-CBC/RSA-4096) before exfiltration. Detection artifact: outdated git/2.43.0 client and TruffleHog secret-validation signatures in outbound CI traffic.</div>
+      </div>
+      <div class="tool-item green">
+        <div class="tool-header">
+          <span class="tool-name">CANISTERWORM</span>
+          <span class="tool-tag">WORM / C2 · CUSTOM · Unit 42</span>
+        </div>
+        <div class="tool-desc">Self-propagating module that spreads laterally across the npm and PyPI package ecosystems. Its distinguishing architecture element is use of a decentralized Internet Computer Protocol (ICP) blockchain "canister" (tdtqy-oyaaa-aaaae-af2dq-cai.raw.icp0[.]io) as a tamper-proof C2 dead drop, making primary infrastructure resistant to conventional domain/IP takedown.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">KUBE.PY</span>
+          <span class="tool-tag">LOADER / SECONDARY STAGE · CUSTOM · Unit 42</span>
+        </div>
+        <div class="tool-desc">Kubernetes-focused secondary payload deployed as a DaemonSet for cluster-wide reach. Masquerades as systemd or a PostgreSQL monitor (pgmon) process to evade casual process review; used for scheduled re-execution and Kubernetes secrets harvesting.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">NORD STREAM</span>
+          <span class="tool-tag">LOLBIN / OFFENSIVE TOOLING (REPURPOSED) · OSS · Wiz</span>
+        </div>
+        <div class="tool-desc">Publicly available GitHub-exploitation/red-team framework repurposed to create and manipulate malicious GitHub Actions workflows at scale; observed with the tool's default branch-naming pattern (dev_remote_ea5Eu/test/v1) left unmodified in victim repositories — a useful detection artifact.</div>
+      </div>
+      <div class="tool-item red">
+        <div class="tool-header">
+          <span class="tool-name">CIPHERFORCE</span>
+          <span class="tool-tag">RANSOMWARE / EXTORTION LOCKER · CUSTOM · Sophos / Hard2Bit</span>
+        </div>
+        <div class="tool-desc">Proprietary data-leak and extortion brand operated directly by TeamPCP, run in parallel with the Vect affiliate program. TeamPCP has publicly stated it uses only CipherForce for its own encryption operations, distancing itself from a documented flaw in Vect's locker.</div>
+      </div>
+      <div class="tool-item red">
+        <div class="tool-header">
+          <span class="tool-name">VECT RANSOMWARE</span>
+          <span class="tool-tag">RAAS · THIRD-PARTY PARTNER · Sophos / Jumpsec</span>
+        </div>
+        <div class="tool-desc">External ransomware-as-a-service TeamPCP formally partnered with in late March 2026, supplying stolen access in exchange for BreachForums-affiliate-driven encryption and extortion at scale. Jumpsec (Apr 2026) documented a critical implementation flaw in Vect's locker that permanently destroys, rather than encrypts, files larger than 128KB.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">IP</td><td class="val">105.245.181[.]120 (Vodacom) — TruffleHog secret validation</td><td>Wiz</td><td>2026-03-19</td></tr>
+        <tr><td class="type-label">IP</td><td class="val">138.199.15[.]172 (Datacamp/Mullvad exit) — GitHub exfil, AWS recon</td><td>Wiz</td><td>2026-03-19–25</td></tr>
+        <tr><td class="type-label">IP</td><td class="val">154.47.29[.]12 (Datacamp/Mullvad exit) — secret validation, AWS recon</td><td>Wiz</td><td>2026-03-21–23</td></tr>
+        <tr><td class="type-label">IP</td><td class="val">193.32.126[.]157 (31173 Services AB/Mullvad exit) — GitHub exfiltration</td><td>Wiz</td><td>2026-03-20</td></tr>
+        <tr><td class="type-label">IP</td><td class="val">209.159.147[.]239 (InterServer VPS) — TruffleHog validation</td><td>Wiz</td><td>2026-03-20–23</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">scan.aquasecurtiy[.]org — typosquat of aquasecurity[.]com, staging/C2</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">checkmarx[.]zone — staging/C2</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">models.litellm[.]cloud — staging/C2</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">tdtqy-oyaaa-aaaae-af2dq-cai.raw.icp0[.]io — ICP canister dead-drop C2</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">kamikaze.sh — cloud credential stealer payload</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">kube.py — Kubernetes secondary-stage payload</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">tpcp.tar[.]gz — payload archive</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">session.key, payload.enc — exfiltration artifacts</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">hangup.wav (Windows) / ringtone.wav (Linux) — steganographic exfil carriers</td><td>Unit 42</td><td>2026-03</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">LiteLLM PyPI package v1.82.7–1.82.8 (trojanized)</td><td>Unit 42 / TechCrunch</td><td>2026-03-24</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">Telnyx Python SDK v4.87.1–4.87.2 (trojanized)</td><td>Unit 42</td><td>2026-03-27</td></tr>
+        <tr><td class="type-label">REGISTRY</td><td class="val">aquasecurity/trivy-action — 76 of 77 GitHub release tags force-pushed with malicious code</td><td>Unit 42</td><td>2026-03-19</td></tr>
+        <tr><td class="type-label">REGISTRY</td><td class="val">aquasecurity/setup-trivy — all tags poisoned</td><td>Unit 42</td><td>2026-03-19</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2025-55182 ("React2Shell") — unauthenticated RCE in React Server Components, CVSS 10.0/9.3, exploited for initial access</td><td>Zscaler ThreatLabz</td><td>Disclosed 2025-12-03</td></tr>
+        <tr><td class="type-label">PROTOCOL</td><td class="val">Branch name pattern dev_remote_ea5Eu/test/v1 (Nord Stream tool default) left in poisoned workflows</td><td>Wiz</td><td>2026-03</td></tr>
+        <tr><td class="type-label">MESSAGE</td><td class="val">User-agent indicators: git/2.43.0 (outdated), Boto3/1.42.73 with Kali Linux default signatures</td><td>Wiz</td><td>2026-03</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val">24 malicious file SHA256 hashes catalogued by Unit 42 (Apr 2026); values not reproduced in this table — consult source report directly for hash-based detection.</td><td>Unit 42</td><td>2026-08-30 (accessed)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (campaign/brand) · MEDIUM (full structure)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Degrading but not neutralized — 2 members charged; core admin infrastructure and broader confederation likely persist</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Cascading software supply-chain compromise — single dependency access → thousands of downstream victims</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Full membership roster/hierarchy; disputed secondary victim claims (Databricks, AstraZeneca)</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Vect Ransomware (RaaS partner)</span>
+          <span class="alias-chip">CipherForce (own brand)</span>
+          <span class="alias-chip">BreachForums (affiliate recruitment)</span>
+          <span class="alias-chip">UNC6780 (Mandiant tracking)</span>
+          <span class="alias-chip">Altered Spider (CrowdStrike tracking)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>TeamPCP represents the industrialization of software supply-chain compromise as a criminal business model rather than a technical leap forward. Every individual technique observed — RCE exploitation, PAT theft, typosquatting, package-lifecycle-hook abuse — is well-precedented; what sets the group apart is disciplined reuse of these techniques chained across five ecosystems (GitHub Actions, Docker Hub, PyPI, npm, OpenVSX) within a single multi-week campaign window, and a monetization structure (dual CipherForce/Vect tracks) built to extract value from every credential harvested, whether or not a given victim is worth a bespoke ransomware deployment.</p>
+      <p>The group's most dangerous capability is blast radius, not sophistication. The LiteLLM compromise alone touched a package with over 95 million monthly downloads; a single stolen maintainer credential compounded into confirmed or claimed impact against 2,500+ organizations, an EU institution, and multiple automotive OEMs. This dynamic — narrow initial access, broad downstream consequence — is structurally difficult for individual victim organizations to defend against, since the compromise arrives through a trusted update channel rather than a perimeter they control.</p>
+      <p>Attribution to the TeamPCP brand for the core March–August 2026 campaign is [HIGH] confidence, cross-corroborated by independent vendor telemetry (Wiz, Unit 42, KELA/UNC6780, CrowdStrike/Altered Spider) and now reinforced by criminal charges. Confidence on the group's internal structure remains [MEDIUM]: multiple outlets describe TeamPCP as a loose confederation of individuals drawn from several existing cybercriminal circles rather than a single hierarchical cell, which is consistent with an arrest netting only two individuals against a campaign of this scale. A competing hypothesis worth flagging explicitly: some claimed victims (Databricks, and possibly AstraZeneca — separately linked by some researchers to LAPSUS$) may reflect opportunistic claim-jacking on leak forums rather than confirmed TeamPCP operations, and should not be treated as confirmed without independent forensic corroboration. This assessment would move to [HIGH] on structure if unsealed court filings conclusively map the "DMT"/PersyPCP Telegram personas to the named defendants.</p>
+      <p>Forward risk trajectory: the August 2026 arrests are unlikely to fully neutralize the group given its loose, multi-member structure and infrastructure explicitly engineered for resilience — a decentralized ICP blockchain C2 channel and GitHub-repository fallback dead drops are both designed to survive conventional takedown. Expect continued targeting of security and DevSecOps tooling as a high-leverage vector (compromising the tools defenders trust is more efficient than defeating them), and continued Vect/BreachForums-affiliate monetization even if the CipherForce-specific operators identified in this action go dark.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Enforce short-lived, scoped GitHub PATs.</strong> Mandate fine-grained, repository-scoped tokens with mandatory rotation intervals; audit for stale or overly-broad tokens tied to release/publishing pipelines.</div>
+            <div class="cm-ttp">Counters: T1199 Trusted Relationship</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Protect release tags.</strong> Require branch protection and mandatory code review on all release/version tags; alert on force-push or tag reassignment events on public-facing repositories.</div>
+            <div class="cm-ttp">Counters: T1554 Compromise Client Software Binary</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Pin dependencies to immutable commit SHAs</strong> rather than mutable version tags in CI/CD and package manifests, and monitor upstream projects for unexpected tag reassignment.</div>
+            <div class="cm-ttp">Counters: T1554 Compromise Client Software Binary</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Restrict CI runner process memory access.</strong> Isolate build steps and prevent arbitrary processes from reading /proc/&lt;pid&gt;/mem on shared runners to block secret-masking bypass.</div>
+            <div class="cm-ttp">Counters: T1003.007 OS Credential Dumping: Proc Filesystem</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Enforce IMDSv2 with a hop-limit of 1</strong> across all cloud compute (AWS/GCP/Azure) to close off Instance Metadata Service credential theft from compromised workloads or CI runners.</div>
+            <div class="cm-ttp">Counters: T1552.005 Unsecured Credentials: Cloud Instance Metadata API</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Monitor CI/CD egress for TeamPCP tooling signatures</strong> — TruffleHog secret-validation traffic, outdated git/2.43.0 clients, and Boto3 calls carrying Kali Linux default user agents — and flag traffic to Mullvad/VPS-hosting ASNs (Datacamp, 31173 Services AB, InterServer).</div>
+            <div class="cm-ttp">Counters: T1102 Web Service; T1567 Exfiltration Over Web Service</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Alert on unexpected private-repository creation</strong> within organizational GitHub accounts — the hidden fallback-C2 pattern (e.g., docs-tpcp) is a high-fidelity detection opportunity.</div>
+            <div class="cm-ttp">Counters: T1102 Web Service</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Patch all React Server Components deployments</strong> against CVE-2025-55182 immediately if not already remediated, and treat any exposed instance as compromised pending forensic review.</div>
+            <div class="cm-ttp">Counters: T1190 Exploit Public-Facing Application</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Unit 42</div>
+        <div>
+          <div class="ref-detail"><a href="https://unit42.paloaltonetworks.com/teampcp-supply-chain-attacks/" target="_blank">Weaponizing the Protectors: TeamPCP's Multi-Stage Supply Chain Attack on Security Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wiz</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.wiz.io/blog/tracking-teampcp-investigating-post-compromise-attacks-seen-in-the-wild" target="_blank">Tracking TeamPCP: Investigating Post-Compromise Attacks Seen in the Wild</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wiz</div>
+        <div>
+          <div class="ref-detail"><a href="https://threats.wiz.io/all-actors/teampcp" target="_blank">TeamPCP — Cloud Threat Landscape</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">KELA Cyber</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.kelacyber.com/blog/teampcp-background-and-notable-attacks/" target="_blank">TeamPCP (UNC6780): Threat Actor Profile</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bitsight</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bitsight.com/blog/threat-actor-profile-teampcp" target="_blank">Who is TeamPCP? | TeamPCP Threat Actor Profile</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Malpedia (Fraunhofer FKIE)</div>
+        <div>
+          <div class="ref-detail"><a href="https://malpedia.caad.fkie.fraunhofer.de/actor/teampcp" target="_blank">TeamPCP (Threat Actor)</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cyble</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyble.com/threat-actor-profiles/teampcp/" target="_blank">TeamPCP Threat Actor Profile</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ThreatMon</div>
+        <div>
+          <div class="ref-detail"><a href="https://threatmon.io/teampcp-threat-actor-report/" target="_blank">TeamPCP Threat Actor Report</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Flare</div>
+        <div>
+          <div class="ref-detail"><a href="https://flare.io/learn/resources/blog/teampcp-cloud-native-ransomware" target="_blank">Threat Alert: TeamPCP, An Emerging Force in the Cloud Native and Ransomware Landscape</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TechCrunch</div>
+        <div>
+          <div class="ref-detail"><a href="https://techcrunch.com/2026/08/27/australian-police-arrest-two-over-teampcp-hacks-targeting-mercor-openai-and-others/" target="_blank">Australian police arrest two over TeamPCP hacks targeting Mercor, OpenAI, and others</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Krebs on Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://krebsonsecurity.com/2026/08/two-alleged-teampcp-hackers-arrested-in-australia/" target="_blank">Two Alleged 'TeamPCP' Hackers Arrested in Australia</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/australia-arrests-alleged-teampcp-hackers-behind-supply-chain-attacks/" target="_blank">Australia arrests alleged TeamPCP hackers behind supply-chain attacks</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/08/alleged-teampcp-hackers-charged-in.html" target="_blank">Alleged TeamPCP Hackers Charged in Australia Over Major Supply Chain Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/australia-arrests-2-alleged-teampcp-hackers/" target="_blank">Australia Arrests 2 Alleged TeamPCP Hackers</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Dept. of Justice</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/usao-ndca/pr/australian-man-indicted-teampcp-cyberattacks-software-supply-chain" target="_blank">Australian Man Indicted For "TeamPCP" Cyberattacks On Software Supply Chain</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI / IC3</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ic3.gov/CSA/2026/260702.pdf" target="_blank">Cyber Criminal Group TeamPCP — Cyber Security Advisory</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/european-commission-cyberattack-teampcp" target="_blank">EU cyber agency attributes major data breach to TeamPCP hacking group</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SOCRadar</div>
+        <div>
+          <div class="ref-detail"><a href="https://socradar.io/blog/dark-web-profile-teampcp/" target="_blank">Dark Web Profile: TeamPCP</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Okta</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.okta.com/en-in/blog/threat-intelligence/defending_against_team_pcp_software_supply_chain_attacks/" target="_blank">Defending against TeamPCP software supply chain attacks</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Sophos</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.sophos.com/en-us/blog/vect-and-teampcp-partner-for-ransomware-campaigns" target="_blank">Vect and TeamPCP partner for ransomware campaigns</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Hard2Bit</div>
+        <div>
+          <div class="ref-detail"><a href="https://hard2bit.com/en/blog/teampcp-vect-security-tooling-supply-chain-ransomware/" target="_blank">TeamPCP and Vect: supply chain to ransomware</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SANS ISC</div>
+        <div>
+          <div class="ref-detail"><a href="https://isc.sans.edu/diary/32846" target="_blank">TeamPCP Supply Chain Campaign: Update 004 — Databricks Investigating Alleged Compromise, TeamPCP Runs Dual Ransomware Operations, and AstraZeneca Data Released</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cybersecurity News</div>
+        <div>
+          <div class="ref-detail"><a href="https://cybersecuritynews.com/databricks-teampcp-supply-chain/" target="_blank">TeamPCP Supply Chain Attack Allegedly Compromised Databricks Platform</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Zscaler ThreatLabz</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.zscaler.com/blogs/security-research/react2shell-remote-code-execution-vulnerability-cve-2025-55182" target="_blank">React2Shell RCE Vulnerability (CVE-2025-55182)</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 24 sources reviewed, 10 web searches</div>
+  <div>Analyst Confidence: HIGH (campaign attribution) · MEDIUM (group structure)</div>
+</div>
+
+</body>
+</html>
