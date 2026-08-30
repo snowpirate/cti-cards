@@ -293,6 +293,99 @@
   .ref-detail a:hover { text-decoration: underline; }
   .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
 
+  /* ── OPSEC PROCEDURES ── */
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  /* ── DETECTION EVASION ── */
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* ── CTID EMULATION PLAN ── */
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
   /* ── FOOTER ── */
   .footer {
     margin-top: 14px;
@@ -334,8 +427,9 @@
   <div class="header-meta">// Threat Actor Profile — Social-Engineering-Driven Extortion &amp; Ransomware Affiliate Collective</div>
   <h1><span class="accent">SCATTERED</span> SPIDER</h1>
   <div class="header-sub">
-    PROFILE COMPILED: 2026-08-29 &nbsp;|&nbsp;
-    SOURCES: MITRE ATT&amp;CK (G1015), CISA/FBI Joint Advisory AA23-320A, Google Cloud/Mandiant (UNC3944), CrowdStrike, Microsoft Threat Intelligence, Krebs on Security, CyberScoop, DOJ press materials, 12+ additional vendor/press sources
+    PROFILE COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-08-29 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK (G1015), CISA/FBI Joint Advisory AA23-320A, Google Cloud/Mandiant (UNC3944), CrowdStrike, Microsoft Threat Intelligence, Krebs on Security, CyberScoop, DOJ press materials, Team Cymru, Silent Push, GuidePoint Security, Halcyon, ReliaQuest, AttackIQ, MITRE CTID, Atomic Red Team, SigmaHQ, 20+ additional vendor/press sources
   </div>
   <div class="classification-bar">
     <div>Status: <span class="danger">ACTIVE — HIGH TEMPO, EXPANDING SECTOR FOCUS</span></div>
@@ -695,7 +789,7 @@
     <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
   </div>
   <div class="section-body">
-    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
     <table class="ioc-table">
       <thead>
         <tr>
@@ -828,6 +922,187 @@
 <div class="section">
   <div class="section-header">
     <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Registrars and hosting providers behind lookalike SSO/login domains rotate heavily between campaigns — Silent Push has tracked the group's phishing infrastructure moving across Njalla-registered name servers and BitLaunch/DigitalOcean VPS instances sub-leased through BitLaunch to obscure the underlying provider relationship (Silent Push, 2024). Team Cymru's infrastructure-profiling work further documents the group deliberately authenticating from <strong>clean, non-VPN United States IP space</strong> rather than commercial VPN exit nodes, and layering <strong>residential-proxy networks</strong> on top of that — a specific effort to defeat geo-anomaly and known-VPN-ASN detection rules that flag logins from datacenter or foreign-exit infrastructure (Team Cymru, "Scattered Spider Attacks: Infrastructure and TTP Analysis").</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Post-access tradecraft leans heavily on PowerShell-driven credential extraction and native registry manipulation rather than the classical LOLBAS set (certutil, mshta, wmic) — GuidePoint Security's forensic analysis documents extensive PowerShell scripting against privileged-access-management platforms (CyberArk, Thycotic) and a batch script that deletes multiple Windows Defender/Threat-Protection registry subkeys to disable native AV, notably reusing command syntax ("Worldwide Web: An Analysis of Tactics and Techniques Attributed to Scattered Spider," GuidePoint Security) that mirrors publicly posted Microsoft-forum "fix" guidance repurposed for defense evasion (see Section 11 for the specific command). This is combined with a distinct open-source/commercial toolset for lateral movement and tunneling (Impacket, Chisel, ngrok, Teleport) rather than bespoke malware for those functions.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Kernel-level anti-forensics centers on the BYOVD toolkit STONESTOP (userland loader) and POORTRY (malicious signed driver), which Mandiant has tracked in Scattered Spider/UNC3944 intrusions since August 2022 and used specifically to unhook and terminate EDR/AV processes at the driver level, removing the forensic visibility those tools would otherwise provide (Mandiant, "Hunting for Attestation Signed Malware"; CrowdStrike). Separately, Halcyon reporting describes the group disabling Windows Defender, SentinelOne, and CrowdStrike agents via obfuscated scripts and direct system-service interaction, and in cloud/virtualized environments removing security agents and clearing logs using stolen or vendor-provided remote-access tooling over VPN. Neither source publishes the specific log-clearing commands or event-ID-level detail — the anti-forensics picture is well-evidenced at the "what was disabled" level but thin on precise operator syntax beyond the registry and driver specifics captured above.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Dwell time before destructive action varies considerably by engagement and appears deliberate rather than incidental: ReliaQuest's account-compromise analysis of the Marks &amp; Spencer intrusion documents an approximately two-month dwell period between initial access and ransomware detonation, used to map the environment, stage exfiltration for double-extortion leverage, and position payloads for maximum simultaneous coverage before triggering encryption. This is a longer, more patient window than the group's compressed initial-access phase (help-desk vishing to credential reset can complete within minutes to hours), indicating the group modulates its operational tempo by phase — fast and aggressive at the social-engineering entry point, slower and more methodical during internal reconnaissance and staging.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">The POORTRY driver has been observed signed with a mix of stolen, leaked, and repurposed code-signing certificates, including at least one variant masquerading as an Internet Download Manager TDI driver from Tonec Inc. and signed with an expired certificate issued to "Shanghai Yikaoda Information Consulting Co., Ltd." (Mandiant). Continued use and iteration of the same STONESTOP/POORTRY pairing from August 2022 through subsequent campaigns indicates a maintained, internally iterated capability rather than single-use tooling, even as the specific signing certificate is rotated per build to evade certificate-revocation and hash-based detection.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Kernel-Level EDR/XDR Unhooking via BYOVD (STONESTOP/POORTRY)</span>
+          <span class="evasion-ttp">T1068 / T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">STONESTOP · POORTRY · CVE-2015-2291</span>
+        </div>
+        <div class="evasion-desc">STONESTOP, a userland utility, loads the POORTRY malicious signed driver — sometimes via the vulnerable Intel Ethernet diagnostics driver (iqvw64.sys, CVE-2015-2291) as the initial loading vector — to terminate endpoint-protection and EDR agent processes directly from kernel space, bypassing driver-signature enforcement and unhooking security sensors before follow-on credential theft (Mandiant; CrowdStrike Falcon detections).</div>
+        <div class="evasion-detail">Specific STONESTOP command-line invocation and exact process-targeting logic not publicly documented as of 2026-08-30 — reporting confirms the loader/driver pairing, the certificate-abuse pattern (Section 10), and the CVE-2015-2291 loading vector, but not the operator's precise commands.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Registry-Based Windows Defender Circumvention</span>
+          <span class="evasion-ttp">T1112 / T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">reg.exe</span>
+        </div>
+        <div class="evasion-desc">A batch script recovered during a Scattered Spider intrusion deletes Windows Defender/Threat-Protection registry policy keys to disable native AV before further tooling is staged. GuidePoint Security notes the command sequence closely mirrors "fix" instructions publicly posted by Microsoft Community forum moderators for unrelated troubleshooting purposes, repurposed here for deliberate defense evasion.</div>
+        <div class="evasion-detail">reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies" /f
+(Source: GuidePoint Security, "Worldwide Web: An Analysis of Tactics and Techniques Attributed to Scattered Spider" — full accompanying script and additional deleted subkeys not fully published as of 2026-08-30.)</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">AMSI &amp; Antivirus Disabling via Obfuscated Scripts</span>
+          <span class="evasion-ttp">T1562.001 / T1027</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">Independent of the BYOVD driver path, Halcyon reporting documents the group disabling Windows Defender, SentinelOne, and CrowdStrike Falcon agents through obfuscated scripts that interact directly with underlying system services, and disabling AMSI to permit unimpeded execution of subsequent PowerShell-based tooling.</div>
+        <div class="evasion-detail">Specific obfuscation method and exact script content not publicly documented as of 2026-08-30 — Halcyon's reporting confirms the outcome (named products disabled, AMSI bypassed) but not the underlying code.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">C2 Blending via Trusted SaaS/PaaS Subdomains</span>
+          <span class="evasion-ttp">T1102 / T1572</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag">Chisel · Teleport · trycloudflare.com</span>
+        </div>
+        <div class="evasion-desc">Chisel instances deployed on compromised VMware vCenter appliances have been configured to communicate with trycloudflare.com subdomains, and Teleport-based C2 has beaconed to victim-specific hostnames under teleport.sh — in both cases riding infrastructure and TLS certificates belonging to trusted third-party platforms (Cloudflare, Teleport) so the traffic blends with legitimate DevOps/remote-access flows and evades detection rules built around known-bad domains or ASNs (GuidePoint Security; multiple DFIR write-ups). Silent Push separately documents a broader strategic shift toward routing C2 through Microsoft Graph and Outlook APIs, which removes the need for attacker-registered domains or VPS infrastructure that defenders can enumerate and block outright.</div>
+        <div class="evasion-detail">Specific Chisel/Teleport configuration flags and Microsoft Graph API call patterns not publicly documented in full as of 2026-08-30.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Network Anomaly Evasion via Residential Proxies &amp; Clean-IP Authentication</span>
+          <span class="evasion-ttp">T1090.002 / T1078.004</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">Authenticating to victim cloud consoles (Entra ID, Okta) from clean, non-VPN U.S. residential IP space rather than commercial VPN or datacenter exit nodes defeats both network-layer geofencing and identity-platform risk-scoring rules that are tuned to flag known-VPN ASNs or improbable-travel patterns — a technique that shifts the detection burden from network indicators onto behavioral/identity analytics that most organizations have not yet operationalized (Team Cymru).</div>
+        <div class="evasion-detail">Specific residential-proxy provider(s) used not publicly attributed as of 2026-08-30.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense Full Emulation Plan has been published for Scattered Spider, UNC3944, Octo Tempest, or Muddled Libra as of 2026-08-30 (verified directly against the Adversary Emulation Library's repository listing). The library's current Full Emulation Plans cover APT29, Blind Eagle, Carbanak Group, FIN6, FIN7, menuPass, OceanLotus, OilRig, Sandworm, Turla, and Wizard Spider — no help-desk-vishing-led eCrime/ransomware-affiliate actor from The Com ecosystem is represented at this time.</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">AttackIQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.attackiq.com/2025/05/29/emulating-scattered-spider/" target="_blank">Emulating the Unyielding Scattered Spider</a></div>
+          <div class="ref-date">Security Optimization Platform emulation scenario covering ransomware (BlackCat, DragonForce), stealers (Atomic, Lumma, Vidar, AveMaria, Raccoon), RATs (RattyRAT, SpectreRAT, Sorillus), the STONESTOP/POORTRY BYOVD pair, and tooling for lateral movement (Impacket wmiexec.py), credential theft (Mimikatz, LaZagne, secretsdump.py), and discovery (ADRecon, RustScan, TruffleHog) · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Atomic Red Team</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.006/T1003.006.md" target="_blank">T1003.006 — OS Credential Dumping: DCSync</a></div>
+          <div class="ref-date">Atomic test, directly applicable — DCSync is a documented Scattered Spider Active Directory credential-access technique (Section 04) · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Atomic Red Team</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1021.004/T1021.004.md" target="_blank">T1021.004 — Remote Services: SSH</a></div>
+          <div class="ref-date">Atomic test, directly applicable — SSH pivoting into VMware vCenter Server Appliances is a documented lateral-movement technique · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Atomic Red Team</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1567.002/T1567.002.md" target="_blank">T1567.002 — Exfiltration Over Web Service: Exfiltration to Cloud Storage</a></div>
+          <div class="ref-date">Atomic test using rclone to a remote MEGA/AWS S3 target — directly applicable to the group's documented pre-encryption exfiltration tradecraft · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SigmaHQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_ngrok.yml" target="_blank">proc_creation_win_pua_ngrok.yml — PUA - Ngrok Execution</a></div>
+          <div class="ref-date">Detection rule for ngrok process execution, a documented Scattered Spider tunneling tool (Section 06) · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SigmaHQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/SigmaHQ/sigma/blob/master/rules/windows/network_connection/net_connection_win_domain_ngrok_tunnel.yml" target="_blank">net_connection_win_domain_ngrok_tunnel.yml — Communication To Ngrok Tunneling Service Initiated</a></div>
+          <div class="ref-date">Detection rule for network connections to ngrok tunnel domains, covering the group's tunneling-based C2 pattern (Section 11) · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
     <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
   </div>
   <div class="section-body">
@@ -958,6 +1233,69 @@
           <div class="ref-date">Accessed: 2026-08-29</div>
         </div>
       </div>
+      <div class="ref-item">
+        <div class="ref-source">Team Cymru</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.team-cymru.com/post/scattered-spider-attacks-infrastructure-profile" target="_blank">Scattered Spider Attacks | Infrastructure and TTP Analysis</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Silent Push</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.silentpush.com/blog/scattered-spider-2024/" target="_blank">Scattered Spider Update: Silent Push Analysts Use Content Scans to Reveal New Phishing Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Mandiant / Google Cloud</div>
+        <div>
+          <div class="ref-detail"><a href="https://cloud.google.com/blog/topics/threat-intelligence/hunting-attestation-signed-malware" target="_blank">I Solemnly Swear My Driver Is Up to No Good: Hunting for Attestation Signed Malware</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CrowdStrike</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.crowdstrike.com/en-us/blog/scattered-spider-attempts-to-avoid-detection-with-bring-your-own-vulnerable-driver-tactic/" target="_blank">SCATTERED SPIDER Attempts to Avoid Detection with Bring-Your-Own-Vulnerable-Driver Tactic</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GuidePoint Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.guidepointsecurity.com/blog/worldwide-web-an-analysis-of-tactics-and-techniques-attributed-to-scattered-spider/" target="_blank">Worldwide Web: An Analysis of Tactics and Techniques Attributed to Scattered Spider</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Halcyon</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.halcyon.ai/blog/scattered-spider-tactics-observed-amid-shift-to-us-targets" target="_blank">Scattered Spider Tactics Observed Amid Shift to US Targets</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ReliaQuest</div>
+        <div>
+          <div class="ref-detail"><a href="https://reliaquest.com/blog/scattered-spider-attack-analysis-account-compromise/" target="_blank">Scattered Spider Attack Analysis</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Center for Threat-Informed Defense</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library" target="_blank">Adversary Emulation Library (checked for Scattered Spider/UNC3944 coverage — none found)</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">AttackIQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.attackiq.com/2025/05/29/emulating-scattered-spider/" target="_blank">Emulating the Unyielding Scattered Spider</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -965,8 +1303,8 @@
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 18 sources, 13 web lookups</div>
-  <div>Attribution confidence: HIGH (named members) / MEDIUM (ecosystem boundaries) · ATT&amp;CK: 12 techniques mapped · Ecosystem: The Com / LAPSUS$ / ShinyHunters</div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 26 sources, 30 web lookups</div>
+  <div>Attribution confidence: HIGH (named members) / MEDIUM (ecosystem boundaries) · ATT&amp;CK: 12 techniques mapped · Ecosystem: The Com / LAPSUS$ / ShinyHunters · UPDATED FROM: 2026-08-29 · Git history preserved</div>
 </div>
 
 </body>
