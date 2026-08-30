@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>REvil — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge ecrime">⚠ ECRIME · RUSSIA-BASED RAAS OPERATOR · NO CONFIRMED STATE SPONSORSHIP</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Ransomware-as-a-Service (RaaS) Operator / Double-Extortion Ransomware</div>
+  <h1><span class="accent">REVIL</span></h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-08-29 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK (G0115 GOLD SOUTHFIELD; S0496 REvil), U.S. DOJ, Wikipedia, CFR Cyber Operations Tracker, Lawfare, The Record, Krebs on Security, Trellix, SentinelOne, 8+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">DORMANT SINCE JAN 2022 — CONTESTED, UNCONFIRMED 2022 REEMERGENCE</span></div>
+    <div>Threat Level: <span class="danger">HIGH (Historical)</span></div>
+    <div>Primary Motive: <span class="warn">Financial Extortion — Double-Extortion Ransomware</span></div>
+    <div>Active Since: <span>April 2019 (assessed successor to GandCrab)</span></div>
+    <div>MITRE ATT&amp;CK: <span>G0115 (GOLD SOUTHFIELD)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">$200M+</div>
+    <div class="stat-label">Estimated Total Ransom Revenue Across the Group's Operating Lifetime</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">1,500</div>
+    <div class="stat-label">Downstream Businesses Hit by the Single Kaseya VSA Supply-Chain Attack (Jul 2021)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">$70M</div>
+    <div class="stat-label">Ransom Demanded for a Universal Kaseya Decryptor — Never Paid</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">14</div>
+    <div class="stat-label">Individuals Arrested by Russia's FSB in the Jan 2022 Takedown</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>REvil — also tracked as Sodinokibi, and by MITRE ATT&amp;CK under the group designation GOLD SOUTHFIELD (G0115, also known as Pinchy Spider) — was one of the most prolific and financially destructive ransomware-as-a-service (RaaS) operations in cybercrime history, active from April 2019 until a coordinated law-enforcement and diplomatic pressure campaign forced it into apparent dormancy in early 2022. Believed to be a successor to the GandCrab ransomware operation (which "retired" in June 2019 after reportedly earning its developers over $2 billion), REvil refined the double-extortion playbook — encrypting victim data while separately threatening to publish stolen files on its "Happy Blog" leak site — into a repeatable, franchised criminal business model.</p>
+      <p>Operating as a RaaS platform, REvil's core developers provided ransomware tooling, negotiation infrastructure, and the Happy Blog to a network of affiliates who conducted the actual intrusions and split ransom proceeds with the operators. This model let REvil scale far beyond what a single team could achieve, and its affiliates were responsible for some of the most consequential ransomware attacks of 2020–2021: foreign-exchange firm Travelex ($2.3M paid in early 2020), electronics manufacturer Acer ($50M demanded), and JBS Foods, the world's largest meat processor, which paid $11 million in June 2021 after the attack disrupted North American and Australian meat supply chains.</p>
+      <p>REvil's defining and most consequential operation came on July 2, 2021, when affiliates exploited a zero-day authentication-bypass and SQL-injection chain (CVE-2021-30116) in Kaseya VSA — remote-monitoring software used by managed service providers (MSPs) — to push ransomware through roughly 50 MSPs to an estimated 800–1,500 downstream small and mid-sized businesses in a single supply-chain attack. REvil demanded $70 million for a universal decryption key; Kaseya obtained a working decryptor from what it called a "trusted third party" without paying, later revealed to be the FBI, which had obtained REvil's decryption keys through a foreign partner's covert access to REvil's own infrastructure.</p>
+      <p>The Kaseya attack's scale, arriving weeks after the JBS attack and the unrelated but similarly high-profile DarkSide attack on Colonial Pipeline, triggered direct US-Russia diplomatic pressure and a rare law-enforcement response: in October 2021 a multinational operation (FBI, US Cyber Command, Secret Service, and foreign partners) hacked REvil's own servers and forced its leak site and payment portal offline, and in January 2022 Russia's FSB — acting, according to Russian and US officials, at direct US request — raided 25 addresses across Russia and arrested 14 individuals, seizing cash, cryptocurrency, and luxury vehicles. A REvil-branded leak site briefly reappeared in April 2022, but researchers have never conclusively determined whether this reflected genuine reactivation by original operators, a successor group reusing the brand, or something else entirely.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">REvil (also known as Sodinokibi, Sodin)</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">None confirmed — independent, financially motivated Russian-speaking criminal enterprise; no verified state sponsorship, though its continued operation from within Russia and the limited scope of its eventual Russian prosecution have drawn analytical scrutiny</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">eCrime — Ransomware-as-a-Service (RaaS) Operator/Developer</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial extortion via double-extortion ransomware (encryption + data-leak threat)</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">April 2019; assessed successor to the GandCrab ransomware operation (retired June 2019), sharing core developers per code/tooling similarity</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">A REvil-branded leak site briefly reappeared online in April 2022; no confirmed, independently verified operations attributed to the original group since the January 2022 Russian arrests</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G0115 (GOLD SOUTHFIELD, aka Pinchy Spider); malware tracked separately as Software S0496 (REvil)</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">14 individuals arrested by Russia's FSB (Jan 2022) under payment-instrument-fraud statutes, not ransomware/hacking charges specifically; separately, US DOJ indicted Yaroslav Vasinskyi (extradited 2022, sentenced May 2024 to 13 years 7 months and $16M restitution for the Kaseya attack) and Yevgeniy Polyanin (charged for a 2019 Texas-focused campaign, remains at large)</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">REvil</span>
+          <span class="alias-chip">Sodinokibi</span>
+          <span class="alias-chip">Sodin</span>
+          <span class="alias-chip">GOLD SOUTHFIELD</span>
+          <span class="alias-chip">Pinchy Spider</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>HIGH that REvil operated as a Russian-speaking, financially motivated criminal RaaS enterprise, corroborated by law-enforcement action on both the US and Russian sides and by successful US prosecutions of named affiliates. Confidence is LOW-MEDIUM on whether the group had any form of state tolerance or protection beyond Russia's general historical unwillingness to prosecute ransomware operators targeting foreign victims — the January 2022 arrests were charged under payment-fraud rather than computer-crime statutes, arrived amid intense diplomatic pressure, and have been followed by no publicly disclosed trial outcomes as of this writing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">APR 2019</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Emergence as GandCrab's Successor</div>
+          <div class="timeline-desc">REvil (Sodinokibi) first appears shortly before the GandCrab RaaS operation "retires" in June 2019; strong code and tooling overlap leads researchers to assess REvil as an evolution of the same core developer team.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">AUG 2019</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Early Sodinokibi Campaign Against Texas Entities</div>
+          <div class="timeline-desc">Affiliates (later linked to Yevgeniy Polyanin) conduct a wave of Sodinokibi ransomware attacks against Texas-based organizations, among the group's first major documented campaigns.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">DEC 2019 –<br/>JAN 2020</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Travelex Attack</div>
+          <div class="timeline-desc">REvil affiliates breach foreign-exchange firm Travelex, demanding $6 million; Travelex reportedly pays $2.3 million for a decryption key after a prolonged outage.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAR 2021</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Acer Extortion Attempt</div>
+          <div class="timeline-desc">Exploiting Microsoft Exchange server vulnerabilities, REvil affiliates breach electronics manufacturer Acer and demand $50 million, among the largest ransom demands publicly disclosed to that point.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAY –<br/>JUN 2021</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">JBS Foods Attack</div>
+          <div class="timeline-desc">REvil affiliates encrypt systems at JBS, the world's largest meat processor, disrupting North American and Australian production; JBS pays an $11 million ransom to avoid further disruption and potential data exposure.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JUL 2021</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Kaseya VSA Supply-Chain Attack</div>
+          <div class="timeline-desc">Exploiting a zero-day authentication-bypass/SQL-injection chain (CVE-2021-30116) in Kaseya VSA, REvil pushes ransomware through ~50 MSPs to an estimated 800–1,500 downstream businesses in a single coordinated operation, demanding $70 million for a universal decryptor.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">OCT 2021 –<br/>APR 2022</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Law Enforcement Takedown, FSB Arrests &amp; Contested Reemergence</div>
+          <div class="timeline-desc">A multinational law-enforcement operation hacks REvil's own servers and forces its infrastructure offline (Oct 2021); Russia's FSB arrests 14 individuals at US request (Jan 2022); the US indicts and later convicts Kaseya-attack affiliate Yaroslav Vasinskyi (extradited 2022, sentenced 2024); a REvil-branded leak site briefly reappears (Apr 2022) under disputed/unconfirmed operatorship, with no independently verified original-group activity documented since.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Ransomware-as-a-Service — separating the platform from the affiliates who used it</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>As a RaaS operation, REvil's "attack lifecycle" is best understood as two linked processes: the core group's development and maintenance of the ransomware platform, negotiation portal, and Happy Blog leak site, and the largely independent intrusion campaigns run by dozens of affiliates who paid for access and shared a percentage of ransom proceeds with the operators. Affiliate initial-access methods varied widely and included malicious spam campaigns (T1566), exploitation of public-facing applications such as Oracle WebLogic and Microsoft Exchange servers (T1190), abuse of publicly accessible RDP and remote-monitoring/management (RMM) tooling (T1133), and — in the Kaseya case — a direct software supply-chain compromise (T1195.002) that bypassed the need to breach each victim individually.</p>
+      <p>Once inside a network, affiliates commonly used legitimate remote-management tools like ConnectWise Control to maintain access and take screen captures of victim environments (T1219, T1113) alongside PowerShell for staging and executing further payloads, frequently base64-encoded to evade signature-based detection (T1059.001, T1027.010). Before deploying the REvil/Sodinokibi encryptor itself, affiliates typically disabled security tooling and backup/shadow-copy services, then exfiltrated sensitive data to support the double-extortion threat before triggering encryption — ensuring victims faced both an availability crisis and a confidentiality threat simultaneously.</p>
+      <p>The Kaseya operation represents the group's most sophisticated and consequential technical achievement: rather than compromising thousands of individual businesses one at a time, affiliates exploited a chain of vulnerabilities in Kaseya's own VSA management software to push the ransomware payload as a disguised, seemingly legitimate software update — directly abusing the trust relationship between an MSP and its downstream customers (T1199) to achieve mass simultaneous impact from a single point of compromise. This "one-to-many" model foreshadowed the software supply-chain risk that has since become a central concern across the ransomware and broader cyber threat landscape.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; group techniques from G0115, malware behaviors from S0496</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566</div>
+        <div class="mitre-name">Phishing</div>
+        <div class="mitre-note">[HIGH] Conducted malicious spam (malspam) campaigns to deliver initial-access malware/loaders ahead of REvil deployment.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Exploited Oracle WebLogic and Microsoft Exchange vulnerabilities, and later a Kaseya VSA auth-bypass/SQLi chain (CVE-2021-30116), for initial compromise.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[MEDIUM] Abused publicly accessible RDP and remote-monitoring/management (RMM) servers as an entry point into victim networks.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1199</div>
+        <div class="mitre-name">Trusted Relationship</div>
+        <div class="mitre-note">[HIGH] Breached Managed Service Providers (MSPs) to deliver ransomware to downstream MSP customers, most notably in the July 2021 Kaseya VSA attack.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1195.002</div>
+        <div class="mitre-name">Supply Chain Compromise: Software Supply Chain</div>
+        <div class="mitre-note">[HIGH] Backdoored a legitimate software update mechanism (Kaseya VSA) via strategic web compromise to distribute ransomware at scale to downstream customers.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.001</div>
+        <div class="mitre-name">Command and Scripting Interpreter: PowerShell</div>
+        <div class="mitre-note">[HIGH] Staged and executed PowerShell scripts on compromised hosts to support payload delivery and execution.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027.010</div>
+        <div class="mitre-name">Obfuscated Files or Information: Command Obfuscation</div>
+        <div class="mitre-note">[MEDIUM] Executed base64-encoded PowerShell scripts to evade signature-based detection.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1112</div>
+        <div class="mitre-name">Modify Registry</div>
+        <div class="mitre-note">[MEDIUM] Modified Windows Registry settings to disable security features and configure the encryption payload prior to execution.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1113</div>
+        <div class="mitre-name">Screen Capture</div>
+        <div class="mitre-note">[LOW] Used the legitimate remote-management tool ConnectWise Control to obtain screen captures from victim machines for reconnaissance.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1219</div>
+        <div class="mitre-name">Remote Access Tools</div>
+        <div class="mitre-note">[MEDIUM] Used the cloud-based remote-management tool ConnectWise Control to maintain interactive access to compromised environments.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[HIGH] Deployed the REvil/Sodinokibi encryptor to encrypt victim files — the core mechanism of the group's double-extortion ransom model.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1490</div>
+        <div class="mitre-name">Inhibit System Recovery</div>
+        <div class="mitre-note">[HIGH] Deleted Volume Shadow Copies and disabled backup/recovery mechanisms prior to encryption to prevent victims from restoring data without paying.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Managed Service Providers &amp; IT Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Manufacturing &amp; Food/Agriculture</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Financial Services / Foreign Exchange</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Technology / Electronics</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Retail &amp; Professional Services (General Affiliate Targeting)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Primarily United States, with significant impact in Canada, Australia (JBS), and the UK (Travelex); dozens of countries reached indirectly through the Kaseya MSP supply-chain attack. Operators/affiliates assessed predominantly Russian-speaking, based in Russia/former-Soviet states</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Large enterprises capable of paying seven- or eight-figure ransoms (JBS, Acer, Travelex) alongside opportunistic small and mid-sized businesses reached indirectly through compromised MSPs and software supply chains</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Exploitation of internet-facing application vulnerabilities (Exchange, WebLogic, Kaseya VSA), phishing/malspam, and abuse of exposed RDP/RMM tooling — comparatively little reliance on social engineering versus contemporaries like Scattered Spider</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Affiliate-driven and largely opportunistic at the individual-victim level, but RaaS operators actively favored maximum-leverage, high-disruption targets (critical food supply, MSP supply chains) capable of generating outsized ransom payments and media attention</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">REvil / Sodinokibi Encryptor</span>
+          <span class="tool-tag">Ransomware / RaaS Payload · MITRE S0496</span>
+        </div>
+        <div class="tool-desc">Core encryption payload distributed to affiliates; encrypts victim files, deletes Volume Shadow Copies, and disables recovery mechanisms before dropping a ransom note directing victims to a Tor-based negotiation portal and threatening publication on the "Happy Blog" leak site if payment is not made.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">ConnectWise Control (Abused)</span>
+          <span class="tool-tag">Legitimate RMM Tool · Living-off-the-Land</span>
+        </div>
+        <div class="tool-desc">Commercial remote-management/monitoring software abused post-compromise to maintain interactive access, capture victim-machine screenshots, and stage further payloads while blending with legitimate IT administration traffic.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">Happy Blog</span>
+          <span class="tool-tag">Double-Extortion Leak Site</span>
+        </div>
+        <div class="tool-desc">Tor-hosted data-leak and auction site used to publish or threaten publication of exfiltrated victim data, and in some cases to auction stolen data to third parties, reinforcing the ransom demand with a confidentiality threat independent of encryption.</div>
+      </div>
+      <div class="tool-item green">
+        <div class="tool-header">
+          <span class="tool-name">CVE-2021-30116 Exploit Chain</span>
+          <span class="tool-tag">Zero-Day Auth Bypass + SQL Injection</span>
+        </div>
+        <div class="tool-desc">Chained a Kaseya VSA credential-disclosure/authentication-bypass flaw with a SQL-injection vulnerability to gain administrative control of the VSA management console, enabling the July 2021 supply-chain attack that reached an estimated 800–1,500 downstream businesses through a single compromised software vendor.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2021-30116 — Kaseya VSA authentication bypass / credential disclosure, chained with SQL injection</td><td>Kaseya; CISA; SentinelOne</td><td>2021-07</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">REvil / Sodinokibi ransomware (MITRE Software S0496)</td><td>MITRE ATT&amp;CK; multiple vendor analyses</td><td>2019–2022</td></tr>
+        <tr><td class="type-label">INFRA</td><td class="val">"Happy Blog" Tor-hosted leak/auction site — offline since Oct 2021 law-enforcement operation; brief unconfirmed reappearance Apr 2022</td><td>Multiple press reporting</td><td>2020–2022</td></tr>
+        <tr><td class="type-label">CHARGED</td><td class="val">Yaroslav Vasinskyi ("Rabotnik"); Yevgeniy Polyanin</td><td>US DOJ</td><td>2021–2024</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No durable, current static IP/domain/hash indicator list is included here — REvil's core infrastructure was seized/dismantled by law enforcement in Oct 2021 and Jan 2022, and any indicators from the group's 2019–2021 operating period are archival. Consult MITRE ATT&amp;CK Software S0496 and named vendor incident reports for the historical technical indicator set.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">HIGH (Historical) — not confirmed as a currently active, independently operating threat</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (criminal enterprise) / LOW-MEDIUM (any state tolerance/protection)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Assessed dormant since the Jan 2022 arrests; the contested Apr 2022 brand reemergence was never independently verified, and by 2026 the broader ransomware ecosystem has moved on to other dominant RaaS brands</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability (Historical)</span><span class="kv-val red">Converting a single software supply-chain compromise (Kaseya) into simultaneous ransomware deployment across 800–1,500+ independently owned downstream victims</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Whether original REvil developers or key affiliates remain at large and operating under new group identities; the true durability of the January 2022 Russian enforcement action given the absence of disclosed trial outcomes</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">GandCrab (assessed predecessor)</span>
+          <span class="alias-chip">DarkSide (founded by suspected former REvil affiliates — NOT the same group; DarkSide, not REvil, conducted the Colonial Pipeline attack)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>REvil's historical significance rests less on any single technical innovation than on how completely it operationalized the RaaS business model and the double-extortion playbook that nearly every major ransomware group has since adopted as standard practice. Its Kaseya operation in particular demonstrated, more clearly than any prior incident, that ransomware operators had begun to think in terms of supply-chain leverage rather than single-victim opportunism — a shift with implications for defenders far beyond the ransomware threat specifically.</p>
+      <p>The January 2022 Russian enforcement action against REvil remains one of the most closely scrutinized instances of Russian cooperation against a cybercriminal group targeting foreign victims, and analysts remain divided on how to interpret it. The charges filed (payment-instrument fraud rather than computer intrusion or extortion) and the absence of any publicly disclosed trial outcomes since the January 2022 arrests are consistent with either a genuine but narrowly scoped prosecution, or a primarily diplomatic gesture timed to reduce US pressure during a period of heightened geopolitical tension — this profile does not have sufficient public evidence to resolve which interpretation is correct.</p>
+      <p>The brief, unconfirmed reappearance of a REvil-branded leak site in April 2022 and the group's subsequent silence make its current operational status genuinely uncertain rather than confidently closed. Given the RaaS model's core asset is code and affiliate relationships rather than any single individual, the possibility that former REvil developers or senior affiliates continue operating — under a different brand entirely — should be treated as at least as likely as a clean, permanent shutdown of all associated capability and personnel.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Patch internet-facing management and remote-access software aggressively.</strong> Prioritize patching for VPN, RMM, and IT-management platforms (the Kaseya VSA vulnerability class) on the same urgency tier as internet-facing servers, given their demonstrated one-to-many blast radius.</div>
+            <div class="cm-ttp">Counters: T1190, T1195.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Apply zero-trust principles to MSP and vendor access.</strong> Segment and monitor the specific access paths MSPs and software vendors use into your environment, and require verification for pushed software updates rather than implicit trust.</div>
+            <div class="cm-ttp">Counters: T1199</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Restrict and monitor RDP and RMM tool exposure.</strong> Disable public-facing RDP where possible, enforce MFA and IP allowlisting where it must remain exposed, and treat legitimate RMM tools (e.g., ConnectWise Control) as high-value monitoring targets for anomalous use.</div>
+            <div class="cm-ttp">Counters: T1133, T1219, T1113</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Deploy anti-phishing controls and user training.</strong> Maintain sandboxed attachment detonation and DMARC/DKIM/SPF enforcement, since malspam remains a persistent initial-access vector for affiliate-driven RaaS operations.</div>
+            <div class="cm-ttp">Counters: T1566</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Monitor for base64-encoded/obfuscated PowerShell execution.</strong> Enable PowerShell script-block logging and alert on encoded-command execution, a documented REvil-affiliate technique for evading signature-based defenses.</div>
+            <div class="cm-ttp">Counters: T1059.001, T1027.010</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Protect Volume Shadow Copies and backups from deletion.</strong> Store backups offline/immutable and monitor for vssadmin/wbadmin deletion commands, which reliably precede ransomware detonation.</div>
+            <div class="cm-ttp">Counters: T1490</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Assume double extortion — prioritize exfiltration detection, not just encryption prevention.</strong> Deploy DLP and egress monitoring for large or anomalous outbound data transfers, since exfiltration precedes encryption specifically to support leak-site extortion regardless of backup posture.</div>
+            <div class="cm-ttp">Counters: General double-extortion posture</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Maintain a tested incident-response and ransomware negotiation plan before an incident occurs.</strong> Given REvil's demonstrated willingness to demand extreme, negotiable amounts, pre-established legal, insurance, and negotiation processes materially affect outcomes.</div>
+            <div class="cm-ttp">Counters: General organizational readiness</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/REvil" target="_blank">REvil</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0115/" target="_blank">GOLD SOUTHFIELD, Pinchy Spider — Group G0115</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/software/S0496/" target="_blank">REvil, Software S0496</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSO Online</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csoonline.com/article/570101/revil-ransomware-explained-a-widespread-extortion-operation.html" target="_blank">REvil Ransomware Explained: A Widespread Extortion Operation</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Trellix</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.trellix.com/blogs/research/dismantling-a-prolific-cybercriminal-empire/" target="_blank">Dismantling a Prolific Cybercriminal Empire: REvil Arrests and Reemergence</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Kaseya_VSA_ransomware_attack" target="_blank">Kaseya VSA Ransomware Attack</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Varonis</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.varonis.com/blog/revil-msp-supply-chain-attack" target="_blank">REvil Ransomware Attack on Kaseya VSA: What You Need to Know</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SentinelOne</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.sentinelone.com/vulnerability-database/cve-2021-30116/" target="_blank">CVE-2021-30116: Kaseya VSA Agent Auth Bypass Vulnerability</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SiliconANGLE</div>
+        <div>
+          <div class="ref-detail"><a href="https://siliconangle.com/2021/06/09/meat-processing-company-jbs-paid-11m-settle-revil-ransomware-attack/" target="_blank">Meat Processing Company JBS Paid $11M to Settle REvil Ransomware Attack</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/fsb-raids-revil-ransomware-gang-members" target="_blank">FSB Arrests REvil Ransomware Gang Members</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Lawfare</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.lawfaremedia.org/article/revil-down-now" target="_blank">REvil Is Down — For Now</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CFR</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cfr.org/cyber-operations/2021/10/18/targeting-of-revil/" target="_blank">Cyber Operations Tracker — Targeting of REvil</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cybersecurity Dive</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cybersecuritydive.com/news/kaseya-ransomware-REvil-crackdown/609742/" target="_blank">DOJ Unveils Charges, Money Seizures in Multinational Crackdown Against REvil</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/revil-ransomware-yaroslav-vasinskyi-prison-sentence" target="_blank">Ukrainian Sentenced to Almost 14 Years for Infecting Thousands With REvil Ransomware</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2024/05/ukrainian-revil-hacker-sentenced-to-13.html" target="_blank">Ukrainian REvil Hacker Sentenced to 13 Years and Ordered to Pay $16 Million</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2022/04/22/revil_ransomware_returns/" target="_blank">REvil Resurrected? Ransomware Crew Appears to Be Back</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSO Online</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csoonline.com/article/570723/darkside-ransomware-explained-how-it-works-and-who-is-behind-it.html" target="_blank">DarkSide Ransomware Explained: How It Works and Who Is Behind It</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 18 sources, 12 web lookups</div>
+  <div>Status: Assessed dormant since Jan 2022; 2022 brand reemergence unconfirmed · Attribution confidence: HIGH (criminal enterprise) / LOW-MEDIUM (state tolerance) · ATT&amp;CK: 12 techniques mapped</div>
+</div>
+
+</body>
+</html>
