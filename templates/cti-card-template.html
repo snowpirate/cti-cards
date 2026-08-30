@@ -304,6 +304,99 @@
   .sanctions-role { font-family: var(--body); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
   .sanctions-badge { font-family: var(--mono); font-size: 8.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
 
+  /* ── OPSEC PROCEDURES ── */
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  /* ── DETECTION EVASION ── */
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* ── CTID EMULATION PLAN ── */
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
   /* ── FOOTER ── */
   .footer {
     margin-top: 14px;
@@ -766,6 +859,153 @@
 <div class="section">
   <div class="section-header">
     <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <!-- OPSEC categories: INFRA-ROTATION | LOL-RATIO | ANTI-FORENSICS | COMMS-SECURITY | PERSONA-MANAGEMENT | TIMING | TOOLING-HYGIENE -->
+      <!-- confidence: [HIGH] | [MEDIUM] | [LOW] — based on observed evidence in source material -->
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">{{CONFIDENCE}}</span>
+        </div>
+        <div class="opsec-desc">{{INFRA_ROTATION_DESC}}</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">{{CONFIDENCE}}</span>
+        </div>
+        <div class="opsec-desc">{{LOL_RATIO_DESC}}
+          <!-- Include: observed ratio of custom tooling vs LOLBins, which native binaries preferred, why -->
+        </div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics Routines</span>
+          <span class="opsec-confidence">{{CONFIDENCE}}</span>
+        </div>
+        <div class="opsec-desc">{{ANTI_FORENSICS_DESC}}
+          <!-- Include: log clearing methods, timestomping, artifact removal, memory-only execution -->
+        </div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">{{CONFIDENCE}}</span>
+        </div>
+        <div class="opsec-desc">{{TIMING_DESC}}
+          <!-- Include: work hours alignment, beacon jitter patterns, activity windows relative to victim time zones -->
+        </div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">{{CONFIDENCE}}</span>
+        </div>
+        <div class="opsec-desc">{{TOOLING_HYGIENE_DESC}}
+          <!-- Include: use of modified/recompiled tools to avoid hash-based detection, compilation timestamps, string sanitization -->
+        </div>
+      </div>
+      <!-- Add opsec-item blocks for additional categories as source material supports -->
+      <!-- If a category has no observed evidence, omit rather than speculate -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <!-- evasion-tag classes: edr | siem | network — tag each item with what control it targets -->
+      <!-- evasion-detail block: specific commands, arguments, sequences observed in source material — be precise -->
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">{{EVASION_1_NAME}}</span>
+          <span class="evasion-ttp">{{EVASION_1_TID}}</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">{{TOOL_OR_BINARY}}</span>
+        </div>
+        <div class="evasion-desc">{{EVASION_1_DESC}}</div>
+        <!-- Include specific observed commands, arguments, sequences where source material supports it -->
+        <div class="evasion-detail">{{EVASION_1_SPECIFICS}}</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">{{EVASION_2_NAME}}</span>
+          <span class="evasion-ttp">{{EVASION_2_TID}}</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+          <span class="evasion-tag network">NETWORK</span>
+        </div>
+        <div class="evasion-desc">{{EVASION_2_DESC}}</div>
+        <div class="evasion-detail">{{EVASION_2_SPECIFICS}}</div>
+      </div>
+      <!-- Add evasion-item blocks for each observed technique -->
+      <!-- CRITICAL: only document specifics that appear in public source material — do not fabricate or extrapolate -->
+      <!-- Where specifics are not publicly documented, note: "Specific arguments not publicly documented as of [DATE]" -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <!-- If CTID plan exists: populate ctid-block fully -->
+    <!-- If no CTID plan: use class="ctid-block not-available" and ctid-tag class="not-available" -->
+    <div class="ctid-block">
+      <div class="ctid-header">
+        <span class="ctid-tag">MITRE CTID — ADVERSARY EMULATION PLAN</span>
+        <span class="ctid-title">{{CTID_PLAN_NAME}}</span>
+      </div>
+      <div class="ctid-body">{{CTID_PLAN_DESC}}
+        <!-- Describe what the plan covers: scope, phases documented, tool emulation included, scenario types -->
+      </div>
+      <div class="ctid-links">
+        <a class="ctid-link" href="{{CTID_PLAN_URL}}" target="_blank">CTID PLAN →</a>
+        <a class="ctid-link" href="{{CTID_REPO_URL}}" target="_blank">GITHUB REPO →</a>
+        <!-- Add additional links for scenario files, YAML configs, supporting tools -->
+      </div>
+      <div class="ctid-phases">
+        <!-- One chip per documented emulation phase in the plan -->
+        <span class="ctid-phase-chip">{{PHASE_1}}</span>
+        <span class="ctid-phase-chip">{{PHASE_2}}</span>
+        <span class="ctid-phase-chip">{{PHASE_3}}</span>
+      </div>
+    </div>
+    <!-- Additional emulation resources beyond CTID -->
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <!-- Include: Atomic Red Team tests, Sigma rules, vendor-published detection labs, CTF scenarios, SCYTHE plans -->
+      <!-- Format same as references section -->
+      <div class="ref-item">
+        <div class="ref-source">{{ORG}}</div>
+        <div>
+          <div class="ref-detail"><a href="{{URL}}" target="_blank">{{TITLE}}</a></div>
+          <div class="ref-date">{{RESOURCE_TYPE}} · Accessed: {{ACCESS_DATE}}</div>
+        </div>
+      </div>
+      <!-- If no additional resources: single entry noting "No additional public emulation resources identified as of [DATE]" -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
     <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
   </div>
   <div class="section-body">

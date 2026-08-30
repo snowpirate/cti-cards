@@ -301,6 +301,99 @@
   .sanctions-role { font-family: var(--body); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
   .sanctions-badge { font-family: var(--mono); font-size: 8.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
 
+  /* ── OPSEC PROCEDURES ── */
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  /* ── DETECTION EVASION ── */
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* ── CTID EMULATION PLAN ── */
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
   /* ── FOOTER ── */
   .footer {
     margin-top: 14px;
@@ -341,8 +434,9 @@
   <div class="header-meta">// Threat Actor Profile — eCrime Extortion Collective / Social-Engineering &amp; Data-Theft Specialist</div>
   <h1><span class="accent">LAPSUS</span><span class="accent2">$</span></h1>
   <div class="header-sub">
-    PROFILE COMPILED: 2026-08-29 &nbsp;|&nbsp;
-    SOURCES: MITRE ATT&amp;CK, Microsoft MSTIC, CISA Cyber Safety Review Board, Krebs on Security, Resecurity, City of London Police court record, 10+ additional vendor/press sources
+    PROFILE COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-08-29 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK, Microsoft MSTIC, CISA Cyber Safety Review Board, Krebs on Security, Resecurity, Mandiant, City of London Police court record, Splunk Security Content, MITRE CTID, Atomic Red Team, SigmaHQ, 10+ additional vendor/press sources
   </div>
   <div class="classification-bar">
     <div>Status: <span class="danger">ACTIVE — RESURGENT (2026)</span></div>
@@ -914,6 +1008,188 @@
 <div class="section">
   <div class="section-header">
     <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[LOW]</span>
+        </div>
+        <div class="opsec-desc">No public evidence of a dedicated, self-hosted, or rotating C2 infrastructure footprint. Rather than building and cycling attacker-owned VPS/VPN nodes, LAPSUS$ authenticated through <strong>legitimate</strong> VPN and remote-access credentials that were purchased, phished, or leaked — meaning the group's network "infrastructure" was, in effect, the victim's own trusted infrastructure. This is consistent with CISA CSRB's finding that the group used "primarily simple techniques" and is itself a notable absence: it removed the usual infrastructure-based detection and attribution surface that IP/domain threat-intel feeds rely on for more traditional actors.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Overwhelmingly weighted toward native OS utilities and commercial/open-source dual-use tools over custom malware. Documented toolset is limited to Mimikatz, Sysinternals AD Explorer, native <code>ntdsutil</code>/DCSync replication, and commercial remote-access software (AnyDesk) — no bespoke implant, loader, or C2 framework has been publicly attributed to the group across any of its major intrusions (Microsoft MSTIC, 2022; CISA CSRB, 2023). CSRB explicitly cited this as the group's defining characteristic: high-impact outcomes achieved through "well-known and available" techniques rather than novel tradecraft.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics / Endpoint-Defense Neutralization</span>
+          <span class="opsec-confidence">[MEDIUM–HIGH]</span>
+        </div>
+        <div class="opsec-desc">During the Sitel/Okta intrusion, Mandiant's forensic report documented the actor using <strong>ProcessHacker and Process Explorer</strong> — both legitimate, publicly-available Windows process/system utilities — specifically to terminate the FireEye endpoint security agent running on the compromised support-engineer workstation, clearing the way for Mimikatz-based credential dumping and privilege escalation. No public reporting reviewed for this compile documents systematic Windows Event Log clearing, timestomping, or memory-only execution discipline beyond this defense-termination step — the group's anti-forensics posture appears narrowly focused on disabling the specific security tool in its way rather than broader forensic-trace suppression.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Microsoft MSTIC documented bursts of 10+ MFA push notifications sent to a single target within minutes, in at least one case timed outside the victim's normal business hours to exploit reduced vigilance and a higher likelihood of an exhausted or half-attentive approval. Beyond this specific MFA-fatigue timing pattern, no broader beaconing, jitter, or dwell-time discipline is publicly documented — consistent with an actor executing short, opportunistic access windows (the Okta/Sitel intrusion lasted approximately 25 minutes) rather than sustained, patient long-dwell operations.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">No evidence of custom-malware recompilation, hash-evasion, or binary obfuscation practices is documented — because the group's toolkit consists almost entirely of unmodified, legitimately-signed or open-source utilities (Mimikatz, AD Explorer, Process Hacker), it has comparatively little need for the packing/obfuscation hygiene associated with actors running bespoke implants. This is best read as a byproduct of the group's living-off-the-land approach rather than a deliberate anti-detection engineering practice.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Personal &amp; Identity OPSEC (Non-Technical)</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">This is the single most consequential OPSEC dimension for LAPSUS$ specifically, and it runs opposite to the group's technical tradecraft: personal/identity security was <strong>notably poor</strong>. A rival doxxed alleged member "White" (subsequently linked in court proceedings to Arion Kurtaj), publishing personal information including age, location, and family details that directly informed the City of London Police investigation (Sekoia, 2022). CSRB's report separately characterized the broader pattern across LAPSUS$ and related groups as reflecting "systemic failures" in both victim organizations' defenses and the actors' own community-facing conduct — public Telegram recruitment, competitive boasting, and in-fighting among members repeatedly generated the investigative leads that led to the March 2022 arrests. The technical living-off-the-land discipline documented above did not extend to the operators' own personal-identity tradecraft.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">EDR Agent Termination via Process Utilities</span>
+          <span class="evasion-ttp">T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">ProcessHacker · Process Explorer</span>
+        </div>
+        <div class="evasion-desc">During the Sitel/Okta intrusion, the actor used the legitimate system utilities <strong>ProcessHacker</strong> and <strong>Process Explorer</strong> to identify and forcibly terminate the FireEye endpoint detection agent process on the compromised workstation before proceeding to credential dumping — a direct, low-sophistication "impair defenses" step rather than a kernel-level or driver-based EDR bypass (Mandiant forensic report, cited via multiple secondary sources, 2022).</div>
+        <div class="evasion-detail">Specific process names, command-line arguments, and exact termination method (GUI interaction vs. scripted) not publicly documented as of 2026-08-30 — reporting confirms the tools used and the outcome (FireEye agent disabled) but not the precise operator commands.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Post-Credential-Dump Escalation via Mimikatz</span>
+          <span class="evasion-ttp">T1003.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">Mimikatz</span>
+        </div>
+        <div class="evasion-desc">Immediately following EDR agent termination, Mimikatz was used to extract credential material from the now-unmonitored host, enabling privilege escalation — the evasion value here is purely sequential (disable detection, then perform the action detection would otherwise catch) rather than any obfuscation of Mimikatz itself.</div>
+        <div class="evasion-detail">Specific Mimikatz module/command invocation (e.g., sekurlsa::logonpasswords vs. other modules) not publicly documented as of 2026-08-30.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Authentication-Anomaly Evasion via MFA-Fatigue Timing</span>
+          <span class="evasion-ttp">T1621</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">Rather than technically evading MFA telemetry, the group exploited the fact that most SIEM/identity-monitoring configurations of the era did not alert on <em>volume or timing anomalies</em> in MFA push requests — sending 10+ requests to a single user within minutes, in at least one case outside normal working hours, until an exhausted user approved one (Microsoft MSTIC, 2022). This defeats detection built around "was the credential valid" rather than "was this authentication behavior itself anomalous."</div>
+        <div class="evasion-detail">No further technical specifics (exact push interval, total request count per incident beyond "10+") publicly documented as of 2026-08-30.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Traffic Blending via Commercial Remote-Access Software</span>
+          <span class="evasion-ttp">T1219</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">Post-compromise use of commercial RMM software (e.g., AnyDesk) generates network traffic and process activity that is difficult to distinguish from legitimate IT-administrator remote support sessions, particularly in environments where such tools are already deployed for helpdesk use — evading both network-based anomaly detection and EDR rules tuned to flag unfamiliar remote-access binaries.</div>
+        <div class="evasion-detail">Specific AnyDesk configuration, deployment method, or persistence flags not publicly documented as of 2026-08-30.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense adversary emulation plan has been published for LAPSUS$, its "Strawberry Tempest"/DEV-0537 designation, or the "Scattered LAPSUS$ Hunters" successor brand as of 2026-08-30. The CTID Adversary Emulation Library's current Full Emulation Plans cover APT29, Blind Eagle, Carbanak Group, FIN6, FIN7, menuPass, OceanLotus, OilRig, Sandworm, Turla, and Wizard Spider — no social-engineering-led eCrime collective in the LAPSUS$/Scattered Spider/The Com ecosystem is represented in the library at this time (verified directly against the library's repository listing).</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Splunk Security Content</div>
+        <div>
+          <div class="ref-detail"><a href="https://research.splunk.com/stories/scattered_lapsus_hunters/" target="_blank">Analytics Story: Scattered Lapsus$ Hunters</a></div>
+          <div class="ref-date">Vendor detection lab — 140+ detections spanning MFA manipulation, LSASS dumping, RMM-tool deployment, Kerberos ticket attacks, defense-evasion/security-tool disablement, and cloud-storage exfiltration, mapped to ATT&amp;CK · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Atomic Red Team</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.006/T1003.006.md" target="_blank">T1003.006 — OS Credential Dumping: DCSync</a></div>
+          <div class="ref-date">Atomic test, directly applicable — DCSync is a documented LAPSUS$ credential-access technique · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Atomic Red Team</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1114.003/T1114.003.md" target="_blank">T1114.003 — Email Collection: Email Forwarding Rule (Office 365)</a></div>
+          <div class="ref-date">Atomic test, directly applicable — mail-transport-rule hijack is a documented LAPSUS$ persistence/collection technique · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Atomic Red Team</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/redcanaryco/atomic-red-team/tree/master/atomics/T1621" target="_blank">T1621 — Multi-Factor Authentication Request Generation</a></div>
+          <div class="ref-date">Atomic test, directly applicable — MFA-fatigue/push-bombing emulation · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SigmaHQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_dcsync.yml" target="_blank">win_security_dcsync.yml</a></div>
+          <div class="ref-date">Detection rule for directory-replication (DCSync) requests · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SigmaHQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/SigmaHQ/sigma/blob/master/rules/windows/builtin/security/win_security_account_backdoor_dcsync_rights.yml" target="_blank">win_security_account_backdoor_dcsync_rights.yml</a></div>
+          <div class="ref-date">Detection rule for backdoored DCSync replication rights grants · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">RedCanary</div>
+        <div>
+          <div class="ref-detail"><a href="https://redcanary.com/blog/threat-detection/o365-email-rules-mindmap/" target="_blank">Forward Thinking: How Adversaries Abuse Office 365 Email Rules</a></div>
+          <div class="ref-date">Detection guidance mapped to the T1114.003 mail-forwarding-rule technique used by LAPSUS$ · Accessed: 2026-08-30</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
     <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
   </div>
   <div class="section-body">
@@ -1030,6 +1306,41 @@
           <div class="ref-date">Accessed: 2026-08-29</div>
         </div>
       </div>
+      <div class="ref-item">
+        <div class="ref-source">Sekoia</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.sekoia.io/lapsus-when-kiddies-play-in-the-big-league/" target="_blank">Lapsus$: When Kiddies Play in the Big League</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CPO Magazine</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cpomagazine.com/cyber-security/csrb-exposes-lapsus-hacker-groups-cyber-extortion-activities-and-systemic-failures-enabling-them/" target="_blank">CSRB Exposes Lapsus$ Hacker Group's Cyber Extortion Activities and Systemic Failures Enabling Them</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Mandiant / Okta Disclosure Coverage</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/okta-lapsus-breach-lasted-only-25-minutes-hit-2-customers/" target="_blank">Okta: Lapsus$ Breach Lasted Only 25 Minutes, Hit 2 Customers</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Center for Threat-Informed Defense</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library" target="_blank">Adversary Emulation Library (checked for LAPSUS$/Scattered Spider coverage — none found)</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Splunk</div>
+        <div>
+          <div class="ref-detail"><a href="https://research.splunk.com/stories/scattered_lapsus_hunters/" target="_blank">Analytics Story: Scattered Lapsus$ Hunters</a></div>
+          <div class="ref-date">Accessed: 2026-08-30</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1037,8 +1348,8 @@
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 16 sources, 15 web searches</div>
-  <div>eCrime / Extortion Collective — G1004</div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 22 sources, 6 refresh web searches</div>
+  <div>eCrime / Extortion Collective — G1004 · UPDATED FROM: 2026-08-29 · Git history preserved</div>
 </div>
 
 </body>
