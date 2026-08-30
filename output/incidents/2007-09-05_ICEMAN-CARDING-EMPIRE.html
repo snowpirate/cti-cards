@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Iceman Carding Empire — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-20070905-ICEMAN<br/>
+    2005 – SEP 2007
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — eCrime Carding Forum Consolidation &amp; Mass Financial Data Theft (Subject of Kevin Poulsen's "Kingpin")</div>
+  <h1><span class="gold">ICEMAN</span> CARDING EMPIRE</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-29 &nbsp;|&nbsp; INCIDENT DATE: 2005 (CardersMarket founded) to 2007-09-05 (arrest); sentenced 2010-02-12 &nbsp;|&nbsp;
+    SOURCES: U.S. DOJ · U.S. Secret Service · Kevin Poulsen's "Kingpin" (2011) · Wikipedia · The Register · NPR · Network World · 6+ additional press sources
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>eCrime — Carding Forum Consolidation / Mass Financial Data Theft</span></div>
+    <div>Attribution: <span class="gold">MAX RAY BUTLER ("ICEMAN" / "MAX VISION") [HIGH — CONVICTED]</span></div>
+    <div>Severity: <span class="red">CRITICAL (Historical)</span></div>
+    <div>Era: <span>Pre-ATT&amp;CK / Early Organized Carding Era</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise (Retrospective)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">~2,000,000</div>
+    <div class="stat-label">Stolen Credit/Debit Card Records Trafficked</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">$86.4M</div>
+    <div class="stat-label">Estimated Fraudulent Charges Resulting From Stolen Data</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">13 Years</div>
+    <div class="stat-label">Prison Sentence — Longest-Ever US Hacking Sentence at the Time</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">6,000</div>
+    <div class="stat-label">Carding-Forum Members Absorbed in a Single-Night Takeover (Aug 2006)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="none">No companion actor card on file — single-perpetrator historical eCrime case; convicted individual (Max Ray Butler, aka "Iceman"), not a tracked MITRE G-ID or ongoing threat cluster</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">The Iceman Carding Empire (CardersMarket Consolidation &amp; Mass Card Theft)</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">2005 (CardersMarket founded) – 2007-09-05 (arrest); pled guilty 2009; sentenced 2010-02-12</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">eCrime — Carding Forum Consolidation / Financial Data Theft</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Max Ray Butler, legally Max Ray Vision ("Iceman," "Digital," "Aphex") — individual perpetrator, San Francisco, CA</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">HIGH — pled guilty; convicted on two counts of wire fraud</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Rival carding forums (DarkMarket, TalkCash, ScandinavianCarding, TheVouched); business/retail wireless networks; payment processors and financial institutions nationwide</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">~2 million compromised card accounts across roughly 100+ US financial institutions; 6,000+ carding-forum members absorbed into CardersMarket</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">Secret Service and FBI separately investigated carding-forum activity through 2006–2007; "Iceman" was unmasked via an undercover investigation using a cooperating associate</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">U.S. Secret Service (lead), with FBI cooperation; informant/cooperating witness within Butler's own criminal network</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">Approximately 2+ years of sustained criminal operation (2005 forum founding to Sept 2007 arrest) before law enforcement disruption</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Consolidation of the English-language carding underground into a single Butler-controlled marketplace; ~$86.4M in fraudulent charges; landmark 13-year sentence and $27.5M restitution order</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise (Retrospective) — predates ATT&amp;CK's 2013 introduction; applied loosely given the fraud/marketplace nature of the case</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">Not catalogued — individual criminal prosecution, not a tracked APT group or campaign</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">CardersMarket and the forums it absorbed have been offline since 2007; techniques are of historical/educational interest only</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Between 2005 and his arrest in September 2007, Max Ray Butler — a former "white hat" security researcher who had once served as an FBI informant — built and forcibly consolidated what became the largest stolen-credit-card marketplace on the internet, trafficking in roughly 2 million compromised card accounts and enabling an estimated $86.4 million in fraudulent charges. Operating under the alias "Iceman," Butler's story, later chronicled in journalist Kevin Poulsen's 2011 book <em>Kingpin</em>, remains one of the defining case studies of the transition from scattered, amateur "carding" forums to organized, monopolistic cybercrime marketplaces.</p>
+      <p>Butler's path to cybercrime was unusual: in the late 1990s he was a respected security researcher and, controversially, a confidential FBI informant, before a 1998 conviction for hacking U.S. Air Force and other federal networks — ironically, while attempting to "patch" a vulnerability he had found — sent him to federal prison for 18 months. Released in 2002 and unable to rebuild a legitimate career, Butler turned fully to the criminal underground, adopting the "Iceman" persona and, in June 2005, launching a carding forum called CardersMarket.</p>
+      <p>Butler's defining and most notorious act came on the night of August 16, 2006: rather than compete with rival carding forums, he simultaneously hacked into four of them — DarkMarket, TalkCash, ScandinavianCarding, and TheVouched — extracted their combined membership databases and years of private conversation histories, rendered the original sites inaccessible, and migrated everything into CardersMarket. Overnight, Butler's forum absorbed roughly 4,500 additional members, quadrupling to around 6,000 users and making him the de facto monopolist of the English-language carding underground — an act of criminal empire-building unprecedented in scale at the time.</p>
+      <p>Butler paired this technical dominance with a real-world cashing-out operation run in partnership with Christopher Aragon, a former bank robber, and was ultimately identified and arrested by the U.S. Secret Service in San Francisco on September 5, 2007. He pled guilty in 2009 and was sentenced in February 2010 to 13 years in federal prison — at the time the longest sentence ever imposed for hacking-related offenses in United States history — along with $27.5 million in restitution.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>By the mid-2000s, "carding" — the trafficking of stolen payment-card data — had matured from informal IRC channels into structured web forums with reputation systems, escrow services, and vendor rankings, mirroring legitimate e-commerce. Competing forums frequently attacked one another in what participants called "hacking wars," attempting to steal rivals' member databases and reputational standing rather than cooperating, a dynamic Butler exploited more decisively and completely than any predecessor.</p>
+      <p>Widespread, poorly secured retail and small-business WiFi networks made wardriving-based intrusion — physically locating and exploiting open or weakly secured wireless networks to reach point-of-sale and payment systems — a viable technique for stealing card data at scale; Butler and his associates rented hotel rooms and used high-powered antennas to reach target networks from a discreet distance. Contemporaneous law-enforcement capability for tracking anonymized, forum-based criminal marketplaces was still developing, and payment-card issuers had not yet widely adopted the fraud-detection and network-segmentation practices that later became standard following high-profile breaches like TJX (2007) and Heartland Payment Systems (2008).</p>
+      <p>Butler's own history was itself a warning sign in hindsight — his 1998 conviction demonstrated both his technical skill and willingness to cross legal lines, and his difficulty finding legitimate work after release is described in retrospective accounts as a direct contributing factor in his return to crime. No specific law-enforcement intervention interrupted his 2005–2006 build-up of CardersMarket before it reached dominant scale.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Post-Release Return to the Underground (2002–2005)</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Following his 2002 release from federal prison, Butler struggled to find legitimate security work under his history, and by 2005 had fully adopted the "Iceman" persona, launching the CardersMarket forum in June 2005 as a venue for trading stolen card data.</div>
+        <div class="kc-pivot">Because this was a low-profile forum launch rather than an intrusion, it drew no law-enforcement attention at the time and gave Butler roughly a year to build initial infrastructure and reputation.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Mass Data Theft via Wireless Network Intrusion</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">In parallel with growing CardersMarket, Butler and associates conducted wardriving operations — renting hotel rooms near target businesses and using high-powered antennas to locate and exploit vulnerable WiFi networks — to breach point-of-sale systems and payment processors, harvesting card data that fed directly into his and his network's carding operations.</div>
+        <div class="kc-pivot">These intrusions targeted a broad, opportunistic set of small and mid-sized businesses rather than a single high-value target, making the campaign's true scope difficult for any single victim organization to detect or report.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Hostile Takeover of Rival Carding Forums (Aug 16, 2006)</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">In a single coordinated operation, Butler exploited security flaws in four rival carding forums — DarkMarket, TalkCash, ScandinavianCarding, and TheVouched — extracting their member databases and years of conversation archives, taking the original sites offline, and merging everything into CardersMarket. Membership quadrupled overnight from roughly 1,500 to 6,000, and Butler became the dominant hub of English-language carding.</div>
+        <div class="kc-pivot">This hostile takeover was highly visible within the criminal underground itself — the "hacking war" it triggered is documented as a contributing factor that later helped FBI Special Agent Keith Mularski establish trust and undercover access on the rebuilding DarkMarket community as "Master Splyntr," a separate FBI sting operation that took root later in 2006.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Cash-Out Operation With Christopher Aragon</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Butler partnered with Christopher Aragon, a former bank robber and drug smuggler, to convert stolen card data into cash through counterfeit cards, gift-card purchases, and other real-world fraud schemes, extending the operation's impact from data theft into direct financial harm.</div>
+        <div class="kc-pivot">The real-world cash-out network created physical evidence and human intermediaries that were ultimately more vulnerable to traditional law-enforcement investigative techniques than Butler's technical operations alone.</div>
+      </div>
+
+      <div class="kc-phase visible">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Undercover Investigation &amp; Identification</span>
+          <span class="vis-badge vis-unreviewed">VISIBLE — UNREVIEWED</span>
+        </div>
+        <div class="kc-body">The U.S. Secret Service, with FBI cooperation, built a case against Butler using a cooperating witness/informant within his own network, gradually connecting the "Iceman" persona to Max Butler's real identity and documenting the scale of stolen data and forum activity.</div>
+        <div class="kc-pivot">This investigative approach — infiltrating the human network around a technically sophisticated actor rather than attempting to out-hack him — proved decisive.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Arrest, Prosecution &amp; Sentencing</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">U.S. Secret Service agents arrested Butler in San Francisco on September 5, 2007. He pled guilty in 2009 to two counts of wire fraud, and on February 12, 2010, was sentenced to 13 years in federal prison plus five years of supervised release and $27.5 million in restitution — at the time the longest sentence ever handed down for hacking-related crimes in US history.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Pre-ATT&CK incident (2005–2007); techniques are retrospective and adapted from a fraud/marketplace case, not a standard intrusion campaign</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1583.001</div>
+        <div class="mitre-name">Acquire Infrastructure: Domains</div>
+        <div class="mitre-note">[HIGH] Registered and operated CardersMarket as consolidated criminal-marketplace infrastructure to host absorbed forum communities.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1595.002</div>
+        <div class="mitre-name">Active Scanning: Vulnerability Scanning</div>
+        <div class="mitre-note">[MEDIUM] Physically located and probed poorly secured retail/business WiFi networks (wardriving) to identify exploitable access points.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Exploited unpatched vulnerabilities in rival carding forums' web software to gain administrative access to their databases.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">[MEDIUM] Leveraged compromised or weakly secured wireless network access as a foothold into retail/business point-of-sale environments.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1005</div>
+        <div class="mitre-name">Data from Local System</div>
+        <div class="mitre-note">[HIGH] Extracted complete member databases, private-message archives, and forum content from four rival carding sites in a single operation.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1213</div>
+        <div class="mitre-name">Data from Information Repositories</div>
+        <div class="mitre-note">[HIGH] Harvested payment-card data from compromised payment-processing and point-of-sale systems reached via wireless intrusion.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1041</div>
+        <div class="mitre-name">Exfiltration Over C2 Channel</div>
+        <div class="mitre-note">[MEDIUM] Removed stolen databases and card data from victim networks for consolidation into CardersMarket infrastructure.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1489</div>
+        <div class="mitre-name">Service Stop</div>
+        <div class="mitre-note">[HIGH] Rendered four competing carding forums permanently inaccessible to their original members as part of the takeover, effectively destroying rival platforms' operational continuity.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] Monetized stolen card data through a real-world cash-out network, contributing to an estimated $86.4 million in fraudulent charges.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1102</div>
+        <div class="mitre-name">Web Service</div>
+        <div class="mitre-note">[LOW] Operated CardersMarket as an open web-forum marketplace rather than covert C2, facilitating ongoing data trading among a large criminal user base.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">FORUM SECURITY &amp;<br/>WIRELESS EXPLOITATION<br/>MISSED</div>
+        <div class="pm-detail">Neither the rival carding forums nor the retail/small-business networks Butler wardrove into detected the underlying vulnerabilities before exploitation; the carding underground's forums were run by other criminals with limited security investment, and retail wireless networks of the era commonly used weak or default encryption.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">HOSTILE TAKEOVER<br/>PARTIALLY DETECTED<br/>(WITHIN CRIMINAL COMMUNITY)</div>
+        <div class="pm-detail">The August 2006 takeover was immediately obvious to the carding community itself — forums went offline and members found themselves migrated to CardersMarket — but this visibility existed entirely outside conventional law-enforcement or victim-organization detection channels, delaying any formal investigative response.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">The case became a template for subsequent U.S. Secret Service and FBI carding investigations (including the DarkMarket sting), demonstrating that infiltrating the human trust networks and cooperating-witness relationships around a criminal marketplace was more effective than attempting to technically out-hack a skilled individual operator.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">SENTENCING PRECEDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">Butler's 13-year sentence — the longest hacking-related sentence in US history at the time — established a strong sentencing precedent for large-scale identity-theft and carding prosecutions, directly informing charging and sentencing strategy in subsequent major cases such as Albert Gonzalez's TJX/Heartland prosecutions.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Wardriving Intrusion Methodology</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Wireless Network Exploitation Technique</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Combination of physical reconnaissance (renting hotel rooms near targets) and high-powered directional antennas to locate and exploit inadequately secured business WiFi networks, providing a foothold into point-of-sale and payment-processing systems without requiring direct physical premises access.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">CardersMarket Forum Platform</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Criminal Marketplace Infrastructure</span>
+            <span class="artifact-tag historical">[HISTORICAL — Offline since 2007]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Web forum launched June 2005 that, following the August 2006 consolidation, became the dominant English-language carding marketplace with roughly 6,000 members, functioning as an open trading venue for stolen card data, tutorials, and vendor reputation — a structural precursor to later, more operationally secure dark-web marketplaces.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Rival-Forum Database Extraction Toolset</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Web Application Exploitation</span>
+            <span class="artifact-tag historical">[HISTORICAL — Specific exploits undisclosed]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Exploited security flaws (specific vulnerabilities not fully disclosed in public reporting) in the web software running DarkMarket, TalkCash, ScandinavianCarding, and TheVouched to extract complete user databases and private-message archives in a single, simultaneous operation on August 16, 2006.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are archival. Infrastructure has long since been dismantled. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">STAT</td><td class="val historical">~2,000,000 stolen credit/debit card records trafficked</td><td>US DOJ sentencing press release</td><td>2010-02-12</td></tr>
+          <tr><td class="type-label">STAT</td><td class="val historical">$86.4 million in estimated fraudulent charges</td><td>US DOJ; press reporting</td><td>2010-02</td></tr>
+          <tr><td class="type-label">INFRA</td><td class="val historical">CardersMarket[.]com (forum, offline since 2007)</td><td>Wikipedia; contemporaneous press</td><td>2005–2007</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">This is a historical criminal-marketplace case rather than a technical intrusion campaign with preserved malware samples; no public malware hashes, C2 domains, or IP indicators have been published, since the operation centered on forum infrastructure and wireless network exploitation rather than deployed malicious code. Consult the US DOJ press releases and Kevin Poulsen's "Kingpin" (2011) for the fullest public accounting of the case's technical and investigative details.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">Not a geopolitical incident, but the case is frequently cited in US law-enforcement and policy discussions of organized cybercrime as an early, clear demonstration that a single skilled individual could achieve marketplace-level dominance over a criminal financial ecosystem, informing later interagency task-force approaches (Secret Service Electronic Crimes Task Forces, FBI cyber squads) to carding and payment-fraud investigations.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Directly informed subsequent law-enforcement investigative technique, particularly the value of long-term undercover infiltration of criminal marketplaces — exemplified by the FBI's own DarkMarket sting under Special Agent Keith Mularski, which took root on the same forum ecosystem Butler had destabilized — over purely technical counter-hacking approaches.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">Established a significant sentencing precedent — Butler's 13-year term was, at the time, the longest ever imposed in the US for hacking-related offenses — shaping prosecutorial and sentencing expectations in subsequent major identity-theft and carding cases, including the prosecution of Albert Gonzalez for the TJX and Heartland Payment Systems breaches.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: HIGH</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Max Ray Butler, legally known as Max Ray Vision, aka "Iceman," "Digital," "Aphex"</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">None — independent individual criminal actor; no state or organizational sponsorship</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Formally and conclusively established through guilty plea and federal conviction; not a disputed or inferred attribution</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">Indicted 2007 on wire fraud and identity theft charges; pled guilty 2009; sentenced 2010-02-12 to 13 years federal prison, 5 years supervised release, and $27.5 million restitution</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file — individual criminal case, not a tracked ongoing threat actor or MITRE Group</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Direct forensic evidence recovered from Butler's own systems and CardersMarket infrastructure; cooperation/testimony from associates within his cash-out network; guilty plea removing any need for contested attribution</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">None — this is one of the rare cases in this library with fully resolved, court-confirmed attribution rather than analytical inference</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Not applicable — attribution is legally conclusive</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Unlike most entries in this library, attribution for the Iceman/CardersMarket case is not an analytical judgment but a matter of public legal record: Max Ray Butler was identified, indicted, pled guilty, and was sentenced by a US federal court, with the underlying evidence — including his own systems, forum infrastructure, and cooperating-witness testimony — never seriously disputed. The case is included here not because attribution is uncertain, but because its investigative, technical, and legal legacy shaped how law enforcement and the security industry have approached organized cybercrime and carding-marketplace prosecutions ever since.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The Iceman case is a foundational example in the study of organized cybercrime economics: Max Butler did not simply steal data, he forcibly consolidated a fragmented, competitive criminal ecosystem into a single dominant marketplace through technical force — a dynamic later echoed, in less violent forms, by the rise and fall of major dark-web marketplaces. It remains a core teaching case for understanding how criminal marketplaces achieve, and lose, market power.</p>
+      <p>The case's investigative resolution — infiltrating the human and financial network around a technically superior individual actor rather than attempting to counter-hack him — became a template subsequently used in larger operations, including the FBI's own DarkMarket sting (itself entangled with the same forum ecosystem Butler had destabilized) and numerous later carding-marketplace takedowns. It demonstrated that even highly capable technical adversaries typically retain real-world, human-network vulnerabilities that patient undercover investigation can exploit.</p>
+      <p>Legally, Butler's 13-year sentence — the longest ever imposed for hacking-related crimes in the US at the time — recalibrated expectations for how severely large-scale identity-theft and carding operations would be punished, directly informing the prosecutorial approach used against subsequent major carding figures like Albert Gonzalez. Chronicled in Kevin Poulsen's widely read 2011 book <em>Kingpin</em>, the case remains one of the most detailed publicly documented accounts of how an individual hacker's technical skill, criminal ambition, and personal history intersected to create outsized real-world financial harm — and how that harm was ultimately unwound.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Max_Butler" target="_blank">Max Butler</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">US DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/archive/criminal/cybercrime/press-releases/2007/butlerIndict.htm" target="_blank">"Iceman," Founder of Online Credit Card Theft Ring, Indicted on Wire Fraud and Identity Theft Charges</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">US Secret Service</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.secretservice.gov/press/releases/2007/09/secret-service-investigation-disrupts-identity-theft-ring" target="_blank">Secret Service Investigation Disrupts Identity Theft Ring</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2007-09</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2010/02/15/max_vision_cybercrook_jailed/" target="_blank">Whitehat 'Max Vision' Cybercrook Jailed for 13 Years</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2001/05/22/whitehat_max_vision_gets/" target="_blank">Whitehat 'Max Vision' Gets 18 Months</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2001</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2001/05/09/whitehat_hacker_made_fbi_patsy/" target="_blank">Whitehat Hacker Made FBI Patsy</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2001</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2000/09/27/fbi_consultant_pleads_guilty/" target="_blank">FBI Consultant Pleads Guilty</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2000</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NPR</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.npr.org/sections/money/2011/06/17/137251254/the-fbi-agent-who-ran-a-stolen-credit-card-ring" target="_blank">The FBI Agent Who Became a Black-Market Mogul (DarkMarket / Master Splyntr)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">PCWorld</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.pcworld.com/article/533063/article-7310.html" target="_blank">Three Years Undercover With the Identity Thieves</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Network World</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.networkworld.com/article/2258801/-iceman--pleads-guilty-to-massive-computer-hacking.html" target="_blank">'Iceman' Pleads Guilty to Massive Computer Hacking</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2009</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Network World</div>
+        <div>
+          <div class="ref-detail"><a href="https://networkworld.com/article/2244967/criminal-hacker--iceman--gets-13-years.html" target="_blank">Criminal Hacker 'Iceman' Gets 13 Years</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2010</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ABC News</div>
+        <div>
+          <div class="ref-detail"><a href="https://abcnews.com/Technology/story?id=99317&page=1" target="_blank">Ex-FBI Informant Pleads Guilty to Hacking</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2000</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SFGate</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.sfgate.com/bayarea/article/ex-fbi-hacker-informant-arrested-for-alleged-wire-2522701.php" target="_blank">Ex-FBI Hacker Informant Arrested for Alleged Wire Fraud</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Kingpin_(book)" target="_blank">Kingpin (book)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/DarkMarket" target="_blank">DarkMarket</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Washington Times</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.washingtontimes.com/news/2018/dec/1/iceman-hacker-accused-having-drone-smuggle-cellpho/" target="_blank">Jailed 'Iceman' Hacker Charged With Drone-Smuggling Scheme Orchestrated From Prison</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Privacy PC</div>
+        <div>
+          <div class="ref-detail"><a href="https://privacy-pc.com/articles/from-white-hat-to-black-the-curious-case-of-cybercrime-kingpin-max-vision.html" target="_blank">From White Hat to Black — The Curious Case of Cybercrime Kingpin Max Vision</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">IPMall / DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://ipmall.law.unh.edu/sites/default/files/hosted_resources/CyberCrime/NEWSRELEASES/butlerSent.pdf" target="_blank">"ICEMAN" Computer Hacker Receives 13-Year Prison Sentence (DOJ Press Release PDF)</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2010</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 18 sources, all publicly available</div>
+  <div>No companion actor card · Attribution confidence: HIGH (court-confirmed) · ATT&amp;CK: 10 techniques, all retrospective</div>
+</div>
+
+</body>
+</html>
