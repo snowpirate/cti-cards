@@ -381,7 +381,7 @@
   <div class="site-header-inner">
     <div>
       <div class="site-title"><span class="teal">CTI</span> <span class="gold">Library</span></div>
-      <div class="site-meta">// snowpirate · cti-cards · Threat Actor Profiles &amp; Incident Case Files</div>
+      <div class="site-meta">// snowpirate · cti-cards · Threat Actor Profiles · Incident Case Files · Vulnerability Advisories</div>
     </div>
     <div class="site-stats">
       <div class="site-stat">
@@ -391,6 +391,10 @@
       <div class="site-stat">
         <div class="site-stat-val gold" id="incident-count">0</div>
         <div class="site-stat-label">Incident Cases</div>
+      </div>
+      <div class="site-stat">
+        <div class="site-stat-val" id="vuln-count" style="color:#00d4ff">0</div>
+        <div class="site-stat-label">Vuln Advisories</div>
       </div>
     </div>
   </div>
@@ -850,6 +854,7 @@
     const vulns     = document.querySelectorAll('#vuln-grid .lib-card').length;
     document.getElementById('actor-count').textContent    = actors;
     document.getElementById('incident-count').textContent = incidents;
+    document.getElementById('vuln-count').textContent     = vulns;
     document.getElementById('actor-section-count').textContent    = actors    + ' PROFILES';
     document.getElementById('incident-section-count').textContent = incidents + ' CASES';
     document.getElementById('vuln-section-count').textContent     = vulns     + ' ADVISORIES';
