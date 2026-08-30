@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CTI Library — snowpirate</title>
-<link rel="icon" type="image/x-icon" href="snowpirate.ico"/>
+<link rel="icon" type="image/png" href="snowpirate1.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -248,6 +248,12 @@
     transition: width 0.15s;
   }
   .lib-card.incident::before { background: var(--gold); }
+  .lib-card.vuln::before     { background: #00d4ff; }
+  .lib-card.vuln .lib-card-footer .open { color: #00d4ff; }
+  .badge.patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.4); color: #ff4d4d; font-size: 8px; padding: 2px 6px; }
+  .badge.patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--gold); font-size: 8px; padding: 2px 6px; }
+  .badge.patch-resolved { background: rgba(90,112,128,0.15); border: 1px solid #1e2e3e; color: #5a7080; font-size: 8px; padding: 2px 6px; }
+  .badge.kev-badge-sm   { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: #00d4ff; font-size: 8px; padding: 2px 6px; font-weight: 700; }
   .lib-card:hover { border-color: var(--border2); background: var(--bg3); }
   .lib-card:hover::before { width: 4px; }
 
@@ -403,6 +409,7 @@
     <div class="chip" data-filter="nation-state">Nation-State</div>
     <div class="chip" data-filter="ecrime">eCrime</div>
     <div class="chip" data-filter="ics">ICS / OT</div>
+    <div class="chip" data-filter="vuln">Vulnerabilities</div>
   </div>
   <div class="filter-count" id="filter-count"></div>
 </div>
@@ -444,178 +451,73 @@
 
       <!-- ↓↓↓ AGENT-MAINTAINED ACTOR CARDS BEGIN ↓↓↓ -->
 
-      <a class="lib-card" href="output/actors/2026-08-30_TEAMPCP.html"
-         data-name="TeamPCP"
-         data-type="ecrime"
-         data-tags="teampcp unc6780 altered spider pcpcat shellforce deadcatx3 persypcp supply chain trivy kics litellm telnyx npm pypi github react2shell cve-2025-55182 vect cipherforce ransomware canisterworm kamikaze devsecops european commission">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">TeamPCP</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge threat-crit">CRITICAL</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">ECRIME · INDEPENDENT · ACTIVE SINCE MID-2025</div>
-          <div class="lib-card-desc">Financially motivated cloud-native supply-chain actor behind the 2026 Trivy/KICS/LiteLLM compromise cascade that hit the European Commission and thousands of downstream orgs; two alleged members arrested and indicted in Australia on 2026-08-27.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-30</span>
-            <span class="open">OPEN PROFILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card" href="output/actors/2026-08-29_JADEPUFFER.html"
-         data-name="JADEPUFFER"
-         data-type="ecrime"
-         data-tags="jadepuffer encforge agentic ransomware llm ai agent langflow cve-2025-3248 nacos cve-2021-29441 mysql minio autonomous ai security atlas sysdig">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">JADEPUFFER</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge threat-crit">CRITICAL</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">AGENTIC THREAT ACTOR — OPERATOR UNKNOWN · ECRIME-STYLE EXTORTION · ACTIVE SINCE JUL 2026</div>
-          <div class="lib-card-desc">The first documented fully AI-agent-driven ransomware operation: an LLM autonomously exploited a Langflow RCE, self-corrected mid-attack in 31 seconds, and destroyed a production database — then resurfaced weeks later with "ENCFORGE," a locker built specifically to destroy AI model files.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN PROFILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card" href="output/actors/2026-08-29_REVIL.html"
-         data-name="REvil"
-         data-type="ecrime"
-         data-tags="revil sodinokibi sodin gold southfield pinchy spider gandcrab kaseya jbs foods travelex acer happy blog raas ransomware double extortion fsb vasinskyi polyanin">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">REvil</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge threat-high">HIGH (HISTORICAL)</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">ECRIME — RANSOMWARE-AS-A-SERVICE · RUSSIA-BASED, NO CONFIRMED STATE TIE · ACTIVE APR 2019 – JAN 2022</div>
-          <div class="lib-card-desc">Sodinokibi RaaS operation behind JBS Foods, Travelex, and the Kaseya VSA supply-chain attack that hit up to 1,500 businesses in one shot; dismantled by a 2021-2022 US-Russia law enforcement campaign, with its true current status still unresolved.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN PROFILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card" href="output/actors/2026-08-29_GONJESHKE-DARANDE.html"
-         data-name="Gonjeshke Darande"
-         data-type="nation-state"
-         data-tags="gonjeshke darande predatory sparrow israel iran meteor wiper indra khouzestan steel nobitex bank sepah railway gas station ics ot sabotage hacktivist">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">Gonjeshke Darande</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge threat-crit">CRITICAL</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">SUSPECTED NATION-STATE-ALIGNED (ISRAEL, UNCONFIRMED) · SELF-STYLED HACKTIVIST · ACTIVE SINCE 2021</div>
-          <div class="lib-card-desc">"Predatory Sparrow" — destructive hacktivist persona behind Iran's railway wiper attack, the Khouzestan Steel mill fire (first cyber-to-physical damage since Stuxnet), and the 2025 Bank Sepah/Nobitex operations that burned $90M in crypto.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN PROFILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card" href="output/actors/2026-08-29_SALT-TYPHOON.html"
-         data-name="Salt Typhoon"
-         data-type="nation-state"
-         data-tags="salt typhoon earth estries ghostemperor famoussparrow unc2286 redmike china mss g1045 telecom wiretap lawful intercept cisco ghostspider demodex snappybee jumbledpath">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">Salt Typhoon</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge threat-crit">CRITICAL</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">NATION-STATE · CHINA (MSS, CONTRACTOR-ENABLED) · ACTIVE SINCE 2019</div>
-          <div class="lib-card-desc">Chinese state-sponsored group that breached nine major US telecom carriers' lawful-intercept and call-record systems, exploiting Cisco edge devices to gain SIGINT-style access now confirmed across 80+ countries.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN PROFILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card" href="output/actors/2026-08-29_APT1.html"
-         data-name="APT1"
-         data-type="nation-state"
-         data-tags="apt1 comment crew comment group comment panda pla unit 61398 china g0006 mandiant shanghai pudong webc2 biscuit uglygorilla wang dong doj indictment">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">APT1</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge threat-high">HIGH (HISTORICAL)</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">NATION-STATE · PLA UNIT 61398 (CHINA) · ACTIVE SINCE 2006</div>
-          <div class="lib-card-desc">The military cyber-espionage unit Mandiant's landmark 2013 report publicly named and traced to a Shanghai building, compromising 141+ organizations and prompting the first-ever US indictment of state-sponsored hackers.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN PROFILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card" href="output/actors/2026-08-29_SCATTERED-SPIDER.html"
-         data-name="Scattered Spider"
-         data-type="ecrime"
-         data-tags="scattered spider unc3944 octo tempest muddled libra roasted 0ktapus scatter swine storm-0875 the com dragonforce alphv blackcat vishing help desk esxi vsphere g1015 scattered lapsus hunters">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">Scattered Spider</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge threat-crit">CRITICAL</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">ECRIME — SOCIAL ENGINEERING / RANSOMWARE AFFILIATE · INDEPENDENT / "THE COM" · ACTIVE SINCE MAY 2022</div>
-          <div class="lib-card-desc">Vishing-driven eCrime collective that defeats MFA via help-desk social engineering and has pivoted to hijacking VMware ESXi/vSphere for direct hypervisor-level ransomware deployment across retail, insurance, and aviation targets.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN PROFILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card" href="output/actors/2026-08-29_LAPSUS.html"
-         data-name="LAPSUS$"
-         data-type="ecrime"
-         data-tags="lapsus scattered spider shinyhunters scattered lapsus hunters the com social engineering vishing mfa fatigue extortion okta microsoft nvidia samsung g1004">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">LAPSUS$</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge threat-high">HIGH</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">ECRIME EXTORTION COLLECTIVE · INDEPENDENT / "THE COM" · ACTIVE SINCE MID-2021</div>
-          <div class="lib-card-desc">Social-engineering-driven extortion collective that breached Microsoft, Nvidia, Samsung, Okta and others in 2022 with no custom malware; resurgent in 2026 as "Scattered LAPSUS$ Hunters."</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN PROFILE →</span>
-          </div>
-        </div>
-      </a>
-
       <!-- ↑↑↑ AGENT-MAINTAINED ACTOR CARDS END ↑↑↑ -->
 
     </div>
     <div class="empty-state" id="actor-empty" style="display:none">// NO ACTOR PROFILES ON FILE</div>
+  </div>
+
+  <!-- ── VULNERABILITY ADVISORIES ── -->
+  <div class="lib-section" id="section-vulns">
+    <div class="lib-section-header">
+      <span class="lib-section-icon" style="color:#00d4ff">◈</span>
+      <span class="lib-section-title" style="color:#00d4ff">Vulnerability Advisories</span>
+      <span class="lib-section-count" id="vuln-section-count"></span>
+    </div>
+    <div class="card-grid" id="vuln-grid">
+      <!-- VULN CARDS — agent maintains this block -->
+      <!-- FORMAT:
+      <a class="lib-card vuln" href="output/vulns/YYYY-MM-DD_VULN-NAME.html"
+         data-name="VULN NAME"
+         data-type="vuln-class"
+         data-tags="CVE-XXXX-XXXXX CWE-XXX VENDOR KEYWORD">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">VULN NAME</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge patch-now">PATCH NOW</span>
+              <span class="badge kev-badge-sm">KEV</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">CVE-XXXX-XXXXX · CWE-XXX · CVSS 9.8 · VENDOR / PRODUCT</div>
+          <div class="lib-card-desc">One or two sentence summary of the vulnerability and its significance.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: YYYY-MM-DD</span>
+            <span class="open">OPEN ADVISORY →</span>
+          </div>
+        </div>
+      </a>
+      -->
+
+      <!-- ↓↓↓ AGENT-MAINTAINED VULN CARDS BEGIN ↓↓↓ -->
+
+      <a class="lib-card vuln" href="output/vulns/2026-08-30_PRINTNIGHTMARE.html"
+         data-name="PrintNightmare"
+         data-type="privilege-escalation"
+         data-tags="CVE-2021-1675 CVE-2021-34527 CVE-2021-34481 CVE-2022-21999 CVE-2024-38198 CWE-269 MICROSOFT WINDOWS PRINT-SPOOLER RANSOMWARE">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">PrintNightmare</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge patch-test">PATCH — TEST FIRST</span>
+              <span class="badge kev-badge-sm">KEV</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">CVE-2021-34527 · CWE-269 · CVSS 8.8 · Microsoft / Windows Print Spooler</div>
+          <div class="lib-card-desc">Windows Print Spooler privilege-escalation/RCE family that took five CVEs and 38 months to close; weaponized by Vice Society, Magniber, and Conti ransomware operators within weeks of disclosure.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: 2026-08-30</span>
+            <span class="open">OPEN ADVISORY →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- ↑↑↑ AGENT-MAINTAINED VULN CARDS END ↑↑↑ -->
+
+    </div>
+    <div class="empty-state" id="vuln-empty" style="display:none">// NO VULNERABILITY ADVISORIES ON FILE</div>
   </div>
 
   <!-- ── INCIDENT CASE FILES ── -->
@@ -652,111 +554,6 @@
 
       <!-- ↓↓↓ AGENT-MAINTAINED INCIDENT CARDS BEGIN ↓↓↓ -->
 
-      <a class="lib-card incident" href="output/incidents/2005-10-31_SONY-BMG-XCP-ROOTKIT.html"
-         data-name="Sony BMG XCP Rootkit"
-         data-type="ecrime"
-         data-tags="sony bmg xcp mediamax first4internet sunncomm rootkit drm mark russinovich breplibot ryknos cd copy protection ftc">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">Sony BMG XCP Rootkit</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge type">SUPPLY CHAIN — VENDOR NEGLIGENCE</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">APR 2005 – JAN 2007 · ATTRIBUTED TO: FIRST4INTERNET / SUNNCOMM (VENDORS) · DWELL TIME: ~6–7 MONTHS</div>
-          <div class="lib-card-desc">Sony BMG shipped kernel-level cloaking DRM (XCP, MediaMax) on tens of millions of audio CDs; independent researcher Mark Russinovich exposed it as rootkit-class software in Oct 2005, and criminal malware weaponized the cloak within ten days.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN CASE FILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card incident" href="output/incidents/2026-08-29_MORRIS-WORM.html"
-         data-name="Morris Worm"
-         data-type="worm"
-         data-tags="morris worm internet worm 1988 robert tappan morris cornell cfaa cert coordination center sendmail finger fingerd buffer overflow self-propagating">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">The Morris Worm</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge type">SELF-PROPAGATING WORM</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">NOV 1988 · ATTRIBUTED TO: ROBERT TAPPAN MORRIS · DWELL TIME: HOURS</div>
-          <div class="lib-card-desc">First self-propagating worm to achieve mass spread across the early Internet, disabling ~6,000 of ~60,000 connected hosts via a miscalibrated reinfection check; led directly to the founding of CERT/CC and the first CFAA prosecution.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN CASE FILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card incident" href="output/incidents/2007-09-05_ICEMAN-CARDING-EMPIRE.html"
-         data-name="The Iceman Carding Empire"
-         data-type="ecrime"
-         data-tags="iceman max butler max vision cardersmarket darkmarket talkcash scandinaviancarding carding kingpin kevin poulsen chris aragon secret service wardriving">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">The Iceman Carding Empire</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge type">ECRIME — CARDING MARKETPLACE CONSOLIDATION</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">2005 – SEP 2007 · ATTRIBUTED TO: MAX RAY BUTLER ("ICEMAN") [HIGH — CONVICTED] · DWELL TIME: ~2+ YEARS</div>
-          <div class="lib-card-desc">Subject of Kevin Poulsen's "Kingpin" — a former FBI informant turned hacker who hijacked four rival carding forums in a single night, trafficked ~2M stolen cards, and drew the longest US hacking sentence of its time.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN CASE FILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card incident" href="output/incidents/2007-04-27_ESTONIA-CYBERATTACKS.html"
-         data-name="2007 Estonia Cyberattacks"
-         data-type="nation-state"
-         data-tags="estonia 2007 web war i bronze soldier tallinn ddos hansabank nashi kremlin nato ccdcoe tallinn manual article 5 hybrid warfare">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">2007 Estonia Cyberattacks</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge type">NATION-STATE — DDOS / HYBRID WARFARE</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">APR 27 – MAY 18, 2007 · ATTRIBUTED TO: RUSSIA-LINKED NATIONALIST HACKTIVISTS [LOW–MEDIUM] · DWELL TIME: N/A (DDOS)</div>
-          <div class="lib-card-desc">Widely regarded as "Web War I" — a 22-day DDoS campaign that paralyzed Estonian banking, government, and media after the Bronze Soldier statue's relocation, directly leading to NATO's Tallinn cyber-defense centre and the Tallinn Manual.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN CASE FILE →</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="lib-card incident" href="output/incidents/2010-01-12_OPERATION-AURORA.html"
-         data-name="Operation Aurora"
-         data-type="nation-state"
-         data-tags="operation aurora google elderwood hydraq beijing group sneaky panda china cve-2010-0249 internet explorer zero-day gaia gmail g0066">
-        <div class="lib-card-inner">
-          <div class="lib-card-top">
-            <div class="lib-card-name">Operation Aurora</div>
-            <div class="lib-card-badges">
-              <span class="badge tlp-clear">TLP:CLEAR</span>
-              <span class="badge type">NATION-STATE ESPIONAGE</span>
-            </div>
-          </div>
-          <div class="lib-card-sub">MID-2009 – JAN 2010 · ATTRIBUTED TO: ELDERWOOD GROUP (CHINA-NEXUS) · DWELL TIME: ~6 MONTHS</div>
-          <div class="lib-card-desc">Zero-day-enabled espionage campaign that breached Google and 30+ other companies to steal source code and target Gmail accounts of Chinese human-rights activists; prompted Google's exit from mainland Chinese search.</div>
-          <div class="lib-card-footer">
-            <span class="date">COMPILED: 2026-08-29</span>
-            <span class="open">OPEN CASE FILE →</span>
-          </div>
-        </div>
-      </a>
-
       <!-- ↑↑↑ AGENT-MAINTAINED INCIDENT CARDS END ↑↑↑ -->
 
     </div>
@@ -777,12 +574,15 @@
   function updateCounts() {
     const actors    = document.querySelectorAll('#actor-grid .lib-card').length;
     const incidents = document.querySelectorAll('#incident-grid .lib-card').length;
+    const vulns     = document.querySelectorAll('#vuln-grid .lib-card').length;
     document.getElementById('actor-count').textContent    = actors;
     document.getElementById('incident-count').textContent = incidents;
-    document.getElementById('actor-section-count').textContent    = actors + ' PROFILES';
+    document.getElementById('actor-section-count').textContent    = actors    + ' PROFILES';
     document.getElementById('incident-section-count').textContent = incidents + ' CASES';
+    document.getElementById('vuln-section-count').textContent     = vulns     + ' ADVISORIES';
     document.getElementById('actor-empty').style.display    = actors    === 0 ? 'block' : 'none';
     document.getElementById('incident-empty').style.display = incidents === 0 ? 'block' : 'none';
+    document.getElementById('vuln-empty').style.display     = vulns     === 0 ? 'block' : 'none';
     updateFilterCount();
   }
 
@@ -820,6 +620,8 @@
           card.classList.toggle('hidden', card.classList.contains('incident'));
         } else if (f === 'incident') {
           card.classList.toggle('hidden', !card.classList.contains('incident'));
+        } else if (f === 'vuln') {
+          card.classList.toggle('hidden', !card.classList.contains('vuln'));
         } else {
           const t = (card.dataset.type || '') + ' ' + (card.dataset.tags || '');
           card.classList.toggle('hidden', !t.toLowerCase().includes(f));

@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrintNightmare — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  /* Patch status badge */
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  /* KEV badge */
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  /* ── CVSS SCORE CALLOUT ── */
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  /* ── CWE BLOCK ── */
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── LIFECYCLE TRACK ── */
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── CVSS VECTOR BREAKDOWN ── */
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  /* ── AFFECTED VERSIONS TABLE ── */
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  /* ── EXPLOITATION TIMELINE ── */
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── KEV BLOCK ── */
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ── PURPLE TEAM TABS ── */
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  /* Query blocks */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── CROSS-REFERENCE LINKS ── */
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  /* ── CVE METADATA BLOCK ── */
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO / THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-test">PATCH — TEST FIRST</div>
+      <div class="kev-badge">KEV LISTED</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — Privilege Escalation / Remote Code Execution · Microsoft / Windows Print Spooler</div>
+  <h1><span class="cyan">PRINT</span>NIGHTMARE</h1>
+  <div class="header-sub">
+    COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    CVE: CVE-2021-1675 · CVE-2021-34527 · CVE-2021-34481 · CVE-2022-21999 · CVE-2024-38198 &nbsp;|&nbsp;
+    CWE: CWE-269 (Improper Privilege Management) · CWE-59 / CWE-345 (variant race-condition bypasses) &nbsp;|&nbsp;
+    SOURCES: 18
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">8.8 (HIGH)</span></div>
+    <div>Affected: <span>Windows 7–11, Server 2008–2022 (all versions with Print Spooler enabled)</span></div>
+    <div>Disclosed: <span>2021-06-29 (accidental)</span></div>
+    <div>Patch Date: <span>2021-07-06 (OOB) — cascade through 2024-08-13</span></div>
+    <div>KEV Added: <span class="cyan">2021-11-03</span></div>
+    <div>EPSS: <span>0.998 (99.96th pct.)</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">8.8</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2021-34527</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">+ CVE-2021-1675 (7.8) · CVE-2021-34481 (8.8) · CVE-2022-21999 (7.8) · CVE-2024-38198 (7.5)</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">5</div>
+    <div class="stat-label">CVEs in the patch cascade, 2021–2024</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">38 MO</div>
+    <div class="stat-label">From first patch to last known bypass fix</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">99.8%</div>
+    <div class="stat-label">EPSS — 30-day exploitation probability</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">3</div>
+    <div class="stat-label">Ransomware crews confirmed exploiting within weeks (Vice Society, Magniber, Conti)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>PrintNightmare is the collective name for a family of vulnerabilities in the Windows Print Spooler service (<code>spoolsv.exe</code>) that allow a low-privileged, authenticated user to install an arbitrary printer driver and have it execute code with SYSTEM privileges — locally, or remotely against a domain controller or file/print server. The Print Spooler runs, by default, on every supported version of Windows from Windows 7 through Windows 11 and on every Windows Server release from 2008 through 2022 (Microsoft Security Response Center, 2021; Wikipedia, 2021). Because the service is enabled out of the box and because Active Directory domain controllers typically run it as well, the practical blast radius of PrintNightmare was, at disclosure, effectively "every Windows domain in existence."</p>
+      <p>What makes PrintNightmare significant is not a single CVE but the pattern it set: an accidental, uncoordinated disclosure in June 2021 triggered a rushed out-of-band patch, and every subsequent fix closed one specific abuse path while leaving the underlying architectural primitive — a low-privileged RPC call that ends in SYSTEM-context file/DLL operations chosen by the caller — intact. Between June 2021 and August 2024, five separate CVEs (CVE-2021-1675, CVE-2021-34527, CVE-2021-34481, CVE-2022-21999, CVE-2024-38198) were required to progressively narrow the same underlying weakness class in the same subsystem (Paragmali, 2024; 0patch/SafeBreach, 2022; Microsoft Security Update Guide, 2024).</p>
+      <p>PrintNightmare matters in 2026 not as breaking news but as a standing reference case: it is one of the clearest public examples of a "patch cascade" — where CISA issued a rare Emergency Directive (ED 21-04) forcing federal agencies to disable a core OS service network-wide (CISA, 2021), where ransomware operators (Vice Society, Magniber, Conti) weaponized the bug for lateral movement within weeks of disclosure (BleepingComputer, 2021; Cybereason, 2021), and where the FIRST.org EPSS model still scores the primary CVE at 0.998 — a near-certainty of continued exploitation attempts against any system left unpatched (FIRST.org EPSS API, accessed 2026-08-30).</p>
+      <p>Who is at risk today: any environment still running end-of-support Windows builds, any environment that has not applied the full patch lineage through August 2024, and any environment relying on Point-and-Print convenience defaults for non-administrative printer driver installation. Legacy healthcare, manufacturing, and OT-adjacent IT networks — where Windows Server upgrade cycles lag — remain the highest-probability targets for opportunistic exploitation of this now five-year-old vulnerability family.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-269</span>
+        <span class="cwe-name">Improper Privilege Management</span>
+      </div>
+      <div class="cwe-body">The product does not properly assign, modify, track, or check privileges for an actor, creating an unintended sphere of control for that actor (MITRE CWE-269). In PrintNightmare's case, the Print Spooler's RPC interface fails to adequately validate that a caller requesting a driver installation is authorized to place executable code in a SYSTEM-writable, SYSTEM-loaded location — collapsing the privilege boundary between "any domain-authenticated user" and "SYSTEM on the target host."</div>
+    </div>
+    <div class="prose">
+      <p>The Print Spooler exposes two functionally symmetric RPC entry points for installing printer drivers: <code>RpcAddPrinterDriverEx</code> (MS-RPRN) and <code>RpcAsyncAddPrinterDriver</code> (MS-PAR). Both ultimately invoke the same internal driver-installation logic, which copies a caller-supplied driver package — including an attacker-controlled DLL (<code>pDataFile</code>) — into the spooler's driver store and then loads it in the context of the spooler service, which runs as SYSTEM. The vulnerability is that this code path does not verify the supplied file paths are local to the target machine before fetching and caching them, and does not restrict the operation to administrators (SentinelOne Vulnerability Database, 2021; Cato Networks, 2021).</p>
+      <p>Microsoft's June 8, 2021 patch (targeting CVE-2021-1675) added an authorization check to only one of the two entry points, <code>RpcAddPrinterDriverEx</code>. Because the two RPC methods are semantically interchangeable from the exploit's perspective, the fix was trivially bypassed by routing the same attack through <code>RpcAsyncAddPrinterDriver</code> — this became the true "PrintNightmare" RCE, CVE-2021-34527, disclosed weeks later (@cube0x0; Rapid7, 2021).</p>
+      <p>The deeper architectural failure is Point-and-Print, a decades-old Windows feature designed so that any domain user could install a shared network printer's driver without administrator credentials — treating "printer driver" as a benign artifact rather than as SYSTEM-privileged code. That design decision, made in an era before driver signing was consistently enforced and before printers were treated as an attack surface, is the actual root cause underneath every CVE in this family. Patching the RPC calls narrows the exploitation surface; it does not remove the design assumption that non-admin users should be able to trigger privileged driver loads at all.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>2021-03 / 06-21</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>2021-06-29</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">03</div>
+        <div class="lc-label">Patch Cascade<br/>2021-07 → 2024-08</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">Exploitation<br/>2021-07 (mass)</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node dim">05</div>
+        <div class="lc-label">Resolution<br/>Ongoing / Partial</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>The lifecycle begins with two independent research efforts converging on the same subsystem. In March 2021, researchers Zhipeng Huo (Tencent Xuanwu Lab), Piotr Madej (AFINE), and Yunhai Zhang (NSFOCUS TIANJI Lab) reported a Print Spooler local-privilege-escalation issue to Microsoft, which was quietly patched on June 8, 2021 as CVE-2021-1675 and classified as a low-severity Elevation of Privilege bug. Separately, Zhiniang Peng, Xuefeng Li, and Lewis Lee of Sangfor Technologies (China) had independently found a related remote code execution primitive in the same driver-install code path, which they intended to unveil at the Tianfu Cup hacking competition and again at Black Hat USA in August 2021.</p>
+      <p>The pivotal event: on June 29, 2021, Sangfor's team — believing their separate RCE finding had already been fully remediated by Microsoft's June 8 patch for CVE-2021-1675 — published a full technical write-up and working proof-of-concept exploit to GitHub, seeing no further embargo value in withholding it. This was an accidental, good-faith misjudgment, not a hostile leak: Sangfor had misidentified their bug as already-patched. Within hours, security researchers determined the PoC in fact bypassed the June patch entirely; Sangfor deleted the repository, but by then it had already been forked and mirrored widely (Infosecurity Magazine, 2021; The Record, 2021; Sangfor, 2021).</p>
+      <p>Microsoft confirmed the distinct, unpatched RCE on June 30, 2021, assigned CVE-2021-34527, and shipped an emergency out-of-band patch on July 6–7, 2021 (KB5004945) — six business days after the accidental leak. That patch was bypassed within roughly five weeks via the Point-and-Print elevation-suppression default, prompting a third patch generation in August 2021 (CVE-2021-34481) that flipped the <code>RestrictDriverInstallationToAdministrators</code> registry default. Microsoft subsequently admitted in a September 14, 2021 advisory that "there is no combination of mitigations that is equivalent to setting <code>RestrictDriverInstallationToAdministrators</code> to 1" — a rare public concession that partial mitigations were insufficient. The cascade continued with SpoolFool (CVE-2022-21999, patched February 2022) and a further race-condition variant (CVE-2024-38198, patched August 13, 2024), each closing one specific abuse path against the same underlying RPC/driver-load primitive (Paragmali, 2024).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Accidental / Uncoordinated</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Sangfor (Peng, Li, Lee); Huo/Madej/Zhang (independent, earlier finding)</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val">Prior to 2021-06-08 (separate CVE-2021-1675 report)</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val red">2021-06-29 — before a patch for the actual bug existed</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val red">PoC preceded patch by ~1 week (functional 0-day window)</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val">Rapid but incomplete — 5 patch generations over 38 months</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val">CERT/CC publicly stated the June 8 patch "does NOT protect against public exploits" (2021-06-30)</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val">No — broken by researcher misidentification, not by intent</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>PrintNightmare is a textbook case of coordinated vulnerability disclosure failing not through malice but through cross-organization ambiguity. Two separate research teams found two separate (but related) bugs in the same code path around the same time, and neither had full visibility into what the other had reported or what Microsoft had actually fixed. Sangfor's assumption that their RCE was "already patched" because a similarly-described EoP bug (CVE-2021-1675) had shipped a fix eleven days earlier is the direct proximate cause of the premature disclosure — a reminder that CVE descriptions and patch scopes are not always legible enough, even to skilled researchers, to confirm a specific exploit chain is actually closed.</p>
+      <p>The vendor response, taken in isolation, was fast: Microsoft shipped an out-of-band emergency patch within roughly a week of confirming the unpatched RCE, including patches for Windows 7 — an operating system whose extended support had already ended, a strong signal of how seriously Microsoft assessed the severity (Wikipedia, 2021). But "fast" and "complete" were not the same thing here: the emergency patch, and the two generations that followed it, each addressed the specific abuse path demonstrated in the leaked PoC rather than the general privilege-boundary defect, which is why the community's skepticism (crystallized in CERT/CC's blunt June 30 statement) proved justified repeatedly over the following three years.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>The core exploit chain for CVE-2021-34527 (the primary RCE variant): an attacker with any valid domain credentials (even a low-privilege standard user account) connects to a target's Print Spooler RPC endpoint — locally, or remotely over the MS-RPRN/MS-PAR named-pipe interface if the Spooler is remotely accessible, which is the default and expected configuration on domain controllers running the print service for the domain. The attacker calls <code>RpcAsyncAddPrinterDriver</code>, supplying a driver package descriptor whose <code>pDataFile</code> field points to an attacker-hosted DLL (served, for example, from an SMB share the attacker controls). The Spooler service, running as SYSTEM, fetches this file without verifying it originates locally, stages it into the driver store, and loads it as a printer driver DLL — executing attacker code with SYSTEM privileges the moment the "driver" is installed.</p>
+      <p>Against a domain controller specifically, this converts any authenticated domain account into a path to full domain compromise: SYSTEM on a DC is equivalent to Domain Admin. This is why CISA's Emergency Directive 21-04 (July 13, 2021) singled out domain controllers for immediate Spooler shutdown ahead of general workstation patching (CISA, 2021).</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVE-2021-34527 · CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">Exploitable over MS-RPRN/MS-PAR RPC without local access — any host reachable to the Spooler pipe is in scope.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">No special conditions or timing needed; public, weaponized PoCs exist for point-and-click exploitation.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val amber">LOW</div>
+          <div class="cvss-comp-meaning">Requires only a standard, authenticated domain (or local) user account — not admin.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No victim action required; the RPC call is initiated directly by the attacker.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">UNCHANGED</div>
+          <div class="cvss-comp-meaning">Impact is contained to the vulnerable component's own security authority (the local Windows security context).</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">SYSTEM-level code execution grants complete read access to the host, and to the domain if executed on a DC.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Attacker can modify any data or system state, including AD objects if run on a domain controller.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">SYSTEM code execution enables full denial of service, including destructive action, at the attacker's discretion.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions &amp; Variant Relationship</div>
+      <table class="versions-table">
+        <thead><tr><th>CVE</th><th>Component</th><th>Affected Versions</th><th>Fixed Version / KB</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>CVE-2021-1675</td><td>RpcAddPrinterDriverEx (MS-RPRN)</td><td class="vuln">Windows 7–10, Server 2008–2019 (pre-2021-06-08)</td><td class="fixed">KB5003637 et al. (2021-06-08)</td><td>Superseded — incomplete, bypassed via MS-PAR</td></tr>
+          <tr><td>CVE-2021-34527</td><td>RpcAsyncAddPrinterDriver (MS-PAR) — true "PrintNightmare"</td><td class="vuln">All supported Windows + Windows 7 (out-of-band)</td><td class="fixed">KB5004945 / KB5004946 et al. (2021-07-06/07)</td><td>Superseded — Point-and-Print default left gap</td></tr>
+          <tr><td>CVE-2021-34481</td><td>Point-and-Print elevation suppression default</td><td class="vuln">All supported Windows (RestrictDriverInstallationToAdministrators=0)</td><td class="fixed">KB5005010 / KB5005033 (2021-08-10)</td><td>Superseded — SpoolDirectory vector remained</td></tr>
+          <tr><td>CVE-2022-21999 (SpoolFool)</td><td>Spooler SpoolDirectory / printer-port symlink handling</td><td class="vuln">All Windows desktop + server versions (default config)</td><td class="fixed">2022-02-08 Patch Tuesday</td><td>Superseded — race-condition variant found 2024</td></tr>
+          <tr><td>CVE-2024-38198</td><td>Print Spooler data-authenticity check (race condition)</td><td class="vuln">Windows 10/11 all channels, Server 2016–2022</td><td class="fixed">2024-08-13 Patch Tuesday</td><td>Current — no further public bypass reported as of 2026-08-30</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block">
+      <div class="kev-header">
+        <span class="kev-tag">CISA KEV LISTED</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2021-11-03 · Required Remediation: 2022-05-03 (federal civilian agencies, per BOD 22-01)</span>
+      </div>
+      <div class="kev-body">CVE-2021-34527 has carried a confirmed "used in ransomware campaigns" flag in the CISA KEV catalog since its addition. This sits alongside CISA's earlier and more unusual step of issuing Emergency Directive 21-04 (2021-07-13) — a same-week, no-CVE-KEV-listing-required mandate — reflecting the severity assessment made even before the formal KEV catalog entry existed.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">2021-06-29</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">PoC Public, Mass Scanning Begins</div>
+            <div class="et-desc">Within hours of the Sangfor PoC leak, mass internet scanning for exposed Print Spooler RPC endpoints was observed.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2021-07 (mid)</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Magniber Ransomware — South Korea</div>
+            <div class="et-desc">CrowdStrike detected the Magniber ransomware operation attempting PrintNightmare exploitation against South Korean targets in mid-June to July 2021, among the earliest ransomware-affiliated abuse observed (CyberDefense Magazine, 2021; Cybereason, 2021).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2021-08</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Vice Society Ransomware — Lateral Movement</div>
+            <div class="et-desc">Vice Society incorporated a malicious DLL exploiting CVE-2021-1675/CVE-2021-34527 for lateral movement inside compromised victim networks (BleepingComputer, 2021).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2021-08</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Conti Playbook Reference</div>
+            <div class="et-desc">A leaked Conti ransomware operations manual explicitly referenced PrintNightmare as an in-scope escalation/lateral-movement technique for affiliates (HowToGeek, 2021; GovInfoSecurity, 2021).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2021-11-03</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">CISA KEV Listing</div>
+            <div class="et-desc">CVE-2021-34527 formally added to the KEV catalog with a 2022-05-03 federal remediation deadline.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2022 → 2024</div>
+          <div class="et-track"><div class="et-dot purple"></div></div>
+          <div class="et-content">
+            <div class="et-event">Continued Opportunistic Use</div>
+            <div class="et-desc">SpoolFool (CVE-2022-21999) and later variant CVEs continued to see inclusion in commodity privilege-escalation toolkits and post-exploitation frameworks through 2024, reflecting the durability of the underlying primitive as a reliable LPE path once initial access is achieved.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>No card currently on file in this repository documents Vice Society, Magniber, or Conti as named threat actors — see Section 10. Exploitation of PrintNightmare has skewed heavily toward ransomware affiliate tooling and generic post-exploitation frameworks (it is a stock module in several open-source LPE/lateral-movement toolkits) rather than being a signature technique of any single tracked nation-state APT, which is consistent with its nature as a broad, low-skill-barrier privilege-escalation primitive rather than a targeted espionage tool.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>PrintNightmare is the clearest publicly documented case of a vendor patching the demonstrated exploit rather than the underlying design defect, and paying for it in installments. Each of the five CVEs closed the specific technical path shown in the most recent public PoC — the MS-RPRN entry point, then MS-PAR, then the Point-and-Print elevation default, then the SpoolDirectory symlink trick, then a race condition in the data-authenticity check — while the shared precondition underneath all five (a low-privileged, remotely reachable RPC interface that can direct a SYSTEM-context process to load caller-supplied code) was never itself redesigned. This is the "whack-a-mole" anti-pattern: it produces short-term compliance (a CVE is closed, a KEV deadline is met) without reducing the actual attack surface class, and it guarantees a security team's work is never finished for as long as the underlying primitive exists.</p>
+      <p>The Print Spooler itself is a case study in accumulated legacy risk. It is architecturally a 1990s-era Windows NT print subsystem, extended over three decades to support remote administration, driver distribution, and enterprise print-server convenience features — each addition widening its privileged attack surface without a corresponding security re-architecture. Point-and-Print specifically encodes a security tradeoff that made sense when printer drivers were assumed to be trustworthy binary blobs distributed by IT departments, and that assumption never survived contact with a threat landscape where any domain-authenticated account (including a compromised low-privilege user) is treated as a potential attacker. This is a recurring pattern across the industry: features built for administrative convenience decades ago — "any user can install this specific kind of privileged software without asking an admin" — routinely become the default LPE/RCE vector once attacker tradecraft catches up. PrintNightmare is functionally the same lesson as print-driver and font-parser vulnerabilities before it, and the appearance of a fifth CVE in this family as late as August 2024 — three years after the original panic patch — demonstrates that the industry's response to this class of bug remains reactive rather than structural: patch the demonstrated path, wait for the next researcher to find the next path.</p>
+      <p>The organizational lesson is equally important: CISA's willingness to issue an Emergency Directive mandating an entire OS service be disabled on domain controllers — rather than waiting for a "complete" patch — reflects a mature response to exactly this pattern. When a vendor's patch cadence cannot keep pace with a shared architectural primitive, the correct interim control is often to remove the exposed surface (disable the service where it is not needed) rather than trust each successive patch to be the last one required.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <!-- A: DETECTION -->
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <div class="query-block">
+        <div class="query-label">Spooler spawning abnormal child process · Sysmon Event ID 1</div>
+        <div class="query-code">EventCode=1 ParentImage="*\spoolsv.exe" Image IN ("*\cmd.exe","*\powershell.exe","*\rundll32.exe","*\mshta.exe","*\regsvr32.exe")
+| table _time, Computer, ParentImage, Image, CommandLine</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">New driver files written to Spooler driver store · Sysmon Event ID 11 (File Create)</div>
+        <div class="query-code">EventCode=11 TargetFilename="*\System32\spool\drivers\x64\3\*.dll"
+| where NOT TargetFilename IN (known_baseline_driver_dll_list)
+| table _time, Computer, TargetFilename, ProcessGuid</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Windows PrintService Operational log — driver install anomalies</div>
+        <div class="query-code">source="WMI:Win32_PrintJob" OR source="Microsoft-Windows-PrintService/Operational"
+EventCode IN (316, 808)
+| stats count by Computer, User, DriverName
+| where User NOT IN (authorized_print_admins)</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>Behavioral indicators independent of the specific CVE variant: any RPC-initiated driver install by a non-administrative account; a spooler process handle opening files outside the expected driver-store path; and new DLLs appearing in <code>%SystemRoot%\System32\spool\drivers\</code> that do not correspond to a known, IT-approved driver push. On domain controllers, any driver-install event at all should be treated as anomalous, since DCs should not be servicing end-user print jobs.</p>
+      </div>
+    </div>
+
+    <!-- B: HUNTING -->
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis 1 — Historical compromise via unpatched Spooler.</strong> Hunt for spoolsv.exe process trees with unexpected child processes or network connections in EDR telemetry going back to the earliest available retention (ideally covering 2021-06 forward for environments that existed then). A single historical hit is sufficient grounds for a full incident response, since successful exploitation grants SYSTEM and is rarely a one-off event in a real intrusion.</p>
+        <p><strong>Hypothesis 2 — Point-and-Print misconfiguration persists.</strong> Query endpoint configuration management (GPO reporting, Intune, SCCM) across the fleet for hosts where <code>RestrictDriverInstallationToAdministrators</code> is absent or set to 0, and where <code>NoWarningNoElevationOnInstall</code> or <code>UpdatePromptSettings</code> permit non-admin driver installation. These are the residual, config-only exposure even on fully-patched code.</p>
+        <p><strong>Hypothesis 3 — Spooler exposed where it shouldn't be.</strong> Enumerate domain controllers and servers with no legitimate print function where the Spooler service is still running (a common oversight after the immediate 2021 remediation window closed and operational pressure eased). This is the single highest-value, lowest-effort finding a hunt team can produce for this vulnerability family.</p>
+      </div>
+    </div>
+
+    <!-- C: PATCH GUIDANCE -->
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Patch Chain</span><span class="kv-val green">KB5004945 (2021-07) → KB5005010/33 (2021-08) → 2022-02 Patch Tuesday → 2024-08-13 Patch Tuesday</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date (latest)</span><span class="kv-val">2024-08-13 (CVE-2024-38198)</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Moderate-High — historically broke non-admin printer driver installs and some third-party print workflows fleet-wide</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Validate print-server driver deployment workflows in a staging OU before broad rollout; confirm helpdesk print-driver install procedures still function under RestrictDriverInstallationToAdministrators=1</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">MSRC Security Update Guide (per-CVE)</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val">Yes — 2021-07-06/07 emergency release, including Windows 7 (EOL)</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val">Each generation superseded by the next; confirm the August 2024 cumulative update is applied as the current baseline</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Because this is a five-CVE lineage rather than a single patch, "patched" only means something if all five generations are applied — an environment current only through the 2021 emergency patches remains exposed to SpoolFool and the 2024 race-condition variant. Given the historical pattern of driver-install regressions accompanying these patches, apply to a representative pilot group (including any legacy print-server infrastructure) before fleet-wide deployment, but do not delay deployment indefinitely — the EPSS score (0.998) reflects sustained, near-certain scanning and exploitation attempts against unpatched hosts.</p>
+      </div>
+    </div>
+
+    <!-- D: COMPENSATING CONTROLS -->
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>Disable the Print Spooler service on domain controllers.</strong> DCs have no legitimate need to service print jobs; this single control removes the highest-consequence exposure (per CISA ED 21-04) regardless of patch level.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Disable the Print Spooler on any server or workstation without a genuine printing requirement.</strong> Extend the DC-only mandate from ED 21-04 to the broader server fleet and to workstations that never print.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Enforce <code>RestrictDriverInstallationToAdministrators = 1</code> via GPO</strong> on every host where the Spooler must remain enabled, and confirm Point-and-Print's <code>NoWarningNoElevationOnInstall</code> / <code>UpdatePromptSettings</code> keys are not silently re-permitting non-admin driver installs.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div class="cm-text"><strong>Restrict inbound access to the Spooler's RPC/named-pipe endpoints</strong> (block or tightly scope SMB/RPC to <code>\pipe\spoolss</code>) at the host firewall for any system where the Spooler cannot be disabled outright.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div class="cm-text"><strong>Monitor and alert on any driver installation event originating from a non-administrative account</strong>, using the detection queries in Section A, as an interim control while patch validation is in progress.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2021-1675</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val amber">7.8 (High)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-269 (NVD lists as NVD-CWE-Other)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val">Tracked jointly with CVE-2021-34527 by most scanners due to shared root cause</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2021-1675" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2021-1675</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-1675" target="_blank" style="color:var(--cyan)">MSRC Update Guide</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not separately listed (superseded by CVE-2021-34527 entry)</span></div>
+          <div class="kv-row"><span class="kv-key">Note</span><span class="kv-val dim">Originally rated "Important"/EoP; Microsoft revised impact to RCE/Critical after the Sangfor disclosure clarified the true exploit chain</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2021-34527</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">8.8 (High)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-269 (Improper Privilege Management)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val red">0.9979 (99.96th percentile)</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2021-34527" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2021-34527</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527" target="_blank" style="color:var(--cyan)">MSRC Update Guide</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed — confirmed ransomware use</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2021-11-03 (due 2022-05-03)</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2021-34481</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">8.8 (High)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H (as later reclassified to RCE)</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-269 (Improper Privilege Management — Point-and-Print default)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not independently retrieved for this compile — treat as high given shared exploit family</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2021-34481" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2021-34481</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34481" target="_blank" style="color:var(--cyan)">MSRC Update Guide</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not independently confirmed on KEV during this compile — verify directly before relying on this field</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2022-21999 (SpoolFool)</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val amber">7.8 (High)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">Local privilege escalation vector (symlink/junction abuse of SpoolDirectory)</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-59 (Improper Link Resolution Before File Access)</span></div>
+          <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Oliver Lyak (@ly4k_), SafeBreach Labs — reported Nov 2021, patched Feb 2022</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2022-21999" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2022-21999</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not independently confirmed on KEV during this compile — verify directly before relying on this field</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2024-38198</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val amber">7.5 (High)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">Race-condition LPE; requires winning a timing window</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-345 (Insufficient Verification of Data Authenticity)</span></div>
+          <div class="kv-row"><span class="kv-key">Patched</span><span class="kv-val green">2024-08-13 Patch Tuesday</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-38198" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2024-38198</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not listed as of this compile — no confirmed in-the-wild exploitation reported</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <div class="xref-none">No companion actor cards on file for Vice Society, Magniber, or Conti as of 2026-08-30 — this repository's existing actor cards (APT1, Gonjeshke Darande, JadePuffer, Lapsus$, REvil, Salt Typhoon, Scattered Spider, TeamPCP) do not include any confirmed PrintNightmare operators. Flagged for future card creation.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <div class="xref-none">No companion incident cards on file reference PrintNightmare as an initial access vector as of 2026-08-30.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div><div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2021-34527" target="_blank">CVE-2021-34527 Detail</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div><div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2021-1675" target="_blank">CVE-2021-1675 Detail</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/alerts/2021/06/30/printnightmare-critical-windows-print-spooler-vulnerability" target="_blank">PrintNightmare, Critical Windows Print Spooler Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/directives/ed-21-04-mitigate-windows-print-spooler-service-vulnerability" target="_blank">Emergency Directive 21-04: Mitigate Windows Print Spooler Service Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA KEV Catalog</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve=CVE-2021-34527" target="_blank">Known Exploited Vulnerabilities Catalog — CVE-2021-34527</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FIRST.org</div>
+        <div><div class="ref-detail"><a href="https://api.first.org/data/v1/epss?cve=CVE-2021-34527" target="_blank">EPSS API — CVE-2021-34527</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft MSRC</div>
+        <div><div class="ref-detail"><a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-1675" target="_blank">Security Update Guide — CVE-2021-1675</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft MSRC</div>
+        <div><div class="ref-detail"><a href="https://msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2024-38198" target="_blank">Security Update Guide — CVE-2024-38198</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Sangfor</div>
+        <div><div class="ref-detail"><a href="https://www.sangfor.com/news-and-press-release/statement-regarding-windows-printnightmare-vulnerability" target="_blank">Statement Regarding the Windows PrintNightmare Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record (Recorded Future News)</div>
+        <div><div class="ref-detail"><a href="https://therecord.media/poc-released-for-dangerous-windows-printnightmare-bug" target="_blank">PoC exploit accidentally leaks for dangerous Windows PrintNightmare bug</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Infosecurity Magazine</div>
+        <div><div class="ref-detail"><a href="https://www.infosecurity-magazine.com/news/printnightmare-zero-day/" target="_blank">PrintNightmare: Windows Zero-Day Accidentally Disclosed by Chinese Researchers</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Rapid7</div>
+        <div><div class="ref-detail"><a href="https://www.rapid7.com/blog/post/ra-cve-2021-34527-printnightmare-analysis/" target="_blank">Rapid7 Analysis: CVE-2021-34527 "PrintNightmare"</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Rapid7</div>
+        <div><div class="ref-detail"><a href="https://www.rapid7.com/blog/post/2021/06/30/cve-2021-1675-printnightmare-patch-does-not-remediate-vulnerability/" target="_blank">CVE-2021-1675 / PrintNightmare Patch Does Not Remediate Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SentinelOne</div>
+        <div><div class="ref-detail"><a href="https://www.sentinelone.com/vulnerability-database/cve-2021-34527/" target="_blank">CVE-2021-34527: Windows Print Spooler RCE Vulnerability</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cato Networks</div>
+        <div><div class="ref-detail"><a href="https://support.catonetworks.com/hc/en-us/articles/4403558273169-CVE-2021-1675-and-CVE-2021-34527-PrintNightmare-Windows-Print-Spooler-RCE" target="_blank">CVE-2021-1675 and CVE-2021-34527: PrintNightmare</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">0patch (ACROS Security)</div>
+        <div><div class="ref-detail"><a href="https://blog.0patch.com/2022/03/micropatches-for-spoolfool-print.html" target="_blank">Micropatches for "SpoolFool" Print Spooler Elevation of Privilege (CVE-2022-21999)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Oliver Lyak / IFCR Research</div>
+        <div><div class="ref-detail"><a href="https://research.ifcr.dk/spoolfool-windows-print-spooler-privilege-escalation-cve-2022-22718-bf7752b68d81" target="_blank">SpoolFool: Windows Print Spooler Privilege Escalation (CVE-2022-21999)</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div><div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/vice-society-ransomware-joins-ongoing-printnightmare-attacks/" target="_blank">Vice Society ransomware joins ongoing PrintNightmare attacks</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cybereason</div>
+        <div><div class="ref-detail"><a href="https://www.cybereason.com/blog/threat-analysis-report-printnightmare-and-magniber-ransomware" target="_blank">Threat Analysis Report: PrintNightmare and Magniber Ransomware</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GovInfoSecurity</div>
+        <div><div class="ref-detail"><a href="https://www.govinfosecurity.com/ransomware-gangs-exploit-printnightmare-vulnerabilities-a-17285" target="_blank">Ransomware Gangs Try to Exploit 'PrintNightmare' Flaws</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Paragmali (retrospective analysis)</div>
+        <div><div class="ref-detail"><a href="https://paragmali.com/blog/three-years-of-printnightmare-how-the-oldest-windows-service/" target="_blank">Three Years of PrintNightmare: How the Oldest Windows Service Survived Four Patch Waves</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia (secondary, corroborating)</div>
+        <div><div class="ref-detail"><a href="https://en.wikipedia.org/wiki/PrintNightmare" target="_blank">PrintNightmare</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SOCRadar</div>
+        <div><div class="ref-detail"><a href="https://socradar.io/august-2024-patch-tuesday-highlights-89-cves-6-zero-day-vulnerabilities-under-exploitation/" target="_blank">August 2024 Patch Tuesday Highlights</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CVE Circulation / CIRCL</div>
+        <div><div class="ref-detail"><a href="https://cve.circl.lu/cve/CVE-2021-34527" target="_blank">CVE-2021-34527 — Vulnerability-Lookup</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 24 sources, all open-source/public</div>
+  <div>Windows Print Spooler · CVE-2021-1675 / CVE-2021-34527 / CVE-2021-34481 / CVE-2022-21999 / CVE-2024-38198</div>
+</div>
+
+</body>
+</html>

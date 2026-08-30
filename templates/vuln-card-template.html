@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>{{VULN_NAME}} — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  /* Patch status badge */
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  /* KEV badge */
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  /* ── CVSS SCORE CALLOUT ── */
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  /* ── CWE BLOCK ── */
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── LIFECYCLE TRACK ── */
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── CVSS VECTOR BREAKDOWN ── */
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  /* ── AFFECTED VERSIONS TABLE ── */
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  /* ── EXPLOITATION TIMELINE ── */
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── KEV BLOCK ── */
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ── PURPLE TEAM TABS ── */
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  /* Query blocks */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── CROSS-REFERENCE LINKS ── */
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  /* ── CVE METADATA BLOCK ── */
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO / THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <!-- TLP badge: tlp-clear | tlp-green | tlp-amber | tlp-red -->
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <!-- Patch status: patch-now | patch-test | patch-workaround | patch-none | patch-disputed | patch-resolved -->
+      <div class="patch-badge patch-resolved">RESOLVED · HISTORICAL</div>
+      <!-- Include kev-badge only if KEV listed -->
+      <div class="kev-badge">KEV LISTED</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — {{VULN_CLASS}} · {{VENDOR}} / {{PRODUCT}}</div>
+  <h1><span class="cyan">{{VULN_NAME_PART1}}</span>{{VULN_NAME_PART2}}</h1>
+  <div class="header-sub">
+    COMPILED: {{DATE}} &nbsp;|&nbsp;
+    CVE: {{CVE_IDS}} &nbsp;|&nbsp;
+    CWE: {{CWE_ID}} &nbsp;|&nbsp;
+    SOURCES: {{SOURCE_LIST}}
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">{{CVSS_SCORE}} (CRITICAL)</span></div>
+    <div>Affected: <span>{{AFFECTED_SUMMARY}}</span></div>
+    <div>Disclosed: <span>{{DISCLOSURE_DATE}}</span></div>
+    <div>Patch Date: <span>{{PATCH_DATE}}</span></div>
+    <div>KEV Added: <span class="cyan">{{KEV_DATE}}</span></div>
+    <div>EPSS: <span>{{EPSS_SCORE}}</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">{{CVSS_SCORE}}</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">{{PRIMARY_CVE}}</div>
+    <!-- Add additional CVE IDs on separate lines for multi-CVE vulns -->
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">{{ADDITIONAL_CVES}}</div>
+  </div>
+  <div class="cvss-vector">{{CVSS_VECTOR_STRING}}</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">{{STAT1_VAL}}</div>
+    <div class="stat-label">{{STAT1_LABEL}}</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">{{STAT2_VAL}}</div>
+    <div class="stat-label">{{STAT2_LABEL}}</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">{{STAT3_VAL}}</div>
+    <div class="stat-label">{{STAT3_LABEL}}</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">{{STAT4_VAL}}</div>
+    <div class="stat-label">{{STAT4_LABEL}}</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>{{OVERVIEW_P1}}</p>
+      <p>{{OVERVIEW_P2}}</p>
+      <p>{{OVERVIEW_P3}}</p>
+      <!-- 3–4 paragraphs. Plain language severity, who is at risk, why it matters. Hook before technical detail. -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <!-- CWE block — one per CWE; add multiple blocks for multi-CWE vulns -->
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">{{CWE_ID}}</span>
+        <span class="cwe-name">{{CWE_NAME}}</span>
+      </div>
+      <div class="cwe-body">{{CWE_SYNOPSIS}}</div>
+    </div>
+    <div class="prose">
+      <p>{{ROOT_CAUSE_P1}}</p>
+      <p>{{ROOT_CAUSE_P2}}</p>
+      <p>{{ROOT_CAUSE_P3}}</p>
+      <!-- Code-level explanation where sources support it. This is the foundation — don't shortchange it. -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <!-- Lifecycle phase tracker -->
+    <div class="lifecycle">
+      <!-- node classes: active=cyan, red=exploit/crisis, amber=patch chaos, dim=resolved -->
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>{{DISCOVERY_DATE}}</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>{{DISCLOSURE_DATE}}</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">03</div>
+        <div class="lc-label">Patch<br/>{{PATCH_DATE}}</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">Exploitation<br/>{{EXPLOIT_DATE}}</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node dim">05</div>
+        <div class="lc-label">Resolution<br/>{{RESOLUTION_DATE}}</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>{{LIFECYCLE_P1}}</p>
+      <p>{{LIFECYCLE_P2}}</p>
+      <p>{{LIFECYCLE_P3}}</p>
+      <!-- Narrative account — technical timeline woven with the human/organizational story -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">{{DISCLOSURE_TYPE}}</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">{{DISCOVERER}}</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val">{{VENDOR_REPORT_DATE}}</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val red">{{POC_DATE}}</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val red">{{POC_PATCH_DELTA}}</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val">{{VENDOR_RESPONSE_QUALITY}}</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val">{{COMMUNITY_REACTION}}</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val">{{CVD_FOLLOWED}}</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>{{DISCLOSURE_P1}}</p>
+      <p>{{DISCLOSURE_P2}}</p>
+      <!-- Researcher/vendor dynamic, coordinated vs uncoordinated, PoC timing, vendor response quality, community reaction -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>{{TECH_P1}}</p>
+      <p>{{TECH_P2}}</p>
+      <!-- Exploitation mechanics, PoC analysis, step-by-step attack chain -->
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — {{CVSS_VECTOR_STRING}}</div>
+      <div class="cvss-breakdown">
+        <!-- One component per metric: AV, AC, PR, UI, S, C, I, A -->
+        <!-- comp-val color: red=high impact/network/none, amber=medium, cyan=low/changed -->
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">{{AV_MEANING}}</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">{{AC_MEANING}}</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">{{PR_MEANING}}</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">{{UI_MEANING}}</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">CHANGED</div>
+          <div class="cvss-comp-meaning">{{S_MEANING}}</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">{{C_MEANING}}</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">{{I_MEANING}}</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">{{A_MEANING}}</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
+      <table class="versions-table">
+        <thead><tr><th>Vendor</th><th>Product</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>{{VENDOR}}</td><td>{{PRODUCT}}</td><td class="vuln">{{AFFECTED_VERSIONS}}</td><td class="fixed">{{FIXED_VERSION}}</td><td>{{STATUS}}</td></tr>
+          <!-- Add rows for each affected product/version combination -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <!-- KEV status block -->
+    <!-- Use class="kev-block not-listed" and kev-tag class="not-listed" if NOT in KEV -->
+    <div class="kev-block">
+      <div class="kev-header">
+        <span class="kev-tag">CISA KEV LISTED</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: {{KEV_DATE}} · Required Remediation: {{KEV_DEADLINE}}</span>
+      </div>
+      <div class="kev-body">{{KEV_CONTEXT}}</div>
+    </div>
+    <!-- Exploitation timeline -->
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <!-- dot colors: cyan=PoC/disclosure, red=destructive/nation-state, amber=ransomware/eCrime, purple=mass exploitation, green=patched/mitigated -->
+        <div class="et-item">
+          <div class="et-date">{{DATE_1}}</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">{{EVENT_1_NAME}}</div>
+            <div class="et-desc">{{EVENT_1_DESC}}</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">{{DATE_2}}</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">{{EVENT_2_NAME}}</div>
+            <div class="et-desc">{{EVENT_2_DESC}}</div>
+          </div>
+        </div>
+        <!-- Add et-item blocks for each exploitation event -->
+      </div>
+    </div>
+    <div class="prose">
+      <p>{{EXPLOITATION_P1}}</p>
+      <p>{{EXPLOITATION_P2}}</p>
+      <!-- Actor breakdown: APT use, ransomware operators, eCrime, mass scanning. Link to actor cards inline. -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>{{ARCH_P1}}</p>
+      <p>{{ARCH_P2}}</p>
+      <p>{{ARCH_P3}}</p>
+      <!-- Systemic failure, design patterns to avoid, what the industry did or didn't learn.
+           "Apply patches promptly" is NOT an architectural lesson.
+           Genuine analytical insight into why this class of bug recurs is required. -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <!-- A: DETECTION -->
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <!-- Add query-block for each detection query/rule -->
+      <div class="query-block">
+        <div class="query-label">{{QUERY_1_LABEL}} · {{LOG_SOURCE_1}}</div>
+        <div class="query-code">{{QUERY_1_CONTENT}}</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">{{QUERY_2_LABEL}} · {{LOG_SOURCE_2}}</div>
+        <div class="query-code">{{QUERY_2_CONTENT}}</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>{{DETECTION_BEHAVIORAL_INDICATORS}}</p>
+      </div>
+    </div>
+
+    <!-- B: HUNTING -->
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p>{{HUNTING_P1}}</p>
+        <p>{{HUNTING_P2}}</p>
+        <!-- Specific, hypothesis-driven hunt procedures. Not generic advice. -->
+      </div>
+    </div>
+
+    <!-- C: PATCH GUIDANCE -->
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Patch</span><span class="kv-val green">{{PATCH_KB_OR_VERSION}}</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">{{PATCH_DATE}}</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">{{REGRESSION_RISK}}</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">{{TESTING_NOTES}}</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">{{VENDOR_ADVISORY_REF}}</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val">{{OOB_PATCH}}</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val">{{SUPERSEDED_BY}}</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>{{PATCH_GUIDANCE_NOTES}}</p>
+      </div>
+    </div>
+
+    <!-- D: COMPENSATING CONTROLS -->
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>{{CONTROL_1_TITLE}}</strong> {{CONTROL_1_BODY}}</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>{{CONTROL_2_TITLE}}</strong> {{CONTROL_2_BODY}}</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>{{CONTROL_3_TITLE}}</strong> {{CONTROL_3_BODY}}</div>
+        </div>
+        <!-- Add cm-item blocks as needed -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <!-- One cve-meta-item per CVE ID -->
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">{{CVE_1}}</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">{{CVSS_1}}</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">{{VECTOR_1}}</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">{{CWE_1}}</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val">{{EPSS_1}}</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="{{NVD_URL_1}}" target="_blank" style="color:var(--cyan)">nvd.nist.gov</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="{{VENDOR_ADV_1}}" target="_blank" style="color:var(--cyan)">{{VENDOR_ADV_LABEL_1}}</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">{{KEV_STATUS_1}}</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">{{KEV_DATE_1}}</span></div>
+        </div>
+      </div>
+      <!-- Add additional cve-meta-item blocks for variant CVEs -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <!-- class="xref-item actor" for actor card links -->
+      <a class="xref-item actor" href="../../output/actors/{{ACTOR_CARD_PATH}}">
+        <div class="xref-type actor">Threat Actor Card</div>
+        <div class="xref-name">{{ACTOR_NAME}}</div>
+        <div class="xref-rel">{{ACTOR_RELATIONSHIP}}</div>
+      </a>
+      <!-- Add xref-item actor blocks for each linked actor card -->
+      <!-- If none: <div class="xref-none">No companion actor cards on file for this vulnerability.</div> -->
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <!-- class="xref-item incident" for incident card links -->
+      <a class="xref-item incident" href="../../output/incidents/{{INCIDENT_CARD_PATH}}">
+        <div class="xref-type incident">Incident Case File</div>
+        <div class="xref-name">{{INCIDENT_NAME}}</div>
+        <div class="xref-rel">{{INCIDENT_RELATIONSHIP}}</div>
+      </a>
+      <!-- Add xref-item incident blocks for each linked incident card -->
+      <!-- If none: <div class="xref-none">No companion incident cards on file for this vulnerability.</div> -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">{{ORG_1}}</div>
+        <div>
+          <div class="ref-detail"><a href="{{URL_1}}" target="_blank">{{TITLE_1}}</a></div>
+          <div class="ref-date">Accessed: {{ACCESS_DATE_1}}</div>
+        </div>
+      </div>
+      <!-- Add ref-item blocks for every source. -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>{{TLP_LABEL}} · COMPILED: {{DATE}} · {{SOURCE_SUMMARY}}</div>
+  <div>{{FOOTER_NOTE}}</div>
+</div>
+
+</body>
+</html>
