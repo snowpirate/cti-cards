@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Salt Typhoon — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge">⚠ NATION-STATE · CHINA — MINISTRY OF STATE SECURITY (MSS), CONTRACTOR-ENABLED</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Telecom &amp; Critical-Infrastructure Cyber Espionage / SIGINT-Enabling Intrusion Group</div>
+  <h1><span class="accent">SALT</span> TYPHOON</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-08-29 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK (G1045), CISA/NSA/FBI Joint Advisory, U.S. Treasury/OFAC, Trend Micro (Earth Estries), Recorded Future (RedMike), Wikipedia, therecord.media, Nextgov/FCW, 10+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE — GLOBAL EXPANSION CONTINUING INTO 2026</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL</span></div>
+    <div>Primary Motive: <span>State-Directed Espionage — SIGINT / Communications Collection</span></div>
+    <div>Active Since: <span>At least 2019 (core cluster); adjacent activity traced to 2021</span></div>
+    <div>MITRE ATT&amp;CK: <span>G1045</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ THREAT UPDATE — 2026</div>
+  <div class="alert-headline">Norway confirms compromise as global footprint passes 80 countries</div>
+  <div class="alert-body">Norway's Police Security Service (PST) confirmed in its 2026 national threat assessment that Salt Typhoon compromised network devices belonging to Norwegian organizations, extending a documented footprint that FBI assessments place at 80+ countries and roughly 600 notified organizations worldwide. The disclosure follows the August 2025 CISA/NSA/FBI joint advisory naming Salt Typhoon (and its Earth Estries/GhostEmperor/UNC2286 aliases) as an active threat to telecommunications and critical infrastructure, and September 2025 U.S. Treasury sanctions against Sichuan Juxinhe Network Technology Co., Ltd. for its direct role supporting the group's US telecom intrusions. Despite sustained diplomatic, sanctions, and advisory pressure, independent honeypot research recorded over 72 million China-origin attack attempts against telecom-emulating decoy systems between August 2023 and August 2025 consistent with Salt Typhoon TTPs, and a suspected Salt Typhoon intrusion into US House national-security committee staff email systems was disclosed in January 2026 — indicating no meaningful reduction in operational tempo.</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">80+</div>
+    <div class="stat-label">Countries With Confirmed or Suspected Salt Typhoon Compromises</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">9</div>
+    <div class="stat-label">Major US Telecom/ISP Providers Breached (incl. AT&amp;T, Verizon, T-Mobile, Lumen)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">1,000+</div>
+    <div class="stat-label">Cisco Network Devices Targeted in a Single Dec 2024–Jan 2025 Campaign Wave</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">2019</div>
+    <div class="stat-label">Earliest Confirmed Activity (Core Cluster)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Salt Typhoon (Microsoft's designation; also tracked as Earth Estries by Trend Micro, GhostEmperor by Kaspersky, FamousSparrow by ESET, UNC2286 by Mandiant, and RedMike by Recorded Future's Insikt Group) is a Chinese state-sponsored cyber-espionage group operating on behalf of China's Ministry of State Security (MSS), active since at least 2019. It became publicly notorious in late 2024 when U.S. officials disclosed that the group had penetrated the core infrastructure of at least nine major American telecommunications and internet-service providers — including AT&amp;T, Verizon, T-Mobile, and Lumen Technologies — in what U.S. intelligence officials characterized as one of the most significant telecommunications intrusions in the nation's history.</p>
+      <p>What distinguishes Salt Typhoon from most espionage-motivated APT activity is the specific nature of the access it sought: rather than stealing intellectual property or financial data, the group targeted telecom carriers' "lawful intercept" systems — the infrastructure that facilitates court-authorized wiretaps — along with call detail records and customer geolocation data. The FBI confirmed the group accessed communications and metadata belonging to a limited number of predominantly government and political figures, including individuals then associated with the 2024 U.S. presidential campaigns, and copied information about which numbers U.S. law enforcement was actively surveilling.</p>
+      <p>Salt Typhoon's scale is exceptional even by nation-state standards: FBI and CISA assessments place its confirmed or suspected footprint at more than 80 countries and roughly 600 notified organizations, spanning telecommunications, government, transportation, lodging, and military sectors. Unlike many Chinese APT clusters that operate as uniformed military units, Salt Typhoon's operations have been traced to at least three ostensibly private Chinese technology companies — Sichuan Juxinhe Network Technology, Beijing Huanyu Tianqiong Information Technology, and Sichuan Zhixin Ruijie Network Technology — that the U.S. Treasury Department assesses function as contractors providing cyber capabilities directly to Chinese intelligence services, a "state-corporate" operating model increasingly common among Chinese APT groups.</p>
+      <p>The group remains fully active as of 2026 despite sustained pressure: an August 2025 joint CISA/NSA/FBI advisory, September 2025 Treasury sanctions against Sichuan Juxinhe, and continued congressional oversight have not visibly reduced its operational tempo. New intrusions — including a suspected compromise of U.S. House committee staff email systems handling China policy, foreign affairs, and intelligence oversight, and confirmed compromises in Norway disclosed in that country's 2026 threat assessment — indicate the group continues both to expand geographically and to escalate the sensitivity of its targeting.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">Salt Typhoon</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">China's Ministry of State Security (MSS); operationally supported by at least three MSS-linked contractor companies (Sichuan Juxinhe Network Technology, Beijing Huanyu Tianqiong Information Technology, Sichuan Zhixin Ruijie Network Technology)</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Nation-State — Contractor-Enabled Cyber Espionage / SIGINT-Enabling Intrusion Group</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">State-directed intelligence collection — communications/SIGINT access, government and political-figure surveillance, strategic-infrastructure reconnaissance</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">At least 2019 (core Salt Typhoon cluster); adjacent Earth Estries/GhostEmperor activity traced to 2021 by some vendors</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">2026 — confirmed compromise disclosed in Norway's 2026 national threat assessment; suspected involvement in a Dec 2025/Jan 2026 US House committee staff email intrusion</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G1045</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">US Treasury/OFAC sanctioned Sichuan Juxinhe Network Technology Co., Ltd. (Sep 2025) for direct involvement in the group's US telecom breaches, and separately sanctioned Shanghai-based cyber actor Yin Kecheng (Jan 2025) for the related US Treasury network compromise. No criminal indictment has been unsealed against named Salt Typhoon operators specifically as of this writing.</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">Salt Typhoon</span>
+          <span class="alias-chip">Earth Estries</span>
+          <span class="alias-chip">GhostEmperor</span>
+          <span class="alias-chip">FamousSparrow</span>
+          <span class="alias-chip">UNC2286</span>
+          <span class="alias-chip">RedMike</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>HIGH on state sponsorship. US government agencies (FBI, CISA, NSA, Treasury/OFAC) and multiple independent vendors (Microsoft, Trend Micro, Kaspersky, ESET, Mandiant, Recorded Future) converge on attributing this activity cluster to Chinese state sponsorship via the Ministry of State Security, corroborated by Treasury's formal sanctions designation of a specific contractor company. Confidence in the precise institutional chain is MEDIUM — which MSS bureau directly taskes the contractor companies, and how cleanly "Salt Typhoon" separates from adjacent clusters like GhostEmperor/Earth Estries at the level of individual personnel, remains an open question reflecting the loosely federated, contractor-based structure increasingly typical of Chinese cyber operations. Note: separate March 2025 DOJ indictments of individuals named "Yin Kecheng" and "Zhou Shuai" concern APT27-linked hacking-for-hire activity; public reporting has not conclusively resolved whether this is the same Yin Kecheng sanctioned for the Salt Typhoon/Treasury intrusion — an acknowledged gap in this profile rather than a confirmed link.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2019</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Earliest Confirmed Activity</div>
+          <div class="timeline-desc">Microsoft and US government assessments place the earliest confirmed Salt Typhoon activity in 2019; overlapping GhostEmperor/Earth Estries clusters are separately documented by some vendors from 2021 onward, reflecting the difficulty of cleanly separating adjacent Chinese contractor-operated clusters.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2021 –<br/>2023</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Global Telecom &amp; Government Espionage Buildout</div>
+          <div class="timeline-desc">Group (tracked by various vendors as Earth Estries/GhostEmperor) conducts long-term espionage campaigns against telecommunications and government networks across the Asia-Pacific region, Middle East, and Africa, developing and refining custom malware including Demodex and SnappyBee.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">DEC 2024</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">US Telecom Breach Disclosed</div>
+          <div class="timeline-desc">US officials disclose that Salt Typhoon penetrated at least nine major US telecom/ISP providers, including AT&amp;T, Verizon, T-Mobile, and Lumen Technologies, compromising lawful-intercept wiretap infrastructure, call records, and geolocation data affecting government and political figures.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">DEC 2024 –<br/>JAN 2025</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Mass Cisco Device Exploitation Campaign</div>
+          <div class="timeline-desc">Group attempts exploitation of 1,000+ internet-facing Cisco network devices worldwide (more than half in the US, South America, and India) via CVE-2023-20198/CVE-2023-20273 and the seven-year-old CVE-2018-0171, tracked by Recorded Future as "RedMike."</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JAN 2025</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Treasury Sanctions &amp; Related Compromise Disclosures</div>
+          <div class="timeline-desc">OFAC sanctions Shanghai-based actor Yin Kecheng for a related compromise of the US Treasury Department's own network, including senior official workstations and bank-regulator email accounts.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">AUG –<br/>SEP 2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Joint Advisory &amp; Corporate Sanctions</div>
+          <div class="timeline-desc">CISA, NSA, and FBI (with international partners) issue a joint cybersecurity advisory on Salt Typhoon/Earth Estries/GhostEmperor activity; Treasury separately sanctions Sichuan Juxinhe Network Technology Co., Ltd. for direct involvement in the telecom breaches.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">LATE 2025 –<br/>2026</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Continued Expansion — Congress &amp; Norway</div>
+          <div class="timeline-desc">A suspected Salt Typhoon intrusion into email systems used by US House committee staff overseeing China policy, foreign affairs, intelligence, and the military is disclosed (Jan 2026); Norway's Police Security Service confirms compromises of Norwegian organizations in its 2026 national threat assessment, underscoring the group's continued global reach.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Living off network devices — minimal malware footprint on carrier-grade infrastructure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Salt Typhoon's initial access is dominated by exploitation of known, often long-unpatched vulnerabilities in internet-facing network edge devices rather than novel zero-days or social engineering. The group has weaponized a seven-year-old flaw in Cisco's IOS Smart Install feature (CVE-2018-0171) and chained a 2023 Cisco IOS XE web-UI privilege-escalation bug with a companion root-access flaw (CVE-2023-20198/CVE-2023-20273) to compromise carrier-grade routers and switches directly, alongside documented exploitation of vulnerabilities in Ivanti Connect Secure VPN, Fortinet FortiClient EMS, Sophos firewalls, and Microsoft Exchange in adjacent Earth Estries campaigns.</p>
+      <p>Once on a device, the group favors "living off the land" on network infrastructure itself rather than deploying conventional endpoint malware: dumping device configuration files to harvest weakly encrypted stored credentials, brute-forcing what it recovers, adding SSH authorized_keys entries and creating new Linux-level accounts directly in /etc/shadow and /etc/passwd for durable, credential-independent persistence, and altering Access Control Lists and loopback interface addresses to bypass network segmentation controls. Where custom tooling is deployed, it is purpose-built for the carrier environment — the JumbledPath utility handles archiving, log-clearing, infrastructure hiding, and multi-stage covert communications, while modular backdoors like GhostSpider, the Demodex rootkit, and the shared Chinese-APT tool SnappyBee provide flexible, victim-tailored capability.</p>
+      <p>The group's ultimate objective — access to lawful-intercept and call-detail infrastructure — is achieved through direct network sniffing between compromised device interfaces and the establishment of covert GRE tunnels that let operators pivot deep into carrier backbones while evading conventional network monitoring. Exfiltration of harvested configuration data typically leaves the network over unencrypted FTP/TFTP sessions rather than a distinct C2 channel, blending with legitimate device-management traffic and complicating detection in environments where network device logging and monitoring are historically underinvested compared to endpoint security.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; mapped against G1045</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1590</div>
+        <div class="mitre-name">Gather Victim Network Information: Network Topology</div>
+        <div class="mitre-note">[HIGH] Parsed stolen network device configuration files to map upstream/downstream segments and identify high-value pivot points.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1587.001</div>
+        <div class="mitre-name">Develop Capabilities: Malware</div>
+        <div class="mitre-note">[HIGH] Developed custom tooling including JumbledPath for archiving, log-clearing, infrastructure hiding, and multi-stage C2.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Exploited a seven-year-old flaw (CVE-2018-0171) in Cisco IOS Smart Install to gain initial footholds on telecom edge routers.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Chained CVE-2023-20198 (Cisco IOS XE web-UI privilege escalation) with CVE-2023-20273 to obtain root access on 1,000+ targeted devices.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1110.002</div>
+        <div class="mitre-name">Brute Force: Password Cracking</div>
+        <div class="mitre-note">[MEDIUM] Cracked weakly encrypted passwords recovered from stolen network device configuration files.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1098.004</div>
+        <div class="mitre-name">Account Manipulation: SSH Authorized Keys</div>
+        <div class="mitre-note">[HIGH] Added SSH authorized_keys entries under root and other accounts on compromised network devices for durable, credential-independent access.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1136</div>
+        <div class="mitre-name">Create Account</div>
+        <div class="mitre-note">[MEDIUM] Modified /etc/shadow and /etc/passwd directly to create new Linux-level user accounts on compromised devices.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1685</div>
+        <div class="mitre-name">Disable or Modify Tools: Clear Logs</div>
+        <div class="mitre-note">[HIGH] Cleared .bash_history, auth.log, lastlog, wtmp, and btmp to erase forensic evidence of access.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1686</div>
+        <div class="mitre-name">Disable or Modify System Firewall</div>
+        <div class="mitre-note">[MEDIUM] Altered Access Control Lists and loopback interface addresses on network devices to bypass restrictions and evade detection.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.004</div>
+        <div class="mitre-name">Remote Services: SSH</div>
+        <div class="mitre-note">[HIGH] Modified loopback interface addresses to bypass ACL restrictions and pivot laterally between network segments via SSH.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1572</div>
+        <div class="mitre-name">Protocol Tunneling</div>
+        <div class="mitre-note">[HIGH] Established Generic Routing Encapsulation (GRE) tunnels via device configuration changes for covert, persistent network paths.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1040</div>
+        <div class="mitre-name">Network Sniffing</div>
+        <div class="mitre-note">[HIGH] Captured live packet data between compromised network device interfaces, directly enabling access to call content, metadata, and lawful-intercept systems.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1048.003</div>
+        <div class="mitre-name">Exfiltration Over Alternative Protocol: Unencrypted Non-C2 Protocol</div>
+        <div class="mitre-note">[MEDIUM] Exfiltrated stolen device configuration files via FTP and TFTP, blending with legitimate device-management traffic.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Telecommunications</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">ISPs / Network Infrastructure Operators</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Government &amp; Public Administration</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Transportation &amp; Lodging</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Military &amp; Defense-Adjacent</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Global — confirmed or suspected compromises across 80+ countries; concentrated targeting of the United States, with confirmed activity also disclosed in Norway (2026), Canada, and across Asia-Pacific, the Middle East, and Africa under the group's Earth Estries/GhostEmperor activity</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Telecom carriers and ISPs operating lawful-intercept/wiretap infrastructure; government agencies and legislative bodies with national-security or China-policy portfolios; organizations running internet-facing, historically under-patched network edge devices</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Exploitation of known (often years-old) CVEs in carrier-grade and enterprise network edge devices — routers, VPN appliances, firewalls — rather than phishing or supply-chain compromise</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Systematic, infrastructure-first targeting aimed at durable SIGINT-style access to communications backbones and the specific legal-surveillance systems designed to protect against unauthorized access — infrastructure capture for long-term intelligence collection, not opportunistic data theft</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">GhostSpider</span>
+          <span class="tool-tag">Modular Backdoor · Custom</span>
+        </div>
+        <div class="tool-desc">Highly modular, victim-tailored backdoor capable of exfiltrating data, loading additional malicious modules on demand, and self-removing from memory to increase stealth; functions are triggered remotely via C2 instructions, letting operators adapt capability per target without redeploying core malware.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">Demodex</span>
+          <span class="tool-tag">Rootkit · Custom</span>
+        </div>
+        <div class="tool-desc">A kernel-level rootkit used to conceal the group's presence on compromised Windows and Linux hosts, deployed alongside GhostSpider and SnappyBee in long-term espionage campaigns against government and telecom targets across Asia-Pacific.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">SnappyBee</span>
+          <span class="tool-tag">Modular Backdoor · Shared Chinese-APT Tooling</span>
+        </div>
+        <div class="tool-desc">A modular backdoor observed across multiple Chinese state-linked intrusion sets, indicating shared tooling and infrastructure-development resources within China's contractor-based cyber ecosystem rather than a tool unique to Salt Typhoon alone.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">JumbledPath</span>
+          <span class="tool-tag">Custom Utility · MITRE S1206</span>
+        </div>
+        <div class="tool-desc">Purpose-built tool for archiving collected data, clearing logs, hiding infrastructure, and conducting multi-stage covert communications and network sniffing — reflecting the group's emphasis on operating discreetly within carrier-grade network device environments rather than on conventional endpoints.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Masol RAT</span>
+          <span class="tool-tag">Linux Backdoor</span>
+        </div>
+        <div class="tool-desc">A Linux-targeting remote access trojan used in campaigns against government and telecom infrastructure, extending the group's capability beyond Windows-centric tooling to the Linux-based network appliances that dominate carrier environments.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2018-0171 — Cisco IOS Smart Install remote code execution</td><td>Cisco Talos / CISA</td><td>Disclosed 2018; exploited 2024–2025</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2023-20198 — Cisco IOS XE Web UI privilege escalation (initial access)</td><td>Cisco / CISA KEV</td><td>Disclosed 2023-10; exploited Dec 2024–Jan 2025</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2023-20273 — Cisco IOS XE root-access flaw (chained with above)</td><td>Cisco / CISA KEV</td><td>Disclosed 2023-10; exploited Dec 2024–Jan 2025</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">JumbledPath, GhostSpider, Demodex, SnappyBee, Masol RAT</td><td>Trend Micro; Recorded Future; CISA/NSA/FBI joint advisory</td><td>2024–2025</td></tr>
+        <tr><td class="type-label">SANCTIONED ENTITY</td><td class="val">Sichuan Juxinhe Network Technology Co., Ltd.</td><td>US Treasury / OFAC</td><td>2025-09</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No durable static IP/domain indicator list is included here. Salt Typhoon compromises carrier-owned network devices directly, and its infrastructure (compromised routers, hop points) is victim-specific and rotates constantly. Consult the August 2025 CISA/NSA/FBI joint advisory and named vendor reporting (Recorded Future "RedMike," Trend Micro "Earth Estries") for current, environment-specific indicators rather than a static list reproduced here.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (state sponsorship) / MEDIUM (precise inter-cluster boundaries)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Escalating — continued geographic expansion (Norway, 2026), continued targeting escalation (US congressional committee staff), no observed reduction in tempo despite sanctions and advisories</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Durable, credential-independent persistence directly on carrier-grade network infrastructure, providing SIGINT-equivalent access to communications content, metadata, and lawful-intercept systems</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Full scope of ongoing access inside already-notified US carriers — AT&amp;T and Verizon state they evicted the group, but a US Senator and independent researchers have publicly questioned whether eviction is complete, given reportedly withheld third-party forensic reports</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Earth Estries</span>
+          <span class="alias-chip">GhostEmperor</span>
+          <span class="alias-chip">FamousSparrow</span>
+          <span class="alias-chip">UNC2286</span>
+          <span class="alias-chip">RedMike</span>
+          <span class="alias-chip">MSS contractor ecosystem (Sichuan Juxinhe, Beijing Huanyu Tianqiong, Sichuan Zhixin Ruijie)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Salt Typhoon represents a doctrinal shift that should concern defenders beyond the telecom sector specifically: rather than treating network infrastructure devices as plumbing to be patched opportunistically, this group treats routers, VPN concentrators, and firewalls as the primary target — the place where durable, high-value access lives — and has demonstrated it can operate there for extended periods with minimal reliance on conventional, more heavily monitored endpoint malware. Its specific interest in lawful-intercept systems is a notable escalation: it targets not just communications but the infrastructure meant to safeguard those communications' legal-authorization boundaries, giving a foreign intelligence service potential visibility into who US law enforcement is investigating.</p>
+      <p>The group's contractor-based operating model — MSS tasking ostensibly private companies like Sichuan Juxinhe rather than uniformed military units — mirrors a broader trend across Chinese state-sponsored activity and complicates both attribution and disruption: sanctioning or even successfully prosecuting one contractor company does not necessarily remove the underlying MSS tasking relationship or the pool of technical talent available to service it. This helps explain why sustained diplomatic and legal pressure through 2025 has not visibly reduced Salt Typhoon's operational tempo into 2026.</p>
+      <p>Confidence in this assessment would increase with independently verified confirmation that named US carriers have fully evicted the group — currently a contested claim given Senate inquiries into withheld third-party forensic reports — and would improve if the September 2025 sanctions or a future criminal indictment meaningfully disrupted the specific contractor relationships enabling the group's edge-device tooling pipeline. The clearest forward risk is further escalation up the sensitivity ladder: having already reached telecom wiretap systems, a federal agency network (Treasury), and now congressional committee staff email, further targeting of comparably sensitive US government functions should be treated as a realistic near-term possibility rather than a worst-case outlier.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Patch and inventory internet-facing network edge devices as a first-class asset class.</strong> Treat routers, VPN concentrators, and firewalls with the same patch-SLA rigor as internet-facing servers; specifically verify remediation of CVE-2018-0171, CVE-2023-20198, and CVE-2023-20273 on all Cisco IOS/IOS XE devices.</div>
+            <div class="cm-ttp">Counters: T1190</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Disable unnecessary device-management interfaces and services.</strong> Disable the Cisco Smart Install feature and internet-exposed web UI management interfaces where not explicitly required; restrict management-plane access to out-of-band networks.</div>
+            <div class="cm-ttp">Counters: T1190</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Harden and monitor device configuration storage and access.</strong> Encrypt stored device credentials rather than relying on weak/reversible encoding, and alert on bulk configuration-file access or export events.</div>
+            <div class="cm-ttp">Counters: T1602, T1110.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Monitor for unauthorized SSH key and account changes on network devices.</strong> Baseline and alert on any modification to SSH authorized_keys files or /etc/shadow and /etc/passwd on routers, switches, and appliances.</div>
+            <div class="cm-ttp">Counters: T1098.004, T1136</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Centralize and protect device logs off-device.</strong> Forward syslog, auth.log, and command-history data to a centralized, access-controlled logging platform immediately upon generation, since on-device log-clearing only works if logs remain solely on the compromised device.</div>
+            <div class="cm-ttp">Counters: T1685</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Audit ACL and loopback interface configuration changes.</strong> Implement configuration-drift detection on network devices to flag unauthorized ACL or loopback-address modifications that could indicate segmentation bypass.</div>
+            <div class="cm-ttp">Counters: T1686, T1021.004</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Monitor for anomalous GRE tunnels and unencrypted bulk transfers.</strong> Alert on newly established GRE tunnels not present in change-management records, and restrict or monitor FTP/TFTP usage on network infrastructure, which legitimate operations rarely require post-provisioning.</div>
+            <div class="cm-ttp">Counters: T1572, T1048.003</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Extend the highest access-control tier to lawful-intercept infrastructure.</strong> Apply enhanced access control, logging, and anomaly detection specifically to lawful-intercept/CALEA systems, treating them as a distinct high-sensitivity zone rather than ordinary carrier backbone.</div>
+            <div class="cm-ttp">Counters: T1040</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G1045/" target="_blank">Salt Typhoon — Group G1045</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/news/cisa-and-partners-release-joint-advisory-countering-chinese-state-sponsored-actors-compromise" target="_blank">CISA and Partners Release Joint Advisory on Countering Chinese State-Sponsored Actors</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">US Treasury</div>
+        <div>
+          <div class="ref-detail"><a href="https://home.treasury.gov/news/press-releases/jy2792" target="_blank">Treasury Sanctions Company Associated with Salt Typhoon and Hacker Associated with Treasury Compromise</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">US Treasury</div>
+        <div>
+          <div class="ref-detail"><a href="https://home.treasury.gov/news/press-releases/sb0042" target="_blank">Treasury Sanctions China-Based Hacker Involved in the Compromise of Sensitive US Victim Networks</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">US DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/opa/pr/justice-department-charges-12-chinese-contract-hackers-and-law-enforcement-officers-global" target="_blank">Justice Department Charges 12 Chinese Contract Hackers and Law Enforcement Officers</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Salt_Typhoon" target="_blank">Salt Typhoon</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/salt-typhoon-targeting-old-cisco-vulnerabilities-in-fresh-telecom-hacks/" target="_blank">Salt Typhoon Targeting Old Cisco Vulnerabilities in Fresh Telecom Hacks</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyberScoop</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberscoop.com/cisco-talos-salt-typhoon-initial-access/" target="_blank">Salt Typhoon Gained Initial Access to Telecoms Through Cisco Devices</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Recorded Future</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.recordedfuture.com/research/redmike-salt-typhoon-exploits-vulnerable-devices" target="_blank">RedMike (Salt Typhoon) Exploits Vulnerable Devices</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Nextgov/FCW</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nextgov.com/cybersecurity/2025/02/salt-typhoon-hackers-exploited-stolen-credentials-and-7-year-old-software-flaw-cisco-systems/403146/" target="_blank">Salt Typhoon Hackers Exploited Stolen Credentials and a 7-Year-Old Software Flaw</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/atandt-and-verizon-say-networks-secure-after-salt-typhoon-breach/" target="_blank">AT&amp;T and Verizon Say Networks Secure After Salt Typhoon Breach</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Nextgov/FCW</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nextgov.com/cybersecurity/2026/02/senator-says-t-and-verizon-blocked-release-salt-typhoon-security-reports/411172/" target="_blank">Senator Says AT&amp;T and Verizon Blocked Release of Salt Typhoon Security Reports</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BankInfoSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bankinfosecurity.com/salt-typhoon-hackers-hit-congressional-emails-in-new-breach-a-30484" target="_blank">Salt Typhoon Hackers Hit Congressional Emails in New Breach</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GovExec</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.govexec.com/technology/2026/01/chinese-hackers-targeted-email-systems-us-congressional-staff-people-familiar-say/410548/" target="_blank">Chinese Hackers Targeted Email Systems of US Congressional Staff</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Trend Micro</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.trendmicro.com/en_us/research/24/k/earth-estries.html" target="_blank">Game of Emperor: Unveiling Long Term Earth Estries Cyber Intrusions</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/application-security/salt-typhoon-malware-arsenal-ghostspider" target="_blank">Salt Typhoon Builds Out Malware Arsenal With GhostSpider</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/salt-typhoon-hackers-backdoor-telcos-with-new-ghostspider-malware/" target="_blank">Salt Typhoon Hackers Backdoor Telcos With New GhostSpider Malware</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/norawy-intelligence-discloses-salt-typhoon-attacks" target="_blank">Norwegian Intelligence Discloses Country Hit by Salt Typhoon Campaign</a></div>
+          <div class="ref-date">Accessed: 2026-08-29</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-08-29 · 19 sources, 12 web lookups</div>
+  <div>Status: ACTIVE, expanding globally · Attribution confidence: HIGH (state sponsorship) · ATT&amp;CK: 13 techniques mapped · Ecosystem: Earth Estries / GhostEmperor / RedMike / MSS contractor network</div>
+</div>
+
+</body>
+</html>
