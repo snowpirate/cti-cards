@@ -337,6 +337,101 @@
   .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
   .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
 
+  /* ── NETWORK EXPOSURE ── */
+  .nmap-window {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-top: 2px solid var(--cyan);
+    margin-bottom: 12px;
+  }
+  .nmap-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+  .nmap-titlebar .cmd { color: var(--cyan); }
+  .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+  .nmap-titlebar .dot.green { background: var(--green); }
+  .nmap-output {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    color: #8ab4c8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .nmap-output .port-open   { color: var(--green); }
+  .nmap-output .port-closed { color: var(--red); }
+  .nmap-output .port-filter { color: var(--amber); }
+  .nmap-output .service     { color: var(--cyan); }
+  .nmap-output .version     { color: #fff; }
+  .nmap-output .vuln-flag   { color: var(--red); font-weight: 700; }
+  .nmap-output .comment     { color: var(--text-dim); }
+  .nmap-output .highlight   { background: rgba(0,212,255,0.08); display: inline; }
+
+  .nse-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--purple);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .nse-name   { font-family: var(--mono); font-size: 10.5px; color: var(--purple); font-weight: 700; }
+  .nse-tags   { display: flex; gap: 5px; }
+  .nse-tag    { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
+  .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .nse-cmd  { font-family: var(--mono); font-size: 10px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 10px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+  .nse-output .vuln-flag { color: var(--red); font-weight: 700; }
+  .nse-output .safe-flag { color: var(--green); font-weight: 700; }
+
+  .shodan-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--amber);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .shodan-label  { font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 11px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .banner-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--cyan2);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .banner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .banner-label  { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.07em; }
+  .banner-status { font-family: var(--mono); font-size: 8.5px; padding: 1px 7px; }
+  .banner-status.vulnerable { border: 1px solid rgba(255,77,77,0.4); color: var(--red); }
+  .banner-status.patched    { border: 1px solid rgba(74,158,106,0.4); color: var(--green); }
+  .banner-text   { font-family: var(--mono); font-size: 10px; color: #8ab4c8; line-height: 1.6; white-space: pre-wrap; }
+  .banner-text .vuln-string { color: var(--red); }
+  .banner-text .safe-string { color: var(--green); }
+
+  .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .port-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
+  .port-table td.port-open { color: var(--green); }
+  .port-table td.svc-name  { color: #fff; }
+  .port-table td.version-vuln { color: var(--red); }
+  .port-table td.version-safe { color: var(--green); }
+
   /* ── REFERENCES ── */
   .ref-list { display: flex; flex-direction: column; gap: 6px; }
   .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
@@ -388,24 +483,25 @@
     <div class="header-badges">
       <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
       <div class="patch-badge patch-now">PATCH NOW</div>
-      <div class="kev-badge">KEV LISTED (2023 GENERATION)</div>
+      <div class="kev-badge">KEV LISTED — ALL FOUR CVEs</div>
     </div>
   </div>
   <div class="advisory-label">// Vulnerability Advisory — Pre-Auth RCE Chain, Two Generations · PaperCut MF / NG Print Management Software</div>
   <h1><span class="cyan">PAPER</span>CUT</h1>
   <div class="header-sub">
-    COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-08-30 &nbsp;|&nbsp;
     CVE: CVE-2023-27350 · CVE-2023-27351 · CVE-2026-81578 · CVE-2026-82078 &nbsp;|&nbsp;
     CWE: CWE-284 (2023 auth bypass) · CWE-287/303 (2023 info disclosure, tentative) · CWE-306 (2026 access control) · CWE-470 (2026 unsafe reflection) &nbsp;|&nbsp;
-    SOURCES: 26
+    SOURCES: 33
   </div>
   <div class="advisory-bar">
     <div>CVSS: <span class="red">9.8 (CRITICAL) — CVE-2023-27350</span></div>
     <div>Affected: <span>PaperCut NG/MF 8.0–26.x — exact vulnerable ranges vary per CVE, see Section 05</span></div>
     <div>First Disclosed: <span>2023-03-14 (coordinated) / Second Chain: 2026-08-27 (post-exploitation)</span></div>
-    <div>Patch Date: <span>2023-03-08 → 2026-08-28 (Emergency Patch Release 2)</span></div>
-    <div>KEV Added: <span class="cyan">2023-04-21 (CVE-2023-27350)</span></div>
-    <div>EPSS: <span>~0.94–0.9999 (2023 gen.) · not yet established (2026 gen., 3 days old)</span></div>
+    <div>Patch Date: <span>2023-03-08 → 2026-09-01 (Emergency Patch Release 3, current baseline)</span></div>
+    <div>KEV Added: <span class="cyan">2023-04-21 (CVE-2023-27350) · 2026-08-31 (CVE-2026-81578 &amp; CVE-2026-82078)</span></div>
+    <div>EPSS: <span>~0.94–0.9999 (2023 gen.) · not yet established (2026 gen.)</span></div>
   </div>
 </div>
 
@@ -432,12 +528,12 @@
     <div class="stat-label">Of ~2,500 tracked PaperCut installs still on v23 or earlier — no patch exists for them (Huntress, 2026-08-27)</div>
   </div>
   <div class="stat-cell">
-    <div class="stat-val">2</div>
-    <div class="stat-label">Emergency patch releases in 48 hours for the 2026 chain after watchTowr found bypasses</div>
+    <div class="stat-val">3</div>
+    <div class="stat-label">Emergency patch releases in 6 days (Aug 27 → Sept 1) for the 2026 chain, fixing regressions in prior releases</div>
   </div>
   <div class="stat-cell">
-    <div class="stat-val dim">4+</div>
-    <div class="stat-label">Distinct threat actors/crews confirmed weaponizing the 2023 chain (Bl00dy, Cl0p, LockBit, Iranian state actors)</div>
+    <div class="stat-val dim">800+</div>
+    <div class="stat-label">Internet-exposed PaperCut servers tracked by Shadowserver (2026-08-31)</div>
   </div>
 </div>
 
@@ -451,8 +547,8 @@
     <div class="prose">
       <p>PaperCut MF and PaperCut NG are widely deployed print-management platforms used by schools, universities, government agencies, healthcare systems, and enterprises to meter, bill, and control network printing. Because print servers are treated as low-priority infrastructure, they are routinely exposed to the internet for remote print release and mobile printing, rarely hardened, and infrequently patched — a profile that makes PaperCut's web-based administration console an unusually attractive target whenever a pre-authentication vulnerability surfaces in it. That has now happened twice, three years apart, via two structurally similar but technically distinct vulnerability chains.</p>
       <p>The first generation — CVE-2023-27350 (CVSS 9.8) and CVE-2023-27351 (CVSS 8.2) — was disclosed in March 2023 and became one of the most consequential mass-exploitation events of that year: the FBI and CISA jointly attributed active exploitation to the Bl00dy Ransomware Gang against the U.S. Education Facilities Subsector, and Microsoft separately confirmed the Cl0p and LockBit ransomware ecosystems, the TrueBot-linked "Lace Tempest" cluster, and Iranian state-sponsored groups tracked as Mango Sandstorm (MuddyWater) and Mint Sandstorm all independently weaponized the same flaw within weeks of disclosure (CISA/FBI AA23-131A, 2023; Microsoft Threat Intelligence, 2023).</p>
-      <p>The second generation — CVE-2026-81578 (CVSS 8.8) and CVE-2026-82078 (CVSS 9.4) — is not history; it is unfolding as this card is compiled. PaperCut published an urgent security bulletin on 2026-08-27 after Huntress confirmed exploitation in two customer environments, shipped an emergency patch the same day, and then shipped a <em>second</em> emergency patch just 24 hours later (2026-08-28, 2:45 PM ET) after independent researchers at watchTowr Labs reproduced the chain and found the first patch could still be bypassed. As of this compile, roughly 47% of the ~2,500 PaperCut installations Huntress tracks are running version 23 or earlier — versions for which no patch exists at all, meaning nearly half of the visible install base has no remediation path short of a version upgrade.</p>
-      <p>PaperCut matters right now because the two generations share the same underlying design pattern despite being technically unrelated bugs: an unauthenticated request against the web management interface that the server's authorization logic mis-trusts, chained into a privileged, code-execution-capable feature that the console exposes to authenticated admins by design (Print/Device Scripting in 2023; unsafe dynamic database-driver class loading in 2026). Any environment running PaperCut and reachable from the internet or an untrusted network segment should treat this as an active, not historical, risk.</p>
+      <p>The second generation — CVE-2026-81578 (CVSS 8.8) and CVE-2026-82078 (CVSS 9.4) — is not history; it is unfolding as this card is compiled, and it has continued to escalate since the previous compile. PaperCut published an urgent security bulletin on 2026-08-27 after Huntress confirmed exploitation in two customer environments, shipped an emergency patch the same day, and then shipped a <em>second</em> emergency patch just 24 hours later (2026-08-28, 2:45 PM ET) after independent researchers at watchTowr Labs reproduced the chain and found the first patch could still be bypassed. A <em>third</em> emergency patch followed on 2026-09-01, fixing two known regressions in Release 2 and adding further hardening. CISA added both CVE-2026-81578 and CVE-2026-82078 to its Known Exploited Vulnerabilities catalog on 2026-08-31, and threat-intelligence firm Defused has observed exploit activity against the chain in its honeypots continuously since 2026-08-29. Post-exploitation activity has evolved beyond reconnaissance: threat intelligence now documents attackers covertly installing legitimate remote-access tools (SimpleHelp, AnyDesk) for persistent access on compromised servers, and a separate track of activity abusing the flaw for direct database-table exfiltration via PaperCut's Derby database rather than full remote code execution (Help Net Security, 2026-08-31; BleepingComputer, 2026-08-31). No threat actor has been publicly attributed to the 2026 activity as of this compile. As of the most recent count, roughly 47% of the ~2,500 PaperCut installations Huntress tracks are running version 23 or earlier — versions for which no patch exists at all, meaning nearly half of the visible install base has no remediation path short of a version upgrade — and Shadowserver independently tracks over 800 PaperCut MF/NG servers still directly exposed to the internet.</p>
+      <p>PaperCut matters right now because the two generations share the same underlying design pattern despite being technically unrelated bugs: an unauthenticated request against the web management interface that the server's authorization logic mis-trusts, chained into a privileged, code-execution-capable feature that the console exposes to authenticated admins by design (Print/Device Scripting in 2023; unsafe dynamic database-driver class loading in 2026). Any environment running PaperCut and reachable from the internet or an untrusted network segment should treat this as an active, not historical, risk — one now formally recognized by CISA's KEV catalog in both generations.</p>
     </div>
   </div>
 </div>
@@ -498,11 +594,11 @@
       </div>
       <div class="lc-phase">
         <div class="lc-node amber">03</div>
-        <div class="lc-label">Patch(es)<br/>2023-03-08 → 2026-08-28</div>
+        <div class="lc-label">Patch(es)<br/>2023-03-08 → 2026-09-01</div>
       </div>
       <div class="lc-phase">
         <div class="lc-node red">04</div>
-        <div class="lc-label">Exploitation<br/>2023-04 (mass) · 2026-08 (targeted)</div>
+        <div class="lc-label">Exploitation<br/>2023-04 (mass) · 2026-08 (escalating)</div>
       </div>
       <div class="lc-phase">
         <div class="lc-node dim">05</div>
@@ -511,7 +607,7 @@
     </div>
     <div class="prose">
       <p><strong>2023 generation.</strong> Trend Micro's Zero Day Initiative (ZDI-23-233) responsibly reported the vulnerability to PaperCut on 2023-01-10. PaperCut shipped a fix on 2023-03-08 (versions 20.1.7, 21.2.11, 22.0.9), and the coordinated public advisory followed on 2023-03-14. PaperCut's own investigation later identified the earliest suspicious activity possibly tied to CVE-2023-27350 as far back as 2023-04-14 — roughly five weeks after the patch shipped but well before most administrators had applied it. PaperCut publicly confirmed active exploitation on 2023-04-19. A working proof-of-concept was published publicly on GitHub around 2023-04-25, and mass exploitation — most visibly the Bl00dy Ransomware Gang's campaign against the U.S. Education Facilities Subsector — followed within days. CISA added CVE-2023-27350 to the KEV catalog on 2023-04-21, ahead of the PoC's public release, reflecting how quickly the exploitation signal outran the initial vendor advisory.</p>
-      <p><strong>2026 generation.</strong> This chain's public timeline is compressed to days rather than months. Huntress observed the first confirmed exploitation of CVE-2026-81578/CVE-2026-82078 in a customer environment on 2026-08-26. PaperCut published an urgent security bulletin and shipped an initial emergency patch on 2026-08-27 — the same day Huntress detected a second intrusion, this one against a server running version 24 before that branch's fix was available. Independent researchers at watchTowr Labs then fully reproduced the chain and identified multiple ways to bypass the initial patch, plus an additional authentication-bypass angle the first patch generation had not addressed. PaperCut responded with Emergency Patch Release 2 on 2026-08-28 at 2:45 PM ET — roughly 24 hours after the first patch — explicitly instructing customers to install Release 2 even if Release 1 was already applied. PaperCut has characterized in-the-wild attacks as "limited and targeted" as of this compile, in contrast to the mass-exploitation profile of the 2023 generation, though the 47%-unpatched install-base figure suggests the opportunity for broader exploitation remains wide open.</p>
+      <p><strong>2026 generation.</strong> This chain's public timeline is compressed to days rather than months. Huntress observed the first confirmed exploitation of CVE-2026-81578/CVE-2026-82078 in a customer environment on 2026-08-26. PaperCut published an urgent security bulletin and shipped an initial emergency patch on 2026-08-27 — the same day Huntress detected a second intrusion, this one against a server running version 24 before that branch's fix was available. Independent researchers at watchTowr Labs then fully reproduced the chain and identified multiple ways to bypass the initial patch, plus an additional authentication-bypass angle the first patch generation had not addressed. PaperCut responded with Emergency Patch Release 2 on 2026-08-28 at 2:45 PM ET — roughly 24 hours after the first patch — explicitly instructing customers to install Release 2 even if Release 1 was already applied. Threat-intelligence firm Defused reported continuous exploit activity against the chain in its honeypots from 2026-08-29 onward, and by 2026-08-31 independent reporting documented two distinct post-exploitation patterns: covert installation of legitimate remote-access tools (SimpleHelp, AnyDesk) for persistence, and direct database-table exfiltration via PaperCut's embedded Apache Derby database rather than full code execution. CISA added both 2026 CVEs to the KEV catalog that same day (2026-08-31). PaperCut shipped a third emergency patch on 2026-09-01, explicitly fixing two known regressions introduced by Release 2 in addition to further hardening — the current patch baseline as of this compile. No threat actor has been publicly attributed to any of the 2026 activity. The 47%-unpatched install-base figure and Shadowserver's 800+ internet-exposed-server count together indicate the opportunity for broader exploitation remains wide open despite three patch generations in six days.</p>
     </div>
   </div>
 </div>
@@ -607,8 +703,8 @@
         <tbody>
           <tr><td>CVE-2023-27350</td><td>SetupCompleted / Session Puzzling auth bypass</td><td class="vuln">8.0.0–19.2.7, 20.0.0–20.1.6, 21.0.0–21.2.10, 22.0.0–22.0.8</td><td class="fixed">20.1.7 / 21.2.11 / 22.0.9 (2023-03-08)</td><td>Fixed — no known bypass reported</td></tr>
           <tr><td>CVE-2023-27351</td><td>SecurityRequestFilter authentication check</td><td class="vuln">15.0 or later, all OS platforms (pre-fix)</td><td class="fixed">20.1.7 / 21.2.11 / 22.0.9 (2023-03-08)</td><td>Fixed — no known bypass reported</td></tr>
-          <tr><td>CVE-2026-81578</td><td>Web management interface — request-routing authorization</td><td class="vuln">All NG/MF versions prior to 2026-08-27 fix, including 24, 25, 26</td><td class="partial">25.0.12 / 26.0.4 (v24 fix delayed) — Emergency Patch Release 2, 2026-08-28</td><td>Superseded — Release 1 (08-27) had reported bypasses</td></tr>
-          <tr><td>CVE-2026-82078</td><td>Database-connection utilities — unsafe dynamic class loading</td><td class="vuln">All NG/MF versions prior to 2026-08-27 fix, including 24, 25, 26; v23 and earlier have no available patch</td><td class="partial">NG 25.0.12.76497 / MF 25.0.12.76496 / 26.0.4 (Windows) — Release 2, 2026-08-28</td><td>Superseded — Release 1 had reported bypasses; v23-and-earlier remains unpatched by design (EOL branches)</td></tr>
+          <tr><td>CVE-2026-81578</td><td>Web management interface — request-routing authorization</td><td class="vuln">All NG/MF versions prior to fix, including 24, 25, 26</td><td class="fixed">Emergency Patch Release 3, 2026-09-01 (current baseline)</td><td>Release 1 (08-27) and Release 2 (08-28) both had reported bypasses/regressions</td></tr>
+          <tr><td>CVE-2026-82078</td><td>Database-connection utilities — unsafe dynamic class loading</td><td class="vuln">All NG/MF versions prior to fix, including 24, 25, 26; v23 and earlier have no available patch</td><td class="fixed">Emergency Patch Release 3, 2026-09-01 (current baseline)</td><td>Releases 1 &amp; 2 superseded — Release 3 fixes two known regressions from Release 2; v23-and-earlier remains unpatched by design (EOL branches)</td></tr>
         </tbody>
       </table>
     </div>
@@ -624,10 +720,10 @@
   <div class="section-body">
     <div class="kev-block">
       <div class="kev-header">
-        <span class="kev-tag">CISA KEV LISTED — CVE-2023-27350 ONLY</span>
-        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2023-04-21 · Required Remediation: 2023-05-12 (federal civilian agencies, per BOD 22-01)</span>
+        <span class="kev-tag">CISA KEV LISTED — CVE-2023-27350, CVE-2026-81578 &amp; CVE-2026-82078</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">2023-27350 Added: 2023-04-21 (due 2023-05-12, BOD 22-01) · 2026 pair Added: 2026-08-31</span>
       </div>
-      <div class="kev-body">CVE-2023-27350 carries a confirmed "used in ransomware campaigns" flag in the CISA KEV catalog. CVE-2023-27351 was not independently confirmed on KEV during this compile — verify directly before relying on that status. Neither CVE-2026-81578 nor CVE-2026-82078 appears in the KEV catalog as of 2026-08-30; given the confirmed active exploitation Huntress observed, a KEV listing for the 2026 pair should be considered likely in the near term rather than treated as evidence of lower severity.</div>
+      <div class="kev-body">CVE-2023-27350 carries a confirmed "used in ransomware campaigns" flag in the CISA KEV catalog. CVE-2023-27351 was not independently confirmed on KEV during this compile — verify directly before relying on that status. CISA added both CVE-2026-81578 and CVE-2026-82078 to the KEV catalog on 2026-08-31, citing evidence of active exploitation — this happened within days of the vulnerabilities' initial disclosure, reflecting how quickly the 2026 chain's exploitation signal was confirmed compared to typical KEV additions. Federal civilian remediation for these entries now falls under BOD 26-04's risk-tiered framework (superseding BOD 22-01's flat deadlines): vulnerability combinations assessed as highest-risk — publicly exposed, KEV-listed, exploitation automatable, and granting total asset control, all of which apply here — carry a 3-calendar-day remediation SLA rather than a fixed date.</div>
     </div>
     <div style="margin-bottom:18px;">
       <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
@@ -690,16 +786,48 @@
         </div>
         <div class="et-item">
           <div class="et-date">2026-08-27</div>
-          <div class="et-track"><div class="et-dot purple"></div></div>
+          <div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div>
           <div class="et-content">
             <div class="et-event">Second Intrusion — Unpatched v24</div>
             <div class="et-desc">A second confirmed intrusion targets a server running version 24, before that branch's fix was available, the same day PaperCut published its advisory and first emergency patch.</div>
           </div>
         </div>
+        <div class="et-item">
+          <div class="et-date">2026-08-29 →</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Honeypot Activity Confirms Sustained Exploitation</div>
+            <div class="et-desc">Threat-intelligence firm Defused reports continuous exploit activity against the CVE-2026-81578/82078 chain in its honeypots from this date onward, indicating exploitation had moved beyond the two initially-confirmed customer incidents.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-08-31</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Remote-Access-Tool Deployment &amp; Database-Dump Attacks Reported</div>
+            <div class="et-desc">Independent reporting documents two distinct post-exploitation patterns on compromised servers: covert installation of legitimate remote-access software (SimpleHelp configured to auto-start; AnyDesk as a secondary channel) for persistent access, and a separate pattern hijacking PaperCut's external user-lookup feature to dump database tables via the embedded Apache Derby engine rather than pursuing full code execution (Help Net Security; BleepingComputer).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-08-31</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">CISA KEV Listing — Both 2026 CVEs</div>
+            <div class="et-desc">CVE-2026-81578 and CVE-2026-82078 added to the KEV catalog, four days after the vendor's initial advisory.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-01</div>
+          <div class="et-track"><div class="et-dot green"></div></div>
+          <div class="et-content">
+            <div class="et-event">Emergency Patch Release 3</div>
+            <div class="et-desc">PaperCut ships a third emergency patch, fixing two known regressions in Release 2 and adding further hardening — the current mandatory baseline.</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="prose">
-      <p>No card currently on file in this repository documents Bl00dy Ransomware Gang, Cl0p, LockBit, Lace Tempest/TA505, MuddyWater/Mango Sandstorm, or Mint Sandstorm as named threat actors — see Section 10. The 2023 chain stands out even among mass-exploited CVEs for the sheer diversity of actor types that independently converged on it within roughly two weeks: financially motivated ransomware affiliates, an initial-access-broker-adjacent malware operator (TrueBot/Silence), and two distinct nation-state espionage services, all drawn to the same unauthenticated RCE primitive. The 2026 chain's exploitation is, as of this compile, narrower and more targeted — two confirmed customer intrusions rather than a mass campaign — but the historical pattern strongly suggests that window will not stay narrow for long once a public PoC circulates.</p>
+      <p>No card currently on file in this repository documents Bl00dy Ransomware Gang, Cl0p, LockBit, Lace Tempest/TA505, MuddyWater/Mango Sandstorm, or Mint Sandstorm as named threat actors — see Section 10. The 2023 chain stands out even among mass-exploited CVEs for the sheer diversity of actor types that independently converged on it within roughly two weeks: financially motivated ransomware affiliates, an initial-access-broker-adjacent malware operator (TrueBot/Silence), and two distinct nation-state espionage services, all drawn to the same unauthenticated RCE primitive. The 2026 chain's exploitation has widened materially since first observed — from two isolated customer intrusions to continuous honeypot-confirmed scanning, RAT deployment for persistence, and a separate database-exfiltration pattern — but as of this compile no threat actor or campaign name has been publicly attached to any of it, a genuine intelligence gap rather than an indication of limited scope.</p>
     </div>
   </div>
 </div>
@@ -765,7 +893,16 @@ OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_ba
         <div class="query-code">EventCode=1 ParentImage="*\\pc-app.exe" Image IN ("*\\cmd.exe","*\\powershell.exe","*\\whoami.exe","*\\tasklist.exe","*\\charmap.exe")
 | table _time, Computer, ParentImage, Image, CommandLine</div>
       </div>
+      <div class="query-block">
+        <div class="query-label">2026 chain (post-compromise) — unauthorized remote-access tool installation · Sysmon Event ID 1 / Service Control Manager Event ID 7045</div>
+        <div class="query-code">(EventCode=7045 ServiceName="Remote Access Service" ServiceFileName="*\\SimpleService.exe")
+OR (EventCode=1 (Image="*\\AnyDesk.exe" OR TargetFilename="*\\JWrapper-Remote Access\\*") AND ParentImage="*\\pc-app.exe")
+| table _time, Computer, ServiceName, Image, TargetFilename</div>
+      </div>
       <div class="prose" style="margin-top:12px;">
+        <p>Specific IOCs from the 2026-08-31 RAT-deployment reporting: a Windows service named "Remote Access Service" running <code>SimpleService.exe</code>; files under <code>C:\ProgramData\JWrapper-Remote Access\JWAppsSharedConfig\restricted\</code>; payloads staged to <code>C:\ProgramData</code> from an external file-sharing host prior to silent installation; and any AnyDesk installation not tracked in change management. Any of these found on a PaperCut Application Server host should be treated as confirmed compromise, not a false positive.</p>
+      </div>
+      <div class="prose" style="margin-top:4px;">
         <p>Additional behavioral indicators independent of query tooling: files matching five-character random names under <code>server/data/content/</code>; a <code>.out</code> file (e.g. <code>Udydn.out</code>) appearing and then disappearing alongside a truncated or deleted <code>server.log</code> — attackers observed in the 2026 chain deleting both the output file and the log itself to cover tracks; and modification timestamps on <code>print.script.sandboxed</code> or <code>print-and-device.script.enabled</code> configuration keys outside a change-managed maintenance window.</p>
       </div>
     </div>
@@ -786,18 +923,18 @@ OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_ba
       <div class="two-col" style="margin-bottom:12px;">
         <div class="kv">
           <div class="kv-row"><span class="kv-key">2023 Chain Patch</span><span class="kv-val green">20.1.7 / 21.2.11 / 22.0.9 or later — fully resolved, no known bypass</span></div>
-          <div class="kv-row"><span class="kv-key">2026 Chain Patch</span><span class="kv-val amber">Emergency Patch Release 2 (2026-08-28) mandatory — Release 1 alone is insufficient</span></div>
-          <div class="kv-row"><span class="kv-key">Current Baseline</span><span class="kv-val">NG 25.0.12.76497 / MF 25.0.12.76496 (Windows); 26.0.4; v24 fix delayed — confirm current status with vendor before relying on v24</span></div>
+          <div class="kv-row"><span class="kv-key">2026 Chain Patch</span><span class="kv-val amber">Emergency Patch Release 3 (2026-09-01) mandatory — Releases 1 and 2 both had reported gaps</span></div>
+          <div class="kv-row"><span class="kv-key">Current Baseline</span><span class="kv-val">Emergency Patch Release 3 (2026-09-01) for versions 24, 25, 26 — fixes two known regressions from Release 2 in addition to further hardening</span></div>
           <div class="kv-row"><span class="kv-key">Unpatchable Population</span><span class="kv-val red">v23 and earlier — no fix exists; upgrade to a supported branch is the only remediation</span></div>
         </div>
         <div class="kv">
-          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">papercut.com/kb — PO-1216/PO-1219 (2023); Security Bulletin 27-Aug-2026 (2026)</span></div>
-          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Low-Moderate — emergency patches historically limited in scope, but Release 1→2 supersession for the 2026 chain means re-testing is required even for already-patched hosts</span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">papercut.com/kb — PO-1216/PO-1219 (2023); Security Bulletin 27-Aug-2026 (2026, updated through Release 3)</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Moderate — Release 2 itself introduced two regressions that Release 3 fixes; re-test print workflows again after applying Release 3 even if Release 2 was already validated</span></div>
           <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Validate Device/Print Scripting workflows and database driver connectivity after patching — both patched code paths intersect legitimate admin functionality</span></div>
         </div>
       </div>
       <div class="prose">
-        <p>Any organization that applied only the 2026-08-27 emergency patch must apply Emergency Patch Release 2 (2026-08-28) — the vendor has explicitly stated this is required even for hosts already patched once. For the population still running version 23 or earlier, there is no patch to apply; treat this as equivalent to a "NO FIX" status for that specific cohort and prioritize migration to a supported branch or, if migration cannot happen immediately, the compensating controls below.</p>
+        <p>Any organization running Release 1 or Release 2 must apply Emergency Patch Release 3 (2026-09-01) — the vendor has explicitly stated this is required even for hosts already patched twice, since Release 2 itself carried two known regressions that Release 3 corrects. Given that CISA has now KEV-listed both 2026-generation CVEs and BOD 26-04's highest-risk tier carries a 3-calendar-day remediation SLA for exactly this exposure profile (publicly exposed, KEV-listed, automatable, total-control), federal and federal-adjacent organizations in particular should treat Release 3 deployment as urgent rather than routine patch-cycle work. For the population still running version 23 or earlier, there is no patch to apply; treat this as equivalent to a "NO FIX" status for that specific cohort and prioritize migration to a supported branch or, if migration cannot happen immediately, the compensating controls below.</p>
       </div>
     </div>
 
@@ -875,7 +1012,8 @@ OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_ba
           <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-306 (Missing Authentication for Critical Function)</span></div>
           <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not yet established — CVE assigned 2026-08, too recent for a stable score</span></div>
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://www.papercut.com/kb/Main/security-bulletin-27-aug-2026-urgent-security-advisory/" target="_blank" style="color:var(--cyan)">PaperCut Security Bulletin, 27-Aug-2026</a></span></div>
-          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not listed as of 2026-08-30 — confirmed active exploitation reported by Huntress independent of KEV status</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed — confirmed active exploitation</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2026-08-31 (federal remediation per BOD 26-04's risk-tiered SLA, not a fixed date — see Section 06)</span></div>
         </div>
       </div>
       <div class="cve-meta-item">
@@ -884,9 +1022,10 @@ OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_ba
           <div class="kv-row"><span class="kv-key">CVSS Score</span><span class="kv-val red">9.4 (Critical)</span></div>
           <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val dim">Full vector not published by vendor/advisory sources as of this compile — only the base score (9.4) was disclosed</span></div>
           <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-470 (Use of Externally-Controlled Input to Select Classes or Code — Unsafe Reflection)</span></div>
-          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not yet established — CVE assigned 2026-08, too recent for a stable score</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not yet established as of this compile</span></div>
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://www.papercut.com/kb/Main/security-bulletin-27-aug-2026-urgent-security-advisory/" target="_blank" style="color:var(--cyan)">PaperCut Security Bulletin, 27-Aug-2026</a></span></div>
-          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not listed as of 2026-08-30 — confirmed active exploitation reported by Huntress independent of KEV status</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed — confirmed active exploitation</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2026-08-31 (federal remediation per BOD 26-04's risk-tiered SLA, not a fixed date — see Section 06)</span></div>
         </div>
       </div>
     </div>
@@ -902,12 +1041,12 @@ OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_ba
   <div class="section-body">
     <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
     <div class="xref-grid" style="margin-bottom:18px;">
-      <div class="xref-none">No companion actor cards on file for Bl00dy Ransomware Gang, Cl0p, LockBit, Lace Tempest/TA505/Silence, MuddyWater (Mango Sandstorm), or Mint Sandstorm as of 2026-08-30 — this repository's existing actor cards (APT1, Gonjeshke Darande, JadePuffer, Lapsus$, REvil, Salt Typhoon, Scattered Spider, TeamPCP) do not include any of the confirmed PaperCut operators from either generation. All six flagged as strong candidates for future actor cards given their confirmed, independently-sourced weaponization of this vulnerability family.</div>
+      <div class="xref-none">No companion actor cards on file for Bl00dy Ransomware Gang, Cl0p, LockBit, Lace Tempest/TA505/Silence, MuddyWater (Mango Sandstorm), or Mint Sandstorm as of 2026-09-02 — this repository's existing actor cards (APT1, CyberAv3ngers, Gonjeshke Darande, JadePuffer, Lapsus$, REvil, Salt Typhoon, Scattered Spider, TeamPCP) do not include any of the confirmed PaperCut operators from either generation. All six flagged as strong candidates for future actor cards given their confirmed, independently-sourced weaponization of this vulnerability family. The 2026-generation attackers (RAT deployment, database-dump activity) remain unattributed as of this compile.</div>
     </div>
 
     <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
     <div class="xref-grid">
-      <div class="xref-none">No companion incident cards on file reference the PaperCut vulnerability chain as an initial access vector as of 2026-08-30. The 2023 Bl00dy/Education Facilities Subsector campaign and the 2026 Huntress-observed intrusions are candidates for future incident cards.</div>
+      <div class="xref-none">No companion incident cards on file reference the PaperCut vulnerability chain as an initial access vector as of 2026-09-02. The 2023 Bl00dy/Education Facilities Subsector campaign and the 2026 Huntress-observed intrusions are candidates for future incident cards.</div>
     </div>
   </div>
 </div>
@@ -916,6 +1055,176 @@ OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_ba
 <div class="section">
   <div class="section-header">
     <div class="section-num">11</div>
+    <div class="section-title">Network Exposure <small>Ports · Protocols · Banners · Nmap · Shodan</small></div>
+  </div>
+  <div class="section-body">
+
+    <!-- PORT / PROTOCOL SUMMARY TABLE -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <table class="port-table" style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>Port</th>
+          <th>Proto</th>
+          <th>Service</th>
+          <th>Vulnerable Condition</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="port-num">9191</td>
+          <td>TCP</td>
+          <td class="svc-name">HTTP — PaperCut Application Server web interface</td>
+          <td class="version-vuln">Unauthenticated <code>SetupCompleted</code> access (2023) / crafted request-routing to admin components (2026)</td>
+          <td>Default, unencrypted management port — reachable from any client that can print, by design, unless firewalled</td>
+        </tr>
+        <tr>
+          <td class="port-num">9192</td>
+          <td>TCP</td>
+          <td class="svc-name">HTTPS — PaperCut Application Server web interface</td>
+          <td class="version-vuln">Same exploit chains as port 9191, over TLS</td>
+          <td>Encryption does not mitigate either vulnerability — both are application-layer authorization defects</td>
+        </tr>
+        <tr>
+          <td class="port-num">9195</td>
+          <td>TCP</td>
+          <td class="svc-name">HTTPS — SHA-2 certificate endpoint (MF 18.3+)</td>
+          <td class="version-vuln">Same exposure as 9192</td>
+          <td>Additional HTTPS listener introduced for SHA-2 certificate support; same web application behind it</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- NMAP SCAN OUTPUT — DEFAULT -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Default Service Scan Output (PaperCut Application Server)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">nmap -sV -p 9191,9192,9195 print01.corp.local</span>
+      </div>
+      <div class="nmap-output"># NOTE: Representative default -sV output — nmap's generic HTTP service-version
+# probe identifies an embedded Jetty web server but does not by itself confirm
+# PaperCut identity, version, or patch level. Combine with the HTTP body-string
+# fingerprint below for positive identification.
+
+Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for print01.corp.local (10.20.30.40)
+Host is up (0.0038s latency).
+
+PORT     STATE SERVICE VERSION
+<span class="port-open">9191/tcp open  http</span>    <span class="version">Eclipse Jetty</span>
+<span class="port-open">9192/tcp open  ssl/http</span> <span class="version">Eclipse Jetty</span>
+<span class="port-open">9195/tcp open  ssl/http</span> <span class="version">Eclipse Jetty</span>
+<span class="vuln-flag">|_http-title: PaperCut Login</span>
+
+Service detection performed. Report any incorrect results at https://nmap.org/submit/</div>
+    </div>
+
+    <!-- NMAP SCAN OUTPUT — VERSION DISCRIMINATING -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; margin-top:16px;">Nmap — Version-Discriminating Scan (Vulnerable vs. Patched)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">nmap --script http-title,http-headers -p 9191 print01.corp.local</span>
+      </div>
+      <div class="nmap-output"># NOTE: No nmap script or HTTP header value published in research reviewed for
+# this compile reliably discriminates a patched from an unpatched PaperCut server —
+# the product does not expose its build number in response headers or the login
+# page by default. The practical, source-documented way to confirm exploitability
+# without disrupting production is Rapid7's Metasploit module
+# exploit/multi/http/papercut_ng_auth_bypass, which implements the same
+# SetupCompleted / Device-Scripting chain used by the 2023 in-the-wild attacks
+# and reports success/failure without requiring a full RCE payload be run.
+#
+# Version ground truth instead requires either authenticated access to
+# Application Server &gt; About, or the vendor's documented KB procedure:
+# https://www.papercut.com/kb/Main/how-to-check-version-numbers/
+
+Starting Nmap 7.94 ( https://nmap.org )
+PORT     STATE SERVICE
+9191/tcp open  http
+| http-title: PaperCut Login
+| http-headers:
+|   Server: Jetty(9.4.z-SNAPSHOT)
+|_  (Request type: HEAD)</div>
+    </div>
+    <div class="prose" style="margin-top:10px; margin-bottom:0;">
+      <p>The Jetty container version disclosed in the <code>Server</code> header identifies the underlying embedded web server, not the PaperCut application version layered on top of it — the same Jetty build can host multiple PaperCut releases spanning both vulnerable and patched status. Treat any internet-reachable PaperCut instance as vulnerable-until-proven-patched rather than attempting remote version fingerprinting; the population of exposed instances documented in Section 01 (Shadowserver's 800+ count) reflects exactly this — reachability, not confirmed vulnerability.</p>
+    </div>
+
+    <!-- SERVICE BANNERS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Version Identification</div>
+
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">HTTP GET / · Port 9191 — Response Body Fragment</span>
+        <span class="banner-status vulnerable">IDENTIFICATION STRING</span>
+      </div>
+      <div class="banner-text">&lt;title&gt;<span class="vuln-string">PaperCut Login</span>&lt;/title&gt;
+...
+&lt;meta name="description" content="<span class="vuln-string">PaperCut NG is a print management system</span>"&gt;</div>
+    </div>
+
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">HTTP GET / · Port 9191 — MF Variant</span>
+        <span class="banner-status vulnerable">IDENTIFICATION STRING</span>
+      </div>
+      <div class="banner-text">&lt;meta name="description" content="<span class="vuln-string">PaperCut MF is a print management system</span>"&gt;</div>
+    </div>
+    <div class="prose" style="margin-top:4px;">
+      <p>Version not reliably discriminated via banner — this response body text is identical across every NG/MF release researched for this compile and is used purely as a product-identification fingerprint (runZero, 2026), not a patch-status indicator. This is the same finding as PrintNightmare's Section 11 in this repository: for authorization-logic vulnerabilities, network banners answer "is this the product" but not "is this patched."</p>
+    </div>
+
+    <!-- NSE SCRIPTS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
+
+    <div class="nse-block">
+      <div class="nse-header">
+        <span class="nse-name">http-title <span style="color:var(--text-dim); font-weight:400;">(generic identification only — NOT a vulnerability check)</span></span>
+        <div class="nse-tags">
+          <span class="nse-tag detect">DETECTION</span>
+        </div>
+      </div>
+      <div class="nse-cmd">nmap --script http-title -p 9191,9192 print01.corp.local</div>
+      <div class="nse-output"># http-title is a generic, built-in nmap script that fetches a page's &lt;title&gt;
+# element. It reliably surfaces "PaperCut Login" for asset-inventory purposes
+# but performs no vulnerability logic whatsoever.
+<span class="safe-flag">PORT     STATE SERVICE
+9191/tcp open  http
+|_http-title: PaperCut Login</span></div>
+    </div>
+    <div class="prose" style="margin-top:8px;">
+      <p>No dedicated built-in NSE script exists for any CVE in the PaperCut family (CVE-2023-27350, CVE-2023-27351, CVE-2026-81578, CVE-2026-82078) as of this compile. The practical, source-documented alternative is Rapid7's Metasploit module <a href="https://www.rapid7.com/db/modules/exploit/multi/http/papercut_ng_auth_bypass/" target="_blank" style="color:var(--cyan)">exploit/multi/http/papercut_ng_auth_bypass</a>, which implements the 2023 SetupCompleted/Device-Scripting chain end-to-end and can be run in check-only mode against a non-production target to confirm exploitability without deploying a payload. No comparable public Metasploit or Nmap tooling for the 2026 chain (CVE-2026-81578/82078) was identified in research reviewed for this compile — the primary public technical references remain Huntress's and eSentire's write-up-level analyses rather than a packaged scanning tool.</p>
+    </div>
+
+    <!-- SHODAN / CENSYS DORKS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
+
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Shodan</span>
+      </div>
+      <div class="shodan-dork">http.title:"PaperCut Login"</div>
+      <div class="shodan-note">Unlike PrintNightmare's internal RPC surface, PaperCut's web management interface is a legitimate internet-facing HTTP service by product design (remote print release, mobile printing), so exposure counts here are directly meaningful. Documented historical counts: approximately 1,700–1,800 internet-exposed PaperCut servers shortly after the 2023 disclosure (multiple vendor blogs, Shodan-sourced, April 2023); over 800 PaperCut MF/NG servers currently tracked by the Shadowserver Foundation as of 2026-08-31, with no public breakdown of how many are honeypots or already patched. Both figures are point-in-time and should not be treated as a live vulnerability count — reachability via this dork does not confirm patch status; see the Nmap version-discrimination note above.</div>
+    </div>
+
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Censys</span>
+      </div>
+      <div class="shodan-dork">services.http.response.html_title="PaperCut Login"</div>
+      <div class="shodan-note">Equivalent title-based query for Censys. No independently documented Censys-specific exposure count for PaperCut was identified in research reviewed for this compile; use the Shodan/Shadowserver figures above as the best available point-in-time reference.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
     <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
   </div>
   <div class="section-body">
@@ -1024,6 +1333,34 @@ OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_ba
         <div class="ref-source">Cybersecurity Help (cybersecurity-help.cz)</div>
         <div><div class="ref-detail"><a href="https://www.cybersecurity-help.cz/vdb/vulns/146037/" target="_blank">Unsafe reflection in PaperCut MF and PaperCut NG — CVE-2026-82078</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
       </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/alerts/2026/08/31/cisa-adds-two-known-exploited-vulnerabilities-catalog" target="_blank">CISA Adds Two Known Exploited Vulnerabilities to Catalog (CVE-2026-81578, CVE-2026-82078)</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Help Net Security</div>
+        <div><div class="ref-detail"><a href="https://www.helpnetsecurity.com/2026/08/31/papercut-attack-remote-access-tools/" target="_blank">Attackers Plant Remote Access Tools on Compromised PaperCut Servers</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div><div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/recently-patched-papercut-zero-days-used-in-data-theft-attacks/" target="_blank">Recently Patched PaperCut Zero-Days Used in Data Theft Attacks</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">runZero</div>
+        <div><div class="ref-detail"><a href="https://www.runzero.com/blog/papercut-software/" target="_blank">PaperCut Software Vulns: CVE-2026-81578, CVE-2026-82078</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cyber Daily (au)</div>
+        <div><div class="ref-detail"><a href="https://www.cyberdaily.au/security/14128-papercut-exploitation-continues-to-worsen-as-company-releases-third-emergency-patch" target="_blank">PaperCut Exploitation Continues to Worsen as Company Releases Third Emergency Patch</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Rapid7</div>
+        <div><div class="ref-detail"><a href="https://www.rapid7.com/db/modules/exploit/multi/http/papercut_ng_auth_bypass/" target="_blank">PaperCut PaperCutNG Authentication Bypass — Metasploit Module</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">PaperCut</div>
+        <div><div class="ref-detail"><a href="https://www.papercut.com/kb/Main/how-to-check-version-numbers/" target="_blank">How to Check PaperCut NG/MF Component Version Numbers</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1031,8 +1368,8 @@ OR (TargetFilename="*\\server\\lib\\*.class" AND NOT TargetFilename IN (known_ba
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 26 sources, all open-source/public</div>
-  <div>PaperCut MF/NG · CVE-2023-27350 / CVE-2023-27351 / CVE-2026-81578 / CVE-2026-82078</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 33 sources, all open-source/public</div>
+  <div>PaperCut MF/NG · CVE-2023-27350 / CVE-2023-27351 / CVE-2026-81578 / CVE-2026-82078 · UPDATED FROM: 2026-08-30 · Git history preserved</div>
 </div>
 
 </body>
