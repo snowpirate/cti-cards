@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CyberAv3ngers — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── OPSEC PROCEDURES ── */
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  /* ── DETECTION EVASION ── */
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* ── CTID EMULATION PLAN ── */
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge">⚠ NATION-STATE · IRGC-CEC · IRAN</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — State-Directed ICS/OT Sabotage Operation Presented Publicly as Hacktivism</div>
+  <h1><span class="accent2">CYBER</span>AV3NGERS</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK (G1027), CISA/FBI/NSA/EPA Joint Advisories AA23-335A &amp; AA26-097A, U.S. Treasury/OFAC, Claroty Team82, Mandiant, Microsoft, Dragos, Tenable, WaterISAC, 15+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE — ESCALATING, NATIONAL-SCALE OT TARGETING</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL</span></div>
+    <div>Primary Motive: <span class="warn">State-Directed Critical-Infrastructure Disruption — publicly framed as anti-Israel/anti-US hacktivism</span></div>
+    <div>Active Since: <span>2020 (assessed) / Oct 2023 (public persona)</span></div>
+    <div>MITRE ATT&amp;CK: <span>G1027</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ THREAT UPDATE — JUL 2026</div>
+  <div class="alert-headline">Coordinated strike on 30+ Minnesota water utilities exposes national exposure of unpatched Rockwell PLCs</div>
+  <div class="alert-body">On 2026-07-26/27, a coordinated cyberattack disrupted more than 30 municipal water systems across Minnesota — including Plymouth, South St. Paul, Maple Plain, and Braham — by remotely accessing internet-exposed Rockwell Automation/Allen-Bradley MicroLogix 1100/1400 PLCs and changing device IP addresses and passwords to lock legitimate operators out. One treatment plant went fully offline, at least two cities reverted to manual operation, and one mayor declared a local state of emergency; Minnesota's Department of Health confirmed no water-quality impact and no boil-water advisories resulted (Tenable, 2026; The Register, 2026). By 2026-07-30 the FBI and EPA confirmed water/wastewater intrusions in at least seven U.S. states. Tenable assesses the operational pattern — Rockwell PLC targeting, IP/credential lockout technique — as consistent with CyberAv3ngers' established modus operandi, though neither state nor federal officials had issued formal attribution as of this compile. The incident follows directly from the six-agency joint advisory AA26-097A (2026-04-07), which confirmed CyberAv3ngers/IRGC-CEC exploitation of the still-unpatched CVE-2021-22681 Rockwell Logix authentication bypass, with expansion to Schneider Electric and Siemens devices via malicious project files designed to override safety-critical logic.</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">75+</div>
+    <div class="stat-label">Unitronics Vision PLCs Compromised Across US, Israel, UK &amp; Ireland (2023 Wave)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">$10M</div>
+    <div class="stat-label">U.S. State Department Rewards for Justice Bounty on the Group</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">30+</div>
+    <div class="stat-label">Minnesota Water Utilities Hit in a Single Coordinated Attack, Jul 26–27 2026</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">7+</div>
+    <div class="stat-label">US States Reporting Water/Wastewater Intrusions as of Jul 30 2026</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CyberAv3ngers is a state-directed cyber unit of Iran's Islamic Revolutionary Guard Corps Cyber-Electronic Command (IRGC-CEC) that operates publicly as a self-presented "hacktivist" collective, active since at least 2020 and tracked under the MITRE ATT&amp;CK designation G1027. It is tracked in industry reporting under a wide alias set — Soldiers of Solomon, Shahid Kaveh Group, and Hydro Kitten/UNC5691 (Mandiant), Storm-0784 (Microsoft), and Bauxite (Dragos) — reflecting independent convergence across multiple vendors and government agencies on the same underlying actor. Unlike most nation-state-linked groups this profile series covers, CyberAv3ngers is defined not by espionage or financial theft but by direct sabotage-oriented targeting of operational technology (OT) and industrial control systems (ICS): programmable logic controllers (PLCs), human-machine interfaces (HMIs), and the physical processes they govern.</p>
+      <p>The group matters acutely right now because its capability and reach have escalated sharply and repeatedly since its public debut. What began in November 2023 as opportunistic exploitation of a single default administrative password ("1111") on internet-exposed Unitronics Vision Series PLCs — compromising a booster station at the Municipal Water Authority of Aliquippa, Pennsylvania, among at least 75 devices worldwide — had by April 2026 escalated into a six-agency U.S. joint advisory (AA26-097A) confirming active exploitation of an unpatched, four-year-old Rockwell Automation authentication-bypass vulnerability (CVE-2021-22681) across water, energy, and government infrastructure nationally, plus expansion to Schneider Electric and Siemens devices via malicious project files engineered to override safety-critical logic. That trajectory culminated, as of this compile, in a coordinated July 2026 strike that knocked out or degraded operator control at 30-plus Minnesota water utilities in a single 24-hour window, with confirmed intrusions spanning at least seven U.S. states.</p>
+      <p>CyberAv3ngers sits at the center of a specific geopolitical function: its hacktivist framing supplies Iran a layer of public deniability for actions against U.S. and Israeli critical infrastructure amid sustained regional tension, while U.S. Treasury, CISA, and multiple private-sector vendors have explicitly and publicly pierced that framing. OFAC sanctioned six named IRGC-CEC officials — including Hamid Reza Lashgarian, head of the IRGC-CEC and a commander in the IRGC-Qods Force — in February 2024, alongside a $10 million State Department bounty, formally establishing state attribution well before the group's most consequential 2026 activity.</p>
+      <p>The critical operational context defenders should hold in mind: CyberAv3ngers' core enabling condition has never been sophisticated malware. It is the routine, often unnecessary practice of exposing PLC and HMI management interfaces directly to the public internet — disproportionately common among small, rural, and municipal water utilities operating with minimal dedicated OT security investment. The group has now demonstrated, repeatedly and at increasing scale despite sanctions, an indictment-adjacent bounty program, and multiple public advisories, that this structural weakness across the U.S. water sector remains exploitable on demand.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">CyberAv3ngers</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">Iran's Islamic Revolutionary Guard Corps — Cyber-Electronic Command (IRGC-CEC)</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Nation-State — OT/ICS Sabotage, operating under a self-presented "hacktivist" persona</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">State-directed critical-infrastructure disruption and pre-positioning, publicly framed as anti-Israel/anti-US political retaliation</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">At least 2020 (MITRE-assessed); public operations under the CyberAv3ngers persona since October 2023</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">2026 — coordinated Minnesota water-utility campaign (Jul 2026); "Cyber4vengers" Telegram persona active since Jan 2026</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G1027</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">OFAC sanctioned six IRGC-CEC officials (Feb 2024, incl. commander Hamid Reza Lashgarian); U.S. State Dept. Rewards for Justice $10M bounty (Feb 2024)</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">CyberAv3ngers</span>
+          <span class="alias-chip">Soldiers of Solomon</span>
+          <span class="alias-chip">Shahid Kaveh Group</span>
+          <span class="alias-chip">Hydro Kitten</span>
+          <span class="alias-chip">UNC5691</span>
+          <span class="alias-chip">Storm-0784</span>
+          <span class="alias-chip">Bauxite</span>
+          <span class="alias-chip">Cyber4vengers (2026 rebrand)</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>Attribution to Iran's IRGC-CEC is HIGH, supported by multiple fully independent lines of evidence: joint U.S. government advisories (CISA/FBI/NSA/EPA — AA23-335A and AA26-097A), formal U.S. Treasury/OFAC sanctions naming specific IRGC-CEC officers as directing operations, and separate, independently arrived-at technical attribution from Mandiant, Microsoft, Dragos, and Claroty. This is a case where government and private-sector attribution converge exceptionally cleanly, and where the actor's own "hacktivist" self-presentation has been explicitly and publicly rejected by attributing bodies rather than merely doubted. The residual uncertainty is not sponsorship but internal structure: the precise division of labor between the propaganda/persona-management layer (serial Telegram rebrands, frequently exaggerated or fabricated claims) and the technical operators executing PLC exploitation is not fully resolved, and these may not be the same individuals or sub-unit.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2020</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Assessed Origins</div>
+          <div class="timeline-desc">MITRE ATT&amp;CK dates group activity to at least 2020, predating the group's public persona; limited public detail exists on this earliest period.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">OCT 2023</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Public Persona Launch — Israel-Focused Claims</div>
+          <div class="timeline-desc">CyberAv3ngers begins publicly claiming attacks against Israeli infrastructure via Telegram: the Dorad power station (Oct 8 — later found to reuse material recycled from an earlier Moses Staff hacktivist leak), ORPAK fuel-station systems, and 10 Israeli water treatment stations (Oct 30). Multiple claims from this period were subsequently assessed by researchers as exaggerated or fabricated.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">NOV 2023</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Pivot to US Critical Infrastructure — Unitronics Campaign</div>
+          <div class="timeline-desc">Exploits the default "1111" administrative password on internet-exposed Unitronics Vision Series PLCs/HMIs; compromises a booster-station PLC at the Municipal Water Authority of Aliquippa, PA (Nov 25) and at least 75 devices total across the US, Israel, UK, and Ireland. Joint CISA/FBI/NSA/EPA/INCD advisory AA23-335A follows.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">NOV 2023 –<br/>APR 2024</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Sustained US ICS/OT Intrusion Wave</div>
+          <div class="timeline-desc">At least 29 confirmed intrusions against U.S. ICS/OT assets are attributed to the group in this window, extending beyond water utilities into other sectors running Unitronics and related equipment.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">FEB 2024</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">OFAC Sanctions &amp; $10M Bounty</div>
+          <div class="timeline-desc">U.S. Treasury/OFAC sanctions six IRGC-CEC officials directing operations, including commander Hamid Reza Lashgarian; the State Department simultaneously announces a $10M Rewards for Justice bounty for information on the group.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">APR 2024</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">OPSEC Failure — Persona Comms Disrupted</div>
+          <div class="timeline-desc">The group's Telegram communications are disrupted, assessed by researchers as possibly linked to poor operational security that may have enabled geolocation of persona operators.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2024 –<br/>2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">IOCONTROL Malware Development</div>
+          <div class="timeline-desc">The group develops IOCONTROL, a custom, modular Linux malware platform for OT/IoT devices spanning routers, PLCs, HMIs, IP cameras, and firewalls from at least nine distinct vendors. Claroty Team82 publishes detailed technical analysis in December 2024, characterizing it as a nation-state cyberweapon.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JAN 2026</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">"Cyber4vengers" Rebrand</div>
+          <div class="timeline-desc">After the "APT IRAN" Telegram channel — widely assessed as a prior CyberAv3ngers rebrand — is deleted, "Cyber4vengers" emerges to continue persona operations, illustrating the group's resilience to platform-level takedowns.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAR –<br/>APR 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Escalation to Rockwell/Schneider/Siemens — AA26-097A</div>
+          <div class="timeline-desc">Campaign expands to exploit unpatched CVE-2021-22681 in Rockwell Automation Logix controllers, then to Schneider Electric and Siemens devices via malicious project files designed to override safety-critical logic. A six-agency advisory (AA26-097A, Apr 7) — FBI, CISA, NSA, EPA, DOE, and U.S. Cyber Command's CNMF — confirms operational disruption and financial loss at multiple U.S. organizations.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JUL 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Coordinated Minnesota Water-Utility Attack</div>
+          <div class="timeline-desc">30+ Minnesota water systems are hit Jul 26–27 via compromised Rockwell/Allen-Bradley MicroLogix 1100/1400 PLCs, with attackers changing device IP addresses and passwords to lock out operators. One plant goes offline; a local state of emergency is declared. FBI/EPA confirm intrusions across at least seven U.S. states by Jul 30. Tenable assesses the pattern as consistent with CyberAv3ngers, though official government attribution remains pending as of this compile.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Internet-exposed OT, not sophisticated intrusion, is the primary access vector</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CyberAv3ngers' intrusion lifecycle begins almost entirely with internet-facing reconnaissance rather than social engineering or supply-chain compromise: Shodan- and Censys-style sweeps for OT/ICS devices exposed directly to the public internet, keyed to known default service ports — TCP 20256 for Unitronics Vision Series PLCs, TCP 44818 for Rockwell EtherNet/IP-enabled controllers (T1595.002). Because so many small and municipal utilities operate these devices without any VPN, firewall segmentation, or network isolation between the management interface and the open internet (T1133), a successful scan alone frequently yields direct administrative reach to a live industrial process.</p>
+      <p>Initial access itself has evolved but has consistently avoided the need for sophisticated exploitation until relatively recently. The 2023 Unitronics campaign required nothing more than the PLC/HMI's unmodified factory-default administrative password, "1111" (T1078.001) — no malware, no exploit, and no credential theft was necessary. The 2026 Rockwell campaign marks a genuine sophistication increase: it weaponizes CVE-2021-22681, a critical authentication-bypass flaw in the cryptographic key used to verify communications between Rockwell's engineering software and Logix-family controllers, for which Rockwell has never issued a firmware patch (T1190). Once inside, the group has needed almost no lateral movement in the traditional IT sense, because the compromised device — a PLC or HMI — is itself the target and the endpoint of impact.</p>
+      <p>Where impact requires more than administrative access to native device functions, the group deploys IOCONTROL, its custom, modular Linux malware platform for OT/IoT devices. IOCONTROL installs a persistence mechanism via an rc.d boot script (T1037.004) and communicates with its operators over MQTT/TLS on port 8883 — a standard IoT protocol chosen specifically to blend command-and-control traffic with legitimate device telemetry — while resolving C2 domains via DNS-over-HTTPS to defeat DNS-based blocking (T1071, T1071.004). Its configuration is AES-256-CBC encrypted and its binary UPX-packed (T1027), reflecting a maintained, professionally engineered development effort well beyond what the group's 2023 campaign required. The final impact phase is where CyberAv3ngers most clearly diverges from typical eCrime or espionage actors: rather than exfiltrating data, the group erases or overwrites original PLC ladder logic with non-functional custom logic, changes device IP addresses and passwords specifically to lock legitimate operators out (as observed at scale in the July 2026 Minnesota campaign), and — per the 2026 Schneider/Siemens expansion — uploads malicious project files intended to override safety-critical control logic, a category of impact that moves beyond availability disruption into genuine physical-safety risk.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise + ATT&amp;CK for ICS — mapped against G1027</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1595.002</div>
+        <div class="mitre-name">Active Scanning: Vulnerability Scanning</div>
+        <div class="mitre-note">[HIGH] Shodan/Censys-style sweeps for internet-exposed Unitronics (TCP 20256) and Rockwell EtherNet/IP (TCP 44818) endpoints ahead of every observed campaign wave.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T0846</div>
+        <div class="mitre-name">Remote System Discovery</div>
+        <div class="mitre-note">[MEDIUM] Enumerates reachable PLC/HMI assets once initial access to one internet-exposed device is achieved.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Exploits CVE-2021-22681, an unpatched authentication-bypass flaw in Rockwell Automation Logix controllers, in the 2026 campaign (AA26-097A).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078.001</div>
+        <div class="mitre-name">Valid Accounts: Default Accounts</div>
+        <div class="mitre-note">[HIGH] Authenticated to Unitronics Vision Series PLCs/HMIs using the unmodified factory-default administrative password "1111" in the 2023 campaign.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Relies on PLC/HMI management interfaces deployed directly on the public internet with no VPN or network segmentation.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1037.004</div>
+        <div class="mitre-name">Boot or Logon Initialization Scripts: RC Scripts</div>
+        <div class="mitre-note">[HIGH] IOCONTROL installs an rc.d boot script on compromised Linux-based OT/IoT devices to survive reboots.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">[HIGH] IOCONTROL's configuration is AES-256-CBC encrypted and its binary UPX-packed to frustrate automated analysis and signature detection.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1071</div>
+        <div class="mitre-name">Application Layer Protocol</div>
+        <div class="mitre-note">[HIGH] IOCONTROL C2 rides MQTT over TLS on port 8883, blending with legitimate IoT device telemetry.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1071.004</div>
+        <div class="mitre-name">Application Layer Protocol: DNS</div>
+        <div class="mitre-note">[MEDIUM] Uses DNS-over-HTTPS for C2 domain resolution to defeat DNS-based blocking and monitoring.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Inhibit Response Function</div>
+        <div class="mitre-id">T0836</div>
+        <div class="mitre-name">Modify Parameter</div>
+        <div class="mitre-note">[HIGH] Remotely changed PLC IP addresses and passwords to lock legitimate operators out of Rockwell MicroLogix controllers across 30+ Minnesota utilities (Jul 2026).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impair Process Control</div>
+        <div class="mitre-id">T0831</div>
+        <div class="mitre-name">Manipulation of Control</div>
+        <div class="mitre-note">[MEDIUM] Uploaded malicious project files to Schneider Electric and Siemens devices designed to override safety-critical control logic (2026 campaign).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Inhibit Response Function</div>
+        <div class="mitre-id">T0856</div>
+        <div class="mitre-name">Spoof Reporting Message</div>
+        <div class="mitre-note">[MEDIUM] Presented falsified process readings to operators while manipulating underlying device state, per 2026 reporting on Siemens/Schneider expansion.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impair Process Control</div>
+        <div class="mitre-id">T0809</div>
+        <div class="mitre-name">Data Destruction</div>
+        <div class="mitre-note">[HIGH] Erased original Unitronics ladder-logic files and replaced them with non-functional custom logic during the 2023 campaign.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0813</div>
+        <div class="mitre-name">Denial of Control</div>
+        <div class="mitre-note">[HIGH] Triggered an alarm-driven booster-station shutdown at Aliquippa (2023) and broader loss of remote operator control across Minnesota utilities (2026).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Water &amp; Wastewater Systems</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Energy — Oil, Gas &amp; Electricity</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Government Facilities</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:60%"></div></div>
+            <span class="sector-pct">MED-HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Fuel Management &amp; Building Automation</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">General Manufacturing / OT-Adjacent IoT</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Primarily United States (dominant target since Nov 2023); Israel (original 2023 claims); United Kingdom and Ireland; confirmed intrusions across 7+ U.S. states as of Jul 2026</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Small, rural, and municipal utilities with limited dedicated OT security budget and staffing; organizations running legacy or default-configured Unitronics, Rockwell/Allen-Bradley, Schneider Electric, or Siemens controllers</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Directly internet-exposed PLC/HMI management interfaces (Shodan-discoverable); factory-default or hardcoded credentials; unpatched public CVEs in engineering-software-to-controller authentication (Rockwell CVE-2021-22681)</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Opportunistic scanning for exposed OT assets rather than pre-selected named victims — the group hits whatever internet-facing device of a targeted vendor family it can reach, then escalates from isolated incidents to coordinated, multi-victim bursts (30+ Minnesota utilities in a single 24-hour window)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">IOCONTROL</span>
+          <span class="tool-tag">Custom Linux OT/IoT Malware Platform</span>
+        </div>
+        <div class="tool-desc">Modular, custom-built malware for Linux-based OT and IoT devices, attributed to CyberAv3ngers by Claroty Team82 (Dec 2024) after extraction from a compromised fuel management system. Targets routers, PLCs, HMIs, IP cameras, and firewalls from at least nine distinct vendors (Baicells, D-Link, Hikvision, Red Lion, Orpak, Phoenix Contact, Teltonika, Unitronics, and others). Communicates over MQTT/TLS (port 8883) to blend with legitimate IoT telemetry, resolves C2 domains via DNS-over-HTTPS, encrypts its configuration with AES-256-CBC, and is UPX-packed. Persists via an rc.d boot script stored as <code>/usr/bin/iocontrol</code>. Team82 characterizes it as a nation-state cyberweapon purpose-built to attack civilian critical infrastructure.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">Custom Unitronics Ladder-Logic Payloads</span>
+          <span class="tool-tag">Bespoke ICS Logic Files</span>
+        </div>
+        <div class="tool-desc">Device-model-specific ladder-logic files crafted to replace legitimate PLC control logic once default-credential administrative access is obtained on Unitronics Vision Series PLCs — the sole "payload" required for the 2023 campaign's impact phase, requiring no separate malware.</div>
+      </div>
+      <div class="tool-item red">
+        <div class="tool-header">
+          <span class="tool-name">Rockwell Logix Authentication-Bypass Exploit Chain</span>
+          <span class="tool-tag">CVE-2021-22681 Weaponization</span>
+        </div>
+        <div class="tool-desc">Leverages CVE-2021-22681, an insufficiently protected cryptographic key used to authenticate communications between Rockwell engineering software (Studio 5000 Logix Designer/RSLogix 5000) and Logix-family controllers, enabling unauthenticated remote connection, code upload, data download, and firmware manipulation. No vendor firmware patch is available as of this compile — the vulnerability has been public since 2021.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Shodan / Censys Reconnaissance</span>
+          <span class="tool-tag">OSINT / Commercial Scanning Services</span>
+        </div>
+        <div class="tool-desc">Commercial internet-wide scanning platforms used to identify internet-exposed OT assets by default service port ahead of every observed campaign wave — not custom tooling, but a consistent and essential reconnaissance dependency.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Serial Telegram Persona Infrastructure</span>
+          <span class="tool-tag">Propaganda / Claim-of-Credit Channels</span>
+        </div>
+        <div class="tool-desc">A sequence of disposable Telegram channels — CyberAv3ngers → "APT IRAN" → "Cyber4vengers" (Jan 2026) — used to claim credit, publish (sometimes fabricated or recycled) "proof" of compromise, and sustain the group's hacktivist narrative independent of and resilient to disruption of any single channel or persona.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>Behavioral indicators predominate — see note below</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2021-22681 — Rockwell Automation Logix controllers authentication bypass via insufficiently protected cryptographic key; no firmware patch available</td><td>Claroty / CISA AA26-097A</td><td>2026-04-07</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2023-6448 / CVE-2023-6488 — Unitronics Vision Series PLC/HMI use of hard-coded default administrative credentials ("1111")</td><td>CISA ICSA-23-348-15</td><td>2023-12</td></tr>
+        <tr><td class="type-label">PORT</td><td class="val">TCP 20256 — default Unitronics Vision Series remote-access port; internet-facing exposure is the primary pre-condition for compromise</td><td>CISA AA23-335A</td><td>2023-11</td></tr>
+        <tr><td class="type-label">PORT</td><td class="val">TCP 44818 — Rockwell EtherNet/IP; scanned and targeted for direct controller access in the 2026 campaign</td><td>CISA AA26-097A</td><td>2026-04</td></tr>
+        <tr><td class="type-label">PROTOCOL</td><td class="val">MQTT over TLS, destination port 8883 — IOCONTROL C2 channel; anomalous on most OT network segments and should be treated as a strong compromise indicator</td><td>Claroty Team82</td><td>2024-12</td></tr>
+        <tr><td class="type-label">PROTOCOL</td><td class="val">DNS-over-HTTPS (DoH) traffic originating from OT/IoT network segments — used by IOCONTROL for C2 domain resolution</td><td>Claroty Team82</td><td>2024-12</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">/usr/bin/iocontrol — IOCONTROL binary storage path on compromised Linux-based OT/IoT devices; rc.d boot script added for persistence</td><td>Claroty Team82</td><td>2024-12</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No durable, publicly attributed static IP or C2-domain list exists for this actor as of this compile. CyberAv3ngers' primary "infrastructure" is the victim's own directly-exposed OT device rather than attacker-owned C2 hosting, and IOCONTROL's DoH/MQTT design specifically resists static domain/IP enumeration. Defenders should prioritize the behavioral and protocol indicators above and the TTPs in Section 04 over static IOC matching, and consult current CISA/Claroty advisories for any newly published indicators.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (state sponsorship) / MEDIUM (internal persona-vs-operator structure)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Escalating — from single-vendor default-credential abuse (2023) to a multi-vendor, safety-logic-targeting campaign disrupting 30+ utilities in one coordinated window (2026)</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Demonstrated progression from availability-only disruption toward malicious project files designed to override safety-critical control logic — a genuine physical-safety risk category, not merely a nuisance-outage one</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Full scope and formal government attribution of the Jul 2026 Minnesota/7-state campaign remains pending; true operational overlap between the propaganda-persona layer and IRGC-CEC technical operators is not fully resolved</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Soldiers of Solomon</span>
+          <span class="alias-chip">IRGC-CEC</span>
+          <span class="alias-chip">Moses Staff</span>
+          <span class="alias-chip">Iranian State Cyber Apparatus</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>CyberAv3ngers occupies an unusually clear-cut position in the threat landscape: a state-directed actor whose sponsorship is not merely assessed but formally established through sanctions naming specific serving officers, operating with a public messaging apparatus that is transparently disposable and separable from its technical capability. That separation is itself analytically significant — takedowns of individual Telegram personas (the April 2024 disruption, the "APT IRAN" channel deletion) have consistently failed to reduce the group's underlying technical operational tempo, evidenced by the escalation straight through 2025 and into the 2026 Rockwell/Schneider/Siemens campaign. Any defensive or policy response premised on disrupting the persona layer alone should be understood as addressing symptom, not cause.</p>
+      <p>The single most consequential capability shift in this profile is the group's move, confirmed in the April 2026 AA26-097A advisory, from PLCs and ladder logic that merely stop functioning (denial of control, denial of view) to malicious project files on Schneider Electric and Siemens devices specifically engineered to override safety-critical logic and present operators with falsified process readings. That is a different risk category than an offline water pump: it describes the technical precondition for a scenario in which a facility's control system reports normal, safe operating parameters while the underlying physical process has been deliberately pushed outside safe bounds. No public reporting reviewed for this compile confirms such an outcome has yet occurred, and that gap should be stated plainly rather than implied — but the capability to attempt it is now documented, which was not true as recently as late 2023.</p>
+      <p>Competing hypotheses on intent persist and should inform, rather than be resolved by, this assessment: the group's activity is consistent with pure disruption/harassment (locking operators out, defacing HMI displays, generating propaganda material), with intelligence pre-positioning (maintaining latent access to U.S. critical infrastructure for use in a future crisis), or with both simultaneously as complementary lines of effort within the same IRGC-CEC unit. The July 2026 Minnesota campaign's tight, coordinated 24-hour timing across 30+ independently operated utilities argues for centralized, scripted state tasking rather than freelance or loosely coordinated hacktivist opportunism — a datapoint that should raise, not lower, confidence in the pre-positioning hypothesis. Confidence in the group's near-term trajectory would increase with formal government attribution of the Minnesota campaign (currently a vendor assessment, not an official one) and would be most significantly revised upward in severity by any confirmed instance of the safety-override capability actually being triggered against a live process.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Remove PLC/HMI management interfaces from direct internet exposure.</strong> Require VPN with MFA for any remote engineering or administrative access; treat any internet-reachable OT device found via Shodan/Censys-style sweep as an active incident precursor.</div>
+            <div class="cm-ttp">Counters: T1133, T1190, T1595.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Change all default and factory-set credentials immediately upon device deployment</strong> — including the Unitronics "1111" administrative password — and enforce unique, strong, per-device credentials with regular rotation.</div>
+            <div class="cm-ttp">Counters: T1078.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Apply Rockwell's compensating-control guidance for CVE-2021-22681</strong> — CIP Security, IPsec, or equivalent communication-authentication hardening — since no firmware patch exists; segment engineering workstations from the broader network.</div>
+            <div class="cm-ttp">Counters: T1190</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Deploy OT-aware network monitoring for MQTT-over-TLS (port 8883) and DNS-over-HTTPS traffic originating from OT segments</strong> — both are anomalous in well-segmented ICS environments not running IOCONTROL-family malware and are strong compromise indicators.</div>
+            <div class="cm-ttp">Counters: T1071, T1071.004</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Maintain and regularly test offline, verified-clean backups of PLC ladder-logic and project files.</strong> Restoration must come from a trusted backup, not a live pull from an already-compromised device, following any Modify Parameter or Data Destruction event.</div>
+            <div class="cm-ttp">Counters: T0836, T0809</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Implement independent, hard-wired safety instrumented systems (SIS) that cannot be reprogrammed via the same network path as the PLC/HMI.</strong> The 2026 campaign's demonstrated ability to override safety-critical logic in project files means software-only interlocks sharing the compromised network are insufficient.</div>
+            <div class="cm-ttp">Counters: T0831, T0856</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Establish and drill manual/local operator override procedures and alarm-response training.</strong> This is precisely what prevented water-quality impact at both Aliquippa (2023) and across Minnesota (2026) — treat it as a proven, not theoretical, control.</div>
+            <div class="cm-ttp">Counters: T0813</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Geofence and deny inbound traffic on known default OT ports</strong> (TCP 20256 for Unitronics, TCP 44818 for Rockwell EtherNet/IP) from non-whitelisted source ranges at the network perimeter.</div>
+            <div class="cm-ttp">Counters: T1133, T1595.002</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">The group treats its public-facing propaganda/claim-of-credit infrastructure as disposable and separable from technical operations: serial Telegram persona rebranding — CyberAv3ngers → "APT IRAN" → "Cyber4vengers" (Jan 2026) — has followed each platform-level takedown, with each new channel able to resume claim-of-credit activity without apparent loss of underlying technical capability. No comparable public reporting documents rotation of attacker-owned technical C2 infrastructure, largely because the group's primary "infrastructure" is the victim's own compromised OT device rather than attacker-hosted servers.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Shows a clear sophistication trend upward over time rather than a static ratio. The 2023 Unitronics campaign was almost entirely "living off default configuration" — no malware at all, just default-credential authentication followed by use of the PLC's own native ladder-logic upload feature. The 2024–2025 development of IOCONTROL introduced bespoke, purpose-built malware for OT/IoT persistence and C2, and the 2026 Rockwell/Schneider/Siemens campaign layers a CVE exploit on top of that. This progression — LOL-only to custom-tooled — is itself a useful maturity indicator for tracking the group's investment and resourcing over time.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics</span>
+          <span class="opsec-confidence">[LOW-MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">IOCONTROL's AES-256-CBC configuration encryption and UPX packing are best characterized as anti-analysis (frustrating malware researchers and automated detonation pipelines) rather than anti-forensics in the traditional log-clearing/timestomping sense. No public reporting reviewed for this compile documents the group clearing logs or manipulating timestamps on compromised OT devices specifically — a plausible and separate gap given how rarely PLCs and HMIs generate or retain rich forensic telemetry at all, which itself functions as a passive anti-forensics advantage the group does not need to actively engineer.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">The July 2026 Minnesota campaign's tight coordination — 30+ independently operated municipal utilities affected within a roughly 24-hour window (Jul 26–27) — is a strong signal of centralized, scripted targeting rather than opportunistic, individually-timed intrusions. This is a departure from the more diffuse, rolling-disclosure pattern of the 2023–2024 wave (29 intrusions over roughly five months) and suggests the group's operational cadence has shifted toward deliberately synchronized, higher-impact bursts.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">IOCONTROL's single-codebase, multi-vendor-device architecture — a modular design adapted across routers, PLCs, HMIs, IP cameras, and firewalls from at least nine distinct manufacturers — indicates a maintained, professionally engineered malware development effort consistent with dedicated state resourcing rather than ad hoc or one-off hacktivist tooling.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Personal &amp; Identity OPSEC (Non-Technical)</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Despite comparatively strong technical/malware tradecraft, the group's persona-management and communications layer has shown real operational security lapses: the April 2024 disruption of its Telegram communications is assessed by researchers as possibly linked to poor OPSEC that may have enabled geolocation of operators. This mirrors a pattern observed in other state-linked and eCrime persona-driven groups (see companion profile: <em>LAPSUS$</em>) where technical capability and personal/communications-layer discipline are not correlated.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, protocol abuse, EDR/network bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">C2 Traffic Blending via MQTT-over-TLS</span>
+          <span class="evasion-ttp">T1071</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag">MQTT · Port 8883</span>
+        </div>
+        <div class="evasion-desc">IOCONTROL uses MQTT over TLS on port 8883 — a standard, widely-deployed IoT messaging protocol — for command-and-control, allowing its traffic to blend with legitimate device telemetry in OT/IoT environments where MQTT is common and rarely baselined or inspected by security monitoring (Claroty Team82).</div>
+        <div class="evasion-detail">Specific MQTT topic-naming scheme and broker infrastructure details not fully publicly documented as of 2026-09-02.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">DNS-Based Detection Evasion via DNS-over-HTTPS</span>
+          <span class="evasion-ttp">T1071.004</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">IOCONTROL resolves C2 domains via DNS-over-HTTPS rather than conventional DNS, wrapping the resolution request inside ordinary HTTPS traffic to a public DoH resolver — defeating traditional DNS-monitoring, sinkholing, and domain-blocklist controls that inspect plaintext DNS queries.</div>
+        <div class="evasion-detail">Specific DoH resolver(s) used by the malware not publicly documented as of 2026-09-02.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Static Analysis Evasion via Packing &amp; Config Encryption</span>
+          <span class="evasion-ttp">T1027</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">UPX · AES-256-CBC</span>
+        </div>
+        <div class="evasion-desc">IOCONTROL's binary is UPX-packed and its configuration block is AES-256-CBC encrypted, frustrating both automated malware-analysis sandboxes and simple string/signature-based detection — a defense-evasion investment that would be unnecessary for the group's earlier, malware-free 2023 campaign.</div>
+        <div class="evasion-detail">Encryption key management/derivation scheme not publicly documented as of 2026-09-02.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Detection-Surface Minimization via Native-Feature Abuse</span>
+          <span class="evasion-ttp">T1078.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">The 2023 Unitronics campaign generated no malware signature at all: authenticating with unmodified default credentials and using the PLC's own legitimate ladder-logic upload feature meant every attacker action looked like ordinary authenticated administration. The primary "evasion" here is architectural — most OT devices of this class have no host-based security monitoring capable of distinguishing a legitimate admin login from an attacker one — rather than technical circumvention of a control that was never present.</div>
+        <div class="evasion-detail">No further technical specifics applicable — this technique's evasion value is structural, not procedural.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense Full Emulation Plan has been published for CyberAv3ngers, IRGC-CEC, or G1027 as of 2026-09-02. The CTID Adversary Emulation Library's current Full Emulation Plans cover APT29, Blind Eagle, Carbanak Group, FIN6, FIN7, menuPass, OceanLotus, OilRig, Sandworm, Turla, and Wizard Spider — no ICS/OT-sabotage-focused Iranian state actor is represented in the library at this time.</div>
+    </div>
+    <div class="prose">
+      <p>Beyond CTID, no OT/ICS-specific Atomic Red Team tests or Sigma detection rules mapped directly to CyberAv3ngers' PLC-manipulation techniques (ATT&amp;CK for ICS T0836, T0831, T0856, T0809, T0813) were identified as published during this compile — these techniques describe device-specific control-logic manipulation that general-purpose Windows/Linux-oriented detection-content repositories do not typically cover. The most directly applicable published purple-team resources are the detection and indicator guidance embedded in the CISA/FBI joint advisories themselves (AA23-335A, AA26-097A) and Claroty Team82's IOCONTROL technical report, both of which include protocol- and behavior-level detection guidance referenced in Sections 07 and 11 above. Organizations building a purple-team program against this actor should treat those advisories, plus Dragos's and Claroty's OT-specific threat-hunting guidance, as the primary available emulation and detection references rather than relying on general enterprise-IT detection-content libraries, which currently have no CyberAv3ngers-specific coverage.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G1027/" target="_blank">CyberAv3ngers, Soldiers of Solomon — Group G1027</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / NSA / EPA / INCD</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-335a" target="_blank">AA23-335A — IRGC-Affiliated Cyber Actors Exploit PLCs in Multiple Sectors, Including US Water and Wastewater Systems Facilities</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / NSA / EPA / DOE / CNMF</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-097a" target="_blank">AA26-097A — Iranian-Affiliated Cyber Actors Exploit Programmable Logic Controllers Across US Critical Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA ICS Advisory</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/ics-advisories/icsa-23-348-15" target="_blank">ICSA-23-348-15 — Unitronics Vision and Samba Series (Update A)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Treasury / OFAC</div>
+        <div>
+          <div class="ref-detail"><a href="https://home.treasury.gov/news/press-releases/jy2072" target="_blank">Treasury Sanctions Actors Responsible for Malicious Cyber Activities on Critical Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Claroty Team82</div>
+        <div>
+          <div class="ref-detail"><a href="https://claroty.com/team82/research/inside-a-new-ot-iot-cyber-weapon-iocontrol" target="_blank">Inside a New OT/IoT Cyberweapon: IOCONTROL</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Claroty Team82</div>
+        <div>
+          <div class="ref-detail"><a href="https://claroty.com/team82/disclosure-dashboard/cve-2021-22681" target="_blank">CVE-2021-22681 Disclosure Dashboard</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Tenable</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.tenable.com/blog/what-to-know-about-cyberav3ngers-the-irgc-linked-group-targeting-critical-infrastructure" target="_blank">CyberAv3ngers: FAQ About Iran-Linked Threat Group Targeting U.S. Critical Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Tenable</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.tenable.com/blog/coordinated-cyberattack-on-minnesota-water-utilities-what-you-need-to-know" target="_blank">Minnesota &amp; Other US Water Cyber Attacks — CISA AA26-097A</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/security/2026/07/29/iran-linked-cyberav3ngers-suspected-in-attacks-on-minnesota-water-systems/" target="_blank">Iran-Linked CyberAv3ngers Suspected in Attacks on Minnesota Water Systems</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/07/coordinated-cyberattack-targets-30.html" target="_blank">Coordinated Cyberattack Targets 30+ Minnesota Water Systems as One Plant Goes Offline</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dragos</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.dragos.com/blog/cyber-av3ngers-hacktivist-group-targeting-israel-made-ot-devices/" target="_blank">Cyber Av3ngers Hacktivist Group Targeting Israel-Made OT Devices</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Secureworks</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.secureworks.com/blog/iranian-cyber-av3ngers-compromise-unitronics-systems" target="_blank">Iranian Cyber Av3ngers Compromise Unitronics Systems</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Industrial Cyber</div>
+        <div>
+          <div class="ref-detail"><a href="https://industrialcyber.co/industrial-cyber-attacks/iranian-hacker-group-cyberav3ngers-allegedly-breach-municipal-water-authority-of-aliquippa/" target="_blank">Iranian Hacker Group CyberAv3ngers Allegedly Breach Municipal Water Authority of Aliquippa</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyberScoop</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberscoop.com/pennsylvania-water-facility-hack-iran/" target="_blank">Pennsylvania Water Facility Hit by Iran-Linked Hackers</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DomainTools Investigations</div>
+        <div>
+          <div class="ref-detail"><a href="https://dti.domaintools.com/research/cyberav3ngers-from-infrastructure-hacks-to-propaganda-machines-in-the-iran-israel-cyber-war/" target="_blank">CyberAv3ngers: From Infrastructure Hacks to Propaganda Machines in the Iran-Israel Cyber War</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia (secondary, corroborating)</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/2026_Minnesota_water_system_cyberattack" target="_blank">2026 Minnesota Water System Cyberattack</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SentinelOne</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.sentinelone.com/blog/iran-backed-cyber-av3ngers-escalates-campaigns-against-u-s-critical-infrastructure/" target="_blank">Iran-Backed Cyber Av3ngers Escalates Campaigns Against U.S. Critical Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek / mbtmag</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.mbtmag.com/cybersecurity/news/22943853/cyberavengers" target="_blank">$10M Bounty Extended for CyberAv3ngers Hacker</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 20 sources, 15 web lookups</div>
+  <div>Attribution confidence: HIGH (state sponsorship) / MEDIUM (persona-vs-operator structure) · ATT&amp;CK: 14 techniques mapped (Enterprise + ICS) · Ecosystem: IRGC-CEC / Soldiers of Solomon</div>
+</div>
+
+</body>
+</html>
