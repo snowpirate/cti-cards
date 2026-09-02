@@ -255,6 +255,7 @@
   .lib-card.vuln .lib-card-footer .open { color: #00d4ff; }
   .badge.patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.4); color: #ff4d4d; font-size: 8px; padding: 2px 6px; }
   .badge.patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--gold); font-size: 8px; padding: 2px 6px; }
+  .badge.patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.4); color: #ff4d4d; font-size: 8px; padding: 2px 6px; }
   .badge.patch-resolved { background: rgba(90,112,128,0.15); border: 1px solid #1e2e3e; color: #5a7080; font-size: 8px; padding: 2px 6px; }
   .badge.kev-badge-sm   { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: #00d4ff; font-size: 8px; padding: 2px 6px; font-weight: 700; }
   .lib-card:hover { border-color: var(--border2); background: var(--bg3); }
@@ -688,6 +689,28 @@
       -->
 
       <!-- ↓↓↓ AGENT-MAINTAINED VULN CARDS BEGIN ↓↓↓ -->
+
+      <a class="lib-card vuln" href="output/vulns/2026-09-02_ROCKWELL-LOGIX-AUTH-BYPASS.html"
+         data-name="Rockwell Logix Auth Bypass"
+         data-type="access-control"
+         data-tags="CVE-2021-22681 CWE-522 ROCKWELL LOGIX PLC ICS OT SCADA COMPACTLOGIX CONTROLLOGIX ETHERNET-IP CIP NO-FIX CYBERAV3NGERS IRGC">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">Rockwell Logix Auth Bypass</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge patch-none">NO FIX</span>
+              <span class="badge kev-badge-sm">KEV</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">CVE-2021-22681 · CWE-522 · CVSS 9.8 · Rockwell Automation Logix Controllers</div>
+          <div class="lib-card-desc">A shared cryptographic key baked into every copy of Rockwell's engineering software authenticates connections to Logix PLCs — Rockwell has determined this cannot be patched. Five years after disclosure, CyberAv3ngers/IRGC-CEC weaponized it against U.S. water and energy infrastructure; 4,400+ controllers remain internet-exposed globally.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: 2026-09-02</span>
+            <span class="open">OPEN ADVISORY →</span>
+          </div>
+        </div>
+      </a>
 
       <a class="lib-card vuln" href="output/vulns/2026-09-02_PAPERCUT.html"
          data-name="PaperCut"

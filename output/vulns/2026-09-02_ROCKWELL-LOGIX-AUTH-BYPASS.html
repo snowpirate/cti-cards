@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rockwell Logix Auth Bypass — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  /* Patch status badge */
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  /* KEV badge */
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  /* ── CVSS SCORE CALLOUT ── */
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  /* ── CWE BLOCK ── */
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── LIFECYCLE TRACK ── */
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── CVSS VECTOR BREAKDOWN ── */
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  /* ── AFFECTED VERSIONS TABLE ── */
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  /* ── EXPLOITATION TIMELINE ── */
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── KEV BLOCK ── */
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ── PURPLE TEAM TABS ── */
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  /* Query blocks */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── CROSS-REFERENCE LINKS ── */
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  /* ── CVE METADATA BLOCK ── */
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  /* ── NETWORK EXPOSURE ── */
+  .nmap-window {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-top: 2px solid var(--cyan);
+    margin-bottom: 12px;
+  }
+  .nmap-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+  .nmap-titlebar .cmd { color: var(--cyan); }
+  .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+  .nmap-titlebar .dot.green { background: var(--green); }
+  .nmap-output {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    color: #8ab4c8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .nmap-output .port-open   { color: var(--green); }
+  .nmap-output .port-closed { color: var(--red); }
+  .nmap-output .port-filter { color: var(--amber); }
+  .nmap-output .service     { color: var(--cyan); }
+  .nmap-output .version     { color: #fff; }
+  .nmap-output .vuln-flag   { color: var(--red); font-weight: 700; }
+  .nmap-output .comment     { color: var(--text-dim); }
+  .nmap-output .highlight   { background: rgba(0,212,255,0.08); display: inline; }
+
+  .nse-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--purple);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .nse-name   { font-family: var(--mono); font-size: 10.5px; color: var(--purple); font-weight: 700; }
+  .nse-tags   { display: flex; gap: 5px; }
+  .nse-tag    { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
+  .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .nse-cmd  { font-family: var(--mono); font-size: 10px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 10px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+  .nse-output .vuln-flag { color: var(--red); font-weight: 700; }
+  .nse-output .safe-flag { color: var(--green); font-weight: 700; }
+
+  .shodan-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--amber);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .shodan-label  { font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 11px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .banner-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--cyan2);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .banner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .banner-label  { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.07em; }
+  .banner-status { font-family: var(--mono); font-size: 8.5px; padding: 1px 7px; }
+  .banner-status.vulnerable { border: 1px solid rgba(255,77,77,0.4); color: var(--red); }
+  .banner-status.patched    { border: 1px solid rgba(74,158,106,0.4); color: var(--green); }
+  .banner-text   { font-family: var(--mono); font-size: 10px; color: #8ab4c8; line-height: 1.6; white-space: pre-wrap; }
+  .banner-text .vuln-string { color: var(--red); }
+  .banner-text .safe-string { color: var(--green); }
+
+  .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .port-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
+  .port-table td.port-open { color: var(--green); }
+  .port-table td.svc-name  { color: #fff; }
+  .port-table td.version-vuln { color: var(--red); }
+  .port-table td.version-safe { color: var(--green); }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO / THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-none">NO FIX</div>
+      <div class="kev-badge">KEV LISTED</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — Unpatchable Authentication Bypass · Rockwell Automation Logix Controllers &amp; Studio 5000 Logix Designer</div>
+  <h1><span class="cyan">ROCKWELL</span> LOGIX</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    CVE: CVE-2021-22681 &nbsp;|&nbsp;
+    CWE: CWE-522 (Insufficiently Protected Credentials) &nbsp;|&nbsp;
+    SOURCES: 20
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">9.8 (CRITICAL)</span></div>
+    <div>Affected: <span>Studio 5000 Logix Designer v21+, RSLogix 5000 v16–20; CompactLogix, ControlLogix, GuardLogix, DriveLogix, SoftLogix families</span></div>
+    <div>Disclosed: <span>2021-02-25 (coordinated, multi-party)</span></div>
+    <div>Patch Date: <span class="red">None — Rockwell has determined no patch is possible</span></div>
+    <div>KEV Added: <span class="cyan">2026-03-05 (due 2026-03-26)</span></div>
+    <div>EPSS: <span class="dim">Not independently retrieved for this compile</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">9.8</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2021-22681</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">Widely cited as 9.8 in current (2026) KEV/press sourcing — see Section 09 for a scoring-discrepancy note</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">5</div>
+    <div class="stat-label">Years between public disclosure (2021) and CISA KEV listing (2026) — no vendor fix exists in that entire window</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">4,407</div>
+    <div class="stat-label">Internet-facing Rockwell/Allen-Bradley controllers tracked globally, 65% in the US (CSA Research Note, 2026-08-03)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">2026-03-05</div>
+    <div class="stat-label">CISA KEV listing date, following confirmed IRGC-CEC/CyberAv3ngers exploitation</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">50%</div>
+    <div class="stat-label">Of exposed Rockwell devices are MicroLogix 1400 controllers — the single most common exposed model</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CVE-2021-22681 is a critical authentication-bypass vulnerability in the mechanism Rockwell Automation's Studio 5000 Logix Designer and RSLogix 5000 engineering software use to verify that a connection to a Logix-family programmable logic controller (PLC) originates from legitimate engineering software. The verification relies on a cryptographic key embedded identically in every copy of the software rather than a per-device or per-deployment secret — an attacker who extracts that key, which CISA assesses requires only "low skill level," can impersonate a trusted engineering workstation against any Logix controller reachable on the network, with no valid credentials at all. The affected product family spans the core of Rockwell's industrial control portfolio: CompactLogix, ControlLogix, GuardLogix, DriveLogix, and SoftLogix controllers used throughout manufacturing, energy, water/wastewater, and critical-infrastructure environments worldwide.</p>
+      <p>What makes this vulnerability unusual — and why it belongs in this card series alongside PrintNightmare and PaperCut rather than as a footnote — is that it has no patch and, per Rockwell's own determination, never will. The flaw is not a bug in a specific code path that can be corrected with an update; it is a foundational design choice (a static, software-embedded shared secret used as an authentication mechanism) that would require replacing the authentication scheme itself, which Rockwell has done — as CIP Security, an entirely separate, opt-in, certificate/PSK-based protocol extension — rather than attempting to retrofit the legacy mechanism. Five years after public disclosure, the vast majority of the installed base still relies on the original, permanently vulnerable verification method.</p>
+      <p>The vulnerability moved from theoretical to actively and repeatedly weaponized in 2026. CISA added CVE-2021-22681 to its Known Exploited Vulnerabilities catalog on 2026-03-05 after confirming that Iran's IRGC-CEC, operating under the CyberAv3ngers persona (see companion actor card), had pivoted from its earlier Unitronics default-credential campaign to exploiting this specific flaw against Rockwell-equipped U.S. water, energy, and government facilities — a campaign a six-agency joint advisory (AA26-097A) confirmed caused operational disruption and financial loss, and which culminated in a coordinated July 2026 attack disrupting 30-plus Minnesota water utilities.</p>
+      <p>Who is at risk today: any organization operating Logix-family Rockwell controllers reachable, directly or indirectly, from an untrusted network — a population research published in August 2026 put at over 4,400 internet-facing devices globally, nearly two-thirds of them in the United States. Because there is no patch, "unpatched" is not a temporary state for this vulnerability — it is the permanent, structural condition of every Logix controller not yet migrated to CIP Security or isolated behind compensating architectural controls.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-522</span>
+        <span class="cwe-name">Insufficiently Protected Credentials</span>
+      </div>
+      <div class="cwe-body">The product transmits or stores authentication credentials using an insecure method that is susceptible to unauthorized interception and/or retrieval (MITRE CWE-522). Here, the "credential" is a cryptographic key baked identically into every distributed copy of Rockwell's engineering software — meaning anyone who obtains a copy of the software, not just a specific target's network traffic, effectively already possesses the credential.</div>
+    </div>
+    <div class="prose">
+      <p>Studio 5000 Logix Designer and RSLogix 5000 authenticate their connections to Logix controllers using a shared cryptographic key rather than a per-device certificate, a per-customer secret, or any value unique to a specific deployment. Claroty's Team82 research, along with independent findings from Kaspersky and researchers at Soonchunhyang University's Lab of Information Systems Security Assurance, demonstrated that this key can be recovered by reverse-engineering the widely-distributed engineering software itself. Once recovered, the key is valid against <em>every</em> Logix controller running the affected verification mechanism worldwide — it is not scoped to a customer, a site, or a device serial number. An attacker holding it can mimic a legitimate engineering workstation well enough for the controller's connection-verification logic to accept it, at which point the attacker can upload or download ladder logic, read or write controller memory and configuration, change the controller's operating mode, or push new firmware (Claroty Team82; CISA ICSA-21-056-03).</p>
+      <p>This is architecturally distinct from a typical authorization-logic bug like PrintNightmare's RPC flaw or PaperCut's request-routing confusion (both covered elsewhere in this card series), where a specific code path fails to check permissions correctly and a patch can close that specific path. Here, the verification mechanism is working exactly as designed — it is the design itself that is unsound, because a secret that must remain secret to provide security cannot be distributed, unmodified, inside a product installed on hundreds of thousands of engineering workstations. This is functionally the same failure class as hardcoded credentials (CWE-798), and it is why Rockwell's remedy is not a patch to the existing mechanism but an entirely separate, properly-designed authentication protocol: CIP Security, which uses per-device X.509 certificates or pre-shared keys rather than one secret shared across an entire product line.</p>
+      <p>The practical consequence is that CVE-2021-22681 cannot be "fixed" in the way most CVEs are — there is no version of Studio 5000 Logix Designer or RSLogix 5000 in the affected range for which the underlying shared-key mechanism has been corrected. Migration to CIP Security requires both software and, on many older controller models, hardware/firmware support that a large fraction of the installed base does not have, making a full architectural fix a multi-year (in many industrial environments, multi-decade) undertaking rather than a patch cycle.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>Pre-2021 (multi-party)</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>2021-02-25</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">03</div>
+        <div class="lc-label">Patch<br/>None — determined impossible</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">Exploitation<br/>Confirmed by 2026-03</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node dim">05</div>
+        <div class="lc-label">Resolution<br/>Unresolved — architectural mitigation only</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>CVE-2021-22681 was independently identified by three separate parties — Claroty's Team82, Kaspersky Lab, and researchers from South Korea's Soonchunhyang University Lab of Information Systems Security Assurance — a convergence pattern echoing PrintNightmare's multi-team discovery and suggesting the flaw was reachable through straightforward reverse engineering rather than exotic technique. Claroty published its research and CISA published the coordinated ICS advisory (ICSA-21-056-03) on 2021-02-25. At the time of disclosure, CISA explicitly stated there were no known public exploits targeting the flaw — a detail worth holding onto, because it means this vulnerability then sat in a five-year window of assessed-but-unconfirmed real-world exploitation before the picture changed decisively in 2026.</p>
+      <p>Because Rockwell determined the flaw "cannot be mitigated with a patch," the 2021 advisory's remediation guidance was architectural from the start: deploy CIP Security where supported, set controller mode switches to RUN to block remote logic changes, and isolate control-system networks behind firewalls with VPN-only remote access — guidance that has not materially changed in the five years since, because there has been no patch to supersede it. That static remediation picture changed in urgency, not in substance, when CISA added CVE-2021-22681 to the KEV catalog on 2026-03-05 (due 2026-03-26 for FCEB agencies), following confirmation that CyberAv3ngers/IRGC-CEC actors had shifted their tradecraft toward exploiting this specific flaw. A six-agency joint advisory (AA26-097A, published 2026-04-07 and updated 2026-07-22) then documented sustained exploitation across U.S. water, energy, and government infrastructure, and by August 2026 independent research confirmed over 4,400 Rockwell controllers remained internet-reachable globally — meaning the population that has actually completed a CIP Security migration or equivalent architectural mitigation, five years after disclosure, remains a minority of the installed base.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Coordinated, multi-party — 3 independent research teams</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Claroty Team82; Kaspersky Lab; Soonchunhyang University Lab of Information Systems Security Assurance</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val dim">Exact private-disclosure date not independently confirmed for this compile</span></div>
+        <div class="kv-row"><span class="kv-key">Public Disclosure</span><span class="kv-val">2021-02-25 (CISA ICSA-21-056-03; Claroty research blog)</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Exploitation</span><span class="kv-val">CISA stated no known public exploits at 2021 disclosure; confirmed active exploitation did not surface publicly until 2026 — a five-year gap</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val red">Determined unfixable with a patch — architectural mitigation only, from day one</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val">Treated at the time as a serious but largely theoretical ICS risk, given ICS exploitation's historically high barrier to entry</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val green">Yes — clean coordinated multi-party disclosure with a joint CISA advisory</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>CVE-2021-22681's disclosure process itself was a model of coordination — three independent teams, a single joint CISA advisory, no leaked PoC, no rushed emergency patch. What makes this card's disclosure story distinctive is not how the vulnerability was disclosed but what the vendor concluded once it was: rather than shipping a fix, Rockwell publicly stated the flaw could not be patched and redirected the entire remediation burden onto customer architecture. That is a categorically different vendor outcome than every other vulnerability profiled in this card series, and it deserves to be read as its own kind of disclosure risk — one where "responsible disclosure was followed" does not converge, eventually, on "the vulnerability was fixed."</p>
+      <p>The five-year gap between disclosure (2021) and confirmed exploitation (2026) is the second notable feature of this vulnerability's history. It is tempting to read that gap as evidence the flaw was low-risk in practice — CISA's own 2021 language ("no known public exploits") could support that reading. A more defensible reading, given what happened next, is that ICS-specific exploitation historically requires either specialized domain knowledge or a state-level actor with the resourcing to develop and operationally validate an OT-specific technique, and that the absence of confirmed exploitation for five years reflects the depth of that barrier rather than the absence of risk. Once a resourced actor (IRGC-CEC/CyberAv3ngers) had reason to invest in OT-specific tradecraft against U.S. critical infrastructure, this five-year-old, publicly documented, permanently unpatchable flaw was sitting ready to be used at scale.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>An attacker begins with network reach to a target Logix controller's EtherNet/IP (CIP) interface — typically TCP/UDP 44818, see Section 11 — either from a compromised host inside the OT network or, per the exposure data in Sections 01 and 11, directly from the internet in a meaningful minority of real-world deployments. The attacker obtains the shared cryptographic key embedded in Studio 5000 Logix Designer or RSLogix 5000 (versions in the affected range are widely available; the key does not need to be extracted from the specific target, only from any legitimate copy of the software). Using that key, the attacker crafts CIP protocol messages that satisfy the controller's connection-verification check exactly as a legitimate engineering-workstation session would — there is no secondary authentication factor, per-session challenge tied to a specific installation, or device-side allowlisting that would catch a correctly-signed-but-illegitimate connection.</p>
+      <p>Once verified, the attacker has engineering-level access equivalent to a legitimate programmer: upload or download ladder logic (enabling logic replacement, as documented in 2026 campaign reporting), read or write controller configuration and memory, change the controller's operating mode between RUN/PROGRAM/REMOTE (a physical hardware keyswitch set to RUN is one of the only controls this vulnerability cannot bypass, since it requires physical presence), and in some configurations push new firmware. Because none of this requires malware — it is legitimate engineering protocol traffic authenticated with a stolen-but-valid key — detection depends entirely on identifying anomalous <em>sources</em> of otherwise-normal traffic, not on identifying malicious payloads.</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVE-2021-22681 · CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">Exploitable over the EtherNet/IP (CIP) protocol against any network-reachable Logix controller.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">CISA assesses this requires only low skill level once the shared key is known — no race conditions or special positioning.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No legitimate credentials, accounts, or prior access to the target are required — only the universally-shared key.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No victim action required; the attacker initiates the CIP session directly.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">UNCHANGED</div>
+          <div class="cvss-comp-meaning">Impact is contained to the compromised controller's own security authority in the standard scoring model.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Full read access to controller logic, configuration, and process data.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Attacker can rewrite ladder logic, configuration, and in some cases firmware — directly altering the controlled physical process.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Attacker can force the controller into a non-operational or unsafe state, halting or disrupting the physical process it governs.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Products &amp; Versions</div>
+      <table class="versions-table">
+        <thead><tr><th>Component</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Studio 5000 Logix Designer</td><td class="vuln">Version 21 and later (shared-key mechanism)</td><td class="vuln">None</td><td>No fix — CIP Security is a separate opt-in protocol, not a patch to this mechanism</td></tr>
+          <tr><td>RSLogix 5000</td><td class="vuln">Versions 16 through 20</td><td class="vuln">None</td><td>No fix — predecessor product to Logix Designer, same underlying issue</td></tr>
+          <tr><td>CompactLogix</td><td class="vuln">1768, 1769, 5370, 5380, 5480 series</td><td class="vuln">None (hardware/firmware CIP Security support varies by model)</td><td>No fix — architectural mitigation only</td></tr>
+          <tr><td>ControlLogix / GuardLogix</td><td class="vuln">5550, 5560, 5570, 5580 (ControlLogix); 5370, 5380, 5570, 5580 (GuardLogix/Compact GuardLogix)</td><td class="vuln">None</td><td>No fix — architectural mitigation only</td></tr>
+          <tr><td>DriveLogix / SoftLogix</td><td class="vuln">DriveLogix 5560, 5730, 1794-L34; SoftLogix 5800</td><td class="vuln">None</td><td>No fix — architectural mitigation only</td></tr>
+        </tbody>
+      </table>
+      <div class="prose" style="margin-top:12px;">
+        <p>2026 campaign reporting also documents CyberAv3ngers/IRGC-CEC activity against MicroLogix 1100/1400 and other Allen-Bradley controllers within the same broader AA26-097A campaign, and against Schneider Electric and Siemens devices — but that activity, per the sourcing reviewed for this compile, appears to primarily use distinct techniques (default/hijacked credentials, IP-address takeover) documented separately in this repository's <em>CyberAv3ngers</em> actor card, not necessarily this specific shared-key bypass mechanism. This card treats CVE-2021-22681 narrowly, as scoped by Rockwell's own advisory (Studio 5000 Logix Designer / RSLogix 5000-managed CompactLogix, ControlLogix, GuardLogix, DriveLogix, and SoftLogix controllers); readers should consult the actor card for the full multi-vendor, multi-technique picture of the 2026 campaign.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block">
+      <div class="kev-header">
+        <span class="kev-tag">CISA KEV LISTED</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2026-03-05 · Required Remediation: 2026-03-26 (FCEB agencies, per BOD 22-01 / BOD 26-04)</span>
+      </div>
+      <div class="kev-body">CVE-2021-22681 was added to the KEV catalog alongside a Hikvision authentication flaw (CVE-2017-7921) and three Apple vulnerabilities in CISA's 2026-03-05 batch, five years after its original public disclosure — one of the longer disclosure-to-KEV gaps documented in this card series, reflecting how long a well-known but unpatchable ICS flaw can sit before confirmed real-world exploitation is publicly established.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">2021-02-25</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Public Disclosure — No Known Exploits</div>
+            <div class="et-desc">CISA's original advisory explicitly notes no known public exploits target the flaw at time of publication.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2021 → 2025</div>
+          <div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Unconfirmed Exploitation Window</div>
+            <div class="et-desc">No public reporting of confirmed exploitation was identified for this multi-year period — a genuine intelligence gap rather than evidence of non-exploitation, given the flaw's low network visibility and ICS environments' typically limited logging.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-03 (by)</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">CyberAv3ngers/IRGC-CEC Pivot Confirmed</div>
+            <div class="et-desc">IRGC-CEC actors operating under the CyberAv3ngers persona confirmed exploiting CVE-2021-22681 against Rockwell Logix controllers, escalating from the group's earlier Unitronics default-credential campaign — see companion actor card for full attribution detail.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-03-05</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">CISA KEV Listing</div>
+            <div class="et-desc">CVE-2021-22681 added to the KEV catalog with a 2026-03-26 federal remediation deadline.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-04-07</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Six-Agency Joint Advisory AA26-097A</div>
+            <div class="et-desc">FBI, CISA, NSA, EPA, DOE, and U.S. Cyber Command's CNMF confirm operational disruption and financial loss at multiple U.S. water, energy, and government organizations; advisory updated 2026-07-22 as the campaign expanded to additional vendors.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-07-26/27</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Coordinated Minnesota Water-Utility Attack</div>
+            <div class="et-desc">30+ Minnesota water systems disrupted via Rockwell/Allen-Bradley PLCs within a single coordinated window — part of the same broader IRGC-CEC campaign, though this specific incident's documented technique (device IP/credential takeover on MicroLogix controllers) is distinct from this CVE's shared-key bypass mechanism; see the CyberAv3ngers actor card for the full incident detail.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-08-03</div>
+          <div class="et-track"><div class="et-dot amber"></div></div>
+          <div class="et-content">
+            <div class="et-event">Exposure Research Published</div>
+            <div class="et-desc">Cloud Security Alliance research documents 4,407 internet-facing Rockwell/Allen-Bradley controllers globally and notes that 19 of 22 exposed hosts in already-attacked cities also ran firmware vulnerable to a separate, older, patched flaw (CVE-2017-16740) — evidence of compounding OT patch-discipline failure beyond this single CVE.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>A companion actor card exists for this campaign: <strong>CyberAv3ngers</strong> (<code>output/actors/2026-09-02_CYBERAV3NGERS.html</code>) documents Iran's IRGC-CEC operating this and related exploitation under a self-presented "hacktivist" persona, formally sanctioned by U.S. Treasury/OFAC, and profiles the group's full 2023–2026 campaign arc. This is the first vulnerability card in this repository with a confirmed, independently-sourced actor-card cross-reference — see Section 10. No other threat actor or campaign has been publicly attributed to exploitation of CVE-2021-22681 specifically as of this compile.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CVE-2021-22681 is the clearest case in this card series of a vulnerability class that patching cannot solve by definition: a symmetric secret distributed, unmodified, inside every copy of widely-available client software is not a secret in any security-meaningful sense the moment more than a handful of trusted parties possess it — and Rockwell distributed it inside commercial engineering software installed on an unknowable number of workstations worldwide. This is architecturally identical to hardcoded-credential failures seen across the industry (default passwords baked into firmware, API keys committed to public repositories, shared signing keys embedded in mobile apps) — the common root is treating "not published" as equivalent to "secret," when the two properties diverge the moment the artifact containing the value is itself distributed at scale. A patch can close a logic error; a patch cannot make an already-widely-distributed value un-known again.</p>
+      <p>The industrial-control-systems context makes this specific failure mode especially durable. In enterprise IT, a hardcoded-credential vulnerability is usually resolved by a vendor pushing a new build that generates unique per-installation values and forcing a rotation — disruptive but achievable within a normal release cycle. In OT, the equivalent fix (CIP Security's certificate/PSK-based authentication) requires hardware and firmware capability that a large fraction of a decades-old installed base simply does not have, and even where the capability exists, deploying it means touching live industrial control systems where downtime has physical-world consequences and change windows are measured in months, not sprints. The 4,407-controller exposure count and the persistence of the underlying shared-key mechanism five years after disclosure is not evidence of organizational negligence so much as evidence that OT security fixes operate on a fundamentally different timescale than IT ones — a timescale attackers, once sufficiently motivated, do not have to respect.</p>
+      <p>The August 2026 finding that 19 of 22 exposed hosts in already-attacked cities also ran firmware vulnerable to a separate, <em>patched</em> 2017 flaw (CVE-2017-16740) reinforces the broader lesson beyond this single CVE: organizations that have not addressed their exposure to an unpatchable 2021 vulnerability have, in the same population, also failed to apply an available patch from 2017. CVE-2021-22681's "no fix exists" status is a genuine and unusual technical constraint, but the data suggests it is compounding with, rather than substituting for, more ordinary OT patch-management gaps — the organizations most exposed to this vulnerability are disproportionately likely to also be behind on the vulnerabilities that <em>do</em> have fixes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <!-- A: DETECTION -->
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <div class="query-block">
+        <div class="query-label">CIP session establishment from non-allowlisted source IP · Zeek/Suricata CIP protocol logs</div>
+        <div class="query-code">source="zeek:cip.log" (service="EtherNet/IP" OR dest_port=44818)
+| where src_ip NOT IN (approved_engineering_workstation_ips)
+| table _time, src_ip, dest_ip, cip_service_code, session_handle</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Logix mode-switch change events outside a scheduled change window</div>
+        <div class="query-code">source="ot_asset_monitoring" event="controller_mode_change" (new_mode="PROGRAM" OR new_mode="REMOTE")
+| where NOT change_window_active
+| table _time, controller_id, old_mode, new_mode, source_ip</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Ladder-logic upload/download from an unexpected engineering-workstation identity</div>
+        <div class="query-code">source="ot_asset_monitoring" event IN ("program_upload","program_download","firmware_update")
+| where source_ip NOT IN (approved_engineering_workstation_ips) OR workstation_id NOT IN (known_asset_inventory)
+| table _time, controller_id, event, source_ip, workstation_id</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>Because exploitation of this vulnerability produces legitimate-looking CIP protocol traffic rather than malware, detection is fundamentally an identity and provenance problem, not a signature-matching one: the question is never "is this a malicious packet" but "should this specific source be issuing this specific command to this specific controller." Any CIP session, mode change, or logic transfer from a source outside a maintained engineering-workstation allowlist should be treated as a strong compromise indicator, not a false positive requiring further triage.</p>
+      </div>
+    </div>
+
+    <!-- B: HUNTING -->
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis 1 — Internet-exposed Logix controllers already in the environment.</strong> Enumerate every Logix-family controller's EtherNet/IP reachability from outside the trusted OT network segment, including from the general internet. Given the 4,407-device global exposure count documented in Section 11, treat any positive finding as a critical, immediate-action item rather than a routine hardening recommendation.</p>
+        <p><strong>Hypothesis 2 — Historical unauthorized engineering sessions never investigated.</strong> Where CIP session logging exists (often limited in older OT environments — a finding in itself worth escalating), review historical sessions for source IPs outside the approved engineering-workstation inventory, as far back as retention allows.</p>
+        <p><strong>Hypothesis 3 — Undetected logic or firmware drift.</strong> Diff current controller ladder logic and firmware against known-good, offline backups. Because this vulnerability's exploitation leaves no malware artifact, silent logic tampering is the most likely form of undetected historical compromise, and a diff against a trusted baseline is the only reliable way to surface it after the fact.</p>
+      </div>
+    </div>
+
+    <!-- C: PATCH GUIDANCE -->
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Patch Availability</span><span class="kv-val red">None — Rockwell has formally determined this cannot be fixed with a patch</span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Guidance</span><span class="kv-val amber">Architectural/compensating controls only, unchanged in substance since 2021</span></div>
+          <div class="kv-row"><span class="kv-key">Actual Remediation Path</span><span class="kv-val">Migrate to CIP Security (certificate/PSK-based authentication) where hardware/firmware supports it</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Moderate — CIP Security deployment can affect latency-sensitive control traffic; requires compatibility testing on legacy segments</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">CISA ICSA-21-056-03 (Update A); Rockwell Automation Knowledgebase Answer ID 1130301</span></div>
+          <div class="kv-row"><span class="kv-key">Hardware Dependency</span><span class="kv-val red">Many legacy CompactLogix/ControlLogix/MicroLogix models cannot be upgraded to support CIP Security without hardware replacement</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Validate CIP Security compatibility and latency impact on production control loops before wide deployment; pilot on non-critical lines first</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Because there is nothing to patch, "patch guidance" for this vulnerability is really a migration and network-architecture program: prioritize CIP Security deployment on internet-reachable or otherwise high-exposure controllers first (using the exposure-identification approach in Section 11 to find them), budget for hardware replacement where legacy models cannot support it, and treat network isolation as the load-bearing control for every controller that has not yet completed migration — which, five years post-disclosure, is still the majority case across the industry.</p>
+      </div>
+    </div>
+
+    <!-- D: COMPENSATING CONTROLS -->
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch (All Environments, By Definition)</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>Deploy CIP Security wherever hardware and firmware support it.</strong> This replaces the vulnerable shared-key mechanism with per-device certificates or pre-shared keys and is the only true fix; treat it as the end state to migrate toward, not merely one control among several.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Set physical hardware keyswitches to RUN mode</strong> on every controller where remote logic changes are not operationally required. This is the one control this vulnerability cannot bypass remotely, since it requires physical presence at the device.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Eliminate direct internet exposure of EtherNet/IP (port 44818) entirely.</strong> Given the 4,407-device global exposure count, this single control would close the vast majority of currently realized attack surface for this vulnerability.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div class="cm-text"><strong>Segment OT networks from IT and the internet</strong>, with engineering-workstation access to Logix controllers permitted only from a tightly controlled, allowlisted network segment — never a flat network shared with general enterprise traffic.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div class="cm-text"><strong>Require VPN with MFA for any remote engineering access</strong>, and never permit direct internet-to-controller engineering sessions under any circumstance.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div class="cm-text"><strong>Maintain and regularly diff offline, verified-clean backups of controller logic and firmware</strong> — this is the only reliable way to detect the silent logic tampering this vulnerability enables, given that exploitation leaves no malware signature.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div class="cm-text"><strong>Keep firmware current on all Rockwell devices</strong>, independent of this specific CVE — the August 2026 finding that most exposed, already-attacked hosts also ran firmware vulnerable to a separate, patched 2017 flaw indicates this vulnerability rarely exists in isolation from broader OT patch-management gaps.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2021-22681</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">9.8 (Critical)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-522 (Insufficiently Protected Credentials)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not independently retrieved for this compile — check first.org/epss directly</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2021-22681" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2021-22681</a></span></div>
+          <div class="kv-row"><span class="kv-key">CISA ICS Advisory</span><span class="kv-val cyan"><a href="https://www.cisa.gov/news-events/ics-advisories/icsa-21-056-03" target="_blank" style="color:var(--cyan)">ICSA-21-056-03 (Update A)</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed — confirmed active exploitation</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2026-03-05 (due 2026-03-26)</span></div>
+          <div class="kv-row"><span class="kv-key">Scoring Note</span><span class="kv-val amber">A 2021-era summary sourced during this compile cited a 10.0 score with vector AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H (Scope Changed); current (2026) KEV catalog, press, and secondary-vendor sourcing consistently report 9.8 with Scope Unchanged, which this card uses as authoritative. Flagged as a documented discrepancy for independent verification rather than silently resolved.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <a class="xref-item actor" href="../actors/2026-09-02_CYBERAV3NGERS.html">
+        <div class="xref-type actor">Actor Card</div>
+        <div class="xref-name">CyberAv3ngers</div>
+        <div class="xref-rel">Iran's IRGC-CEC, operating publicly as a "hacktivist" persona (G1027), confirmed exploiting CVE-2021-22681 against Rockwell Logix controllers since approximately March 2026 as part of an escalating campaign against U.S. water, energy, and government infrastructure (CISA AA26-097A). This is the primary technique cited for the group's 2026 escalation beyond its earlier Unitronics default-credential campaign.</div>
+      </a>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <div class="xref-none">No companion incident cards on file reference CVE-2021-22681 as an initial access vector as of 2026-09-02. The July 2026 coordinated Minnesota water-utility attack (documented in the CyberAv3ngers actor card) is a strong candidate for a future incident card, though its specific technical vector (MicroLogix IP/credential takeover) may differ from this CVE's shared-key bypass mechanism — see Section 05's scoping note.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Network Exposure <small>Ports · Protocols · Banners · Nmap · Shodan</small></div>
+  </div>
+  <div class="section-body">
+
+    <!-- PORT / PROTOCOL SUMMARY TABLE -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <table class="port-table" style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>Port</th>
+          <th>Proto</th>
+          <th>Service</th>
+          <th>Vulnerable Condition</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="port-num">44818</td>
+          <td>TCP/UDP</td>
+          <td class="svc-name">EtherNet/IP — CIP explicit messaging</td>
+          <td class="version-vuln">Accepts CIP session establishment authenticated only by the shared, extractable software key</td>
+          <td>Primary attack surface — every affected controller listens here by default</td>
+        </tr>
+        <tr>
+          <td class="port-num">2222</td>
+          <td>UDP</td>
+          <td class="svc-name">EtherNet/IP — CIP implicit (I/O) messaging</td>
+          <td class="version-vuln">Real-time I/O data exchange; not the primary bypass vector but part of the same protocol stack</td>
+          <td>Typically only reachable after a session is established via 44818</td>
+        </tr>
+        <tr>
+          <td class="port-num">44818</td>
+          <td>UDP</td>
+          <td class="svc-name">EtherNet/IP — device discovery (List Identity)</td>
+          <td class="version-vuln">Responds to unauthenticated identity requests, enabling remote device fingerprinting</td>
+          <td>This is the channel the enip-info NSE script (below) uses for identification</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- NMAP SCAN OUTPUT — DEFAULT -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Default Service Scan Output (Logix Controller)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">nmap -sV -p 44818 plc01.corp.local</span>
+      </div>
+      <div class="nmap-output"># NOTE: Representative default -sV output — nmap's generic service-version probe
+# identifies EtherNet/IP presence but not device model, vendor, or firmware
+# revision. Use the enip-info NSE script below for full device identification.
+
+Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for plc01.corp.local (10.40.10.15)
+Host is up (0.0022s latency).
+
+PORT      STATE SERVICE    VERSION
+<span class="port-open">44818/tcp open  EtherNet-IP-2</span> <span class="version">Rockwell Automation EtherNet/IP</span>
+
+Service detection performed. Report any incorrect results at https://nmap.org/submit/</div>
+    </div>
+
+    <!-- NMAP SCAN OUTPUT — VERSION DISCRIMINATING -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; margin-top:16px;">Nmap — Device Identification (Vulnerable vs. Patched)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">nmap --script enip-info -sU -p 44818 plc01.corp.local</span>
+      </div>
+      <div class="nmap-output"># NOTE: Unlike PrintNightmare and PaperCut (both covered elsewhere in this card
+# series), there is genuinely no "patched" state to distinguish here — Rockwell
+# has not shipped a fix, so any device this identifies as a member of the
+# affected Logix family (via productCode/vendor) is vulnerable by default,
+# unless CIP Security has been separately deployed (which enip-info cannot
+# detect). Device identification is therefore functionally equivalent to
+# exposure identification for this specific CVE.
+
+Starting Nmap 7.94 ( https://nmap.org )
+PORT      STATE SERVICE
+44818/udp open  EtherNet-IP-2
+| enip-info:
+|   type: <span class="vuln-flag">Communications Adapter (12)</span>
+|   vendor: <span class="vuln-flag">Rockwell Automation/Allen-Bradley (1)</span>
+|   productName: <span class="vuln-flag">1769-L32E Ethernet Port</span>
+|   serialNumber: 0x000000
+|   productCode: 158
+|   revision: 3.7
+|   status: 0x0030
+|_  state: 0x03</div>
+    </div>
+    <div class="prose" style="margin-top:10px; margin-bottom:0;">
+      <p>The <code>productName</code> field (here, <code>1769-L32E</code>, a CompactLogix 1769-series module) is the practical way to confirm a scanned host is a member of the affected Logix family without needing authenticated access. Because this vulnerability has no patched version to distinguish from an unpatched one, positive identification of an affected product line is the closest thing to a definitive vulnerability confirmation this section can offer — a meaningfully different situation from PrintNightmare and PaperCut, where reachability alone does not imply vulnerability.</p>
+    </div>
+
+    <!-- SERVICE BANNERS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Device Identification</div>
+
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">EtherNet/IP List Identity Response · Port 44818/UDP</span>
+        <span class="banner-status vulnerable">IDENTIFICATION FIELDS</span>
+      </div>
+      <div class="banner-text">vendorId: <span class="vuln-string">1 (Rockwell Automation/Allen-Bradley)</span>
+deviceType: 12 (Communications Adapter)
+productName: <span class="vuln-string">1769-L32E Ethernet Port</span>
+revision: 3.7</div>
+    </div>
+    <div class="prose" style="margin-top:4px;">
+      <p>Version not meaningfully discriminated via banner — the revision field indicates firmware version, which is useful for tracking exposure to <em>other</em>, patchable CVEs (such as CVE-2017-16740, referenced in Section 07) but has no bearing on CVE-2021-22681 specifically, since no firmware revision resolves the underlying shared-key design.</p>
+    </div>
+
+    <!-- NSE SCRIPTS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
+
+    <div class="nse-block">
+      <div class="nse-header">
+        <span class="nse-name">enip-info <span style="color:var(--text-dim); font-weight:400;">(built-in, dedicated EtherNet/IP identification script)</span></span>
+        <div class="nse-tags">
+          <span class="nse-tag detect">DETECTION</span>
+        </div>
+      </div>
+      <div class="nse-cmd">nmap --script enip-info -sU -p 44818 &lt;target-or-subnet&gt;</div>
+      <div class="nse-output"># enip-info sends an EtherNet/IP List Identity request and parses the response
+# for device type, vendor ID, product name, serial number, product code,
+# revision, and status/state. Unlike PrintNightmare and PaperCut, nmap DOES
+# ship a purpose-built script for this protocol family — it just cannot
+# distinguish CIP-Security-protected devices from unprotected ones, since
+# that distinction is architectural, not protocol-visible.
+<span class="safe-flag">| enip-info:
+|   vendor: Rockwell Automation/Allen-Bradley (1)
+|   productName: 1769-L32E Ethernet Port
+|_  state: 0x03</span></div>
+    </div>
+    <div class="prose" style="margin-top:8px;">
+      <p>This is the one card in this series where the standard nmap distribution ships a dedicated, purpose-built protocol script rather than requiring third-party tooling — a reflection of EtherNet/IP's broad adoption across industrial environments rather than anything specific to this CVE. Run at subnet scale, <code>enip-info</code> is a practical, source-documented way to enumerate every Rockwell device on a network segment and cross-reference the results against the affected-product table in Section 05.</p>
+    </div>
+
+    <!-- SHODAN / CENSYS DORKS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
+
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Shodan</span>
+      </div>
+      <div class="shodan-dork">port:44818 product:"EtherNet/IP"</div>
+      <div class="shodan-note">Documented exposure counts: 4,407 internet-facing Rockwell/Allen-Bradley controllers globally as of 2026-08-03 (Cloud Security Alliance research note), with 65% (2,844) in the United States, 12% in Canada, and 3% in Spain. Long-term trend shows a 43.6% reduction from March 2020's 7,814 devices, though exposure ticked back up following a June 2026 low. MicroLogix 1400 controllers account for roughly half of exposed assets, followed by CompactLogix 1769 (22%) and MicroLogix 1100/ControlLogix 5590 (8% each). As with every dork in this card series, reachability does not by itself confirm CIP Security has not been deployed — but given documented low CIP Security adoption rates, treat this population as presumptively vulnerable pending confirmation otherwise.</div>
+    </div>
+
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Censys</span>
+      </div>
+      <div class="shodan-dork">services.service_name="ENIP" and services.port=44818</div>
+      <div class="shodan-note">Equivalent EtherNet/IP-based query for Censys. No independently documented Censys-specific exposure count for Rockwell/Logix devices was identified in research reviewed for this compile; use the Shodan-sourced Cloud Security Alliance figures above as the best available point-in-time reference.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/ics-advisories/icsa-21-056-03" target="_blank">ICSA-21-056-03 — Rockwell Automation Logix Controllers (Update A)</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Claroty Team82</div>
+        <div><div class="ref-detail"><a href="https://claroty.com/team82/research/critical-authentication-bypass-in-rockwell-software" target="_blank">Team82 Discovers Critical Authentication Bypass in Rockwell Software</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Claroty</div>
+        <div><div class="ref-detail"><a href="https://claroty.com/team82/disclosure-dashboard/cve-2021-22681" target="_blank">CVE-2021-22681 Disclosure Dashboard</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div><div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2021-22681" target="_blank">CVE-2021-22681 Detail</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Help Net Security</div>
+        <div><div class="ref-detail"><a href="https://www.helpnetsecurity.com/2021/03/01/cve-2021-22681/" target="_blank">Critical Flaw in Rockwell PLCs Allows Attackers to Fiddle with Them (CVE-2021-22681)</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div><div class="ref-detail"><a href="https://www.securityweek.com/unprotected-private-key-allows-remote-hacking-rockwell-controllers/" target="_blank">Unprotected Private Key Allows Remote Hacking of Rockwell Controllers</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div><div class="ref-detail"><a href="https://www.securityweek.com/rockwell-vulnerability-allowing-remote-ics-hacking-exploited-in-attacks/" target="_blank">Rockwell Vulnerability Allowing Remote ICS Hacking Exploited in Attacks</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/alerts/2026/03/05/cisa-adds-five-known-exploited-vulnerabilities-catalog" target="_blank">CISA Adds Five Known Exploited Vulnerabilities to Catalog</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div><div class="ref-detail"><a href="https://thehackernews.com/2026/03/hikvision-and-rockwell-automation-cvss.html" target="_blank">Hikvision and Rockwell Automation CVSS 9.8 Flaws Added to CISA KEV Catalog</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Security Affairs</div>
+        <div><div class="ref-detail"><a href="https://securityaffairs.com/189005/security/u-s-cisa-adds-apple-rockwell-and-hikvision-flaws-to-its-known-exploited-vulnerabilities-catalog.html" target="_blank">U.S. CISA Adds Apple, Rockwell, and Hikvision Flaws to Its KEV Catalog</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / NSA / EPA / DOE / CNMF</div>
+        <div><div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-097a" target="_blank">AA26-097A — Iranian-Affiliated Cyber Actors Exploit Programmable Logic Controllers Across US Critical Infrastructure</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cloud Security Alliance</div>
+        <div><div class="ref-detail"><a href="https://labs.cloudsecurityalliance.org/research/csa-research-note-rockwell-plc-water-utility-exposure-202608/" target="_blank">Exposed Rockwell PLCs at Water Utilities: Security Implications and Guidance</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Tenable</div>
+        <div><div class="ref-detail"><a href="https://www.tenable.com/cve/CVE-2021-22681" target="_blank">CVE-2021-22681</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SentinelOne</div>
+        <div><div class="ref-detail"><a href="https://www.sentinelone.com/vulnerability-database/cve-2021-22681/" target="_blank">CVE-2021-22681: FactoryTalk Auth Bypass Vulnerability</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GitHub Advisory Database</div>
+        <div><div class="ref-detail"><a href="https://github.com/advisories/GHSA-pvh9-p4pw-h78q" target="_blank">Rockwell Automation Studio 5000 Logix Designer — GHSA-pvh9-p4pw-h78q</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Rockwell Automation</div>
+        <div><div class="ref-detail"><a href="https://support.rockwellautomation.com/app/answers/answer_view/a_id/1130301/~/cve-2021-22681:-authentication-bypass-vulnerability-found-in-logix-controllers-" target="_blank">CVE-2021-22681: Authentication Bypass Vulnerability Found in Logix Controllers</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Nmap.org NSEDoc</div>
+        <div><div class="ref-detail"><a href="https://nmap.org/nsedoc/scripts/enip-info.html" target="_blank">enip-info NSE Script Documentation</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Tenable (OT Plugin)</div>
+        <div><div class="ref-detail"><a href="https://www.tenable.com/plugins/ot/500451" target="_blank">Rockwell Automation Logix Controllers Insufficiently Protected Credentials</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Lyrie Research</div>
+        <div><div class="ref-detail"><a href="https://lyrie.ai/research/research/2026-04-26-iran-rockwell-plc-cisa" target="_blank">Iran APT Still Exploiting 5-Year-Old Rockwell Flaw to Disrupt US Critical Infrastructure</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Tenable (Blog)</div>
+        <div><div class="ref-detail"><a href="https://www.tenable.com/blog/coordinated-cyberattack-on-minnesota-water-utilities-what-you-need-to-know" target="_blank">Minnesota &amp; Other US Water Cyber Attacks — CISA AA26-097A</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 20 sources, all open-source/public</div>
+  <div>Rockwell Automation Studio 5000 Logix Designer / RSLogix 5000 / Logix Controllers · CVE-2021-22681</div>
+</div>
+
+</body>
+</html>
