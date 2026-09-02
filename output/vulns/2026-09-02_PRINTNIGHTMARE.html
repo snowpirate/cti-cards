@@ -337,6 +337,101 @@
   .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
   .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
 
+  /* ── NETWORK EXPOSURE ── */
+  .nmap-window {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-top: 2px solid var(--cyan);
+    margin-bottom: 12px;
+  }
+  .nmap-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+  .nmap-titlebar .cmd { color: var(--cyan); }
+  .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+  .nmap-titlebar .dot.green { background: var(--green); }
+  .nmap-output {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    color: #8ab4c8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .nmap-output .port-open   { color: var(--green); }
+  .nmap-output .port-closed { color: var(--red); }
+  .nmap-output .port-filter { color: var(--amber); }
+  .nmap-output .service     { color: var(--cyan); }
+  .nmap-output .version     { color: #fff; }
+  .nmap-output .vuln-flag   { color: var(--red); font-weight: 700; }
+  .nmap-output .comment     { color: var(--text-dim); }
+  .nmap-output .highlight   { background: rgba(0,212,255,0.08); display: inline; }
+
+  .nse-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--purple);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .nse-name   { font-family: var(--mono); font-size: 10.5px; color: var(--purple); font-weight: 700; }
+  .nse-tags   { display: flex; gap: 5px; }
+  .nse-tag    { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
+  .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .nse-cmd  { font-family: var(--mono); font-size: 10px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 10px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+  .nse-output .vuln-flag { color: var(--red); font-weight: 700; }
+  .nse-output .safe-flag { color: var(--green); font-weight: 700; }
+
+  .shodan-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--amber);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .shodan-label  { font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 11px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .banner-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--cyan2);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .banner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .banner-label  { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.07em; }
+  .banner-status { font-family: var(--mono); font-size: 8.5px; padding: 1px 7px; }
+  .banner-status.vulnerable { border: 1px solid rgba(255,77,77,0.4); color: var(--red); }
+  .banner-status.patched    { border: 1px solid rgba(74,158,106,0.4); color: var(--green); }
+  .banner-text   { font-family: var(--mono); font-size: 10px; color: #8ab4c8; line-height: 1.6; white-space: pre-wrap; }
+  .banner-text .vuln-string { color: var(--red); }
+  .banner-text .safe-string { color: var(--green); }
+
+  .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .port-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
+  .port-table td.port-open { color: var(--green); }
+  .port-table td.svc-name  { color: #fff; }
+  .port-table td.version-vuln { color: var(--red); }
+  .port-table td.version-safe { color: var(--green); }
+
   /* ── REFERENCES ── */
   .ref-list { display: flex; flex-direction: column; gap: 6px; }
   .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
@@ -394,10 +489,11 @@
   <div class="advisory-label">// Vulnerability Advisory — Privilege Escalation / Remote Code Execution · Microsoft / Windows Print Spooler</div>
   <h1><span class="cyan">PRINT</span>NIGHTMARE</h1>
   <div class="header-sub">
-    COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-08-30 &nbsp;|&nbsp;
     CVE: CVE-2021-1675 · CVE-2021-34527 · CVE-2021-34481 · CVE-2022-21999 · CVE-2024-38198 &nbsp;|&nbsp;
     CWE: CWE-269 (Improper Privilege Management) · CWE-59 / CWE-345 (variant race-condition bypasses) &nbsp;|&nbsp;
-    SOURCES: 18
+    SOURCES: 24
   </div>
   <div class="advisory-bar">
     <div>CVSS: <span class="red">8.8 (HIGH)</span></div>
@@ -609,7 +705,7 @@
           <tr><td>CVE-2021-34527</td><td>RpcAsyncAddPrinterDriver (MS-PAR) — true "PrintNightmare"</td><td class="vuln">All supported Windows + Windows 7 (out-of-band)</td><td class="fixed">KB5004945 / KB5004946 et al. (2021-07-06/07)</td><td>Superseded — Point-and-Print default left gap</td></tr>
           <tr><td>CVE-2021-34481</td><td>Point-and-Print elevation suppression default</td><td class="vuln">All supported Windows (RestrictDriverInstallationToAdministrators=0)</td><td class="fixed">KB5005010 / KB5005033 (2021-08-10)</td><td>Superseded — SpoolDirectory vector remained</td></tr>
           <tr><td>CVE-2022-21999 (SpoolFool)</td><td>Spooler SpoolDirectory / printer-port symlink handling</td><td class="vuln">All Windows desktop + server versions (default config)</td><td class="fixed">2022-02-08 Patch Tuesday</td><td>Superseded — race-condition variant found 2024</td></tr>
-          <tr><td>CVE-2024-38198</td><td>Print Spooler data-authenticity check (race condition)</td><td class="vuln">Windows 10/11 all channels, Server 2016–2022</td><td class="fixed">2024-08-13 Patch Tuesday</td><td>Current — no further public bypass reported as of 2026-08-30</td></tr>
+          <tr><td>CVE-2024-38198</td><td>Print Spooler data-authenticity check (race condition)</td><td class="vuln">Windows 10/11 all channels, Server 2016–2022</td><td class="fixed">2024-08-13 Patch Tuesday</td><td>Current — no further public bypass reported as of 2026-09-02</td></tr>
         </tbody>
       </table>
     </div>
@@ -885,12 +981,12 @@ EventCode IN (316, 808)
   <div class="section-body">
     <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
     <div class="xref-grid" style="margin-bottom:18px;">
-      <div class="xref-none">No companion actor cards on file for Vice Society, Magniber, or Conti as of 2026-08-30 — this repository's existing actor cards (APT1, Gonjeshke Darande, JadePuffer, Lapsus$, REvil, Salt Typhoon, Scattered Spider, TeamPCP) do not include any confirmed PrintNightmare operators. Flagged for future card creation.</div>
+      <div class="xref-none">No companion actor cards on file for Vice Society, Magniber, or Conti as of 2026-09-02 — this repository's existing actor cards (APT1, CyberAv3ngers, Gonjeshke Darande, JadePuffer, Lapsus$, REvil, Salt Typhoon, Scattered Spider, TeamPCP) do not include any confirmed PrintNightmare operators. Flagged for future card creation.</div>
     </div>
 
     <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
     <div class="xref-grid">
-      <div class="xref-none">No companion incident cards on file reference PrintNightmare as an initial access vector as of 2026-08-30.</div>
+      <div class="xref-none">No companion incident cards on file reference PrintNightmare as an initial access vector as of 2026-09-02.</div>
     </div>
   </div>
 </div>
@@ -899,6 +995,192 @@ EventCode IN (316, 808)
 <div class="section">
   <div class="section-header">
     <div class="section-num">11</div>
+    <div class="section-title">Network Exposure <small>Ports · Protocols · Banners · Nmap · Shodan</small></div>
+  </div>
+  <div class="section-body">
+
+    <!-- PORT / PROTOCOL SUMMARY TABLE -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <table class="port-table" style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>Port</th>
+          <th>Proto</th>
+          <th>Service</th>
+          <th>Vulnerable Condition</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="port-num">445</td>
+          <td>TCP</td>
+          <td class="svc-name">SMB / Microsoft-DS</td>
+          <td class="version-vuln">MS-RPRN/MS-PAR reachable via named pipe \PIPE\spoolss over SMB</td>
+          <td>Primary real-world exploitation path inside AD environments — most orgs already permit 445 between domain members</td>
+        </tr>
+        <tr>
+          <td class="port-num">135</td>
+          <td>TCP</td>
+          <td class="svc-name">MSRPC (Endpoint Mapper)</td>
+          <td class="version-vuln">Discloses registered MS-RPRN/MS-PAR interface bindings and the dynamic port they resolve to</td>
+          <td>Must never be internet-exposed; internal network segmentation is the primary control, per CISA ED 21-04</td>
+        </tr>
+        <tr>
+          <td class="port-num">139</td>
+          <td>TCP</td>
+          <td class="svc-name">NetBIOS Session Service</td>
+          <td class="version-vuln">Legacy SMB transport — alternate path to the same \PIPE\spoolss named pipe as port 445</td>
+          <td>Same exposure risk as 445; disable where legacy NetBIOS/SMB1 is not operationally required</td>
+        </tr>
+        <tr>
+          <td class="port-num">49152–65535</td>
+          <td>TCP</td>
+          <td class="svc-name">MSRPC (dynamic ncacn_ip_tcp endpoint)</td>
+          <td class="version-vuln">Direct RPC/TCP binding to MS-PAR once resolved via the port 135 endpoint mapper</td>
+          <td>Varies per host/boot; frequently missed by firewall rules that only enumerate well-known ports 135/445</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- NMAP SCAN OUTPUT — DEFAULT -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Default Service Scan Output (Print Spooler Host)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">nmap -sV -p 135,139,445 dc01.corp.local</span>
+      </div>
+      <div class="nmap-output"># NOTE: Representative default -sV output — msrpc/microsoft-ds service banners are
+# byte-identical whether the host is patched or unpatched. A default nmap scan can
+# confirm the Spooler's RPC surface is reachable; it cannot by itself confirm
+# PrintNightmare exposure or patch level.
+
+Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for dc01.corp.local (10.10.10.5)
+Host is up (0.0041s latency).
+
+PORT    STATE SERVICE      VERSION
+<span class="port-open">135/tcp open  msrpc</span>        <span class="version">Microsoft Windows RPC</span>
+<span class="port-open">139/tcp open  netbios-ssn</span>  <span class="version">Microsoft Windows netbios-ssn</span>
+<span class="port-open">445/tcp open  microsoft-ds</span> <span class="version">Microsoft Windows Server 2019 Standard 17763 microsoft-ds</span>
+
+Service detection performed. Report any incorrect results at https://nmap.org/submit/</div>
+    </div>
+
+    <!-- NMAP SCAN OUTPUT — VERSION DISCRIMINATING -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; margin-top:16px;">Nmap — Version-Discriminating Scan (Vulnerable vs. Patched)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">rpcdump.py corp.local/user:pass@dc01.corp.local -p 135 | egrep 'MS-RPRN|MS-PAR'</span>
+      </div>
+      <div class="nmap-output"># NOTE: Reconstructed from documented rpcdump.py (Impacket) usage and the published
+# MS-RPRN interface UUID — not captured from a live host during this compile.
+#
+# IMPORTANT: No nmap-native command, and no known network-based scan of any kind,
+# reliably discriminates a patched from an unpatched Print Spooler host. The
+# PrintNightmare fix lives in server-side RPC-method authorization logic, not in
+# the RPC interface's advertised existence or any version string — so the output
+# below is IDENTICAL whether run against a fully-patched (Aug 2024 cumulative) or
+# a fully-unpatched (pre-June 2021) host.
+
+Protocol: [MS-RPRN]: <span class="service">Print System Remote Protocol</span>
+Provider: spoolsv.exe
+<span class="vuln-flag">UUID: 12345678-1234-ABCD-EF00-0123456789AB v1.0</span>
+Bindings:
+              ncacn_ip_tcp:10.10.10.5[49667]
+              ncacn_np:\\10.10.10.5[\PIPE\spoolss]
+
+Protocol: [MS-PAR]: <span class="service">Print System Asynchronous Remote Protocol</span>
+Provider: spoolsv.exe
+Bindings:
+              ncacn_ip_tcp:10.10.10.5[49667]
+              ncacn_np:\\10.10.10.5[\PIPE\spoolss]</div>
+    </div>
+    <div class="prose" style="margin-top:10px; margin-bottom:0;">
+      <p>Presence of both MS-RPRN and MS-PAR bindings confirms the Spooler service is running and network-reachable — a <em>necessary</em> precondition for exploitation — but is not sufficient to confirm vulnerability, since both interfaces remain identically registered and enumerable on fully-patched hosts. This is the single most important operational lesson in this section: for PrintNightmare, network reconnaissance identifies attack-surface candidates, not patch status. Patch-level ground truth requires endpoint-level inventory (confirming KB5004945 and each subsequent cumulative update through 2024-08-13 is installed), not a remote scan of any kind.</p>
+    </div>
+
+    <!-- SERVICE BANNERS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Version Identification</div>
+
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">MSRPC Endpoint Mapper · Port 135 — DCE/RPC Bind Ack</span>
+        <span class="banner-status vulnerable">PRE-PATCH (Jun 2021)</span>
+      </div>
+      <div class="banner-text">Interface: <span class="vuln-string">12345678-1234-abcd-ef00-0123456789ab</span> v1.0 (MS-RPRN)
+Provider: spoolsv.exe
+Result: acceptance</div>
+    </div>
+
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">MSRPC Endpoint Mapper · Port 135 — DCE/RPC Bind Ack</span>
+        <span class="banner-status patched">POST-PATCH (Aug 2024 cumulative)</span>
+      </div>
+      <div class="banner-text">Interface: <span class="safe-string">12345678-1234-abcd-ef00-0123456789ab</span> v1.0 (MS-RPRN)
+Provider: spoolsv.exe
+Result: acceptance</div>
+    </div>
+    <div class="prose" style="margin-top:4px;">
+      <p>Version not reliably discriminated via banner. The interface-binding response is byte-for-byte identical before and after applying KB5004945 or any subsequent PrintNightmare-family patch, because Microsoft's fix validates the caller's authorization inside the RPC method implementation rather than changing the interface's advertised UUID, provider, or version. This is the clearest illustration in this card of why banner-based vulnerability scanning cannot detect PrintNightmare patch status — see the NSE and detection-tooling discussion below for the practical consequence.</p>
+    </div>
+
+    <!-- NSE SCRIPTS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
+
+    <div class="nse-block">
+      <div class="nse-header">
+        <span class="nse-name">smb-vuln-ms10-061 <span style="color:var(--text-dim); font-weight:400;">(closest built-in script — NOT applicable to PrintNightmare)</span></span>
+        <div class="nse-tags">
+          <span class="nse-tag detect">DETECTION</span>
+        </div>
+      </div>
+      <div class="nse-cmd">nmap -p445 --script=smb-vuln-ms10-061 dc01.corp.local</div>
+      <div class="nse-output"># This script tests for CVE-2010-2729 (MS10-061), the Print Spooler impersonation
+# vulnerability notably exploited by Stuxnet — a fundamentally different, decade-earlier
+# flaw in the same service. It performs a safe authentication-bypass check against a
+# shared printer, NOT the RpcAddPrinterDriverEx/RpcAsyncAddPrinterDriver authorization
+# defect that PrintNightmare exploits.
+#
+<span class="safe-flag">Host script results:
+|_smb-vuln-ms10-061: Could not negotiate a connection</span>
+
+# WARNING: A "not vulnerable" result from this script says nothing about PrintNightmare
+# exposure. Using it to clear a host of CVE-2021-34527/CVE-2021-1675 risk would be a
+# dangerous false negative.</div>
+    </div>
+    <div class="prose" style="margin-top:8px;">
+      <p>No dedicated built-in NSE script exists for any CVE in the PrintNightmare family (CVE-2021-1675, CVE-2021-34527, CVE-2021-34481, CVE-2022-21999, CVE-2024-38198) as of this compile. Community-maintained, non-NSE tooling fills the gap instead: Impacket's <code>rpcdump.py</code> (interface enumeration, shown above), the standalone Python subnet scanner "ItWasAllADream" (tests exploitability over MS-PAR/MS-RPRN across a CIDR range and generates a CSV report), and cube0x0's <a href="https://github.com/cube0x0/CVE-2021-1675" target="_blank" style="color:var(--cyan)">CVE-2021-1675</a> Impacket/C# reference implementation, which doubles as a practical vulnerability-confirmation tool when run against a non-production target. None of these are nmap-native, and all require separate installation.</p>
+    </div>
+
+    <!-- SHODAN / CENSYS DORKS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
+
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Shodan</span>
+      </div>
+      <div class="shodan-dork">port:445 os:"Windows"</div>
+      <div class="shodan-note">No PrintNightmare-specific Shodan dork was identified in public research reviewed for this compile, and for good reason: the dork above surfaces internet-exposed SMB/Windows hosts <strong>generally</strong> — it is NOT PrintNightmare-discriminating and should not be used to infer exposure to this specific vulnerability family. PrintNightmare's canonical exploit chain requires authenticated domain credentials (it is a privilege-escalation/lateral-movement primitive, not an unauthenticated internet-facing pre-auth RCE), and it targets an RPC interface that CISA's own Emergency Directive 21-04 states should never be reachable from the internet in the first place — independent of patch level. The operationally meaningful exposure metric for this vulnerability is internal network segmentation posture (is the Spooler's RPC surface reachable from network segments beyond domain-joined peers), not internet-facing footprint.</div>
+    </div>
+
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Censys</span>
+      </div>
+      <div class="shodan-dork">services.port=445 and services.service_name="SMB"</div>
+      <div class="shodan-note">Same caveat as the Shodan dork above applies in full — this surfaces general internet-facing SMB exposure, not PrintNightmare-specific risk. No historical Censys exposure count specific to PrintNightmare was identified in public research reviewed for this compile.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
     <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
   </div>
   <div class="section-body">
@@ -999,6 +1281,26 @@ EventCode IN (316, 808)
         <div class="ref-source">CVE Circulation / CIRCL</div>
         <div><div class="ref-detail"><a href="https://cve.circl.lu/cve/CVE-2021-34527" target="_blank">CVE-2021-34527 — Vulnerability-Lookup</a></div><div class="ref-date">Accessed: 2026-08-30</div></div>
       </div>
+      <div class="ref-item">
+        <div class="ref-source">Nmap.org NSEDoc</div>
+        <div><div class="ref-detail"><a href="https://nmap.org/nsedoc/scripts/smb-vuln-ms10-061.html" target="_blank">smb-vuln-ms10-061 NSE Script Documentation</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Juggernaut-sec</div>
+        <div><div class="ref-detail"><a href="https://juggernaut-sec.com/ad-recon-msrpc/" target="_blank">AD Recon — MSRPC (135/539)</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Juggernaut-sec</div>
+        <div><div class="ref-detail"><a href="https://juggernaut-sec.com/printnightmare/" target="_blank">PrintNightmare — Windows Privilege Escalation</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">cube0x0 (GitHub)</div>
+        <div><div class="ref-detail"><a href="https://github.com/cube0x0/CVE-2021-1675" target="_blank">CVE-2021-1675 — C# and Impacket Implementation of PrintNightmare</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Pentest Laboratories</div>
+        <div><div class="ref-detail"><a href="https://pentestlab.blog/2021/08/17/domain-escalation-printnightmare/" target="_blank">Domain Escalation — PrintNightmare</a></div><div class="ref-date">Accessed: 2026-09-02</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1006,8 +1308,8 @@ EventCode IN (316, 808)
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 24 sources, all open-source/public</div>
-  <div>Windows Print Spooler · CVE-2021-1675 / CVE-2021-34527 / CVE-2021-34481 / CVE-2022-21999 / CVE-2024-38198</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 24 sources, all open-source/public</div>
+  <div>Windows Print Spooler · CVE-2021-1675 / CVE-2021-34527 / CVE-2021-34481 / CVE-2022-21999 / CVE-2024-38198 · UPDATED FROM: 2026-08-30 · Git history preserved</div>
 </div>
 
 </body>

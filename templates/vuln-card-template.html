@@ -337,6 +337,101 @@
   .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
   .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
 
+  /* ── NETWORK EXPOSURE ── */
+  .nmap-window {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-top: 2px solid var(--cyan);
+    margin-bottom: 12px;
+  }
+  .nmap-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+  .nmap-titlebar .cmd { color: var(--cyan); }
+  .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+  .nmap-titlebar .dot.green { background: var(--green); }
+  .nmap-output {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    color: #8ab4c8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .nmap-output .port-open   { color: var(--green); }
+  .nmap-output .port-closed { color: var(--red); }
+  .nmap-output .port-filter { color: var(--amber); }
+  .nmap-output .service     { color: var(--cyan); }
+  .nmap-output .version     { color: #fff; }
+  .nmap-output .vuln-flag   { color: var(--red); font-weight: 700; }
+  .nmap-output .comment     { color: var(--text-dim); }
+  .nmap-output .highlight   { background: rgba(0,212,255,0.08); display: inline; }
+
+  .nse-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--purple);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .nse-name   { font-family: var(--mono); font-size: 10.5px; color: var(--purple); font-weight: 700; }
+  .nse-tags   { display: flex; gap: 5px; }
+  .nse-tag    { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
+  .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .nse-cmd  { font-family: var(--mono); font-size: 10px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 10px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+  .nse-output .vuln-flag { color: var(--red); font-weight: 700; }
+  .nse-output .safe-flag { color: var(--green); font-weight: 700; }
+
+  .shodan-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--amber);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .shodan-label  { font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 11px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .banner-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--cyan2);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .banner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .banner-label  { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.07em; }
+  .banner-status { font-family: var(--mono); font-size: 8.5px; padding: 1px 7px; }
+  .banner-status.vulnerable { border: 1px solid rgba(255,77,77,0.4); color: var(--red); }
+  .banner-status.patched    { border: 1px solid rgba(74,158,106,0.4); color: var(--green); }
+  .banner-text   { font-family: var(--mono); font-size: 10px; color: #8ab4c8; line-height: 1.6; white-space: pre-wrap; }
+  .banner-text .vuln-string { color: var(--red); }
+  .banner-text .safe-string { color: var(--green); }
+
+  .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .port-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
+  .port-table td.port-open { color: var(--green); }
+  .port-table td.svc-name  { color: #fff; }
+  .port-table td.version-vuln { color: var(--red); }
+  .port-table td.version-safe { color: var(--green); }
+
   /* ── REFERENCES ── */
   .ref-list { display: flex; flex-direction: column; gap: 6px; }
   .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
@@ -840,6 +935,158 @@
 <div class="section">
   <div class="section-header">
     <div class="section-num">11</div>
+    <div class="section-title">Network Exposure <small>Ports · Protocols · Banners · Nmap · Shodan</small></div>
+  </div>
+  <div class="section-body">
+
+    <!-- PORT / PROTOCOL SUMMARY TABLE -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <table class="port-table" style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>Port</th>
+          <th>Proto</th>
+          <th>Service</th>
+          <th>Vulnerable Condition</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="port-num">{{PORT}}</td>
+          <td>{{PROTO}}</td>
+          <td class="svc-name">{{SERVICE}}</td>
+          <td class="version-vuln">{{VULN_CONDITION}}</td>
+          <td>{{PORT_NOTES}}</td>
+        </tr>
+        <!-- Add rows for each affected port/service combination -->
+      </tbody>
+    </table>
+
+    <!-- NMAP SCAN OUTPUT — DEFAULT -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Default Service Scan Output (Vulnerable Host)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">{{NMAP_DEFAULT_CMD}}</span>
+        <!-- e.g.: nmap -sV -p {{PORT}} {{TARGET}} -->
+      </div>
+      <div class="nmap-output">{{NMAP_DEFAULT_OUTPUT}}
+<!-- Example format — agent replaces with source-documented output:
+Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for target.example.com (x.x.x.x)
+Host is up (0.012s latency).
+
+PORT      STATE  SERVICE   VERSION
+<span class="port-open">443/tcp   open   https</span>     <span class="version">Microsoft IIS httpd 10.0</span>
+<span class="comment">| http-ntlm-info:</span>
+<span class="comment">|   NTLM: NTLMSSP</span>
+<span class="vuln-flag">|_  Target_Name: VULN-EXCHANGE (VULNERABLE VERSION DETECTED)</span>
+
+Service detection performed. -->
+      </div>
+    </div>
+
+    <!-- NMAP SCAN OUTPUT — VERSION DISCRIMINATING -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; margin-top:16px;">Nmap — Version-Discriminating Scan (Vulnerable vs. Patched)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">{{NMAP_DISCRIMINATING_CMD}}</span>
+      </div>
+      <div class="nmap-output">{{NMAP_DISCRIMINATING_OUTPUT}}
+<!-- Show side-by-side or sequential output for vulnerable vs patched where possible.
+     Highlight the specific version string, header, or response delta that distinguishes them.
+     Only reproduce output documented in public sources — flag reconstructed output clearly:
+     # NOTE: Output below reconstructed from CVE documentation — not observed directly -->
+      </div>
+    </div>
+
+    <!-- SERVICE BANNERS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Version Identification</div>
+
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">{{BANNER_1_SERVICE}} · Port {{BANNER_1_PORT}}</span>
+        <span class="banner-status vulnerable">VULNERABLE</span>
+      </div>
+      <div class="banner-text">{{BANNER_1_VULNERABLE}}
+<!-- The raw banner string from a vulnerable host. Highlight the version string or
+     field that identifies vulnerability. Use span class="vuln-string" for the key identifier. --></div>
+    </div>
+
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">{{BANNER_1_SERVICE}} · Port {{BANNER_1_PORT}}</span>
+        <span class="banner-status patched">PATCHED</span>
+      </div>
+      <div class="banner-text">{{BANNER_1_PATCHED}}
+<!-- The same banner from a patched host — show the version string delta.
+     Use span class="safe-string" for the patched identifier. --></div>
+    </div>
+    <!-- Add banner-block pairs for each service/port combination -->
+    <!-- If banner-based discrimination is not possible, note: "Version not reliably discriminated via banner — use NSE script (below)" -->
+
+    <!-- NSE SCRIPTS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
+
+    <div class="nse-block">
+      <div class="nse-header">
+        <span class="nse-name">{{NSE_SCRIPT_1_NAME}}</span>
+        <div class="nse-tags">
+          <span class="nse-tag vuln">VULN</span>
+          <span class="nse-tag detect">DETECTION</span>
+        </div>
+      </div>
+      <!-- Full nmap command with script -->
+      <div class="nse-cmd">{{NSE_1_CMD}}</div>
+      <!-- Representative output — vulnerable host -->
+      <div class="nse-output">{{NSE_1_OUTPUT_VULN}}
+<!-- Example:
+Host script results:
+<span class="vuln-flag">| ssl-heartbleed:
+|   VULNERABLE:
+|   The Heartbleed Bug is a serious vulnerability in the popular OpenSSL library
+|     State: VULNERABLE
+|     Risk factor: High
+|_    Description: OpenSSL versions 1.0.1 and 1.0.2-beta releases (including
+      1.0.1f and 1.0.2-beta1) of OpenSSL are affected by the Heartbleed bug.</span>
+-->
+      </div>
+    </div>
+    <!-- Add nse-block for each relevant NSE script -->
+    <!-- If no dedicated NSE script exists: note it explicitly — "No dedicated NSE script. Use version discrimination via banner comparison above." -->
+    <!-- Link to NSE script docs: https://nmap.org/nsedoc/scripts/SCRIPT-NAME.html -->
+
+    <!-- SHODAN / CENSYS DORKS -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
+
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Shodan</span>
+      </div>
+      <div class="shodan-dork">{{SHODAN_DORK_1}}</div>
+      <div class="shodan-note">{{SHODAN_DORK_1_NOTE}}
+      <!-- Note: approximate exposed instance count at time of disclosure where documented --></div>
+    </div>
+
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Censys</span>
+      </div>
+      <div class="shodan-dork">{{CENSYS_DORK_1}}</div>
+      <div class="shodan-note">{{CENSYS_DORK_1_NOTE}}</div>
+    </div>
+    <!-- Add shodan-block for additional dorks (product-specific, version-specific, banner-specific) -->
+    <!-- Include historical exposure counts where documented in research — note they are point-in-time -->
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
     <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
   </div>
   <div class="section-body">
