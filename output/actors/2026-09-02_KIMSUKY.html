@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kimsuky — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL ITEMS ── */
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* ── IOC TABLE ── */
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  /* ── COUNTERMEASURES ── */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── SANCTIONS ── */
+  .sanctions-list { display: flex; flex-direction: column; gap: 5px; }
+  .sanctions-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 6px 0; border-bottom: 1px solid rgba(30,46,62,0.4); }
+  .sanctions-row:last-child { border-bottom: none; }
+  .sanctions-name { font-family: var(--body); font-size: 11.5px; color: var(--text); font-weight: 500; }
+  .sanctions-role { font-family: var(--body); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+  .sanctions-badge { font-family: var(--mono); font-size: 8.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
+
+  /* ── OPSEC PROCEDURES ── */
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  /* ── DETECTION EVASION ── */
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* ── CTID EMULATION PLAN ── */
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge">⚠ NATION-STATE · RECONNAISSANCE GENERAL BUREAU (RGB) · NORTH KOREA (DPRK)</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — DPRK State-Directed Cyber Espionage &amp; Self-Funding Financial Cybercrime Collective</div>
+  <h1><span class="accent">KIM</span>SUKY</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK (G0094), CISA/FBI Joint Advisory AA20-301A, FBI IC3 FLASH AC-000001-MW (Jan 2026), U.S. Treasury/OFAC, Mandiant/Google GTIG (APT43), Microsoft Threat Intelligence (Emerald Sleet), Kaspersky/Securelist, Trellix, Enki WhiteHat, The Hacker News, DomainTools, 16+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE — ESCALATING, AI-AUGMENTED TRADECRAFT</span></div>
+    <div>Threat Level: <span class="danger">HIGH</span></div>
+    <div>Primary Motive: <span class="warn">State-Directed Foreign Policy/Nuclear Intelligence Collection + Self-Funding Cybercrime</span></div>
+    <div>Active Since: <span>2012 (assessed)</span></div>
+    <div>MITRE ATT&amp;CK: <span>G0094</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ THREAT UPDATE — AUG 2026</div>
+  <div class="alert-headline">Operation GitPower: Kimsuky builds an offline AI stack to accelerate phishing lures and malware development</div>
+  <div class="alert-body">Reporting published in August 2026 documents Kimsuky assembling a self-hosted, offline large-language-model stack — including Ollama, GPT4All, and Msty — deliberately kept off external cloud AI platforms to avoid the abuse-detection telemetry those vendors maintain, while extending an active campaign ("Operation GitPower") that abuses GitHub repositories as a covert C2 channel within an LNK-to-PowerShell infection chain distributing AsyncRAT payloads disguised as image files (The Hacker News, 2026-08). This follows a 2025 Genians finding that a Kimsuky spear-phishing operation used ChatGPT-generated images of South Korean military employee ID cards as lure content, and sits alongside a parallel FBI FLASH advisory (AC-000001-MW, 2026-01-08) documenting Kimsuky's use of malicious QR codes ("quishing") against foreign-policy think tanks, embassies, and NGOs since May 2025. No formal follow-on CISA/FBI advisory specific to the offline-AI-stack finding had been published as of this compile; treat the underlying campaign infrastructure as active and evolving.</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">14+</div>
+    <div class="stat-label">Years of Continuous Espionage Operations (Active Since 2012)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">8</div>
+    <div class="stat-label">DPRK Agents + Group Sanctioned by US Treasury OFAC, Nov 30 2023 (with AU/JP/ROK)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">19+</div>
+    <div class="stat-label">Embassy Spear-Phishing Emails in One Coordinated Campaign, Mar–Jul 2025 (Trellix)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">20+</div>
+    <div class="stat-label">Distinct Malware Families &amp; Tool Variants Tracked (MITRE G0094 + 2025-26 Reporting)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Kimsuky is a North Korea-based cyber espionage collective active since at least 2012, tracked by MITRE ATT&amp;CK as G0094 and known across the vendor community under a wide range of names — Black Banshee, Velvet Chollima, THALLIUM, Emerald Sleet, APT43, TA427, Springtail, Earth Kumiho, and PatheticSlug among them (MITRE ATT&amp;CK, accessed 2026-09-02). The group is assessed to operate under or in close coordination with North Korea's Reconnaissance General Bureau (RGB), the regime's primary foreign intelligence service, and its core tasking has remained consistent for over a decade: collect intelligence on foreign policy, nuclear negotiations, sanctions posture, and national-security decision-making tied to the Korean Peninsula (CISA AA20-301A, 2020).</p>
+      <p>Kimsuky matters now because it has not stood still. Where the group's earliest reporting centered on South Korean government, think-tank, and nuclear-industry targets — including a 2014 compromise of Korea Hydro &amp; Nuclear Power Co. — its operations have expanded to embassies, foreign-policy institutions, and individual subject-matter experts across the United States, Japan, and Europe (MITRE ATT&amp;CK; Trellix, 2025). Through 2025 and into 2026 the group has layered in QR-code "quishing" specifically engineered to move a victim's malicious click off a monitored corporate endpoint and onto a personal mobile device (FBI IC3 FLASH AC-000001-MW, 2026-01-08); pivoted into supply-chain intrusions against South Korean groupware vendors to reach their downstream customers (Enki WhiteHat, 2026); and, as of August 2026, begun operationalizing offline large-language-model tooling to accelerate lure generation and malware development while deliberately avoiding the abuse-detection telemetry maintained by cloud AI vendors (The Hacker News, 2026-08).</p>
+      <p>Kimsuky sits within a broader North Korean state cyber ecosystem alongside Lazarus Group and Andariel — sibling RGB-linked clusters with overlapping but distinct mission sets (Anthropic Threat Intelligence Report, Aug 2025). Unlike those more destructively- or financially-focused units, Kimsuky's defining characteristic is that it targets people as much as networks: named foreign-policy analysts, retired and active diplomats, and journalists covering the Korean Peninsula are recurring, individually-selected victims, not incidental catches of an enterprise-wide intrusion. Mandiant's 2023 APT43 reporting also documented the group engaging in financially-motivated cryptocurrency theft and laundering — via stolen wallets and cloud-mining/hash-rental services — explicitly to self-fund its own operational needs rather than draw on state budget, a pattern consistent with the sanctions-pressured regime's broader push toward cyber-enabled hard-currency generation (Mandiant, 2023).</p>
+      <p>The critical operational context for 2026 is twofold: first, Kimsuky remains squarely within the U.S. government's active exploited-vulnerability picture — CVE-2024-1708 in ConnectWise ScreenConnect, which Kimsuky weaponized to deploy the ToddlerShark malware variant, sits on CISA's Known Exploited Vulnerabilities catalog. Second, the group's growing reliance on legitimate, trusted platforms — GitHub, Google Drive, Dropbox, VS Code remote tunnels — as command-and-control infrastructure means conventional domain- and IP-reputation-based network defenses are increasingly poor tools against it, raising the operational burden on user-level and behavioral detection instead.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">Kimsuky</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">Reconnaissance General Bureau (RGB), DPRK</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Nation-State APT — Espionage + Self-Funding Cybercrime</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Foreign policy / nuclear-policy intelligence collection; secondary financial self-funding via cryptocurrency theft</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">2012 (assessed; earliest widely-reported operations 2013-2014)</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Aug 2026 (Operation GitPower, offline-AI-stack tradecraft)</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G0094</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">OFAC-sanctioned (US Treasury, 30 Nov 2023, coordinated w/ AU/JP/ROK); no public indictment identified as of this compile</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">Kimsuky (MITRE G0094)</span>
+          <span class="alias-chip">Black Banshee</span>
+          <span class="alias-chip">Velvet Chollima (CrowdStrike)</span>
+          <span class="alias-chip">THALLIUM (Microsoft, legacy)</span>
+          <span class="alias-chip">Emerald Sleet (Microsoft, current)</span>
+          <span class="alias-chip">APT43 (Mandiant/Google GTIG)</span>
+          <span class="alias-chip">TA427 (Proofpoint)</span>
+          <span class="alias-chip">Springtail (Symantec/Broadcom)</span>
+          <span class="alias-chip">Earth Kumiho (Trend Micro)</span>
+          <span class="alias-chip">PatheticSlug</span>
+          <span class="alias-chip">STOLEN PENCIL (2018 campaign name)</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p><strong>[HIGH]</strong> confidence Kimsuky is a North Korea-directed cyber espionage collective operating under or in close coordination with the RGB. This rests on convergent, independently-derived attribution: a formal U.S. Treasury/OFAC sanctions action (30 Nov 2023, coordinated with Australia, Japan, and South Korea) explicitly naming Kimsuky as RGB-controlled; a joint CISA/FBI advisory (AA20-301A, 2020); and consistent technical and infrastructure tradecraft independently tracked since at least 2018 by Mandiant/Google GTIG (as APT43), Microsoft (as Emerald Sleet, formerly THALLIUM), CrowdStrike (as Velvet Chollima), and Kaspersky. A residual <strong>[MEDIUM]</strong> gap exists at the organizational-boundary level: Mandiant's original APT43 designation explicitly folded prior "Kimsuky"/"Thallium" reporting into one cluster distinguished partly by self-funding cryptocurrency operations, while MITRE ATT&amp;CK (G0094) and most other public reporting treat all of the above names as one continuously-tracked entity. Whether this reflects a single team with an evolving mission set, or multiple RGB-directed sub-units sharing tooling and infrastructure, is not resolved in the open-source reporting reviewed for this compile.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2012–2018</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Origins &amp; South Korea-Focused Espionage</div>
+          <div class="timeline-desc">Earliest tracked activity targets South Korean government agencies, think tanks, and subject-matter experts, using BabyShark-style PowerShell tooling for initial reconnaissance. A 2014 intrusion into Korea Hydro &amp; Nuclear Power Co. is among the group's earliest widely-reported operations against critical national infrastructure adjacent targets (CISA AA20-301A, 2020).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">SEP 2018</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Operation STOLEN PENCIL</div>
+          <div class="timeline-desc">Campaign targeting academic institutions, primarily in South Korea, using browser-extension malware and credential-harvesting techniques to compromise researchers and students working on Korea-related subject matter — an early example of the group's individual-level, expert-targeted collection doctrine (MITRE ATT&amp;CK G0094).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2019</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Operation Kabar Cobra &amp; Operation Smoke Screen — International Expansion</div>
+          <div class="timeline-desc">Kimsuky's targeting footprint expands beyond South Korea to include UN offices and organizations across government, education, and business sectors in the United States, Japan, Russia, and Europe, alongside continued targeting of retired South Korean diplomats and military officials (MITRE ATT&amp;CK G0094; reporting, Aug 2019).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">OCT 2020</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">CISA/FBI Joint Advisory AA20-301A</div>
+          <div class="timeline-desc">CISA and the FBI publish "North Korean Advanced Persistent Threat Focus: Kimsuky," the first major U.S. government-formalized public profile of the group, consolidating years of tradecraft observation — tailored spear-phishing, exploitation of known software vulnerabilities post-access, and persistence techniques — into a single reference advisory still cited in current reporting.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAR–NOV 2023</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Mandiant APT43 Report &amp; U.S./Allied OFAC Sanctions</div>
+          <div class="timeline-desc">Mandiant publishes its APT43 profile (Mar 2023), documenting the group's self-funding cryptocurrency theft and laundering operations via cloud-mining and hash-rental services, and noting early adoption of large language models for reconnaissance and social-engineering content generation. On 30 Nov 2023, the U.S. Treasury, coordinated with Australia, Japan, and South Korea, sanctions Kimsuky and eight foreign-based agents in direct response to North Korea's Nov 1, 2023 military-reconnaissance satellite launch.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2024</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">CVE-2024-1708 Exploitation — ToddlerShark</div>
+          <div class="timeline-desc">Kimsuky actively exploits CVE-2024-1708, a path-traversal vulnerability in ConnectWise ScreenConnect (CVSS 8.4), to deploy a polymorphic malware variant tracked as ToddlerShark — marking a shift toward technical exploitation of internet-facing remote-management software as a complement to social engineering.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">MAR 2025–JAN 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Embassy GitHub-C2 Campaign &amp; FBI Quishing FLASH Advisory</div>
+          <div class="timeline-desc">Between March and July 2025, Trellix identifies at least 19 spear-phishing emails against diplomatic missions worldwide, impersonating trusted contacts and timing lures to real diplomatic events, delivering a XenoRAT variant via GitHub-hosted C2 and Dropbox/Daum-staged password-protected archives. In parallel, May–June 2025 campaigns embed malicious QR codes in emails to think tanks and foreign-policy advisory firms, culminating in the FBI's IC3 FLASH AC-000001-MW (8 Jan 2026), which formally warns NGOs, academia, and foreign-policy experts of the quishing technique.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025–AUG 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Groupware Supply-Chain Intrusions &amp; AI-Augmented Tradecraft</div>
+          <div class="timeline-desc">Enki WhiteHat tracks Kimsuky infiltrating South Korean groupware vendors' internal networks via mail-server RCE and spear-phishing, deploying Gomir/HttpTroy-derived BirdTroy and DriveTroy backdoors (the latter using Google Drive as its C2 channel), then pivoting laterally into customer-facing servers and tampering with vendor login pages to harvest downstream customer credentials. By August 2026, reporting documents "Operation GitPower" — GitHub-repository C2 for LNK-to-PowerShell AsyncRAT delivery — alongside an offline LLM stack (Ollama, GPT4All, Msty) assembled to accelerate phishing-lure and malware development while avoiding cloud-AI-vendor abuse telemetry.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Social-Engineering-Led Espionage Chain with Legitimate-Service C2</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Entry begins almost always with meticulously tailored spear-phishing that impersonates a known professional contact — a foreign policy advisor, embassy staff member, journalist, or think-tank peer — frequently timed to coincide with real, contemporaneous events (an EU meeting, a diplomatic luncheon, a conference) to lend the pretext credibility (Trellix, 2025). Since 2025 the group has layered in QR-code "quishing": embedding a malicious URL inside a QR code so the victim scans it with a personal mobile device, deliberately moving the malicious click off the monitored corporate endpoint and its email-security controls entirely, landing on fake conference-registration pages or spoofed Google account login pages built for credential harvesting (FBI IC3 FLASH AC-000001-MW, 2026). Where social engineering alone is insufficient, Kimsuky exploits internet-facing infrastructure directly — most notably CVE-2024-1708 in ConnectWise ScreenConnect, and, against South Korean groupware vendors, direct remote-code-execution against externally exposed mail servers.</p>
+      <p>Core initial-stage tooling has remained BabyShark (a PowerShell/VBS implant used for reconnaissance and lightweight C2 relay since 2018) and AppleSeed (a backdoor providing keylogging, screenshot capture, file exfiltration, and C2 communication). Mid-stage access increasingly relies on the PebbleDash malware cluster — HelloDoor, httpMalice, MemLoad, and httpTroy — and the newer Gomir/HttpTroy-derived family, whose 2025-2026 variants BirdTroy and DriveTroy extend targeting specifically to Linux server infrastructure at compromised software vendors. Credential and browser-data theft is handled by GoBear and Troll Stealer, alongside the older KGH_SPY spyware suite; dual-use tools including Mimikatz and PsExec support internal reconnaissance and lateral movement once inside a network.</p>
+      <p>A defining and increasingly consistent trait is Kimsuky's abuse of legitimate, trusted cloud and developer platforms as the command-and-control channel itself, rather than maintaining bespoke C2 infrastructure that carries its own reputation signal: GitHub repositories (Operation GitPower's LNK→PowerShell→AsyncRAT chain), Google Drive (DriveTroy), and Dropbox/Daum/Blogspot for payload staging and beaconing. This blends malicious network traffic into ordinary SaaS usage patterns and defeats domain-reputation- and IP-allowlist-based network detection that would flag traffic to unfamiliar infrastructure.</p>
+      <p>Once inside groupware-vendor environments, the group aggressively pursues lateral movement into customer-facing servers, harvests vendor infrastructure credentials, and tampers with compromised vendors' login pages to capture downstream customer credentials — a supply-chain amplification pattern distinct from Kimsuky's earlier, more purely espionage-driven operations. Persistence relies on scheduled tasks and autostart mechanisms, alongside abuse of Visual Studio Code's built-in remote-tunnel feature for durable, legitimately-signed remote access unlikely to trip EDR application-control policies tuned to traditional remote-access tools. Collected material — documents, credentials, screenshots, and cryptocurrency wallet contents — is archived and exfiltrated over the same abused C2 channel or via web-service upload.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; 13 techniques mapped</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1589</div>
+        <div class="mitre-name">Gather Victim Identity Information</div>
+        <div class="mitre-note">[HIGH] Extensive pre-attack profiling of named individuals (think-tank scholars, diplomats, journalists) to build credible impersonation pretexts before first contact (Trellix, 2025).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1588.007</div>
+        <div class="mitre-name">Obtain Capabilities: Artificial Intelligence</div>
+        <div class="mitre-note">[HIGH] Offline LLM stack (Ollama, GPT4All, Msty) for phishing-lure and malware-development assistance kept off external cloud AI platforms to evade vendor abuse telemetry (The Hacker News, Aug 2026); ChatGPT-generated fake military ID imagery used as lure content (Genians, 2025).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.001 / .002</div>
+        <div class="mitre-name">Phishing: Spearphishing Attachment / Link</div>
+        <div class="mitre-note">[HIGH] Tailored spear-phishing impersonating known professional contacts, timed to real diplomatic/policy events; primary and most consistent initial-access vector since 2012 (CISA AA20-301A).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] CVE-2024-1708 (ConnectWise ScreenConnect, CVSS 8.4) exploited to deploy ToddlerShark; separately, direct RCE against internet-facing mail servers at South Korean groupware vendors (Enki WhiteHat, 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.001</div>
+        <div class="mitre-name">Command and Scripting Interpreter: PowerShell</div>
+        <div class="mitre-note">[HIGH] BabyShark's core implant logic is PowerShell/VBS-based, in continuous use as an initial-stage tool since 2018 (MITRE ATT&amp;CK G0094).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1204.001</div>
+        <div class="mitre-name">User Execution: Malicious Link</div>
+        <div class="mitre-note">[HIGH] QR-code "quishing" specifically engineered to induce a personal-device scan-and-click outside corporate email-security controls (FBI FLASH AC-000001-MW, 2026).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1053.005</div>
+        <div class="mitre-name">Scheduled Task/Job</div>
+        <div class="mitre-note">[MEDIUM] Scheduled tasks used for backdoor persistence across the AppleSeed/PebbleDash tool clusters (MITRE ATT&amp;CK G0094; CISA AA20-301A).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1036</div>
+        <div class="mitre-name">Masquerading</div>
+        <div class="mitre-note">[HIGH] Spoofed subdomains mimicking legitimate Google/Yahoo mail login pages; AsyncRAT payloads disguised as image files in Operation GitPower (DomainTools; The Hacker News, 2026).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">[MEDIUM] Consistent recompilation/rebranding of malware families (PebbleDash→HelloDoor/httpTroy; Gomir→BirdTroy/DriveTroy) to evade signature-based detection of prior variants (Securelist; Enki WhiteHat).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003</div>
+        <div class="mitre-name">OS Credential Dumping</div>
+        <div class="mitre-note">[HIGH] Mimikatz deployed post-access for credential harvesting; DomainTools' "Kim leak" analysis documented PAM password-change log artifacts consistent with systematic credential-theft workflow.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1056.002</div>
+        <div class="mitre-name">Input Capture: GUI Input Capture</div>
+        <div class="mitre-note">[HIGH] Fake Google-account login pages served via QR-code landing flows to directly harvest entered credentials (FBI FLASH AC-000001-MW, 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1114</div>
+        <div class="mitre-name">Email Collection</div>
+        <div class="mitre-note">[MEDIUM] Sustained email-account access/collection consistent with the group's foreign-policy-intelligence collection doctrine (CISA AA20-301A).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1102.002</div>
+        <div class="mitre-name">Web Service: Bidirectional Communication</div>
+        <div class="mitre-note">[HIGH] GitHub repositories (Operation GitPower) and Google Drive (DriveTroy) used directly as C2 channels, blending traffic into legitimate SaaS/developer platform usage (The Hacker News; Enki WhiteHat, 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1567.002</div>
+        <div class="mitre-name">Exfiltration to Cloud Storage</div>
+        <div class="mitre-note">[MEDIUM] Dropbox and Daum used for password-protected archive staging and payload/data movement in the 2025 embassy campaign (Trellix, 2025).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Government &amp; Diplomatic</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Think Tanks, NGOs &amp; Academia</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:80%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Defense &amp; National Security Policy</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:70%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Software / Groupware &amp; IT Vendors</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:55%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Cryptocurrency &amp; Financial Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:45%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">South Korea (primary, sustained); United States, Japan, and EU member states via diplomatic missions; global embassy targeting expansion observed 2025 (Trellix)</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Named individuals more often than infrastructure alone — foreign policy analysts, retired/active diplomats, embassy staff, journalists covering the Korean Peninsula, nuclear-policy SMEs, plus enterprise targets at South Korean groupware/software vendors</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Human-centric social engineering (impersonation spear-phishing, QR-code quishing) as primary vector; internet-facing RMM/mail-server exploitation as secondary vector where a technical foothold is required without a willing human step</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Selective, individual-level targeting aligned to DPRK foreign-policy intelligence requirements, supplemented by opportunistic financially-motivated cryptocurrency operations to self-fund continued espionage activity</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">BABYSHARK</span>
+          <span class="tool-tag">LOADER/RECON · CUSTOM · T1059.001</span>
+        </div>
+        <div class="tool-desc">PowerShell/VBS-based implant, in use since 2018, providing initial system profiling, lightweight C2 relay, and staging for follow-on backdoors. Remains a core first-stage tool despite its age, indicating continued operational reliance rather than replacement.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">APPLESEED</span>
+          <span class="tool-tag">BACKDOOR · CUSTOM · T1114 / T1113</span>
+        </div>
+        <div class="tool-desc">Backdoor with keylogging, screenshot capture, file exfiltration, and C2 communication capability; deployed after initial access as a mid-stage persistent implant. One of the two malware clusters (alongside PebbleDash) Kaspersky assesses as the group's most technically advanced tooling.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">PEBBLEDASH CLUSTER (HelloDoor / httpMalice / MemLoad / httpTroy)</span>
+          <span class="tool-tag">BACKDOOR · CUSTOM · T1027</span>
+        </div>
+        <div class="tool-desc">Family of related backdoors used for durable access and C2, with new tool naming (HelloDoor, httpMalice, MemLoad, httpTroy) reflecting periodic recompilation and feature-forking to defeat signature-based detection of earlier PebbleDash variants (Securelist, Kaspersky).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">GOMIR / HTTPTROY DERIVATIVES (BirdTroy, DriveTroy)</span>
+          <span class="tool-tag">BACKDOOR (LINUX) · CUSTOM · T1102.002</span>
+        </div>
+        <div class="tool-desc">Go-based backdoor family extending Kimsuky's reach to Linux server infrastructure specifically at compromised groupware/software vendors. DriveTroy is Kimsuky's own entry into Google Drive-based C2, using the legitimate cloud API to blend into a groupware server's ordinary traffic profile (Enki WhiteHat, 2026).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">GOBEAR / TROLL STEALER</span>
+          <span class="tool-tag">STEALER · CUSTOM · T1555 / T1003</span>
+        </div>
+        <div class="tool-desc">Credential and browser-data stealer pairing; Troll Stealer was flagged in 2024/2025 reporting as novel malware actively leveraged by Kimsuky for expanded credential-harvesting operations (SOC Prime; MITRE ATT&amp;CK S1196/S1197).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">KGH_SPY</span>
+          <span class="tool-tag">SPYWARE SUITE · CUSTOM · T1113 / T1005</span>
+        </div>
+        <div class="tool-desc">Modular spyware suite (info-stealer, keylogger, and additional plugin modules) documented by Cybereason as part of Kimsuky's broader "KGH" toolset targeting reconnaissance and long-term data collection.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">XENORAT (KIMSUKY VARIANT)</span>
+          <span class="tool-tag">RAT · MODIFIED COTS · T1219</span>
+        </div>
+        <div class="tool-desc">Modified variant of the open-source XenoRAT remote-access trojan, providing full system control for intelligence gathering; delivered via password-protected archives hosted on Dropbox/Daum in the 2025 embassy spear-phishing campaign (Trellix).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">MIMIKATZ / PSEXEC</span>
+          <span class="tool-tag">DUAL-USE / LOLBIN · COTS · T1003 / T1570</span>
+        </div>
+        <div class="tool-desc">Widely-available credential-dumping and remote-execution utilities used for internal reconnaissance and lateral movement once inside a target network (MITRE ATT&amp;CK G0094 software list).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">GITHUB / GOOGLE DRIVE / DROPBOX / DAUM / BLOGSPOT (ABUSED C2 INFRASTRUCTURE)</span>
+          <span class="tool-tag">INFRASTRUCTURE · LEGITIMATE PLATFORM ABUSE · T1102.002</span>
+        </div>
+        <div class="tool-desc">Not malware but core infrastructure: legitimate developer and cloud-storage platforms used directly as C2 channels and payload-staging points ("Operation GitPower" for GitHub; DriveTroy for Google Drive), specifically chosen to blend malicious traffic into normal SaaS usage and defeat domain/IP-reputation-based network detection.</div>
+      </div>
+      <div class="tool-item green">
+        <div class="tool-header">
+          <span class="tool-name">OFFLINE LLM STACK (Ollama, GPT4All, Msty)</span>
+          <span class="tool-tag">AI TOOLING · CUSTOM DEPLOYMENT OF COTS SOFTWARE · T1588.007</span>
+        </div>
+        <div class="tool-desc">Self-hosted local model runners assembled to give operators LLM-assisted phishing-lure and malware-development capability without routing prompts through external cloud AI platforms, reducing the chance that operational content is visible to those vendors' own abuse-detection systems (The Hacker News, Aug 2026).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">DOMAIN</td><td class="val">eucie09111[.]myartsonline[.]com</td><td>Securelist/Kaspersky</td><td>Observed since late 2020</td></tr>
+        <tr><td class="type-label">URL</td><td class="val">hxxp://eucie09111[.]myartsonline[.]com/0502/v[.]php</td><td>Securelist/Kaspersky</td><td>Observed since late 2020</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2024-1708 — ConnectWise ScreenConnect path-traversal, CVSS 8.4, CISA KEV-listed; exploited to deploy ToddlerShark</td><td>CISA KEV; SecurityWeek</td><td>2024</td></tr>
+        <tr><td class="type-label">INFRA</td><td class="val">Attacker-controlled GitHub repositories used as C2 relay in an LNK→PowerShell→AsyncRAT infection chain ("Operation GitPower"); no fixed repo/domain IOC published — monitor for anomalous repository-content polling from endpoint processes</td><td>The Hacker News</td><td>Aug 2026</td></tr>
+        <tr><td class="type-label">INFRA</td><td class="val">Google Drive API endpoints abused as C2 by the DriveTroy Linux backdoor variant targeting groupware-vendor server infrastructure</td><td>Enki WhiteHat</td><td>2025–2026</td></tr>
+        <tr><td class="type-label">MESSAGE</td><td class="val">Behavioral pattern: spear-phish impersonating a foreign advisor/embassy contact → embedded QR code → fake conference registration or spoofed Google account login page for credential harvesting</td><td>FBI IC3 FLASH AC-000001-MW</td><td>May–Jun 2025 (advisory issued 2026-01-08)</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val">Comprehensive current IP/domain/hash IOC lists were not published in the open sources reviewed for this compile (2026-09-02), owing to rapid infrastructure rotation and reliance on legitimate cloud/developer platforms as C2. Consult CISA AA20-301A and FBI IC3 FLASH AC-000001-MW directly for their published machine-readable IOC packages.</td><td>—</td><td>As of 2026-09-02</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">HIGH</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (unified naming) / MEDIUM (internal org. boundaries)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Escalating sophistication — AI integration, legitimate-platform C2 abuse, supply-chain expansion</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Adaptive social engineering fused with legitimate-service C2 that defeats reputation-based network detection</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Sparse, rapidly-stale public IOC data; unresolved Kimsuky/APT43 internal organizational boundary</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Lazarus Group (sibling RGB-linked cluster)</span>
+          <span class="alias-chip">Andariel (sibling RGB-linked cluster)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Kimsuky is assessed as a <strong>HIGH</strong>, not CRITICAL, threat: unlike destructively-oriented actors, its confirmed impact to date is espionage and financial theft rather than physical or operational disruption, and no source reviewed for this compile documents Kimsuky-attributed critical-infrastructure sabotage. What elevates it above a routine espionage actor is persistence and rate of tradecraft evolution — fourteen-plus years of continuous operation against a stable target set, with a demonstrated pattern of adopting new delivery channels (QR codes), new C2 substrates (GitHub, Google Drive), and now AI tooling faster than defenders have generally re-tuned detections to match.</p>
+      <p>The single most dangerous capability is not any individual malware family but the combination of highly credible, individually-tailored social engineering with C2 infrastructure built on legitimate, trusted platforms. A SOC that alerts on connections to unfamiliar or newly-registered domains will not flag a beacon to github.com or drive.google.com; this forces defenders toward slower, higher-friction behavioral and content-based detection just as the group's AI-assisted lure generation is making its phishing content harder to distinguish from genuine correspondence. The August 2026 offline-LLM-stack finding is a leading indicator worth taking seriously even though its downstream operational impact is not yet independently measured in public reporting.</p>
+      <p>Competing hypotheses on organizational structure remain genuinely open. Mandiant's APT43 designation and MITRE's single G0094 entry are not fully reconciled in public source material: it is possible that "Kimsuky" is best understood as one team whose mission has broadened over a decade to include self-funding cybercrime, or as an umbrella covering multiple RGB-directed sub-units that share tooling, infrastructure habits, and reporting lineage without being a single continuously-operating team. This assessment would shift toward the latter if future reporting documents simultaneous, geographically-distinct operational tempos inconsistent with a single unified group — evidence not present in current sources. Forward risk trajectory is upward: continued supply-chain pivoting through South Korean software vendors, further legitimate-platform C2 adoption, and operationalized AI tooling together suggest Kimsuky's effective capability is growing faster than its headcount, a pattern consistent with the broader industry concern (echoed in Anthropic's own August 2025 threat-intelligence reporting on North Korean actors' use of AI) that language models are lowering the skill floor required to sustain prolific, well-crafted state-directed operations.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Require phishing-resistant MFA</strong> (FIDO2/hardware security keys) for all remote access and sensitive-system authentication, replacing SMS/OTP-based factors that AiTM credential-phishing flows can intercept.</div>
+            <div class="cm-ttp">Counters: T1566.001/.002, T1056.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Restrict or manage QR-code scanning</strong> from corporate-adjacent mobile devices; where feasible, route scanned URLs through the same web-filtering/proxy controls applied to desktop email links rather than treating mobile as an implicitly trusted, unmonitored channel.</div>
+            <div class="cm-ttp">Counters: T1204.001 (quishing pivot)</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Patch and inventory internet-facing RMM/remote-management software</strong>, prioritizing CVE-2024-1708 (ConnectWise ScreenConnect) and any other CISA KEV-listed remote-access products in the environment.</div>
+            <div class="cm-ttp">Counters: T1190</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Deploy egress monitoring for anomalous outbound traffic</strong> to GitHub raw-content endpoints, Google Drive API hosts, and Dropbox/Daum, correlating unexpected process-to-cloud-service connections rather than relying solely on domain-reputation allowlisting.</div>
+            <div class="cm-ttp">Counters: T1102.002, T1567.002</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Run targeted awareness training</strong> for foreign-policy, diplomatic, academic, and think-tank staff specifically on impersonation of known professional contacts and fabricated conference/meeting invitations — the group's most consistent and highest-yield lure pattern.</div>
+            <div class="cm-ttp">Counters: T1566.001/.002, T1589</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Enable PowerShell script-block logging and AMSI</strong> on EDR, and alert on BabyShark-consistent script-execution chains (obfuscated PowerShell spawning reconnaissance/staging commands).</div>
+            <div class="cm-ttp">Counters: T1059.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Rotate and monitor PAM/VPN credentials</strong> on a regular schedule, and alert on anomalous password-change log entries consistent with the credential-harvesting workflow documented in DomainTools' "Kim leak" analysis.</div>
+            <div class="cm-ttp">Counters: T1003</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Vet and continuously monitor third-party groupware/software-vendor access</strong> into customer environments; require prompt vendor breach-notification SLAs given Kimsuky's demonstrated pattern of pivoting from vendor compromise into customer credential theft.</div>
+            <div class="cm-ttp">Counters: Supply-chain lateral movement (T1190, T1195-adjacent)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Rapid rotation of disposable subdomains crafted to mimic legitimate mail/cloud services (spoofed Google/Yahoo mail login pages); DomainTools' analysis of a leaked operational dataset ("the Kim dump") and CISA AA20-301A both note a pattern of operating significant supporting infrastructure out of Chinese and Russian IP space while targeting South Korea, using regionally-plausible hosting to reduce geolocation suspicion.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Heavy and growing reliance on legitimate cloud/developer platforms — GitHub, Google Drive, Dropbox, Daum, Blogspot, and VS Code remote tunnels — as C2 and delivery infrastructure rather than bespoke, attacker-registered servers. This blends malicious traffic into normal SaaS/developer usage patterns and specifically defeats network detections tuned to known-bad infrastructure rather than behavioral anomalies.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics Routines</span>
+          <span class="opsec-confidence">[LOW]</span>
+        </div>
+        <div class="opsec-desc">Source material reviewed for this compile does not document specific log-clearing, timestomping, or artifact-removal procedures attributed to Kimsuky. Stated explicitly as a gap rather than inferred from general APT tradecraft assumptions.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">[LOW]</span>
+        </div>
+        <div class="opsec-desc">DomainTools' leaked-dataset analysis suggests a disciplined, systematic operator workflow (structured reconnaissance, PAM password-change logging), but no source reviewed independently confirms a specific work-hours cadence or beacon-jitter configuration relative to victim time zones. Flagged as a gap rather than assumed.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Consistent, deliberate evolution and rebranding of malware families — PebbleDash into HelloDoor/httpMalice/MemLoad/httpTroy; Gomir/HttpTroy into BirdTroy/DriveTroy — indicates recompilation and feature-forking specifically to evade signature-based detection of prior variants. The August 2026 adoption of self-hosted, offline LLMs (Ollama, GPT4All, Msty) for phishing-lure and malware-development assistance is itself a tooling-hygiene decision: keeping AI-assisted development off external cloud AI platforms avoids exposing operational content to those vendors' own abuse-detection and threat-intelligence pipelines.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Legitimate-Service C2 Abuse — GitHub</span>
+          <span class="evasion-ttp">T1102.002</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag siem">SIEM</span>
+        </div>
+        <div class="evasion-desc">"Operation GitPower" uses attacker-controlled GitHub repositories as a covert C2 channel within an LNK-to-PowerShell infection chain, distributing AsyncRAT payloads disguised as image files; this blends C2 traffic into expected developer/DevOps network activity, defeating domain-reputation- and IP-based network detections tuned to unfamiliar infrastructure.</div>
+        <div class="evasion-detail">Chain per public reporting: malicious LNK file → PowerShell downloader stage → AsyncRAT payload masqueraded as an image file (.jpg-style naming), staged and retrieved via GitHub repository content (The Hacker News, Aug 2026). Precise repository-request patterns and full command-line arguments not publicly documented as of 2026-09-02.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Cloud Storage C2 — Google Drive (DriveTroy)</span>
+          <span class="evasion-ttp">T1102.002</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+        </div>
+        <div class="evasion-desc">The DriveTroy Go-based Linux backdoor variant of the Gomir/HttpTroy family uses the Google Drive API as its C2 channel, specifically chosen to blend into a compromised groupware server's legitimate cloud-API traffic and evade network monitoring tuned to unfamiliar destinations.</div>
+        <div class="evasion-detail">Specific Drive API call sequences and authentication-token handling not publicly documented as of 2026-09-02 (Enki WhiteHat's published analysis describes the technique at a behavioral level without full protocol detail).</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">QR-Code Delivery to Bypass Email Security (Quishing)</span>
+          <span class="evasion-ttp">T1204.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM</span>
+          <span class="evasion-tag network">NETWORK</span>
+        </div>
+        <div class="evasion-desc">Embeds a malicious URL inside a QR code within the phishing email body rather than as a clickable link or attachment, so the victim scans it with a personal/mobile device — moving the malicious request off the monitored corporate endpoint and its email-security/proxy stack entirely.</div>
+        <div class="evasion-detail">Documented flow (FBI IC3 FLASH AC-000001-MW, 2026-01-08): spoofed email from a trusted contact → embedded QR code → fake conference-registration landing page → registration button → spoofed Google account login page for credential harvesting.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Remote Access via Legitimate Developer Tooling — VS Code Tunnels</span>
+          <span class="evasion-ttp">T1219 (adjacent)</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR</span>
+        </div>
+        <div class="evasion-desc">Expansion of the toolkit (per May 2026 reporting alongside HTTPSpy and HelloDoor) to abuse Visual Studio Code's built-in remote-tunnel feature — a legitimate, Microsoft-signed capability unlikely to be flagged by EDR application-control policies tuned to block traditional third-party remote-access software.</div>
+        <div class="evasion-detail">Specific tunnel-configuration commands and authentication-token acquisition steps not publicly documented as of 2026-09-02.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Kimsuky Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">The MITRE Center for Threat-Informed Defense's Adversary Emulation Library (github.com/center-for-threat-informed-defense/adversary_emulation_library, checked 2026-09-02) currently contains full emulation plans for APT29, Blind Eagle, Carbanak Group, FIN6, FIN7, menuPass, OceanLotus, OilRig, Sandworm, Turla, and Wizard Spider. No plan for Kimsuky, APT43, THALLIUM, or Velvet Chollima exists in the repository as of this date.</div>
+      <div class="ctid-links">
+        <a class="ctid-link" href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library" target="_blank">CTID REPOSITORY →</a>
+      </div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">GAP</div>
+        <div>
+          <div class="ref-detail">No Kimsuky-specific Atomic Red Team test bundle or SigmaHQ rule set was identified in the sources reviewed for this compile (as of 2026-09-02).</div>
+          <div class="ref-date">Defenders should rely on the generic ATT&amp;CK-technique-mapped Atomic Red Team tests for the techniques in Section 04 (e.g. T1566, T1059.001, T1053.005, T1003, T1102.002) pending publication of actor-specific detections.</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa20-301a" target="_blank">North Korean Advanced Persistent Threat Focus: Kimsuky (AA20-301A)</a></div>
+          <div class="ref-date">Government Advisory · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI / IC3</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ic3.gov/CSA/2026/260108.pdf" target="_blank">North Korean Kimsuky Actors Leverage Malicious QR Codes (FLASH AC-000001-MW)</a></div>
+          <div class="ref-date">Government Advisory / Detection Guidance · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0094/" target="_blank">Kimsuky, Black Banshee, Velvet Chollima, Emerald Sleet, THALLIUM, APT43, TA427, Springtail, Earth Kumiho, PatheticSlug, Group G0094</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa20-301a" target="_blank">North Korean Advanced Persistent Threat Focus: Kimsuky</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI / IC3</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ic3.gov/CSA/2026/260108.pdf" target="_blank">North Korean Kimsuky Actors Leverage Malicious QR Codes (FLASH AC-000001-MW)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Mandiant</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.mandiant.com/resources/blog/apt43-north-korea-cybercrime-espionage" target="_blank">Not Just Espionage: APT43 Uses Cybercrime to Fund Espionage Operations</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Treasury / OFAC</div>
+        <div>
+          <div class="ref-detail"><a href="https://home.treasury.gov/news/press-releases/jy1919" target="_blank">Treasury Sanctions DPRK Actors In Response to Recent Satellite Launch</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/08/kimsuky-builds-offline-ai-stack-that.html" target="_blank">Kimsuky Builds Offline AI Stack to Boost Phishing and Automate Malware Development</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/04/dprk-linked-hackers-use-github-as-c2-in.html" target="_blank">DPRK-Linked Hackers Use GitHub as C2 in Multi-Stage Attacks Targeting South Korea</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/05/kimsuky-deploys-httpspy-expands-arsenal.html" target="_blank">Kimsuky Deploys HTTPSpy, Expands Arsenal with HelloDoor and VS Code Tunnels</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Trellix</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.trellix.com/blogs/research/dprk-linked-github-c2-espionage-campaign/" target="_blank">The Coordinated Embassy Hunt: Unmasking the DPRK-linked GitHub C2 Espionage Campaign</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Enki WhiteHat</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.enki.co.kr/en/media-center/blog/analysis-of-kimsuky-s-attack-on-a-south-korean-groupware-vendor-using-a-new-gomir-family-variant" target="_blank">Analysis of Kimsuky's Attack on a South Korean Groupware Vendor Using a New Gomir Family Variant</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Securelist / Kaspersky</div>
+        <div>
+          <div class="ref-detail"><a href="https://securelist.com/kimsuky-appleseed-pebbledash-campaigns/119785/" target="_blank">Disclosing New PebbleDash-Based Tools by Kimsuky</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DomainTools</div>
+        <div>
+          <div class="ref-detail"><a href="https://dti.domaintools.com/research/inside-the-kimsuky-leak-how-the-kim-dump-exposed-north-koreas-credential-theft-playbook" target="_blank">Inside the Kimsuky Leak: How the "Kim" Dump Exposed North Korea's Credential Theft Playbook</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/us-sanctions-north-korean-cyberespionage-group-kimsuky/" target="_blank">US Sanctions North Korean Cyberespionage Group Kimsuky</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">securityonline.info</div>
+        <div>
+          <div class="ref-detail"><a href="https://securityonline.info/cisa-kev-catalog-kimsuky-apt28-exploitation-cve-2024-1708-cve-2026-32202/" target="_blank">CISA Sounds the Alarm: State-Sponsored Hackers Weaponize New Windows and ScreenConnect Flaws</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Anthropic</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.anthropic.com/news/detecting-countering-misuse-aug-2025" target="_blank">Detecting and Countering Misuse of AI: August 2025</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Center for Threat-Informed Defense</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library" target="_blank">Adversary Emulation Library (GitHub repository)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 16+ Sources (Government, Vendor, Press)</div>
+  <div>MITRE ATT&amp;CK G0094 · No CTID Emulation Plan Available</div>
+</div>
+
+</body>
+</html>
