@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JPMorgan Chase Data Breach — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  /* Stamp watermark */
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  /* Defender visibility badge */
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    FC-2014-06<br/>
+    2014-06/2014-10
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Financial Crime / Large-Scale Data Theft</div>
+  <h1><span class="gold">JPMORGAN CHASE</span> DATA BREACH</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-02 &nbsp;|&nbsp; INCIDENT DATE: Intrusion ~June 2014 – mid-Aug 2014 &nbsp;|&nbsp; Public disclosure: 2014-10-02 &nbsp;|&nbsp;
+    SOURCES: 17
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>FINANCIAL CRIME</span></div>
+    <div>Attribution: <span class="green">Shalon / Aaron / Orenstein / Tyurin criminal enterprise [HIGH]</span></div>
+    <div>Severity: <span class="red">HIGH</span></div>
+    <div>Era: <span>2014 (predates public ATT&amp;CK Enterprise release by ~1 year)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">83M</div>
+    <div class="stat-label">Accounts compromised — 76M households + 7M small businesses</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">~2 MONTHS</div>
+    <div class="stat-label">Undetected dwell time before a routine review surfaced the intrusion</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">$500M</div>
+    <div class="stat-label">JPMorgan's projected annual cybersecurity budget after doubling (from $250M)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">ZERO</div>
+    <div class="stat-label">SSNs, passwords, or account numbers confirmed stolen — no direct account fraud traced to the theft</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="name">Gery Shalon / Joshua Samuel Aaron / Ziv Orenstein / Andrei Tyurin criminal enterprise — <span class="none">No companion actor card on file (no vendor-tracked APT/eCrime group name assigned to this cluster)</span></span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">JPMorgan Chase Data Breach (2014)</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Intrusion: ~June 2014 – mid-Aug 2014 · Disclosed: 2014-10-02</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Financially-motivated data theft in furtherance of securities fraud, illegal gambling &amp; payment processing</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Shalon/Aaron/Orenstein/Tyurin criminal enterprise (Israel/US/Russia)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[HIGH]</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">JPMorgan Chase &amp; Co. — plus confirmed additional data theft at Fidelity Investments and, per DOJ/press reporting on the same campaign, Dow Jones and Scottrade; attempted intrusions reported at Citigroup, HSBC, E*Trade, Regions Financial, and ADP (source lists vary on confirmed-vs-attempted classification across ~9 targeted firms)</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">83M JPMorgan accounts (76M households + 7M small businesses); millions more across the campaign's other financial-firm victims</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">Late July 2014 (anomaly flagged); fully contained mid-August 2014</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">JPMorgan's internal security team, via a routine security review</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">~2 months, undetected, across ~90 internal servers</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Contact data (names, addresses, phone numbers, emails) on 83M accounts; no financial/credential data confirmed taken</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None assigned — this criminal enterprise is not tracked under a dedicated MITRE ATT&amp;CK Group ID</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Yes — [HISTORICAL, limited detection utility]; public technical IOCs for this specific intrusion are genuinely thin</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>In the summer of 2014, JPMorgan Chase — the largest bank in the United States by assets — discovered that intruders had been sitting inside its network for roughly two months, with access to some 90 internal servers and contact data belonging to 83 million accounts: 76 million households and 7 million small businesses (JPMorgan Chase 8-K disclosure, reported by The Washington Post and Forbes, Oct. 2, 2014). At the time it was disclosed, it stood as the largest theft of customer data from a U.S. financial institution in the bank's history, and remains one of the largest breaches ever recorded at a single American company by account count.</p>
+      <p>The story that first reached the public in late August 2014 was not the story that turned out to be true. Early reporting, citing unnamed U.S. law enforcement officials, described a "zero-day" website vulnerability, data routed through multiple countries before reaching Russia, and active FBI scrutiny of whether the Russian government was behind the intrusion — potentially in retaliation for U.S. sanctions imposed after Russia's annexation of Crimea earlier that year (Bloomberg/Nextgov, Aug. 27–28, 2014). Security experts at the time argued the operation's apparent sophistication put it "far beyond the capability of ordinary criminal hackers." That theory dominated the public narrative for more than a year. It was wrong.</p>
+      <p>What federal prosecutors ultimately unwound, across a 2015 indictment and prison sentences handed down as late as 2021, was not a state intelligence operation but one of the largest securities-fraud enterprises ever prosecuted in the United States — a scheme in which stolen customer contact lists from JPMorgan and at least eight other financial firms were used to blast out pump-and-dump stock spam, running alongside illegal online casinos and unlicensed payment processing, generating an estimated $100 million-plus in illicit proceeds (CNN Money, Nov. 10, 2015). And the technical root cause behind the breach that fed that scheme was almost anticlimactically mundane: one internal server that JPMorgan's security team had failed to upgrade to two-factor authentication, in an otherwise bank-wide rollout that had covered every other sensitive system.</p>
+      <p>JPMorgan Chase is still taught today less for any single novel technique than for the shape of the whole case: the danger of leaping to nation-state attribution on the basis of scale and apparent sophistication alone; the way a single unremediated configuration gap in an enterprise of JPMorgan's resources and sophistication could still open the door to a breach of this magnitude; and a rare, well-documented example of a financially-motivated criminal group achieving intrusion depth and duration usually associated with state-sponsored espionage.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The breach unfolded against a geopolitical backdrop that made a nation-state explanation immediately plausible to investigators and reporters alike. Russia had annexed Crimea in March 2014 and was backing separatist conflict in eastern Ukraine; the U.S. and EU responded with escalating sanctions through the spring and summer of 2014 targeting Russian banks, energy firms, and individuals close to the Kremlin. Against that backdrop, a sophisticated intrusion into a systemically important American bank read, to many at the time, as a plausible act of retaliation — a read that several unnamed U.S. officials reportedly shared with reporters before the investigation had run its course (Bloomberg/Nextgov, Aug. 2014).</p>
+      <p>JPMorgan was not an unprepared or unsophisticated target. The bank had already been spending roughly $250 million a year on cybersecurity — a substantial figure for the era — and had been actively rolling out two-factor authentication across its server estate as part of that program (Bloomberg, Oct. 10, 2014). The breach happened not because the bank lacked a security program, but because that program's rollout had a gap: in an environment of thousands of internal servers, one had been missed. This is a structurally common failure mode in large, decades-old financial institutions that have grown by acquisition and maintain sprawling, unevenly-modernized internal infrastructure — the same broad category of problem, if a different specific mechanism, that would recur at other major enterprises in years to come.</p>
+      <p>The breach also arrived less than a year after the Target Corporation breach of late 2013, which had put retail and financial-sector board rooms on unusually high alert about the consequences of large-scale customer data theft. That recent memory shaped both the intensity of public and regulatory attention JPMorgan received (including a formal request from Rep. Elijah Cummings for a House Oversight hearing within days of disclosure) and the bank's own aggressive public response, including Chairman and CEO Jamie Dimon's public commitment to double the security budget.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Employee Credential Theft</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">The intrusion's origin point was outside JPMorgan's own visibility entirely: an employee's personal computer was infected with malware that harvested login credentials, including those used to remotely access JPMorgan's corporate network via VPN (multiple contemporaneous and retrospective sources, incl. SecurityWeek, Computerworld, Dec. 2014). Public reporting does not specify the exact infection vector for the personal machine — whether phishing, a drive-by download, or another mechanism — and this project has found no source that fills that gap; it is stated here honestly as an open point rather than guessed at. Because the compromise occurred on a device JPMorgan did not own or monitor, there was no telemetry available to the bank's security team at this stage under any circumstances.</div>
+        <div class="kc-pivot">A single set of legitimate-looking VPN credentials, harvested off-network, gave the intruders everything they needed to walk in the front door.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">The Missing Second Factor</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">The stolen credentials alone should not have been sufficient: JPMorgan had rolled out two-factor authentication across its server environment as part of its cybersecurity program. Investigators found that one server — reportedly overlooked amid the broader rollout — had not been upgraded to require the second factor (SecurityWeek; Computerworld, citing investigators, Dec. 2014). A stolen password was, on that single node, sufficient by itself. From the network's perspective this looked like an ordinary authenticated remote employee login; there was no anomaly for any control to flag, because no control existed at that specific point to flag it.</div>
+        <div class="kc-pivot">One unremediated server converted a stolen password into full, authenticated presence on JPMorgan's internal network.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Internal Reconnaissance &amp; Lateral Movement</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">From the initial foothold, the intruders obtained a list of JPMorgan's internal applications and programs and used it to identify further paths into the environment (reporting synthesized from Twingate and DarkReading retrospectives, citing the original investigation). Over the following weeks they moved laterally, ultimately reaching approximately 90 of the bank's internal servers (Infosecurity Magazine, citing investigators). Public reporting does not name a specific lateral-movement technique or tool (e.g., no confirmed use of a named credential-dumping or remote-execution utility) — the mechanism is described only in general terms across available sources, and this card does not fabricate specifics beyond what has been published. Andrei Tyurin, the Russian national later convicted for the technical intrusion work, is described in his own case record as maintaining persistent access and "regularly refreshing" the stolen data through repeated downloads over an extended period, indicating a sustained presence rather than a single smash-and-grab session.</div>
+        <div class="kc-pivot">Reach across dozens of servers, sustained over weeks, gave the operation the scale needed to harvest data in bulk rather than from a single system.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Bulk Data Exfiltration</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Using what contemporaneous reporting describes only as "customized malware," the intruders exfiltrated gigabytes of data from the compromised servers, including the contact records — names, addresses, phone numbers, and email addresses — for 76 million households and 7 million small businesses (BankInfoSecurity; The Register, Oct. 2014). Some contemporaneous reporting also described the stolen data as having been routed through servers in multiple countries, including Brazil, before ultimately reaching infrastructure in Russia — a detail consistent with the deliberate obfuscation typical of financially-motivated cybercrime infrastructure, though it was also, at the time, one of the details cited in support of the (later disproven) nation-state theory. JPMorgan has stated it found no evidence that account numbers, passwords, Social Security numbers, or dates of birth were included in what was taken.</div>
+        <div class="kc-pivot">Bulk contact data — not financial credentials — became the raw material for a downstream fraud scheme the bank itself had no reason to anticipate.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Discovery &amp; Containment</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">The intrusion was surfaced not by an alert tied to the compromised server or the exfiltration itself, but by a routine security investigation that, in the course of unrelated review work, uncovered signs that customized malware was active on the network (SentinelOne/Darknet Diaries retrospective, citing the original investigation). JPMorgan's security team traced the activity back through the network, identified the ~90 affected servers, and moved to contain and evict the intruders; the compromise was fully halted by mid-August 2014, roughly two months after it began. The bank disclosed the incident to regulators and, on October 2, 2014, to the public, with the full 76-million-household, 7-million-business figure.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; 2014 intrusion predates ATT&amp;CK's public release (2015) but postdates this project's pre-2013 retrospective-labeling threshold</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">[HIGH] Stolen VPN credentials of a JPMorgan employee were used to authenticate as a legitimate remote user.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Corporate VPN was the access channel; the single server lacking 2FA was the specific point of entry.</div>
+      </div>
+      <div class="mitre-cell dim">
+        <div class="mitre-tactic">Initial Access (precursor)</div>
+        <div class="mitre-id">T1566</div>
+        <div class="mitre-name">Phishing</div>
+        <div class="mitre-note">[LOW] Plausible mechanism for the employee's personal-machine infection, but no source reviewed confirms the specific vector — stated as a gap, not a finding.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1018</div>
+        <div class="mitre-name">Remote System Discovery</div>
+        <div class="mitre-note">[HIGH] Attackers obtained a list of JPMorgan's internal applications/programs to identify further access paths.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1046</div>
+        <div class="mitre-name">Network Service Discovery</div>
+        <div class="mitre-note">[MEDIUM] Mapping activity across the internal environment preceded reaching ~90 servers over several weeks.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021</div>
+        <div class="mitre-name">Remote Services</div>
+        <div class="mitre-note">[LOW-MEDIUM] Attackers reached ~90 internal servers from the initial foothold; the specific protocol/tooling used for lateral movement is not publicly documented as of this compile date.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1119</div>
+        <div class="mitre-name">Automated Collection</div>
+        <div class="mitre-note">[MEDIUM] Tyurin's case record describes "regularly refreshing" stolen data via repeated downloads over an extended dwell period, consistent with a recurring/automated collection pattern rather than a single extraction.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1213</div>
+        <div class="mitre-name">Data from Information Repositories</div>
+        <div class="mitre-note">[HIGH] Customer contact-record databases across the ~90 compromised servers were the specific target of collection.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1090</div>
+        <div class="mitre-name">Proxy</div>
+        <div class="mitre-note">[MEDIUM] Contemporaneous reporting describes data routed through infrastructure in multiple countries, including Brazil, before reaching Russia — consistent with multi-hop C2/exfil proxying, though not confirmed to the level of a named tool.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1041</div>
+        <div class="mitre-name">Exfiltration Over C2 Channel</div>
+        <div class="mitre-note">[MEDIUM] "Customized malware" was used to move gigabytes of data off JPMorgan's network; no further technical detail on the exfiltration channel is publicly documented.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">2FA ROLLOUT<br/>MISSED</div>
+        <div class="pm-detail"><strong>A single server was overlooked</strong> in an otherwise bank-wide two-factor authentication rollout. In an environment with thousands of servers, this project has found no public evidence of an automated inventory/enforcement control that would have flagged a server as non-compliant with the 2FA policy — the gap appears to have persisted purely because no one identified it, not because a known exception was accepted.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">INTERNAL LATERAL MOVEMENT<br/>MISSED</div>
+        <div class="pm-detail">Reconnaissance and lateral movement across <strong>~90 internal servers</strong> over a period of weeks generated no alert that triggered investigation on its own. This is consistent with an internal network architecture and monitoring posture — common at the time even among well-resourced banks — that treated authenticated internal traffic as inherently trusted rather than continuously scrutinized.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">DISCOVERY<br/>PARTIALLY DETECTED</div>
+        <div class="pm-detail">The intrusion was ultimately surfaced by a <strong>routine security review</strong>, not a targeted alert tied to the compromised server, the lateral movement, or the exfiltration itself. This represents a "got lucky" discovery mode rather than a designed detection capability catching the specific technique used — a distinction worth being honest about rather than crediting the eventual catch to a control that wasn't actually the one that worked.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">JPMorgan committed to <strong>doubling its annual cybersecurity budget</strong> from roughly $250M to $500M over five years (Jamie Dimon, Oct. 2014), and the incident became a widely-cited industry reference point for enforcing 2FA with zero exceptions rather than near-universal coverage. The case is frequently taught alongside the Target 2013 breach as part of the mid-2010s shift toward board-level ownership of cybersecurity risk at large financial institutions.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Unnamed Credential-Stealing Malware (Employee Endpoint)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">CUSTOM/UNKNOWN</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Infected an employee's personal computer and harvested VPN login credentials used for the initial network foothold. No specific malware family name, hash, or sample has been publicly disclosed for this component as of this compile date.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">"Customized Malware" (Exfiltration Tooling)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">CUSTOM</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Used to exfiltrate gigabytes of customer contact data from the compromised servers. Contemporaneous reporting (BankInfoSecurity, The Register) uses only the generic description "customized malware" — no family name or technical signature has entered public reporting.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Multi-Country Proxy Infrastructure (Brazil → Russia routing)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">INFRASTRUCTURE</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Contemporaneous (August 2014) reporting described stolen data being routed through servers in multiple countries, including Brazil, before reaching infrastructure in a large Russian city. No specific IPs or hostnames from this routing were ever published; the detail comes from anonymous-official sourcing rather than independently verified network forensics.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">No CVE — Configuration Gap, Not a Software Vulnerability</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">ROOT-CAUSE NOTE</span>
+          </div>
+        </div>
+        <div class="artifact-desc">No CVE is associated with this intrusion. The root cause was a compromised credential paired with a server that had not been upgraded to require two-factor authentication — a process/configuration gap, not an exploited software flaw. <strong>Correction worth stating explicitly:</strong> some secondary sources and AI-generated summaries conflate this breach with a separate Heartbleed (CVE-2014-0160)-enabled intrusion against an unrelated Boston-area mutual fund victim within the same broader Shalon/Aaron/Orenstein/Tyurin criminal campaign (2012–2015). That CVE was not the vector for the JPMorgan Chase intrusion itself, and no cross-reference to this project's existing Heartbleed vuln card is made here for that reason — attaching one would misrepresent causation. Per this project's standing orders on vuln-card auto-dispatch, this incident does not reduce to a single, clearly identifiable CVE and no vuln card build was triggered.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ No literal IP/domain IOCs are publicly documented for this intrusion; the one behavioral/routing indicator below is included for research context, not operational detection use.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are archival, from a 2014 intrusion. Infrastructure has long since rotated. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">TRAFFIC PATTERN</td><td class="val historical">Exfiltrated data reportedly proxied through multi-country infrastructure (incl. Brazil) before reaching a large Russian city — no specific host/IP ever published</td><td>Bloomberg / Nextgov (anonymous official sourcing)</td><td>2014-08-27</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No hashes, IPs, domains, or malware family names have been publicly disclosed for this intrusion — unusually thin for a breach of this scale, reflecting that this was prosecuted as a criminal fraud case with limited public forensic disclosure, unlike comparable nation-state APT reporting.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">For more than a year, the breach fed a live narrative of Russian state retaliation against U.S. sanctions policy, discussed at the level of FBI investigation and anonymous-official press briefings. That narrative was ultimately disproven by the 2015 criminal indictments, but not before shaping contemporary discourse on the fragility of financial-sector critical infrastructure amid great-power tension. <strong>The reversal itself is the more durable geopolitical lesson</strong>: a case study in how quickly "sophisticated + high-value target" gets read as "nation-state" by officials, press, and security experts alike, and how that read can hold the public narrative for over a year before hard evidence (guilty pleas, forfeitures, convictions) corrects it.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">JPMorgan committed to doubling its annual cybersecurity spending from roughly $250M to $500M over five years (Jamie Dimon, Oct. 2014). The incident became an industry-wide reference point for enforcing two-factor authentication with zero exceptions across server estates, rather than near-complete coverage, and contributed to a broader post-Target/post-JPMorgan wave of board-level cybersecurity investment across the U.S. financial sector.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">DOJ's Southern District of New York unsealed a 23-count indictment in November 2015 against Gery Shalon, Joshua Samuel Aaron, and Ziv Orenstein covering computer hacking, securities fraud, wire fraud, identity theft, illegal internet gambling, and money laundering conspiracy — described at the time as one of the largest financial-data-theft prosecutions in U.S. history. Shalon pleaded guilty and forfeited over $400 million; Andrei Tyurin, the Russian national responsible for the technical intrusion work, was extradited from Georgia in 2018, pleaded guilty, and was sentenced to 12 years in federal prison in January 2021 (U.S. Secret Service; DOJ SDNY press releases). Rep. Elijah Cummings formally requested a House Oversight Committee hearing on the breach within days of its October 2014 disclosure.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: [HIGH]</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Gery Shalon, Joshua Samuel Aaron, Ziv Orenstein (securities-fraud/hacking enterprise) &amp; Andrei Tyurin (technical intrusion operator)</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">None — financially-motivated criminal enterprise, not state-sponsored</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">DOJ SDNY indictment, Nov. 2015; guilty pleas and convictions 2016–2019; final sentencing (Tyurin) Jan. 2021</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">23-count SDNY indictment (Shalon/Aaron/Orenstein); separate Tyurin indictment/plea</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file — no vendor-tracked group name exists for this cluster</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Guilty pleas, criminal convictions, and asset forfeitures — direct legal admissions/adjudications, not inferential technical attribution</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">Initial (Aug. 2014) theory: Russian state-sponsored retaliation for Ukraine-related sanctions — reported by Bloomberg/Nextgov citing anonymous officials; not borne out by the eventual prosecution</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Little would meaningfully change this — convictions are a stronger evidentiary basis than inferential attribution. Residual open question: whether Tyurin's Moscow basing or the Brazil→Russia data routing reflect any informal tolerance or connection to Russian state or criminal infrastructure beyond coincidence of geography — no source reviewed substantiates this beyond speculation, and none is asserted here</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>This incident is a clean case study in attribution correction. The initial public theory — state-sponsored Russian retaliation — was plausible given the geopolitical backdrop, was reported by credible outlets citing government sources, and was taken seriously enough to drive an active FBI counterintelligence-adjacent investigation thread. It was nonetheless wrong. The actual actors were a transnational financial-crime enterprise: two Israeli nationals (Shalon, Orenstein) and an American (Aaron) running a stock-manipulation, illegal-gambling, and payment-processing operation, supported by a Russian national (Tyurin) who performed the technical intrusion work from Moscow using infrastructure spanning five continents. The eventual attribution rests on the strongest possible evidentiary basis — guilty pleas and criminal convictions — rather than the circumstantial, capability-based inference that drove the original nation-state theory. The lesson generalizes well beyond this case: sophistication and target selection are not, by themselves, reliable signals of a state sponsor, and criminal enterprises operating at sufficient scale and patience can produce intrusions that read, in the moment, as indistinguishable from state tradecraft.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The JPMorgan Chase breach established, in a widely-publicized and fully adjudicated case, that financially-motivated criminal actors — not just nation-states — could achieve the scale, dwell time, and internal reach (90 servers, two months, 83 million accounts) typically associated with state-sponsored espionage. That finding mattered because it directly undercut a reflexive assumption common at the time — including among security professionals quoted in contemporaneous reporting — that operations of this apparent sophistication had to be state-directed.</p>
+      <p>It is also one of the clearest publicly documented examples of attribution correction in the field's history: a plausible, officially-sourced nation-state theory held the public narrative for over a year before being displaced by the harder evidence of a criminal prosecution. That arc — sophisticated intrusion, initial state-actor suspicion, eventual criminal conviction — is now a standard teaching example for calibrating attribution confidence and resisting the pull of "this looks too advanced to be criminals."</p>
+      <p>Operationally, the case cemented "universal two-factor authentication, no exceptions" as a baseline expectation for large enterprise environments, precisely because the entire breach traced back to one overlooked server in an otherwise properly executed rollout. Combined with the Target breach less than a year earlier, JPMorgan Chase helped drive the mid-2010s shift toward board-level ownership of cybersecurity risk at major U.S. financial institutions and the broader industry norm of large, sustained security-budget growth as a direct, publicly-committed response to a breach.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Washington Post</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.washingtonpost.com/business/economy/jpmorgan-says-76-million-households-affected-by-cyber-breach/2014/10/02/4c18330a-4a79-11e4-a046-120a8a855cca_story.html" target="_blank">JPMorgan says 76 million households were affected by cyber breach</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2014-10-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Forbes</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.forbes.com/sites/maggiemcgrath/2014/10/02/jp-morgan-says-76-million-households-affected-by-data-breach/" target="_blank">JP Morgan Says 76 Million Households Affected By Data Breach</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2014-10-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bloomberg</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bloomberg.com/news/articles/2014-10-10/dimon-sees-jpmorgan-doubling-250-million-cyber-security-budget" target="_blank">Dimon Sees Cyber-Security Spending Doubling After Hack</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2014-10-10</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BankInfoSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bankinfosecurity.com/chase-attackers-exploited-basic-flaws-a-7717" target="_blank">Chase Attackers Exploited Basic Flaws</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2014-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/jpmorgan-hackers-compromised-server-unprotected-two-factor-authentication/" target="_blank">JPMorgan Hackers Compromised Server Unprotected by Two-factor Authentication</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2014-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Computerworld</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.computerworld.com/article/1490217/twofactor-authentication-oversight-led-to-jpmorgan-breach-investigators-reportedly-found-3.html" target="_blank">Two-factor authentication oversight led to JPMorgan breach, investigators reportedly found</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2014-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CNN Money</div>
+        <div>
+          <div class="ref-detail"><a href="https://money.cnn.com/2015/11/10/technology/jpmorgan-hack-charges/" target="_blank">JPMorgan's accused hackers had vast $100 million operation</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2015-11-10</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Washington Post</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.washingtonpost.com/news/the-switch/wp/2015/11/10/u-s-announces-criminal-charges-in-massive-2014-jpmorgan-hack/" target="_blank">U.S. announces criminal charges in massive 2014 JPMorgan hack</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2015-11-10</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bloomberg</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bloomberg.com/news/articles/2015-07-21/fbi-israel-make-securities-fraud-arrests-tied-to-jpmorgan-hack" target="_blank">Digital Misfits Link JPMorgan Hack to Pump-and-Dump Fraud</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2015-07-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CBS News</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cbsnews.com/news/joshua-samuel-aaron-suspected-jp-morgan-hacker-arrested-after-returning-from-moscow" target="_blank">Suspected JP Morgan hacker arrested after returning from Moscow</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Secret Service</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.secretservice.gov/newsroom/releases/2021/01/russian-hacker-sentenced-12-years-prison-involvement-massive-network" target="_blank">Russian Hacker Sentenced to 12 Years in Prison for Involvement in Massive Network Intrusions at U.S. Financial Institutions</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyberScoop</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberscoop.com/andrei-tyurin-jp-morgan-hack-sentencing/" target="_blank">Russian man sentenced to 12 years in prison for massive JPMorgan data heist</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/d9/press-releases/attachments/2015/11/10/us_v_shalon_et_al_indictment.pdf" target="_blank">United States v. Shalon et al. — SDNY Indictment</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS DOCUMENT — 2015-11-10</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Nextgov/FCW</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nextgov.com/cybersecurity/2014/08/russian-government-might-be-behind-new-jpmorgan-hack/92624/" target="_blank">Russian Government Might Be Behind New JPMorgan Hack</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2014-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BankInfoSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bankinfosecurity.com/jpmorgan-hack-a-7242" target="_blank">Report: Russians Hack JPMorgan Chase</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2014-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">House Oversight Dems</div>
+        <div>
+          <div class="ref-detail"><a href="https://oversightdemocrats.house.gov/news/press-releases/cummings-requests-hearing-on-data-security-breach-at-jpmorgan-chase" target="_blank">Cummings Requests Hearing on Data Security Breach at JPMorgan Chase</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS DOCUMENT — 2014-10-07</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/2014_JPMorgan_Chase_data_breach" target="_blank">2014 JPMorgan Chase data breach</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 17 Sources (Government, Court Records, Press)</div>
+  <div>No companion actor or vuln card on file for this incident's root cause. See Section 06 for the Heartbleed-conflation correction.</div>
+</div>
+
+</body>
+</html>
