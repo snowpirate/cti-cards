@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Operation Ababil — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  /* Stamp watermark */
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  /* Defender visibility badge */
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    CTI-INC-2012-ABABIL<br/>
+    SEP 2012 – MAY 2013
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Hacktivism / DDoS — State-Sponsored (Confirmed 2016)</div>
+  <h1><span class="gold">OPERATION</span> ABABIL</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-02 &nbsp;|&nbsp; INCIDENT DATE: SEPTEMBER 18, 2012 – MAY 2013 (THREE ANNOUNCED PHASES) &nbsp;|&nbsp;
+    SOURCES: DOJ, U.S. TREASURY/OFAC, FBI, RECORDED FUTURE, PROLEXIC/AKAMAI, CONTEMPORANEOUS PRESS
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>Hacktivism / DDoS (State-Sponsored)</span></div>
+    <div>Attribution: <span class="green">IRGC / ITSecTeam &amp; Mersad Co. [HIGH]</span></div>
+    <div>Severity: <span class="red">HIGH</span></div>
+    <div>Era: <span>Pre-ATT&amp;CK (2012–2013)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise (Retrospective)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">46</div>
+    <div class="stat-label">U.S. Financial Institutions Targeted (DOJ)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">176</div>
+    <div class="stat-label">Days of DDoS Attacks Cited in DOJ Indictment</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">~70 Gbps</div>
+    <div class="stat-label">Peak Observed Attack Volume</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">7</div>
+    <div class="stat-label">IRGC-Affiliated Individuals Indicted (2016)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="name">Izz ad-Din al-Qassam Cyber Fighters (ITSecTeam / Mersad Co., IRGC-affiliated) — <span class="none">No companion actor card on file</span></span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">Operation Ababil (U.S. Bank DDoS Campaign)</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Sep 18, 2012 – ~May 2013 (3 announced phases)</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Hacktivism/DDoS — State-Sponsored (confirmed 2016)</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Izz ad-Din al-Qassam Cyber Fighters (front) / ITSecTeam &amp; Mersad Co. (IRGC)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[HIGH] — post-2016 DOJ indictment &amp; OFAC sanctions</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">U.S. financial sector (online/mobile banking availability)</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">46 companies (DOJ), primarily major U.S. banks</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">Sep 18, 2012 — attackers self-announced via Pastebin</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Public self-announcement; corroborated in real time by bank outage reports</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">N/A — disruption campaign, not covert intrusion (Bowman Dam exception: ~3 wks)</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Extended online-banking outages; tens of millions USD in remediation</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise — Retrospective (campaign predates ATT&amp;CK's 2013 founding)</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None — no MITRE ATT&amp;CK Group ID assigned to this cluster as of 2026-09-02</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Yes — 12+ years old; archival value only</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Between September 2012 and mid-2013, a group calling itself the Izz ad-Din al-Qassam Cyber Fighters ran three publicly announced waves of distributed denial-of-service (DDoS) attacks against dozens of major U.S. financial institutions, including Bank of America, JPMorgan Chase, Wells Fargo, PNC, U.S. Bancorp, Citigroup, HSBC USA, Capital One, TD Bank, American Express, and the New York Stock Exchange. The Department of Justice's 2016 indictment ultimately cited 46 targeted companies and over 176 days of cumulative attack activity, at a remediation cost the DOJ characterized as "tens of millions of dollars" (DOJ SDNY, Mar 2016).</p>
+      <p>At the time, the campaign was framed — including by the attackers themselves — as grassroots retaliation for the "Innocence of Muslims" video, an anti-Islamic film that had triggered protests across the Muslim world in September 2012. But the scale of the operation strained that framing almost immediately: Akamai's own security analysts measured sustained attack traffic in the 65–70 Gbps range, a volume one of its evangelists told the press was "more consistent with a state actor" than a typical hacktivist DDoS effort of the era, which rarely exceeded a few gigabits per second (SecurityWeek/Akamai, 2012). The group itself publicly and repeatedly denied any tie to the Iranian government or to Anonymous (NBC News, 2012) — denials that would not survive the eventual federal investigation.</p>
+      <p>Technically, the campaign is notable less for novelty than for professionalization at scale. Rather than assembling a botnet from infected home PCs, the operators built their attack infrastructure — the itsoknoproblembro toolkit, nicknamed "Brobot" — out of thousands of commercial web-hosting servers compromised through known, unpatched content-management-system plugin vulnerabilities. That gave a single operation access to enterprise-grade bandwidth from server farms never connected to a home broadband line, a template that recurs in DDoS campaigns to this day.</p>
+      <p>The matter was not formally resolved until March 24, 2016, when the DOJ unsealed an indictment against seven Iranian nationals employed by two IRGC-affiliated Iran-based computer companies, ITSecTeam and Mersad Company, and the U.S. Treasury simultaneously sanctioned the same individuals. One of the seven, Hamid Firoozi, was separately charged for a related, previously undisclosed 2013 intrusion into the SCADA control system of a small dam in Rye Brook, New York — folding a modest critical-infrastructure reconnaissance operation into what had otherwise been remembered purely as a banking-sector disruption event.</p>
+      <p>Operation Ababil still matters as a case study for three reasons: it is one of the first sustained, state-linked disruption campaigns against U.S. critical financial infrastructure; it demonstrated — years before it became a familiar pattern — that a state could operate behind an ostensibly independent hacktivist identity at meaningful scale; and its resolution established the DOJ's now-standard practice of publicly indicting individual state-linked cyber operators even when arrest is functionally impossible.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The campaign arrived amid escalating U.S. and international sanctions targeting Iran's nuclear program through 2011–2012, alongside a string of revelations — Stuxnet (2010), Duqu (2011), and Flame (2012) — about Western and Israeli cyber operations against Iranian nuclear and intelligence infrastructure. Iran's own offensive cyber capability had been widely reported as expanding rapidly in direct response to those operations, and U.S. Senator Joseph Lieberman publicly floated Iranian state responsibility for the bank attacks as early as September 21, 2012, just three days after the campaign's opening wave (Washington Post, Sep 2012) — years before any formal confirmation existed.</p>
+      <p>Technologically, the era's banking sector was not built for volumetric DDoS at the scale this campaign eventually reached. Dedicated DDoS scrubbing and cloud-mitigation services (Prolexic, Akamai's Kona-era offerings, and peers) existed but were not yet standard, default infrastructure for regional and national banks. Separately, and unrelated to the banks themselves, the small-business web-hosting ecosystem of the period was saturated with unpatched WordPress and Joomla installations — the outdated TimThumb image-resizing plugin being a particularly common offender — giving an attacker with modest resources a practically unlimited supply of exploitable, high-bandwidth commercial servers to recruit into a botnet.</p>
+      <p>Per the DOJ's own account, the infrastructure-building phase of the operation traces back to "late 2011," roughly ten months before the group's first public statement — meaning the botnet was assembled quietly, with no public indicator that a coordinated campaign against the banking sector was being staged, until the September 2012 announcement made the operation impossible to miss.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Infrastructure Compromise &amp; Botnet Assembly (itsoknoproblembro / Brobot)</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Beginning around late 2011, ITSecTeam and Mersad Company operators developed and deployed the itsoknoproblembro toolkit against unrelated, third-party commercial web-hosting servers — targeting known, unpatched vulnerabilities in widely deployed WordPress and Joomla plugins, most notably the outdated TimThumb image-resizing script. Compromised servers ("brobots") were seeded with PHP-based flood scripts capable of coordinated, multi-vector attacks. None of this activity touched a bank-owned system, and none of the eventual victim institutions had any visibility into a botnet being assembled a year ahead of the first public attack (SecurityWeek/Prolexic, 2012; DOJ SDNY, Mar 2016).</div>
+        <div class="kc-pivot">This quiet, year-long server-farming phase gave the group a distributed, high-bandwidth launch platform that no defender at the eventual victim banks had any way to see coming.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase One: Public Announcement &amp; Volumetric Onslaught (Sep–Oct 2012)</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">On September 18, 2012, the Izz ad-Din al-Qassam Cyber Fighters posted to Pastebin announcing "Operation Ababil," citing the "Innocence of Muslims" video and demanding its removal from YouTube. Bank of America's site degraded within hours; over the following weeks, Wells Fargo, JPMorgan Chase, and PNC were hit, with U.S. Bancorp warned in advance, and SunTrust, Regions Financial, and HSBC USA struck in October before the group went quiet mid-month. Attacks were <strong>overt by design</strong> — FS-ISAC issued a fraud alert to member institutions within roughly 24 hours of the first attack, and sustained traffic peaking near 65–70 Gbps was independently measured by Akamai in real time (BankInfoSecurity, 2012; Recorded Future, 2012).</div>
+        <div class="kc-pivot">The scale and coordination of the opening wave forced banks and their DDoS-mitigation vendors to publicly concede that a self-declared hacktivist collective had fielded volumetric capability that read, to experienced defenders, as nation-state caliber — kicking off years of unresolved public speculation over the group's true sponsor.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase Two: Renewed Campaign &amp; Coordinated Political Messaging (Dec 2012–Jan 2013)</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">On December 10, 2012, the group announced a second phase, again citing continued availability of the offending video and again targeting the same roster of major U.S. banks. On January 29, 2013, the Cyber Fighters posted to Pastebin announcing a suspension of attacks, explicitly tying the decision to YouTube's partial removal of the video — a level of message discipline and demonstrable command-and-control over attack timing that struck several contemporaneous analysts as inconsistent with a loosely organized, spontaneous hacktivist collective (BankInfoSecurity, 2013).</div>
+        <div class="kc-pivot">The group's demonstrated ability to start and stop a multi-bank DDoS campaign in lockstep with an external political trigger sharpened suspicions of centralized, state-directed control ahead of the campaign's final phase.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase Three: Escalation, Plateau &amp; Quiet Withdrawal (Mar–May 2013)</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">A third phase was announced March 5, 2013, justified on the grounds that the video remained accessible in some form; further attack waves — including a documented Phase 3 "Wave 4" in late March/April 2013 (Radware ERT, 2013) — followed before the coordinated DDoS activity tapered off by roughly May 2013 without a formal closing announcement. By this point, banks and mitigation vendors had operationalized detection and scrubbing responses developed during Phases One and Two, and public/media attention had shifted decisively toward the unresolved attribution question.</div>
+        <div class="kc-pivot">By the time the waves stopped, the banking sector had been forced into a permanent uplift in DDoS-mitigation posture — even as the question of who was truly behind the Izz ad-Din al-Qassam Cyber Fighters remained publicly unresolved for nearly three more years.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Ancillary Covert Access: Bowman Avenue Dam SCADA Reconnaissance (Aug–Sep 2013)</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Separately from the bank DDoS campaign, and using a search-engine reconnaissance technique commonly referred to as "Google dorking" to locate internet-exposed industrial control systems, Hamid Firoozi — one of the seven later-indicted individuals — obtained unauthorized access between August 28 and September 18, 2013 to the internet-connected SCADA monitoring gateway of the Bowman Avenue Dam, a small flood-control structure in Rye Brook, New York. He repeatedly queried water level, temperature, and sluice-gate status. Per DOJ, the sluice gate had been manually disconnected for unrelated maintenance at the time — meaning that although the access technically permitted remote manipulation, none was possible during the intrusion window, a matter of fortunate timing rather than any defensive control. The dam's operator had no monitoring capable of detecting the intrusion in real time; it surfaced publicly only through the unrelated federal investigation into the bank DDoS campaign, and remediation was documented at over $30,000 (DOJ SDNY / Slate, Mar 2016).</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework, mapped retrospectively — campaign predates ATT&amp;CK's 2013 founding</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1595.002</div>
+        <div class="mitre-name">Active Scanning: Vulnerability Scanning</div>
+        <div class="mitre-note">[HIGH] Systematic identification of unpatched WordPress/Joomla plugin installs (e.g., outdated TimThumb) across commercial hosting providers, targeting infrastructure entirely unrelated to the eventual bank victims.</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1584.005</div>
+        <div class="mitre-name">Compromise Infrastructure: Botnet</div>
+        <div class="mitre-note">[HIGH] Beginning ~late 2011, thousands of compromised commercial servers were assembled into the "Brobot" network — high-bandwidth infrastructure staged roughly a year ahead of the first public attack.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access (Botnet Hosts)</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] itsoknoproblembro exploited known, unpatched CMS plugin vulnerabilities on third-party hosting servers to seed the botnet — not an intrusion into any bank-owned system.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059</div>
+        <div class="mitre-name">Command and Scripting Interpreter</div>
+        <div class="mitre-note">[MEDIUM] PHP-based itsoknoproblembro payload executed flood scripts on compromised servers on operator command; specific interpreter internals beyond "PHP script" are not detailed in public reporting reviewed.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Command and Control</div>
+        <div class="mitre-id">T1071.001</div>
+        <div class="mitre-name">Application Layer Protocol: Web Protocols</div>
+        <div class="mitre-note">[MEDIUM] Attack commands issued to the brobot network over standard web protocols, blending botmaster traffic with ordinary hosting-provider network activity.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1498.001</div>
+        <div class="mitre-name">Network Denial of Service: Direct Network Flood</div>
+        <div class="mitre-note">[HIGH] Multi-vector volumetric floods (TCP, UDP, and HTTP GET/POST) sustained peak throughput of roughly 65–70 Gbps against bank web infrastructure — extreme for the 2012–2013 era.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1499.004</div>
+        <div class="mitre-name">Endpoint Denial of Service: Application Exhaustion Flood</div>
+        <div class="mitre-note">[MEDIUM] The toolkit's "Kamikaze" repeating GET-flood script targeted specific application-layer resources (e.g., login/search pages) to exhaust server-side compute independent of raw bandwidth.</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Reconnaissance (Bowman Dam)</div>
+        <div class="mitre-id">T1593</div>
+        <div class="mitre-name">Search Open Websites/Domains</div>
+        <div class="mitre-note">[MEDIUM] Reported in press coverage as "Google dorking" — search-engine queries crafted to surface internet-exposed ICS/SCADA gateways. No single canonical ATT&amp;CK technique cleanly covers this OT-reconnaissance method; mapped here as the closest Enterprise fit.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access (Bowman Dam)</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Firoozi accessed the dam's internet-connected SCADA monitoring gateway directly via an externally exposed remote-access service lacking adequate authentication controls.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Collection (Bowman Dam)</div>
+        <div class="mitre-id">T1005</div>
+        <div class="mitre-name">Data from Local System</div>
+        <div class="mitre-note">[MEDIUM] Repeated queries of water level, temperature, and sluice-gate status. Enterprise ATT&amp;CK has no purpose-built technique for OT process-variable monitoring; ICS framework mapping was deliberately not applied to avoid overstating a minor, non-manipulative access event — see calibration note in Section 08.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">Pre-Campaign<br/>Botnet Assembly<br/>(2011–2012)<br/>MISSED</div>
+        <div class="pm-detail">Hosting providers and CMS operators had essentially no monitoring for the itsoknoproblembro compromise sweeping through their WordPress/Joomla customer base. The exploited TimThumb and related plugin vulnerabilities had public patches available for months before mass exploitation — this was a systemic, industry-wide patch-adoption failure across a long tail of small commercial hosting customers, not a single organization's lapse.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">Live-Campaign<br/>Attribution<br/>(2012–2013)<br/>PARTIALLY DETECTED</div>
+        <div class="pm-detail">U.S. officials (Sen. Lieberman) and some private analysts (Akamai, on attack-scale grounds) suspected Iranian state involvement within days of the first attack, while others (independent OSINT researcher Dancho Danchev, citing the attackers' "amateurish" technical presentation) read the operation as genuine hacktivism. The intelligence community had strong circumstantial signal but no public evidentiary attribution for more than three years.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">Bowman Ave. Dam<br/>SCADA Exposure<br/>(Aug–Sep 2013)<br/>MISSED</div>
+        <div class="pm-detail">A micro-dam's control-system gateway was internet-facing and discoverable via basic search-engine reconnaissance, and the ~3-week intrusion went completely unnoticed by the operator at the time — a small, essentially unmonitored municipal critical-infrastructure asset with no meaningful detection capability of any kind.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">The banking sector broadly adopted dedicated DDoS scrubbing/mitigation services (Prolexic, Akamai, and peers) as standard infrastructure, and FS-ISAC's real-time inter-bank threat-sharing model was validated and expanded. DOJ's 2016 action established a durable "indict publicly, even without extradition" deterrence pattern later applied extensively to Chinese, Russian, and North Korean state-linked operators (see this project's Sandworm Team card for a direct successor case). The Bowman Dam disclosure specifically helped drive increased federal attention to small/municipal critical-infrastructure cyber exposure.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">itsoknoproblembro (aka "Brobot")</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">DDoS Toolkit</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">PHP-based multi-vector DDoS toolkit deployed onto compromised commercial web/hosting servers, converting them into "brobots" capable of coordinated POST/GET/TCP/UDP floods plus a distinctive "Kamikaze" repeating GET-flood script. Prolexic's contemporaneous threat advisory documented sustained attack traffic peaking near 70 Gbps — a volume Akamai's Michael Smith characterized at the time as more consistent with state-level resourcing than typical hacktivist tooling (Prolexic/SecurityWeek, 2012).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Compromised Web-Hosting Botnet ("Brobot" Network)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Infrastructure</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Rather than a traditional home-PC botnet, the attack infrastructure was built from commercially hosted servers with high available bandwidth, recruited via exploitation of outdated CMS plugins (notably TimThumb). DOJ's indictment dates this infrastructure buildout to "in or about late 2011," roughly a year ahead of the first public attack.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Bowman Avenue Dam SCADA Gateway Access</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">OT/ICS Intrusion</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Between Aug 28 and Sep 18, 2013, Hamid Firoozi obtained unauthorized access to the internet-connected SCADA monitoring system of the Bowman Avenue Dam in Rye Brook, NY, repeatedly querying water level, temperature, and sluice-gate status. The sluice gate was manually disconnected for unrelated maintenance during the intrusion window, preventing remote manipulation despite the access technically permitting it. Documented remediation cost: over $30,000 (DOJ, Mar 2016).</div>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top: 14px;">
+      <p><strong>Root-cause note:</strong> This incident does not reduce to a single, identifiable CVE. The itsoknoproblembro botnet was assembled by exploiting varied, largely unpatched vulnerabilities — most consistently in outdated CMS plugins such as TimThumb — across thousands of unrelated third-party web-hosting servers, not through one specific exploited flaw. Per <em>CLAUDE-INCIDENTS.md</em>'s vulnerability-card auto-dispatch criteria, this does not qualify for automatic vuln-card generation; no vuln card is cross-referenced here for that reason, not from an oversight.</p>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains, where present, are defanged. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are archival. Infrastructure has long since rotated. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">TOOL-NAME</td><td class="val historical">itsoknoproblembro / "Brobot"</td><td>Prolexic Threat Advisory</td><td>2012</td></tr>
+          <tr><td class="type-label">TARGETED-PLUGIN</td><td class="val historical">WordPress TimThumb plugin (outdated/unpatched versions)</td><td>SecurityWeek, CSO Online</td><td>2012</td></tr>
+          <tr><td class="type-label">ATTACK-VECTOR</td><td class="val historical">Multi-vector flood: HTTP POST/GET, TCP, UDP + "Kamikaze" repeating GET flood</td><td>Prolexic, Infosecurity Magazine</td><td>2012</td></tr>
+          <tr><td class="type-label">PEAK-VOLUME</td><td class="val historical">~70 Gbps sustained (Prolexic); ~65 Gbps independently measured (Akamai)</td><td>Prolexic, Akamai</td><td>2012</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No file-hash or IP/domain-level indicators for this campaign were located in the public reporting reviewed for this card. The attack infrastructure consisted of thousands of ordinary, unrelated third-party hosting servers rather than attacker-registered domains or dedicated IP ranges, and none of the contemporaneous vendor advisories reviewed published a defanged indicator list. Stated explicitly rather than fabricated.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">One of the first sustained, state-linked disruption campaigns against U.S. critical financial infrastructure conducted through an ostensibly independent "hacktivist" front — a template of state sponsorship layered behind a deniable proxy identity that recurs in later Iranian, Russian, and pro-Russia hacktivist-fronted operations. Also an early, notable demonstration of the U.S. government's willingness to formally, publicly name IRGC-linked individuals years after the fact as a deterrence and naming-and-shaming tool, independent of any realistic prospect of arrest.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Forced the U.S. banking sector's large-scale, effectively permanent adoption of dedicated DDoS scrubbing/mitigation infrastructure and validated FS-ISAC's real-time inter-bank threat-sharing model, both now standard practice industry-wide. Also demonstrated how trivially abundant, unpatched commercial web-hosting infrastructure could be weaponized into nation-state-scale attack platforms without the attacker ever needing to compromise a single victim-owned system directly.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">The March 2016 DOJ indictment and simultaneous U.S. Treasury OFAC sanctions were a notable early instance of formal U.S. legal action against individual IRGC-affiliated hackers for financial-sector attacks, paired with a separate CFAA charge for the Bowman Dam SCADA intrusion — establishing a legal and diplomatic record subsequently cited in later Iran-linked cyber indictments and sanctions actions.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: HIGH (post-2016)</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Izz ad-Din al-Qassam Cyber Fighters (public front) — formally, 7 named individuals employed by ITSecTeam (ITSEC) &amp; Mersad Company (MERSAD)</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">Islamic Revolutionary Guard Corps (IRGC), Government of Iran</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Yes — DOJ (SDNY) indictment, Mar 24, 2016; simultaneous U.S. Treasury OFAC sanctions</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">Ahmad Fathi, Hamid Firoozi, Amin Shokohi, Sadegh Ahmadzadegan, Omid Ghaffarinia, Sina Keissar, Nader Saedi — conspiracy/CFAA; Firoozi separately charged for the Bowman Dam intrusion</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file for this cluster as of this compile</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">DOJ indictment detailing IRGC-entity employment, technical infrastructure tracing shared across the bank and dam intrusions, and grand-jury findings</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">During the live campaign: genuine independent hacktivism (the group's own stated claim) vs. state-directed operation using the video as a deniable pretext — analysts were split at the time (Akamai's traffic-scale argument for state involvement vs. Danchev's "amateurish" technical-proficiency argument for genuine hacktivism)</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">N/A at HIGH confidence — the 2016 indictment and OFAC action represent the U.S. government's own formal evidentiary conclusion; only a credible independent forensic rebuttal or verifiable Iranian government counter-disclosure would warrant revisiting it, and none has surfaced as of this compile</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution moved through three distinct stages. At the outset (September 2012), the operation presented as spontaneous religious-political hacktivism, and the group itself repeatedly and publicly denied any government or Anonymous affiliation. Within days, however, U.S. officials and some private-sector analysts voiced informal suspicion of Iranian state involvement, largely on the strength of the attack's volumetric scale rather than any disclosed technical evidence — a suspicion other analysts explicitly disputed at the time, citing the group's public communications as more consistent with genuine, if resourced, hacktivism. That ambiguity persisted, unresolved in public, for more than three years. It was only the March 2016 DOJ indictment — built on evidence tying the individual defendants to IRGC-affiliated employers, and further corroborated by the same infrastructure and personnel surfacing in the separate Bowman Dam intrusion — that converted informal suspicion into a formal, evidentiary, government attribution. This case is a clean illustration of why this project's Analytical Standards distinguish "widely reported as" from "confirmed": for more than three years, competent analysts disagreed in good faith on the same public facts, and only compulsory legal process resolved the question.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Operation Ababil is one of the first sustained, nation-state-linked DDoS campaigns against U.S. financial critical infrastructure, and the first to demonstrate — at real operational scale, not merely as a theoretical concern — that a state could conduct disruptive cyber operations behind an ostensibly independent hacktivist brand convincingly enough to sustain more than three years of genuine public and analytical uncertainty.</p>
+      <p>Its 2016 resolution established a durable Department of Justice pattern: publicly indict individual state-linked cyber operators by name, even where extradition is functionally impossible, as a deterrence and attribution-signaling tool rather than a realistic path to prosecution. That pattern became standard practice for subsequent indictments of Chinese PLA officers, Russian GRU and FSB officers — including the six Unit 74455 officers named for NotPetya, documented in this project's Sandworm Team actor card and Maersk NotPetya incident card — and North Korean operators. Operation Ababil's 2016 indictment predates and directly prefigures that later, far larger body of practice.</p>
+      <p>Operationally, the campaign catalyzed the modern DDoS-mitigation-as-a-service industry's adoption across the banking sector and validated FS-ISAC's real-time inter-bank threat-sharing model, both now baseline expectations rather than advanced practice. Its ancillary Bowman Avenue Dam episode — though inconsequential in physical outcome — was an early, concrete public proof that the same state-linked actors targeting major financial institutions could just as easily reach small, essentially unmonitored critical-infrastructure operators, foreshadowing the far more consequential OT/ICS targeting later realized by Sandworm's Ukrainian grid attacks.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">DOJ / SDNY</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/usao-sdny/pr/manhattan-us-attorney-announces-charges-against-seven-iranians-conducting-coordinated" target="_blank">Manhattan U.S. Attorney Announces Charges Against Seven Iranians For Conducting Coordinated Campaign Of Cyber Attacks Against U.S. Financial Sector</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DOJ / OPA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/archives/opa/pr/seven-iranians-working-islamic-revolutionary-guard-corps-affiliated-entities-charged" target="_blank">Seven Iranians Working for Islamic Revolutionary Guard Corps-Affiliated Entities Charged for Conducting Coordinated Campaign of Cyber Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/news/stories/iranians-charged-with-hacking-us-financial-sector" target="_blank">Iranians Charged with Hacking U.S. Financial Sector</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/threat-intelligence/7-indicted-iranian-nationals-now-hit-with-sanctions-by-us-treasury" target="_blank">7 Indicted Iranian Nationals Now Hit with Sanctions by US Treasury</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/cloud-security/doj-indicts-7-iranian-hackers-for-attacks-on-us-banks-and-new-york-dam" target="_blank">DOJ Indicts 7 Iranian Hackers For Attacks On US Banks And New York Dam</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Forbes</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.forbes.com/sites/thomasbrewster/2016/03/24/iran-hackers-charged-bank-ddos-attacks-banks/" target="_blank">U.S. Accuses 7 Iranians Of Cyberattacks On Banks And Dam</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Recorded Future</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.recordedfuture.com/blog/deconstructing-the-al-qassam-cyber-fighters-assault-on-us-banks" target="_blank">Deconstructing the Al-Qassam Cyber Fighters Assault on US Banks</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/firm-says-itsoknoproblembro-ddos-toolkit-was-used-recent-debilitating-cyber-attacks/" target="_blank">Firm Says "itsoknoproblembro" DDoS Toolkit Was Used in Recent Debilitating Cyber Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2012</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Infosecurity Magazine</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.infosecurity-magazine.com/news/dissection-of-itsoknoproblembro-the-ddos-tool/" target="_blank">Dissection of 'itsoknoproblembro', the DDoS tool that shook the banking world</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2012</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Slate</div>
+        <div>
+          <div class="ref-detail"><a href="https://slate.com/technology/2016/03/hamid-firoozi-used-google-dorking-to-find-vulnerability-in-new-york-dam-computer-network.html" target="_blank">Hamid Firoozi used "Google dorking" to find vulnerability in New York dam computer network</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TIME</div>
+        <div>
+          <div class="ref-detail"><a href="https://time.com/4270728/iran-cyber-attack-dam-fbi/" target="_blank">Iranian Cyber Attack on New York Dam Reveals Future of War</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Control Engineering</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.controleng.com/throwback-attack-how-the-modest-bowman-avenue-dam-became-the-target-of-iranian-hackers/" target="_blank">Throwback Attack: How The Modest Bowman Avenue Dam Became The Target Of Iranian Hackers</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Washington Post</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.washingtonpost.com/world/national-security/iran-blamed-for-cyberattacks/2012/09/21/afbe2be4-0412-11e2-9b24-ff730c7f6312_story.html" target="_blank">Iran blamed for cyberattacks on U.S. banks and companies</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — Sep 21, 2012</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BankInfoSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bankinfosecurity.com/ddos-attackers-announce-phase-4-a-5929" target="_blank">DDoS: Attackers Announce Phase 4</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2013</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BankInfoSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bankinfosecurity.com/ddos-attacks-target-new-group-banks-a-5458" target="_blank">Hacktivists Suspend DDoS Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — Jan 2013</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NBC News</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nbcnews.com/news/amp/wbna49757910" target="_blank">Bank Attackers Deny Iran, Anonymous Ties</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2012</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Operation_Ababil" target="_blank">Operation Ababil</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 17 Sources (Government, Vendor, Press)</div>
+  <div>No companion actor card on file for Izz ad-Din al-Qassam Cyber Fighters / ITSecTeam / Mersad Company — flagged for future creation</div>
+</div>
+
+</body>
+</html>
