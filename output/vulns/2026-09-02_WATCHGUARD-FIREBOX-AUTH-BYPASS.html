@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WatchGuard Firebox &amp; XTM Privilege Escalation — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.92;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 14px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  .nmap-window { background: #020608; border: 1px solid var(--border2); border-top: 2px solid var(--cyan); margin-bottom: 12px; }
+  .nmap-titlebar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--bg3); border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.06em; }
+  .nmap-titlebar .cmd { color: var(--cyan); }
+  .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+  .nmap-titlebar .dot.green { background: var(--green); }
+  .nmap-output { font-family: var(--mono); font-size: 10.5px; line-height: 1.7; padding: 14px 16px; color: #8ab4c8; white-space: pre; overflow-x: auto; }
+  .nmap-output .port-open   { color: var(--green); }
+  .nmap-output .port-closed { color: var(--red); }
+  .nmap-output .port-filter { color: var(--amber); }
+  .nmap-output .service     { color: var(--cyan); }
+  .nmap-output .version     { color: #fff; }
+  .nmap-output .vuln-flag   { color: var(--red); font-weight: 700; }
+  .nmap-output .comment     { color: var(--text-dim); }
+
+  .nse-block { background: #020608; border: 1px solid var(--border2); border-left: 2px solid var(--purple); padding: 12px 16px; margin-bottom: 10px; }
+  .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .nse-name   { font-family: var(--mono); font-size: 10.5px; color: var(--purple); font-weight: 700; }
+  .nse-tags   { display: flex; gap: 5px; }
+  .nse-tag    { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
+  .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .nse-cmd  { font-family: var(--mono); font-size: 10px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 10px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+
+  .shodan-block { background: var(--bg3); border: 1px solid var(--border2); border-left: 2px solid var(--amber); padding: 12px 16px; margin-bottom: 10px; }
+  .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .shodan-label  { font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 11px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .port-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
+  .port-table td.svc-name  { color: #fff; }
+  .port-table td.version-vuln { color: var(--red); }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 130px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .footer { margin-top: 14px; padding: 10px 18px; border: 1px solid var(--border); background: var(--bg2); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 34px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-resolved">RESOLVED · HISTORICAL</div>
+      <div class="kev-badge">KEV LISTED</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — Authentication / Privilege Escalation · WatchGuard / Firebox &amp; XTM</div>
+  <h1><span class="cyan">WATCHGUARD FIREBOX</span> &amp; XTM PRIVILEGE ESCALATION</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    CVE: CVE-2022-23176 &nbsp;|&nbsp;
+    CWE: NVD-CWE-noinfo (analyst-assigned: CWE-863 / CWE-269 — see Section 02) &nbsp;|&nbsp;
+    SOURCES: CISA, NCSC-UK, NVD, WatchGuard PSIRT, DOJ, SentinelOne, SecurityWeek, Vendor Docs
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">8.8 (HIGH)</span></div>
+    <div>Affected: <span>Fireware OS &lt; 12.7.2_U1 / 12.1.3_U3 / 12.5.7_U3</span></div>
+    <div>Disclosed: <span>2022-02-23</span></div>
+    <div>Patch Date: <span>2021-12-30</span></div>
+    <div>KEV Added: <span class="cyan">2022-04-11</span></div>
+    <div>EPSS: <span class="dim">Not independently confirmed in this research pass</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">8.8</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2022-23176</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">No variant/related CVEs identified for this specific flaw</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">8.8</div>
+    <div class="stat-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">~2.5 YRS</div>
+    <div class="stat-label">Exploited Before Patch (Since ~Jun 2019 Per CISA)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">14 DAYS</div>
+    <div class="stat-label">Federal Remediation Window (BOD 22-01 Standard)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">THOUSANDS</div>
+    <div class="stat-label">Devices In Resulting Botnet Per DOJ</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CVE-2022-23176 is a privilege escalation vulnerability in WatchGuard's Fireware OS, the firmware that runs the company's Firebox and XTM firewall/UTM appliances — the perimeter devices that sit at the network edge of tens of thousands of small and mid-size organizations. The flaw lets a remote attacker who already holds any unprivileged, authenticated credential on the device's management interface escalate that session to full administrative control, via a broken authorization check on the management access path (CISA/NCSC-UK/FBI joint advisory AA22-054A, Feb 2022; NVD CVE-2022-23176). Rated CVSS 8.8, it does not require a foothold beyond a low-privilege credential and no user interaction, making it a clean stepping-stone from "some access" to "own the perimeter device."</p>
+      <p>What makes this vulnerability significant is not its technical novelty — it is a fairly ordinary authorization-bypass bug — but who used it and for what. WatchGuard patched it quietly in Fireware 12.7.2 Update 1 on December 30, 2021, without publicizing that the flaw was under active exploitation. It was only in February 2022, when CISA, the FBI, NSA, and the UK's NCSC jointly disclosed a new Sandworm Team (Russian GRU Unit 74455) malware framework called Cyclops Blink, that the public learned this specific CVE had been the primary initial-access vector Sandworm used to plant that malware on Firebox and XTM devices since at least June 2019 (CISA AA22-054A, Feb 23 2022). WatchGuard has stated publicly that the U.S. Department of Justice directed it to delay full public disclosure of the vulnerability's exploitation until court authorization was granted for a law-enforcement remediation operation (SecurityWeek, Apr 2022) — meaning ordinary WatchGuard customers ran an actively-exploited, nation-state-weaponized flaw on their perimeter firewalls for roughly two months after a patch existed, without being told the severity of what they were exposed to.</p>
+      <p>Who is at risk: any organization running an internet-reachable, unpatched Firebox or XTM management interface prior to the December 2021 fix. Perimeter firewalls are, by design, supposed to be the hardened boundary of a network — a vulnerability that turns the firewall itself into the attacker's foothold, and then into a piece of nation-state botnet infrastructure used to launch or obscure further operations, inverts the entire premise of the device. This card documents both the technical flaw and the vulnerability-disclosure-under-law-enforcement-constraint story around it, since the two are inseparable here.</p>
+      <p>By 2026 this CVE is fully patched and well past its window of live relevance for detection purposes — it is documented here primarily as the root-cause vulnerability behind the CYCLOPS BLINK incident card (see Section 10), and as a case study in how coordinated vulnerability disclosure norms interact with an active law-enforcement botnet-disruption operation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-863 (analyst-assigned)</span>
+        <span class="cwe-name">Incorrect Authorization</span>
+      </div>
+      <div class="cwe-body"><strong>NVD assigned no CWE for this record</strong> (listed as <code>NVD-CWE-noinfo</code>). Based on the public vulnerability description — "a remote attacker with unprivileged credentials [can] access the system with a privileged management session via exposed management access" — the mechanics most closely match CWE-863 (Incorrect Authorization): the management interface performs an authorization check that fails to correctly verify the requesting session actually holds the privilege level it is granted. CWE-269 (Improper Privilege Management) is a reasonable secondary classification for the same behavior. Neither label is NVD-confirmed; both are this card's own analytical read of the public description, stated explicitly as such.</div>
+    </div>
+    <div class="cwe-block" style="border-left-color: var(--amber);">
+      <div class="cwe-header">
+        <span class="cwe-id" style="color:var(--amber);">CWE-321 (analyst-assigned, separate weakness)</span>
+        <span class="cwe-name">Use of Hard-coded Cryptographic Key</span>
+      </div>
+      <div class="cwe-body">A second, distinct weakness — not itself carrying its own CVE identifier in any source reviewed for this card — sits downstream of CVE-2022-23176 in Sandworm's actual attack chain: Firebox devices reportedly used a hard-coded key to compute the HMAC that validates firmware "update" images, meaning an attacker who already holds a privileged management session (via CVE-2022-23176) could recompute a valid HMAC for a modified firmware image and push it as a legitimate-looking update (Kudelski Security Research, Apr 2022). This is what let Cyclops Blink achieve reboot-surviving persistence disguised as a routine firmware upgrade. It is documented here for completeness since it is functionally part of the same exploitation chain, but it is a separate architectural flaw from the authorization bug above, and this card does not treat it as a second CVE-numbered vulnerability — no source reviewed assigns it one.</div>
+    </div>
+    <div class="prose">
+      <p>The primary flaw (CVE-2022-23176) is an authorization gap on the Fireware management path: a session that has authenticated with unprivileged credentials is able to reach functionality that should be gated to administrative sessions only, "via exposed management access" per WatchGuard's own advisory language. Public sources reviewed for this card do not include a vendor- or researcher-published root-cause writeup with code-level specificity beyond that description — WatchGuard's PSIRT advisory for this CVE (WGSA-2021-00004) is no longer resolvable at its original URL as of this research pass, and the fuller technical breakdown lives primarily in the NCSC's malware analysis report on Cyclops Blink rather than in a vulnerability-specific writeup. That gap is stated honestly rather than papered over with invented mechanism detail.</p>
+      <p>The secondary hard-coded-HMAC-key weakness is architecturally more interesting and better documented: embedded/appliance firmware update mechanisms frequently implement code-signing or integrity validation using a single, static key baked into every unit of a product line, rather than per-device or vendor-rotated keys. Once that static key is known or recoverable (through extraction from any single device, firmware reverse engineering, or — as appears to be the case here — direct compromise via the authorization bug), the "signature" check on firmware updates stops functioning as a security boundary and becomes a checksum an attacker can trivially satisfy. This exact anti-pattern recurs across the embedded-device and network-appliance industry (see Section 07).</p>
+      <p>Together, the two weaknesses form a clean two-step chain: CVE-2022-23176 gets an attacker from "some low-privilege credential" to "full admin," and the hard-coded HMAC key then lets that admin session push a malicious firmware image that survives reboots and looks, to the device, like a routine vendor update.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Exploitation Begins<br/>~Jun 2019</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Silent Patch<br/>2021-12-30</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">03</div>
+        <div class="lc-label">Public Disclosure<br/>2022-02-23</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">DOJ Remediation Op<br/>2022-03-18</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node dim">05</div>
+        <div class="lc-label">KEV Listed<br/>2022-04-11</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>This lifecycle runs in an unusual order compared to a typical CVE. Exploitation came first and ran silently for roughly two and a half years: CISA's advisory states Sandworm had deployed Cyclops Blink malware — which relies on this flaw for initial access — since at least June 2019, with nobody outside the intrusion aware of it. WatchGuard fixed the underlying authorization bug in a routine December 2021 Fireware release (12.7.2 Update 1, plus parallel fixes in the 12.1.x and 12.5.x branches) without a public CVE identifier attached or any customer-facing framing that this was an actively-exploited, nation-state-weaponized flaw — at the time, it read as an ordinary maintenance patch.</p>
+      <p>The public disclosure only happened on February 23, 2022, when CISA, the FBI, NSA, and NCSC-UK jointly published advisory AA22-054A revealing Cyclops Blink as Sandworm's VPNFilter successor and, in doing so, connected the malware's initial-access mechanism back to this CVE. WatchGuard has stated that the U.S. Department of Justice specifically directed the company to hold back full public disclosure until court authorization was granted for a law-enforcement operation to remotely disable the botnet (SecurityWeek, Apr 2022) — that operation was authorized on March 18, 2022 and executed shortly after, with the FBI copying and removing Cyclops Blink from remaining command-and-control devices without their owners' consent, under court order (DOJ press release, Apr 6 2022).</p>
+      <p>The vulnerability was added to CISA's Known Exploited Vulnerabilities catalog on April 11, 2022, formally starting the clock on the federal remediation deadline under Binding Operational Directive 22-01 — by that point the patch had already existed for over fifteen months, and the law-enforcement disruption operation had already run. The KEV listing here functioned less as new information to defenders and more as a formal, dated record closing out an episode that had already played out.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Coordinated, Law-Enforcement-Delayed</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val dim">Not clearly named in public sources</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val dim">Unclear — does not read as classic external researcher CVD</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val dim">No public PoC identified in sources reviewed</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val">N/A — no public PoC found</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val amber">Technically prompt, transparency legally constrained</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val">Some criticism of the ~2-month severity-transparency gap</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val dim">Atypical — government-directed delay, not standard embargo</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>This is not a conventional coordinated-disclosure story with a named external researcher and a fixed embargo date. The available record suggests WatchGuard (working with, or at the direction of, U.S. law enforcement) identified and patched the flaw internally, then sat on full public disclosure of its severity and active exploitation for roughly two months at the DOJ's direction — a genuinely different disclosure model than the standard vendor-researcher relationship this section is normally written about. WatchGuard's own framing, reported by SecurityWeek in April 2022, is that "the DOJ and court orders directed WatchGuard to delay disclosure until official authorization was granted" — i.e., the company argues its hands were legally tied, not that it chose opacity for its own convenience.</p>
+      <p>The community reaction, captured in contemporaneous coverage (SecurityWeek's headline: "CISA Tells Orgs to Patch WatchGuard Flaw Exploited for Months Before Disclosure"), reflects real tension: customers who applied the December 2021 patch as routine maintenance had no way to know they were closing a hole a Russian military intelligence unit had been actively using for over two years, and organizations that had not yet applied it were carrying that exposure without the elevated urgency the situation actually warranted. Whether the law-enforcement operation's success genuinely required withholding that context from the broader user base — versus disclosing severity while withholding operational specifics of the takedown — is not resolved in the sources reviewed, and this card does not take a side on it; it is flagged as a real, documented point of friction, not settled.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>The attack chain documented in public sources runs in two steps. First, an attacker who already holds some unprivileged, authenticated credential on a Firebox or XTM device's exposed management interface sends requests that the management-plane authorization logic fails to properly gate — the session ends up with a fully privileged administrative context it should never have been granted (NVD CVE-2022-23176; CISA AA22-054A). No user interaction is required and the attack complexity is low: this is a logic flaw in server-side authorization, not a fragile memory-corruption exploit requiring careful crafting.</p>
+      <p>Second, once in possession of a privileged session, Sandworm used that access to push a malicious firmware "update" — this is where the separate hard-coded HMAC key weakness (Section 02) comes in: the device's own firmware-integrity check accepted the attacker's modified image as legitimate because the attacker could compute a valid HMAC using the same static key every device shipped with. Cyclops Blink then persisted across reboots as if it were a normal, vendor-signed firmware component (NCSC Malware Analysis Report, Feb 23 2022).</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">Exploitable remotely over the network if the management interface is reachable — no local/physical access needed.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">No special conditions, races, or extensive preparation required once a low-priv credential is in hand.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val amber">LOW</div>
+          <div class="cvss-comp-meaning">Attacker needs SOME authenticated, unprivileged credential first — this is a privilege-escalation bug, not an unauthenticated one.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No victim click, approval, or action required.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">UNCHANGED</div>
+          <div class="cvss-comp-meaning">Impact is contained to the vulnerable component (the Firebox/XTM device itself), not a separate downstream system.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Full admin access exposes all device configuration, VPN keys, and traffic-inspection capability.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Full admin access permits arbitrary configuration and firmware modification.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">An attacker with full admin control can disrupt or disable the firewall entirely.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
+      <table class="versions-table">
+        <thead><tr><th>Vendor</th><th>Product</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>WatchGuard</td><td>Firebox / XTM (Fireware OS)</td><td class="vuln">&lt; 12.7.2_U1</td><td class="fixed">12.7.2_U1</td><td>Patched 2021-12-30</td></tr>
+          <tr><td>WatchGuard</td><td>Firebox / XTM (Fireware OS)</td><td class="vuln">12.x &lt; 12.1.3_U3</td><td class="fixed">12.1.3_U3</td><td>Patched 2021-12-30</td></tr>
+          <tr><td>WatchGuard</td><td>Firebox / XTM (Fireware OS)</td><td class="vuln">12.2.x – 12.5.x &lt; 12.5.7_U3</td><td class="fixed">12.5.7_U3</td><td>Patched 2021-12-30</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block">
+      <div class="kev-header">
+        <span class="kev-tag">CISA KEV LISTED</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2022-04-11 · Federal remediation: standard BOD 22-01 window (14 days for post-directive KEV entries) — exact per-CVE due date not independently confirmed in this research pass, stated as a gap rather than assumed</span>
+      </div>
+      <div class="kev-body">Listed on CISA's Known Exploited Vulnerabilities catalog following the February 2022 joint advisory confirming Sandworm Team's active exploitation. By the KEV listing date, the exploitation was already historical (the DOJ's remediation operation had run a month earlier) — the listing formalized what was already publicly known rather than surfacing new information.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">~Jun 2019</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Sandworm Begins Deployment</div>
+            <div class="et-desc">Cyclops Blink first deployed against WatchGuard devices, retroactively dated by CISA/NCSC forensic analysis — not observed live at the time.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2021-12-30</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Silent Patch Released</div>
+            <div class="et-desc">Fireware 12.7.2_U1 and parallel branch fixes close the authorization gap, without public framing of active exploitation.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2022-02-23</div>
+          <div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Joint Advisory AA22-054A</div>
+            <div class="et-desc">CISA/FBI/NSA/NCSC-UK publicly attribute Cyclops Blink to Sandworm and tie its initial access to this CVE.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2022-03-18</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">DOJ Remediation Operation Authorized</div>
+            <div class="et-desc">Court order permits FBI to remotely copy and remove Cyclops Blink from WatchGuard and ASUS devices without owner consent.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2022-04-11</div>
+          <div class="et-track"><div class="et-dot green"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Added to CISA KEV Catalog</div>
+            <div class="et-desc">Formal federal-remediation-deadline listing, closing out an episode that had already concluded operationally.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p><strong>Actor breakdown:</strong> every source reviewed for this card attributes exploitation exclusively to Sandworm Team (GRU Unit 74455 — see actor card, Section 10). No ransomware, eCrime, or unrelated mass-scanning reuse of this specific CVE was identified in this research pass; that absence is stated as a finding, not assumed from silence — it may simply reflect that public reporting concentrated entirely on the nation-state angle once the DOJ operation made headlines, leaving less visibility into any lower-profile criminal reuse.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Network-edge appliances — firewalls, VPN concentrators, SOHO routers — occupy a structurally dangerous position in the modern security stack: they are treated by their own vendors and by defenders as trusted infrastructure, yet they typically run closed, vendor-controlled firmware that sits entirely outside the reach of enterprise EDR, host-based logging, and the rest of the internal-network monitoring stack. A privilege-escalation bug on a Windows server gets caught by EDR telemetry, SIEM correlation, or at minimum a forensic disk image; the same class of bug on a Firebox appliance produces none of that by default. This is precisely why Sandworm has now built two generations of durable botnet infrastructure — VPNFilter in 2018, Cyclops Blink from 2019 — on exactly this category of device: it is not that edge appliances are more vulnerable in some absolute sense, it is that compromise of them is dramatically less likely to be detected, and persistence on them survives most of what an incident responder would normally do to clean up a compromised endpoint.</p>
+      <p>The hard-coded HMAC key used to "validate" firmware updates (Section 02) is its own recurring architectural anti-pattern, and it is worth being specific about why it keeps happening: firmware code-signing is frequently implemented late in an embedded product's development cycle, treated as a checkbox requirement rather than a security boundary designed to resist a knowledgeable adversary, and — critically — a single static key shared across an entire product line is operationally far simpler for a vendor to manage than a per-device or centrally-rotated key infrastructure. That operational convenience is exactly what converts a "signed firmware update" mechanism from a meaningful integrity control into decoration, the moment the static key is exposed through any single avenue — which, as this case shows, only needs to happen once (via the unrelated authorization bug) for every device running that firmware to become equally exposed. This is the same underlying failure mode documented across other embedded/IoT ecosystems for over a decade; this vulnerability adds one more well-documented instance rather than a novel one.</p>
+      <p>The disclosure-timeline story here also surfaces a genuine, still-unresolved industry tension: coordinated vulnerability disclosure norms were built around a two-party relationship (researcher and vendor) negotiating an embargo. A nation-state botnet-disruption operation introduces a third party — law enforcement — whose operational security requirements can extend that embargo well past the point where the vendor itself would otherwise be ready to fully disclose severity to customers. There is no settled industry doctrine for how long that extension is acceptable, who bears the risk of customers left exposed during it, or what obligations (if any) a vendor has to signal elevated urgency to its user base without disclosing the specific operational details a law-enforcement partner needs kept quiet. This case is a clean, well-documented example for studying that tension rather than a resolution of it.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <div class="query-block">
+        <div class="query-label">Firebox / WSM Management Audit Log — Privilege Escalation Without Re-authentication</div>
+        <div class="query-code">source = watchguard_syslog
+| filter event_category = "management_session"
+| filter (initial_session_privilege = "unprivileged" AND subsequent_action_privilege = "admin")
+  AND NOT preceded_by(event = "re_authentication", window = 60s)
+-- Flag any management-plane session that performs administrative actions
+-- without an intervening full re-authentication event.</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Unexpected Firmware Update Initiation From Management Session</div>
+        <div class="query-code">source = watchguard_syslog
+| filter event = "firmware_update_initiated"
+| filter initiator_source NOT IN (known_admin_ip_allowlist)
+   OR update_package_hash NOT IN (watchguard_published_known_good_hashes)</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>These are structural detection logic, not vendor-published query syntax — WatchGuard's own syslog export schema and field names should be substituted; no public source reviewed for this card publishes ready-made SIEM rules for this specific CVE, so this is analyst-constructed guidance rather than a reproduced vendor artifact, stated as such rather than presented as an official query.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis 1:</strong> any Firebox/XTM device that was internet-facing with its management interface exposed prior to December 30, 2021 should be treated as potentially compromised until firmware integrity is independently verified — not assumed clean simply because the routine patch was later applied, since Cyclops Blink's persistence mechanism survives a standard firmware upgrade if the device was already infected beforehand.</p>
+        <p><strong>Hypothesis 2:</strong> hunt for unexpected outbound TLS connections originating from the device's management plane to IP ranges outside WatchGuard's own cloud/telemetry infrastructure — Cyclops Blink's C2 traffic is TLS-wrapped specifically to blend with legitimate management-plane traffic (NCSC Malware Analysis Report), so this requires baseline knowledge of what normal WatchGuard cloud-service connections look like, not a simple signature match.</p>
+        <p><strong>Hypothesis 3:</strong> compare the device's current firmware hash against WatchGuard's published known-good hash list and check uptime/reboot history for any "update" event not correlated with an administrator-initiated, logged upgrade action.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Patch</span><span class="kv-val green">Fireware 12.7.2_U1 / 12.1.3_U3 / 12.5.7_U3</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2021-12-30</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val green">Low — routine appliance OS release</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Standard change-window validation; no unusual compatibility concerns identified in sources</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">WatchGuard PSIRT (advisory ID no longer resolving at original URL)</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val dim">No — shipped in a routine release cycle</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val dim">None identified — no later CVE supersedes this fix</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p><strong>Critical caveat for already-infected devices:</strong> applying the standard firmware patch alone is documented by WatchGuard and CISA as insufficient for devices already compromised by Cyclops Blink — because the malware's persistence lives inside the firmware-update mechanism itself, remediation requires WatchGuard's dedicated non-standard detection-and-removal process rather than a routine in-place upgrade. Any Firebox/XTM device that was internet-exposed and unpatched for a meaningful window before December 2021 should go through that dedicated remediation path, not just the ordinary patch cycle.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>Disable internet-facing management access.</strong> WatchGuard's own long-standing guidance is that Firebox/XTM management interfaces should never be directly reachable from the public internet; restrict to VPN-only or internal-network-only access as an immediate, no-patch-required mitigation.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Network-level ACL restriction.</strong> Where remote management is operationally required, restrict access to the management ports (see Section 11) to a known, small allowlist of administrator source IPs.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Firmware integrity verification.</strong> Periodically verify running firmware hashes against WatchGuard's published known-good values rather than trusting the device's own self-reported update status, given that the compromise mechanism specifically targets the update-validation path.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div class="cm-text"><strong>Credential hygiene on management accounts.</strong> Since the flaw requires an attacker to already hold some unprivileged credential, eliminating shared/default/weak management-interface accounts removes the attacker's starting foothold even before the authorization bug itself is patched.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2022-23176</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">8.8 (HIGH)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">NVD-CWE-noinfo (analyst: CWE-863 / CWE-269)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not independently confirmed in this research pass</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2022-23176" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2022-23176</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://psirt.watchguard.com/" target="_blank" style="color:var(--cyan)">WatchGuard PSIRT</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2022-04-11</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <a class="xref-item actor" href="../actors/2026-09-02_SANDWORM.html">
+        <div class="xref-type actor">Threat Actor Card</div>
+        <div class="xref-name">Sandworm Team</div>
+        <div class="xref-rel">GRU Unit 74455 used this flaw as the primary initial-access mechanism for the Cyclops Blink botnet, deployed against Firebox/XTM devices since ~June 2019.</div>
+      </a>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <a class="xref-item incident" href="../incidents/2022-02-23_CYCLOPS-BLINK.html">
+        <div class="xref-type incident">Incident Case File</div>
+        <div class="xref-name">CYCLOPS BLINK</div>
+        <div class="xref-rel">This CVE is the documented root-cause vulnerability for the CYCLOPS BLINK botnet incident and the March 2022 DOJ court-authorized disruption operation.</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Network Exposure <small>Ports · Protocols · Banners · Nmap · Shodan</small></div>
+  </div>
+  <div class="section-body">
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <table class="port-table" style="margin-bottom:20px;">
+      <thead>
+        <tr><th>Port</th><th>Proto</th><th>Service</th><th>Vulnerable Condition</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="port-num">8080</td><td>TCP/HTTPS</td><td class="svc-name">Fireware Web UI</td><td class="version-vuln">Exposed to untrusted networks, unpatched Fireware OS</td><td>WatchGuard's documented default Web UI management port</td></tr>
+        <tr><td class="port-num">4118</td><td>TCP/SSH</td><td class="svc-name">Fireware CLI</td><td class="version-vuln">Exposed to untrusted networks, unpatched Fireware OS</td><td>Command-line management access</td></tr>
+        <tr><td class="port-num">4105 / 4117</td><td>TCP</td><td class="svc-name">WatchGuard System Manager (WSM)</td><td class="version-vuln">Exposed to untrusted networks, unpatched Fireware OS</td><td>Centralized/legacy management-console access ports per WatchGuard documentation</td></tr>
+      </tbody>
+    </table>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Default Service Scan Output (Vulnerable Host)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot"></div>
+        <span class="cmd">nmap -sV -p 8080,4118,4117,4105 &lt;target&gt;</span>
+      </div>
+      <div class="nmap-output"><span class="comment"># NOTE: No source-documented public nmap capture of a live-vulnerable Firebox was located
+# in this research pass. Reconstructed only from WatchGuard's own documented default
+# port/service assignments — not directly observed output. Do not treat as verified banner data.</span>
+
+PORT     STATE SERVICE VERSION
+<span class="port-open">8080/tcp open  https</span>   <span class="version">WatchGuard Fireware Web UI</span>
+<span class="port-open">4118/tcp open  ssh</span>     <span class="version">WatchGuard Fireware CLI</span>
+<span class="port-open">4117/tcp open  unknown</span> <span class="comment">WatchGuard System Manager</span></div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; margin-top:16px;">Nmap — Version-Discriminating Scan (Vulnerable vs. Patched)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot"></div>
+        <span class="cmd">nmap --script http-title,ssl-cert -p 8080 &lt;target&gt;</span>
+      </div>
+      <div class="nmap-output"><span class="comment"># No public source documents a reliable banner/response delta between vulnerable
+# and patched Fireware OS builds for this specific CVE — WatchGuard does not expose
+# the Fireware OS version string on the unauthenticated Web UI login page in a way
+# any source reviewed here captured. Version discrimination for this CVE realistically
+# requires authenticated access (About/System Status page) rather than an unauthenticated
+# network probe. Stated as a genuine capability gap rather than invented output.</span></div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Version Identification</div>
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">Fireware Web UI · Port 8080</span>
+        <span class="banner-status vulnerable">UNDOCUMENTED</span>
+      </div>
+      <div class="banner-text">No public raw banner capture for a confirmed-vulnerable Fireware build was located in this research pass. Version discrimination requires authenticated access to the device's System Status / About page rather than an unauthenticated banner grab — noted as a genuine research gap, not fabricated.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
+    <div class="nse-block">
+      <div class="nse-header">
+        <span class="nse-name">No dedicated NSE script identified</span>
+        <div class="nse-tags">
+          <span class="nse-tag">NOT AVAILABLE</span>
+        </div>
+      </div>
+      <div class="nse-output">No NSE script specific to CVE-2022-23176 was found on nmap.org/nsedoc/ or in vendor/researcher writeups reviewed for this card. Detection realistically requires WatchGuard's own vendor-provided detection/remediation tooling (referenced in Section 08-C) rather than a generic network scanner script, since exploitation requires an already-authenticated session rather than an unauthenticated network-observable condition.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Shodan</span>
+      </div>
+      <div class="shodan-dork">http.title:"Fireware" port:8080</div>
+      <div class="shodan-note">Conceptual dork structure only — no historical point-in-time exposure count for this specific query was located in sources reviewed for this card. Not run operationally as part of this research; presented as a starting structure for an analyst to refine, not a verified historical count.</div>
+    </div>
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Censys</span>
+      </div>
+      <div class="shodan-dork">services.http.response.html_title: "Fireware" and services.port: 8080</div>
+      <div class="shodan-note">Same caveat as above — structural only, not independently verified against a live Censys query for this card.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / NSA / NCSC-UK</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-054a" target="_blank">AA22-054A: New Sandworm Malware Cyclops Blink Replaces VPNFilter</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NCSC (UK)</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ncsc.gov.uk/files/Cyclops-Blink-Malware-Analysis-Report.pdf" target="_blank">Malware Analysis Report — Cyclops Blink</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div>
+          <div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2022-23176" target="_blank">CVE-2022-23176 Detail</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SentinelOne</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.sentinelone.com/vulnerability-database/cve-2022-23176/" target="_blank">CVE-2022-23176: WatchGuard Fireware Auth Bypass Vulnerability</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/cisa-tells-orgs-patch-watchguard-flaw-exploited-months-disclosure/" target="_blank">CISA Tells Orgs to Patch WatchGuard Flaw Exploited for Months Before Disclosure</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Department of Justice</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/archives/opa/pr/justice-department-announces-court-authorized-disruption-botnet-controlled-russian-federation" target="_blank">Justice Department Announces Court-Authorized Disruption of Botnet Controlled by the Russian Federation's GRU</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Kudelski Security Research</div>
+        <div>
+          <div class="ref-detail"><a href="https://research.kudelskisecurity.com/2022/04/04/cyclops-blink-malware-targeting-watchguard-firewalls/" target="_blank">Cyclops Blink Malware Targeting WatchGuard Firewalls</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">WatchGuard</div>
+        <div>
+          <div class="ref-detail"><a href="https://psirt.watchguard.com/" target="_blank">WatchGuard PSIRT Security Advisories</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">WatchGuard</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.watchguard.com/support/release-notes/fireware/12/en-US/EN_ReleaseNotes_Fireware_12_7_2/Fireware_Release-Notes_v12_7_2.pdf" target="_blank">Fireware v12.7.2 Release Notes</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">WatchGuard</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.watchguard.com/help/docs/help-center/en-US/Content/en-US/Fireware/system_status/connecting_about_web.html" target="_blank">Connect to Fireware Web UI (Management Port Documentation)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/software/S0687/" target="_blank">Cyclops Blink, Software S0687</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0034/" target="_blank">Sandworm Team, G0034</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 12 Sources (Government, Vendor, MITRE, Press)</div>
+  <div>Built via incident-card Vuln Auto-Dispatch — root-cause vulnerability for CYCLOPS BLINK incident card</div>
+</div>
+
+</body>
+</html>
