@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SonicWall SonicOS Access Control Bypass — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+  .header-top-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .header h1 { font-family: var(--sans); font-size: 60px; font-weight: 900; letter-spacing: -0.01em; line-height: 0.9; text-transform: uppercase; color: #fff; margin-bottom: 6px; }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+  .advisory-bar { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border2); font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+  .cvss-callout { display: inline-flex; align-items: center; gap: 14px; background: var(--bg3); border: 1px solid var(--border2); border-left: 3px solid var(--red); padding: 10px 18px; margin-bottom: 14px; flex-wrap: wrap; }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+  .cwe-block { background: var(--bg3); border: 1px solid var(--border2); border-left: 3px solid var(--cyan); padding: 14px 18px; margin-bottom: 18px; }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after { content: '→'; position: absolute; right: -8px; top: 14px; font-family: var(--mono); font-size: 12px; color: var(--border2); z-index: 1; }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--cyan-dim); background: var(--bg3); margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: var(--cyan-dim); font-weight: 700; }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+  .kev-block { background: var(--bg3); border: 1px solid rgba(0,212,255,0.2); border-left: 3px solid var(--cyan); padding: 14px 18px; margin-bottom: 18px; }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item { background: var(--bg3); border: 1px solid var(--border); padding: 10px 14px; text-decoration: none; display: block; transition: border-color 0.15s; }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+  .nmap-window { background: #020608; border: 1px solid var(--border2); border-top: 2px solid var(--cyan); margin-bottom: 12px; }
+  .nmap-titlebar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--bg3); border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.06em; }
+  .nmap-titlebar .cmd { color: var(--cyan); }
+  .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+  .nmap-titlebar .dot.green { background: var(--green); }
+  .nmap-output { font-family: var(--mono); font-size: 10.5px; line-height: 1.7; padding: 14px 16px; color: #8ab4c8; white-space: pre; overflow-x: auto; }
+  .nmap-output .port-open   { color: var(--green); }
+  .nmap-output .port-closed { color: var(--red); }
+  .nmap-output .port-filter { color: var(--amber); }
+  .nmap-output .service     { color: var(--cyan); }
+  .nmap-output .version     { color: #fff; }
+  .nmap-output .vuln-flag   { color: var(--red); font-weight: 700; }
+  .nmap-output .comment     { color: var(--text-dim); }
+  .nmap-output .highlight   { background: rgba(0,212,255,0.08); display: inline; }
+  .nse-block { background: #020608; border: 1px solid var(--border2); border-left: 2px solid var(--purple); padding: 12px 16px; margin-bottom: 10px; }
+  .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .nse-name   { font-family: var(--mono); font-size: 10.5px; color: var(--purple); font-weight: 700; }
+  .nse-tags   { display: flex; gap: 5px; }
+  .nse-tag    { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
+  .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .nse-cmd  { font-family: var(--mono); font-size: 10px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 10px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+  .nse-output .vuln-flag { color: var(--red); font-weight: 700; }
+  .nse-output .safe-flag { color: var(--green); font-weight: 700; }
+  .shodan-block { background: var(--bg3); border: 1px solid var(--border2); border-left: 2px solid var(--amber); padding: 12px 16px; margin-bottom: 10px; }
+  .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .shodan-label  { font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 11px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+  .banner-block { background: #020608; border: 1px solid var(--border2); border-left: 2px solid var(--cyan2); padding: 10px 14px; margin-bottom: 8px; }
+  .banner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .banner-label  { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.07em; }
+  .banner-status { font-family: var(--mono); font-size: 8.5px; padding: 1px 7px; }
+  .banner-status.vulnerable { border: 1px solid rgba(255,77,77,0.4); color: var(--red); }
+  .banner-status.patched    { border: 1px solid rgba(74,158,106,0.4); color: var(--green); }
+  .banner-status.unknown    { border: 1px solid var(--border2); color: var(--text-dim); }
+  .banner-text   { font-family: var(--mono); font-size: 10px; color: #8ab4c8; line-height: 1.6; white-space: pre-wrap; }
+  .banner-text .vuln-string { color: var(--red); }
+  .banner-text .safe-string { color: var(--green); }
+  .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .port-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
+  .port-table td.port-open { color: var(--green); }
+  .port-table td.svc-name  { color: #fff; }
+  .port-table td.version-vuln { color: var(--red); }
+  .port-table td.version-safe { color: var(--green); }
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+  .footer { margin-top: 14px; padding: 10px 18px; border: 1px solid var(--border); background: var(--bg2); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 36px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-now">PATCH NOW</div>
+      <div class="kev-badge">KEV LISTED</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — Improper Access Control (CWE-284) · SonicWall / SonicOS Gen 5/6/7 Firewalls</div>
+  <h1><span class="cyan">SONICWALL</span> SONICOS<br/>ACCESS CONTROL BYPASS</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-03 &nbsp;|&nbsp;
+    CVE: CVE-2024-40766 &nbsp;|&nbsp;
+    CWE: CWE-284 (Improper Access Control) &nbsp;|&nbsp;
+    SOURCES: 18 (Government, MITRE-Adjacent Vendor Advisory, Independent Research, Press)
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">9.3 (CRITICAL)</span></div>
+    <div>Affected: <span>SonicWall Gen 5/6/7 Firewalls (TZ/NSA/SM/SOHO) — SonicOS Management &amp; SSLVPN</span></div>
+    <div>Disclosed: <span>2024-08-22</span></div>
+    <div>Patch Date: <span>2024-08-22 (same day as disclosure)</span></div>
+    <div>KEV Added: <span class="cyan">2024-09-09</span></div>
+    <div>EPSS: <span>5.50% (as observed at research time; fluctuates)</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">9.3</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2024-40766</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">No variant CVEs — single CVE, recurring misattribution as a "new" zero-day (see Section 04)</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:L</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">9.3</div>
+    <div class="stat-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">430,363</div>
+    <div class="stat-label">Internet-Exposed SonicOS Login Pages (Bishop Fox, Dec 2024)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">55 MIN</div>
+    <div class="stat-label">Fastest Observed Time-to-Encryption Post-Login (Akira, Jul 2025 — Arctic Wolf)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">22+ MOS</div>
+    <div class="stat-label">Sustained Active Exploitation Since Patch Release (Aug 2024 → Jun 2026 SANS ISC Audit)</div>
+  </div>
+</div>
+
+<!-- ══ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">01</div><div class="section-title">Situation Overview</div></div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CVE-2024-40766 is an improper access control vulnerability (CWE-284) in SonicWall's SonicOS firmware, affecting the management interface and SSLVPN service across three hardware generations — Gen 5 SOHO, Gen 6 TZ/NSA/SM, and Gen 7 TZ/NSA firewalls. Rated CVSS 9.3, it allows an unauthenticated, remote attacker to gain unauthorized access to sensitive firewall resources and, under specific conditions, crash the device outright. SonicWall published the advisory (SNWLID-2024-0015) and a firmware patch simultaneously on August 22, 2024 — an unusual same-day pairing that itself signals the vendor likely became aware of the issue through something other than a conventional external coordinated-disclosure process, though the exact discovery circumstances were never made public (SonicWall, Aug 2024).</p>
+      <p>It matters right now because CVE-2024-40766 has become the single most consequential vulnerability in the current ransomware threat landscape's initial-access economy. Within weeks of the patch, the Akira ransomware operation — and, independently, the Fog ransomware group — began weaponizing it at scale, and CISA added it to the Known Exploited Vulnerabilities catalog on September 9, 2024, just eighteen days after disclosure (CISA KEV, Sept 2024). By July 2025, Akira affiliates alone were tied to roughly 40 ransomware incidents in a single month substantially built on this one flaw, with encryption completed in as little as 55 minutes from initial SSLVPN login in the fastest observed cases (Arctic Wolf Labs, Aug 2025). This card's companion actor card for Akira (<code>output/actors/2026-09-03_AKIRA.html</code>) documents that group's broader operations; this card is the technical and lifecycle account of the vulnerability itself.</p>
+      <p>Who is at risk is a broader population than the CVSS score alone suggests. Because the affected product line spans SOHO-grade to enterprise-grade appliances, and because SonicWall's own install base skews toward small and mid-sized organizations that often lack dedicated security operations, this is a critical-severity flaw sitting on infrastructure with comparatively thin monitoring coverage. Worse, patching alone has proven insufficient to close the door: a June 2026 SANS Internet Storm Center audit of fourteen already-patched devices found Akira and Fog operators still resident inside several of them, nearly two years after the fix shipped (SANS ISC, Jun 2026) — a genuinely unusual and analytically important finding this card treats as central rather than peripheral (see Section 02 and Section 07).</p>
+      <p>As of this compile date, SonicWall itself has had to publicly clarify — as recently as August 2025 — that renewed waves of intrusion activity against its Gen 7 SSLVPN customers were not evidence of a new zero-day, but continued exploitation of this same, twenty-two-month-old CVE compounded by unremediated configuration debt (SonicWall/TheHackerNews, Aug 2025). That clarification is itself a data point about how poorly "patched" and "safe" map onto each other in this specific case.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">02</div><div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div></div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header"><span class="cwe-id">CWE-284</span><span class="cwe-name">Improper Access Control</span></div>
+      <div class="cwe-body">The product does not restrict, or incorrectly restricts, access to a resource from an unauthorized actor. CWE-284 is a broad parent category (as opposed to a narrow, mechanism-specific weakness like a hardcoded credential or a missing authentication check on one specific endpoint) — SonicWall's own advisory and NVD's classification do not narrow it further, which is itself notable and addressed below.</div>
+    </div>
+    <div class="prose">
+      <p>SonicWall's public advisory (SNWLID-2024-0015) describes the flaw only at the level of "improper access control mechanisms in SonicOS, where insufficient restrictions allow unauthorized access to sensitive resources," without publishing a code-level or protocol-level technical root-cause writeup. No independent researcher writeup with reverse-engineered exploit mechanics was identified in this research pass either — unusually for a CVSS 9.3 flaw under this much active exploitation, there is no public proof-of-concept and no detailed technical dissection of exactly which access-control check fails and how. That absence is stated here as a genuine intelligence gap, not glossed over: this card cannot describe the precise code path that fails, because no source material makes it available.</p>
+      <p>What is well documented, however, is a second and arguably more consequential root cause that compounds the first: SonicWall's firmware migration path from Gen 6 to Gen 7 devices carries forward local user account credentials and LDAP bind configuration unchanged. Organizations that upgraded hardware generations without separately auditing and rotating those carried-over identities retained an authentication surface that predates — and is untouched by — the August 2024 patch. On Gen 6 devices specifically, LDAP configuration enabling MFA bypass persists after the firmware update because the patch does not touch it (SANS ISC, Jun 2026). SANS's audit further found that roughly half of a small sample of compromised, patched devices had their Virtual Office TOTP self-enrollment portal reachable from the public internet, letting an attacker who already had valid (often stale, carried-over) credentials register their own authenticator device ahead of the legitimate user — a full, self-service MFA bypass that requires no exploitation of the CVE's underlying access-control logic at all once initial credential access is achieved.</p>
+      <p>Architecturally, then, CVE-2024-40766 is not a single, isolated code defect so much as it is a case where a patchable access-control bug sits on top of an unpatchable — by firmware update alone — identity and configuration debt problem. The vendor's remediation instrument (a firmware patch) was structurally incapable of resolving the second root cause, and SonicWall's advisory language never made that limitation explicit to customers, which is the throughline this card returns to in Section 07.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">03</div><div class="section-title">Vulnerability Lifecycle</div></div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase"><div class="lc-node active">01</div><div class="lc-label">Discovery<br/>Undisclosed, ≤ Aug 2024</div></div>
+      <div class="lc-phase"><div class="lc-node active">02</div><div class="lc-label">Disclosure<br/>2024-08-22</div></div>
+      <div class="lc-phase"><div class="lc-node amber">03</div><div class="lc-label">Patch<br/>2024-08-22 (same day)</div></div>
+      <div class="lc-phase"><div class="lc-node red">04</div><div class="lc-label">Exploitation<br/>Sep 2024 → Ongoing</div></div>
+      <div class="lc-phase"><div class="lc-node dim">05</div><div class="lc-label">Resolution<br/>ONGOING — not fully resolved</div></div>
+    </div>
+    <div class="prose">
+      <p>SonicWall published SNWLID-2024-0015 and the corresponding firmware fix on the same day, August 22, 2024, initially stating the vulnerability was "not known to be exploited in the wild." That assessment did not hold: within roughly two and a half weeks, SonicWall quietly revised the advisory to note the flaw was "potentially being exploited," and on September 9, 2024, CISA independently confirmed active exploitation by adding CVE-2024-40766 to the KEV catalog with a federal remediation deadline of September 30, 2024 (CISA, Sept 2024). Arctic Wolf's earliest incident-response engagements traced Akira affiliate access directly to compromised SSLVPN accounts on vulnerable devices in this same window.</p>
+      <p>Exploitation did not spike and taper the way many CVEs do after a KEV listing and remediation deadline — it escalated over the following year. By July–August 2025, Rapid7, Darktrace, and Arctic Wolf were independently documenting a sharp uptick, with Akira accounting for roughly 40 ransomware incidents that July alone (the third-most-active group that month) and fastest observed times from SSLVPN login to full encryption of 55 minutes. That same period produced a notable disclosure-drama-adjacent event in its own right: Kudelski Security's Cyber Fusion Center, investigating multiple fully-patched-device breaches with MFA rendered ineffective, initially believed it had identified a new zero-day, only for SonicWall to clarify in August 2025 that the activity traced back to this same year-old CVE, compounded by the unrotated-credential and LDAP-carryover configuration debt described in Section 02.</p>
+      <p>As of this card's compile date, resolution remains genuinely incomplete — not a rhetorical flourish but a documented, current finding. A SANS Internet Storm Center audit published in June 2026 examined fourteen devices confirmed to be running patched SonicOS firmware and found Akira and Fog operators had been resident inside several of them well after the patch window closed, because the underlying identity material the patch never touched was never separately remediated. This card's "Resolution" lifecycle node is marked ongoing rather than resolved for that reason.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">04</div><div class="section-title">Disclosure Analysis</div></div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Vendor-published; discoverer not named</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val dim">Not publicly disclosed — genuine gap</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val dim">Not publicly documented</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val">None identified in this research pass</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val">N/A — no public PoC found; patch shipped same day as advisory</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val amber">Fast on paper, opaque in substance</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val red">High — 2025 "zero-day scare" cycle</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val dim">Cannot be determined — no named external researcher</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>The disclosure pattern here departs from the typical coordinated-vulnerability-disclosure narrative this card's sibling advisories (e.g. PrintNightmare, Heartbleed) document. There is no named researcher, no public writeup describing a find-report-patch timeline, and no proof-of-concept exploit code identified anywhere in the sources reviewed for this card — despite CVE-2024-40766 being one of the most consequential ransomware-enabling CVEs of 2024–2026. The most plausible reading of the same-day advisory-and-patch pairing is that SonicWall identified the issue internally or via its own telemetry rather than through an external CVD process, but this is inference from the pattern, not a confirmed fact, and is presented as such.</p>
+      <p>The more analytically interesting disclosure event is not the original August 2024 advisory but the August 2025 one. Kudelski Security's Cyber Fusion Center, working multiple incident-response engagements involving fully-patched SonicWall devices with MFA "rendered ineffective," published research suggesting a likely zero-day — a serious claim about a still-supported, actively-sold security product. SonicWall's response, updating its own advisory to confirm the activity was CVE-2024-40766 exploitation compounded by known configuration debt rather than a new flaw, function as a second, informal disclosure cycle a full year after the first — and one that exists specifically because SonicWall's original patch-day communication never adequately conveyed that a firmware update alone would not remediate migrated Gen 6-to-Gen 7 deployments. The community reaction (extensive vendor blog and press coverage treating "is this a new zero-day" as a live, unresolved question through mid-2025) is itself evidence that the original disclosure under-communicated the vulnerability's true remediation requirements.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">05</div><div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div></div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>No public technical writeup — from SonicWall or from independent researchers — describes the specific access-control check that CVE-2024-40766 defeats at a code or protocol level. What sources do document is the practical exploitation path attackers use in the wild: an attacker reaches an internet-exposed SonicOS management interface or SSLVPN endpoint, leverages the improper access-control weakness to obtain unauthorized access to resources that should require authentication, and — under conditions SonicWall's advisory does not further specify — can trigger a firewall crash. This card documents that level of detail honestly rather than fabricating a lower-level mechanism no source supports.</p>
+      <p>The exploitation chain observed in real intrusions is considerably richer than the CVE in isolation, because attackers routinely combine the access-control weakness with the separate credential and LDAP-carryover issue from Section 02: an attacker who has obtained (via the access-control flaw, via a purchased/brute-forced credential, or via a Gen 6-to-Gen 7 migration's unrotated local account) a foothold on the management or SSLVPN surface can then, where the Virtual Office TOTP self-enrollment portal is internet-reachable, register their own authenticator device against an existing account and complete a fully "MFA-verified" login with no interaction from the legitimate user at all (SANS ISC, Jun 2026).</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:L</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component"><div class="cvss-comp-label">Attack Vector</div><div class="cvss-comp-val red">NETWORK</div><div class="cvss-comp-meaning">Exploitable remotely over the internet against any exposed management or SSLVPN interface — no local or adjacent-network access required.</div></div>
+        <div class="cvss-component"><div class="cvss-comp-label">Attack Complexity</div><div class="cvss-comp-val red">LOW</div><div class="cvss-comp-meaning">No special timing, race condition, or victim-specific configuration is needed beyond the target simply being reachable and unpatched.</div></div>
+        <div class="cvss-component"><div class="cvss-comp-label">Privileges Required</div><div class="cvss-comp-val red">NONE</div><div class="cvss-comp-meaning">The access-control flaw itself requires no prior authentication — this is what makes it a true pre-auth bypass rather than a privilege-escalation bug.</div></div>
+        <div class="cvss-component"><div class="cvss-comp-label">User Interaction</div><div class="cvss-comp-val red">NONE</div><div class="cvss-comp-meaning">Fully automatable; no phishing, click, or victim action is a precondition, consistent with its use in mass, scripted initial-access sweeps.</div></div>
+        <div class="cvss-component"><div class="cvss-comp-label">Scope</div><div class="cvss-comp-val cyan">CHANGED</div><div class="cvss-comp-meaning">Exploiting the firewall's control-plane access controls affects resources and network access beyond the vulnerable component itself — i.e. the internal network the firewall protects.</div></div>
+        <div class="cvss-component"><div class="cvss-comp-label">Confidentiality</div><div class="cvss-comp-val red">HIGH</div><div class="cvss-comp-meaning">Unauthorized access to sensitive firewall resources (configuration, session, and — per real-world outcomes — effectively administrative material).</div></div>
+        <div class="cvss-component"><div class="cvss-comp-label">Integrity</div><div class="cvss-comp-val amber">NONE</div><div class="cvss-comp-meaning">Notably conservative given real-world outcomes: the base score attributes no direct integrity impact to the flaw itself, yet in practice it enables full authenticated access that leads to configuration and downstream network integrity impact once chained with the credential/MFA weaknesses in Section 02. This is a case where the base CVSS score under-represents real-world severity because the scoring reflects the isolated flaw, not the commonly-chained attack.</div></div>
+        <div class="cvss-component"><div class="cvss-comp-label">Availability</div><div class="cvss-comp-val amber">LOW</div><div class="cvss-comp-meaning">A firewall crash is possible only "under specific conditions" per the vendor advisory — a partial, conditional denial-of-service outcome rather than a guaranteed one.</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
+      <table class="versions-table">
+        <thead><tr><th>Vendor</th><th>Product</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>SonicWall</td><td>Gen 5 SOHO Firewalls</td><td class="vuln">5.9.2.14-12o and earlier</td><td class="fixed">Newer than 5.9.2.14-12o</td><td>Patch available</td></tr>
+          <tr><td>SonicWall</td><td>Gen 6 TZ / NSA / SM Firewalls</td><td class="vuln">6.5.4.14-109n and earlier</td><td class="fixed">Newer than 6.5.4.14-109n</td><td>Patch available; migration credential debt persists — see Section 02</td></tr>
+          <tr><td>SonicWall</td><td>Gen 7 TZ / NSA Firewalls</td><td class="vuln">SonicOS 7.0.1-5035 and earlier</td><td class="fixed">Newer than SonicOS 7.0.1-5035</td><td>Patch available; migration credential debt persists — see Section 02</td></tr>
+        </tbody>
+      </table>
+      <div class="prose" style="margin-top:10px;"><p style="font-size:11px; color:var(--text-dim);">SonicWall's advisory specifies these builds as the affected/fixed boundary rather than enumerating each subsequent GA release by exact build number; administrators should consult the MySonicWall portal or SNWLID-2024-0015 directly for the current recommended firmware build per platform rather than relying on a single fixed-version number, which changes as SonicWall ships further GA releases.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">06</div><div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div></div>
+  <div class="section-body">
+    <div class="kev-block">
+      <div class="kev-header"><span class="kev-tag">CISA KEV LISTED</span><span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2024-09-09 · Required Remediation: 2024-09-30 (federal civilian agencies, per BOD 22-01)</span></div>
+      <div class="kev-body">CISA added CVE-2024-40766 to the Known Exploited Vulnerabilities catalog eighteen days after SonicWall's advisory, confirming active exploitation independent of the vendor's own (initially more cautious) assessment. The listing predates the vulnerability's eventual centrality to the 2025 ransomware landscape by nearly a year, underscoring that KEV listing alone did not drive remediation urgency at the pace the ongoing exploitation warranted.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item"><div class="et-date">2024-08-22</div><div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">Advisory &amp; Patch Released</div><div class="et-desc">SonicWall publishes SNWLID-2024-0015 and firmware fix same-day; initial assessment states "not known to be exploited."</div></div></div>
+        <div class="et-item"><div class="et-date">2024-09-09</div><div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">CISA KEV Listing</div><div class="et-desc">Advisory quietly revised to "potentially being exploited"; CISA independently confirms active exploitation, sets Sept 30 federal remediation deadline.</div></div></div>
+        <div class="et-item"><div class="et-date">Sep 2024 →</div><div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">Akira &amp; Fog Begin Sustained Exploitation</div><div class="et-desc">Arctic Wolf traces earliest Akira affiliate SSLVPN account compromises to this window; Fog ransomware exploitation documented independently from the same period.</div></div></div>
+        <div class="et-item"><div class="et-date">Jul–Aug 2025</div><div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">Major Escalation &amp; "Zero-Day Scare"</div><div class="et-desc">Akira tied to ~40 ransomware incidents in July 2025 alone (3rd-most-active group that month); Kudelski Security research suspects a new zero-day given breaches of fully-patched devices with MFA bypassed.</div></div></div>
+        <div class="et-item"><div class="et-date">2025-08</div><div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">SonicWall Clarifies: Not a New Zero-Day</div><div class="et-desc">Vendor confirms ongoing activity is CVE-2024-40766 exploitation compounded by unremediated Gen 6→Gen 7 migration credential and LDAP debt, not a novel flaw.</div></div></div>
+        <div class="et-item"><div class="et-date">2026-06</div><div class="et-track"><div class="et-dot red"></div></div><div class="et-content"><div class="et-event">SANS ISC Audit — Ongoing Exploitation Confirmed</div><div class="et-desc">Review of 14 patched devices finds Akira/Fog operators still resident in several, nearly two years after the original patch shipped.</div></div></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p><strong>Akira</strong> — the primary documented actor. This project's companion actor card (<code>output/actors/2026-09-03_AKIRA.html</code>) documents Akira's full identity, TTPs, and broader eight-CVE weaponization pattern; the CISA/FBI/Europol joint advisory (AA24-109A) names CVE-2024-40766 as Akira's current primary initial-access vector, and Arctic Wolf's July 2025 reporting attributes roughly 40 ransomware incidents that month substantially to this vulnerability. No content from that actor card is duplicated here — refer to it for identity, motivation, and full TTP mapping.</p>
+      <p><strong>Fog</strong> ransomware has independently and repeatedly been documented exploiting the same CVE and the same underlying misconfiguration pattern (op-c.net, TheHackerNews, Sept 2025). Fog does not appear to have a MITRE ATT&amp;CK Group ID or a stable, singular vendor-consensus tracked identity the way Akira does as of this research — <em>no companion actor card exists in this project for Fog</em>, and building one is noted as a candidate in this card's closing recommendations rather than assumed to already exist.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">07</div><div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div></div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The access-control bug itself is, by the standards of headline CVEs, fairly ordinary — CWE-284 is one of the most common weakness classes in existence. What makes CVE-2024-40766 worth teaching is that its patch closed a code-level door while leaving the identity material behind that door completely untouched. SonicWall's Gen 6-to-Gen 7 migration path was engineered for administrative convenience: carry the local users, carry the LDAP bind configuration, minimize re-setup friction for the customer. That convenience decision, made independently of and years before this CVE existed, is precisely what let the eventual patch fail to actually close the door for any organization that had migrated hardware generations without a separate credential-rotation step. A vulnerability management program that tracks "patched: yes/no" as its only state variable cannot see this failure mode at all.</p>
+      <p>This is not unique to SonicWall. The same structural pattern — a perimeter/edge appliance vendor ships a code fix, but pre-existing configuration or identity state inherited across firmware or hardware generations survives the fix untouched — has recurred across Ivanti, Citrix NetScaler, Fortinet FortiOS, and Cisco ASA/FTD incidents in the same general period, all involving VPN concentrators or firewalls as durable, high-value initial-access infrastructure. These devices sit structurally outside typical EDR and endpoint telemetry coverage, they are administered infrequently relative to their criticality, and vendors' patch-release tooling is consistently more mature than their migration-and-configuration-audit tooling. The CVE is rarely the whole story on this class of device; it is usually the visible fraction of a larger, harder-to-remediate identity and configuration problem.</p>
+      <p>What the industry did not learn, at least not by the time of SonicWall's August 2025 clarification, is how to communicate that distinction to customers at patch time. A one-year gap between "patch released" and "vendor has to publicly explain that patching alone did not fix this" is itself a lesson: security advisories that report a fixed firmware version without separately, explicitly flagging which pre-existing configuration states the fix does <em>not</em> remediate are setting up exactly the confusion Kudelski Security's researchers experienced in 2025 — mistaking unremediated old debt for a brand-new zero-day. Vulnerability advisories for identity-adjacent infrastructure arguably need a second, distinct field beyond "patched version": something closer to "configuration states this patch does not remediate," and that field does not exist in standard CVE/vendor-advisory practice today.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">08</div><div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div></div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <div class="query-block">
+        <div class="query-label">Anomalous SonicOS Admin / SSLVPN Login · Log Source: SonicWall GMS / Syslog (Category "System - Login" / "VPN - Client")</div>
+        <div class="query-code">Alert on: successful admin or SSLVPN login where (source GeoIP/ASN is inconsistent with the account's normal usage pattern) OR (source IP has no prior authentication history for that account) OR (login occurs on a local user account whose creation/last-modified timestamp predates the device's most recent Gen 6→Gen 7 firmware migration date, per Section 02) OR (login immediately follows, within minutes, a TOTP/authenticator device re-enrollment event for the same account).</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">BYOVD Driver Load — Post-Exploitation Artifact · Log Source: Windows Sysmon Event ID 6 (Driver Loaded) / EDR</div>
+        <div class="query-code">Alert on driver load events matching: filename hlpdrv.sys (SHA256 bd1f381e5a3db22e88776b7873d4d2835e9a1ec620571d2b1da0c58f81c84a56) OR rwdrv.sys (SHA256 16f83f056177c4ec24c7e99d01ca9d9d6713bd0497eeedb777a3ffefa99c97f0, an abused legitimate ThrottleStop driver) OR service name KMHLPSVC / mgdsrv OR registry modification of HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\DisableAntiSpyware immediately following a SonicWall SSLVPN authentication event (GuidePoint Security GRITREP, 2025 — observed specifically in the Akira SonicWall campaign as a defense-evasion step post-initial-access).</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>Behaviorally, the highest-value signal is temporal correlation rather than any single log line: a successful SSLVPN or management-interface authentication followed, within the same short session, by internal network reconnaissance and then rapid driver-load/EDR-tampering activity is a strong compound indicator specific to this exploitation chain, and is far more reliable than alerting on the CVE's underlying access-control bypass in isolation, for which no distinct, publicly documented log signature exists.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis 1:</strong> an attacker retained access via a local SonicOS user account carried over from a Gen 6-to-Gen 7 migration that was never rotated. Hunt procedure: enumerate every local user account on every SonicWall device in the environment; cross-reference each account's creation and last-password-change timestamp against the device's documented hardware/firmware migration date; flag any account whose credential material predates that migration and has not been rotated since — treat every such account as presumed-compromised pending manual verification, regardless of current patch level.</p>
+        <p><strong>Hypothesis 2:</strong> MFA was bypassed via self-service enrollment on an internet-exposed Virtual Office TOTP portal. Hunt procedure: pull the full TOTP/authenticator device enrollment event log for every account; for each enrollment event, verify a corresponding helpdesk ticket, change request, or known device-replacement reason exists; treat any enrollment without a documented business justification — particularly for accounts with no recent interactive login history prior to the enrollment — as a likely indicator of attacker-initiated MFA takeover.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Patch</span><span class="kv-val green">Latest GA SonicOS release per platform generation (see Section 05 for affected-build boundaries)</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2024-08-22</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Low–Medium — standard firmware-upgrade regression risk; Gen 7 platforms may require a config re-migration pass</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val red">Yes — and must include a full local-user and LDAP-binding audit, not firmware version alone</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">SNWLID-2024-0015</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val dim">No — shipped with the original advisory</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val dim">None — remains the operative CVE as of this card's compile date</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Confirming a device shows the current firmware build in the management console is necessary but explicitly not sufficient remediation for this specific CVE. Per Sections 02 and 07, any device that has ever been migrated from a Gen 6 to a Gen 7 platform must additionally have every local user account password reset and its LDAP configuration reviewed and re-bound, and its Virtual Office TOTP enrollment portal's internet exposure checked, before the device can be considered actually remediated rather than merely patched.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item"><span class="cm-num">01</span><div class="cm-text"><strong>Remove the WAN management interface from the public internet entirely.</strong> Restrict access to a management VPN or an explicit source-IP allowlist — SonicWall's own top mitigation recommendation and the single highest-leverage control against this CVE's network-vector exploitability.</div></div>
+        <div class="cm-item"><span class="cm-num">02</span><div class="cm-text"><strong>Disable internet-facing SSLVPN where it is not operationally required</strong>, or restrict it to allowlisted source IPs / a separate remote-access VPN tier not exposed to the same interface.</div></div>
+        <div class="cm-item"><span class="cm-num">03</span><div class="cm-text"><strong>Force a full local-user credential reset and LDAP re-bind review</strong> on any device that has ever undergone a Gen 6-to-Gen 7 migration, independent of and in addition to firmware patch level — this is the control that actually closes the gap the June 2026 SANS ISC audit documented.</div></div>
+        <div class="cm-item"><span class="cm-num">04</span><div class="cm-text"><strong>Restrict or disable the Virtual Office TOTP self-enrollment portal's internet reachability</strong>, or require out-of-band (e.g. helpdesk-verified) approval before any new authenticator device is accepted for an existing account.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">09</div><div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div></div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2024-40766</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">9.3 (Critical)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:L</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-284 — Improper Access Control</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val">5.50% (point-in-time, at research access date)</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-40766" target="_blank" style="color:var(--cyan)">nvd.nist.gov/vuln/detail/CVE-2024-40766</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://www.sonicwall.com/support/notices/product-notice-improper-access-control-vulnerability-in-sonicos/kA1VN0000000Tq10AE" target="_blank" style="color:var(--cyan)">SNWLID-2024-0015</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2024-09-09 (deadline 2024-09-30)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">10</div><div class="section-title">Cross-References <small>Linked actor and incident cards</small></div></div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:10px;">
+      <a class="xref-item actor" href="../../output/actors/2026-09-03_AKIRA.html">
+        <div class="xref-type actor">Threat Actor Card</div>
+        <div class="xref-name">Akira</div>
+        <div class="xref-rel">Current primary initial-access vector — weaponized since Sept 2024, escalating through 2025; CISA/FBI/Europol AA24-109A names this CVE explicitly among Akira's 8 weaponized flaws.</div>
+      </a>
+    </div>
+    <div class="xref-none" style="margin-bottom:18px;">Fog ransomware is independently documented exploiting this CVE but has no MITRE-tracked group ID and no companion card on file in this project as of 2026-09-03 — see Section 06.</div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-none">No companion incident cards on file for this vulnerability as of 2026-09-03 — the exploitation documented in Section 06 is a sustained campaign pattern rather than a single named incident with its own case file in this project.</div>
+  </div>
+</div>
+
+<!-- ══ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">11</div><div class="section-title">Network Exposure <small>Ports · Protocols · Banners · Nmap · Shodan</small></div></div>
+  <div class="section-body">
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <table class="port-table" style="margin-bottom:20px;">
+      <thead><tr><th>Port</th><th>Proto</th><th>Service</th><th>Vulnerable Condition</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="port-num">443</td><td>TCP/HTTPS</td><td class="svc-name">SonicOS Management Interface</td><td class="version-vuln">Unpatched firmware + internet-exposed WAN management</td><td>Default management port; customizable per SonicWall KB</td></tr>
+        <tr><td class="port-num">4433</td><td>TCP/HTTPS</td><td class="svc-name">SSLVPN / NetExtender</td><td class="version-vuln">Unpatched firmware + internet-exposed SSLVPN, or stale post-migration credentials regardless of patch level</td><td>Default SSLVPN port; frequently left internet-facing for remote access</td></tr>
+        <tr><td class="port-num">8443</td><td>TCP/HTTPS</td><td class="svc-name">SonicOS Management Interface (alt.)</td><td class="version-vuln">Same as port 443</td><td>Common alternate management port configuration</td></tr>
+      </tbody>
+    </table>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Default Service Scan Output (Vulnerable Host)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar"><div class="dot green"></div><span class="cmd">nmap -sV -p 443,4433,8443 &lt;target&gt;</span></div>
+      <div class="nmap-output"># NOTE: Reconstructed from SonicWall advisory/product documentation — not directly observed.
+No CVE-2024-40766-specific researcher-published nmap output was located in this research pass.
+
+PORT     STATE SERVICE  VERSION
+<span class="port-open">443/tcp  open  ssl/http</span>  <span class="version">SonicWALL SonicOS SSL-VPN</span>
+<span class="comment">|_http-title: SonicWall - Login</span>
+<span class="comment">| ssl-cert: Subject: commonName=SonicWALL</span>
+<span class="comment">(Generic SonicOS fingerprint — does NOT by itself indicate patched vs. vulnerable firmware build)</span></div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; margin-top:16px;">Nmap — Version-Discriminating Scan (Vulnerable vs. Patched)</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar"><div class="dot"></div><span class="cmd">— no documented technique identified —</span></div>
+      <div class="nmap-output">No publicly documented nmap-based, unauthenticated technique for discriminating a patched build from a vulnerable one was identified in this research pass. SonicOS does not appear to expose its precise firmware build number in an unauthenticated banner or response header, and Bishop Fox's December 2024 exposure research (Section 11 Shodan data below) relied on decrypted-firmware fingerprinting methodology rather than live banner-grab version discrimination — a fundamentally different, non-network-based technique this card cannot reproduce as an nmap command. Stated here as an honest gap rather than a fabricated command.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Version Identification</div>
+    <div class="banner-block">
+      <div class="banner-header"><span class="banner-label">SonicOS Management/SSLVPN · Port 443/4433</span><span class="banner-status unknown">NOT DISCRIMINATING</span></div>
+      <div class="banner-text">No publicly documented raw banner strings distinguishing vulnerable from patched SonicOS builds were located for this CVE. The standard login-page banner is identical in wording across affected and fixed firmware; version discrimination via simple banner-grab is not a reliable technique for this vulnerability. Use authenticated firmware-version checks via the management console or MySonicWall portal instead.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
+    <div class="nse-block">
+      <div class="nse-header"><span class="nse-name">No dedicated NSE script identified</span><div class="nse-tags"><span class="nse-tag detect">GAP</span></div></div>
+      <div class="nse-output">No script specific to CVE-2024-40766 or SonicWall SonicOS was found in the official Nmap NSE script repository (nmap.org/nsedoc) as of this research pass. Use the generic service/version scan above plus authenticated firmware-version verification instead of an NSE-based vulnerability check for this CVE.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
+    <div class="shodan-block">
+      <div class="shodan-header"><span class="shodan-label">Shodan</span></div>
+      <div class="shodan-dork">http.title:"SonicWall"</div>
+      <div class="shodan-note">General product-identification dork, NOT vulnerability-specific — it surfaces any internet-reachable SonicOS login page regardless of patch status, since no version-discriminating banner exists for this CVE (see above). Bishop Fox's December 2024 research combining Shodan and BinaryEdge queries for SonicWall HTTP/S services found approximately 732,000 unique targets, narrowing to 430,363 unique IP:port combinations with a confirmed exposed SonicOS/X login page — of which 62% exposed both the management and SSLVPN interfaces simultaneously, 31% management-only, and 6% SSLVPN-only. These are point-in-time figures from December 2024, not current counts, and given this CVE's status as an actively-exploited critical flaw, this dork structure is documented here for exposure-awareness purposes only and should not be used to enumerate live targets for exploitation.</div>
+    </div>
+    <div class="shodan-block">
+      <div class="shodan-header"><span class="shodan-label">Censys</span></div>
+      <div class="shodan-dork">services.http.response.html_title="SonicWall - Login"</div>
+      <div class="shodan-note">Equivalent general-exposure query for Censys; same non-version-discriminating caveat applies. No CVE-2024-40766-specific Censys query was documented in any source reviewed for this card.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header"><div class="section-num">12</div><div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div></div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item"><div class="ref-source">CISA</div><div><div class="ref-detail"><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog?search_api_fulltext=CVE-2024-40766" target="_blank">Known Exploited Vulnerabilities Catalog — CVE-2024-40766</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">NVD / NIST</div><div><div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-40766" target="_blank">NVD — CVE-2024-40766 Detail</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">SonicWall</div><div><div class="ref-detail"><a href="https://www.sonicwall.com/support/notices/product-notice-improper-access-control-vulnerability-in-sonicos/kA1VN0000000Tq10AE" target="_blank">Product Notice: Improper Access Control Vulnerability in SonicOS (SNWLID-2024-0015)</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">Rapid7</div><div><div class="ref-detail"><a href="https://www.rapid7.com/blog/post/2024/09/09/etr-cve-2024-40766-critical-improper-access-control-vulnerability-affecting-sonicwall-devices/" target="_blank">ETR: CVE-2024-40766 Critical Improper Access Control Vulnerability Affecting SonicWall Devices</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">Help Net Security</div><div><div class="ref-detail"><a href="https://www.helpnetsecurity.com/2024/08/26/cve-2024-40766/" target="_blank">SonicWall patches critical flaw affecting its firewalls (CVE-2024-40766)</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">Help Net Security</div><div><div class="ref-detail"><a href="https://www.helpnetsecurity.com/2024/09/10/cve-2024-40766-exploited/" target="_blank">CISA confirms that SonicWall vulnerability is getting exploited (CVE-2024-40766)</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">Arctic Wolf</div><div><div class="ref-detail"><a href="https://arcticwolf.com/resources/blog/cve-2024-40766/" target="_blank">CVE-2024-40766</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">Arctic Wolf</div><div><div class="ref-detail"><a href="https://arcticwolf.com/resources/blog/arctic-wolf-observes-july-2025-uptick-in-akira-ransomware-activity-targeting-sonicwall-ssl-vpn/" target="_blank">Arctic Wolf Observes July 2025 Uptick in Akira Ransomware Activity Targeting SonicWall SSL VPN</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">SANS ISC</div><div><div class="ref-detail"><a href="https://isc.sans.edu/diary/33094" target="_blank">CVE-2024-40766: The Patch Fixed the Bug. Nobody Fixed the Configuration.</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">Kudelski Security</div><div><div class="ref-detail"><a href="https://kudelskisecurity.com/research/a-likely-zero-day-vulnerability-in-sonicwall-ssl-vpn-exploited-by-akira-ransomware-group" target="_blank">A Likely Zero-Day Vulnerability in SonicWall SSL-VPN Exploited by Akira Ransomware Group</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">The Hacker News</div><div><div class="ref-detail"><a href="https://thehackernews.com/2025/08/sonicwall-confirms-patched.html" target="_blank">SonicWall Confirms Patched Vulnerability Behind Recent VPN Attacks, Not a Zero-Day</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">The Hacker News</div><div><div class="ref-detail"><a href="https://thehackernews.com/2025/09/sonicwall-ssl-vpn-flaw-and.html" target="_blank">SonicWall SSL VPN Flaw and Misconfigurations Actively Exploited by Akira Ransomware Hackers</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">CERT-EU</div><div><div class="ref-detail"><a href="https://cert.europa.eu/publications/security-advisories/2024-089/" target="_blank">Security Advisory 2024-089</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">ACSC / cyber.gov.au</div><div><div class="ref-detail"><a href="https://www.cyber.gov.au/about-us/view-all-content/alerts-and-advisories/ongoing-active-exploitation-of-sonicwall-ssl-vpns-in-australia" target="_blank">Ongoing Active Exploitation of SonicWall SSL VPNs in Australia (CVE-2024-40766)</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">Bishop Fox</div><div><div class="ref-detail"><a href="https://bishopfox.com/blog/state-sonicwall-exposure-firmware-decryption-unlocks-insights" target="_blank">State of SonicWall Exposure: Firmware Decryption Unlocks Insights</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">GuidePoint Security</div><div><div class="ref-detail"><a href="https://www.guidepointsecurity.com/blog/gritrep-akira-sonicwall/" target="_blank">GRITREP: Observed Malicious Driver Use Associated with Akira SonicWall Campaign</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">SentinelOne</div><div><div class="ref-detail"><a href="https://www.sentinelone.com/vulnerability-database/cve-2024-40766/" target="_blank">CVE-2024-40766: SonicWall SonicOS Auth Bypass Vulnerability</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+      <div class="ref-item"><div class="ref-source">GitHub Advisory DB</div><div><div class="ref-detail"><a href="https://github.com/advisories/GHSA-8736-pr6r-r9hr" target="_blank">GHSA-8736-pr6r-r9hr — CVE-2024-40766</a></div><div class="ref-date">Accessed: 2026-09-03</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-03 · 18 Sources (Government, Vendor, Independent Research, Press)</div>
+  <div>Companion cards: output/actors/2026-09-03_AKIRA.html (cross-linked, Section 06/10)</div>
+</div>
+
+</body>
+</html>
