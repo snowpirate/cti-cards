@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Akira — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .sanctions-list { display: flex; flex-direction: column; gap: 5px; }
+  .sanctions-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 6px 0; border-bottom: 1px solid rgba(30,46,62,0.4); }
+  .sanctions-row:last-child { border-bottom: none; }
+  .sanctions-name { font-family: var(--body); font-size: 11.5px; color: var(--text); font-weight: 500; }
+  .sanctions-role { font-family: var(--body); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+  .sanctions-badge { font-family: var(--mono); font-size: 8.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
+
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge ecrime">$ ECRIME · RANSOMWARE-AS-A-SERVICE · ASSESSED RUSSIA / POST-SOVIET (NO FORMAL STATE ATTRIBUTION)</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Ransomware-as-a-Service (RaaS) Operator</div>
+  <h1><span class="accent">AKI</span><span class="accent2">RA</span></h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-03 &nbsp;|&nbsp;
+    SOURCES: CISA/FBI/DC3/HHS/Europol/OFAC-France/Germany/NCSC-NL Joint Advisory AA24-109A (orig. Apr 2024, updated Nov 2025), MITRE ATT&amp;CK G1024, Arctic Wolf Labs, TRM Labs, Trend Micro, Unit 42 (Howling Scorpius), Rapid7, Sophos X-Ops, and 12+ additional vendor/OSINT sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL</span></div>
+    <div>Primary Motive: <span>Financial — Double Extortion</span></div>
+    <div>Active Since: <span>March 2023</span></div>
+    <div>MITRE ATT&amp;CK: <span>G1024</span></div>
+    <div>Law Enforcement Action: <span class="warn">NONE CONFIRMED AS OF NOV 2025</span></div>
+  </div>
+</div>
+
+<!-- No alert banner: no confirmed development within the last 90 days of this profile's compile date (2026-09-03) was identified in research — the most recent formal advisory update is 13 Nov 2025, and the most recent data point (1,584 cumulative leak-site victims) is a running total, not a discrete recent event. Omitted per template guidance rather than forced. -->
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">$244M+</div>
+    <div class="stat-label">Ransom Proceeds Claimed (USD, as of Sep 2025)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">1,584</div>
+    <div class="stat-label">Victims Posted to Leak Site (Cumulative, as of Aug 2026)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">8</div>
+    <div class="stat-label">CVEs Actively Weaponized for Initial Access</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">~55 MIN</div>
+    <div class="stat-label">Fastest Observed Time-to-Encryption (SonicWall Campaign, Jul 2025)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Akira is a Ransomware-as-a-Service (RaaS) operation first observed in March 2023, notable both for its distinctive 1980s "green-screen" leak-site aesthetic and for becoming — in under three years — one of the most prolific ransomware operations currently tracked, with joint US/EU law enforcement reporting approximately $244.17 million in claimed ransom proceeds and a cumulative leak-site victim count that had reached 1,584 organizations by late August 2026 (CISA/FBI/Europol Joint Advisory AA24-109A, updated Nov 13, 2025; leak-site tracking via TRM Labs and Comparitech). It matters right now because Akira has filled market share left vacant by law-enforcement disruptions of peer operations (LockBit, BlackCat/ALPHV, Hive) without suffering a comparable takedown itself, and because its operational tempo has been accelerating rather than plateauing — a July–August 2025 surge tied to a critical SonicWall SonicOS vulnerability (CVE-2024-40766, CVSS 9.3) saw encryption completed in as little as 55 minutes from initial access in some incidents (Arctic Wolf Labs, Aug 2025).</p>
+      <p>Technically, Akira sits at the intersection of two notable trends in contemporary ransomware operations: near-total reliance on living-off-the-land tooling (commercial remote-access software, open-source credential dumpers, and legitimate cloud-sync utilities rather than bespoke C2 infrastructure) and aggressive, opportunistic exploitation of internet-facing edge devices — VPN concentrators and backup appliances specifically — that lack phishing-resistant multifactor authentication. The joint advisory names eight distinct CVEs across Cisco ASA/FTD, SonicWall SonicOS, and Veeam Backup &amp; Replication that Akira affiliates have weaponized for initial access, several of them years-old and already patched, underscoring that unpatched edge infrastructure — not novel zero-day tradecraft — remains the group's primary way in.</p>
+      <p>Akira is widely assessed, with a meaningful evidentiary basis rather than mere reputation, to include personnel from the dissolved Conti syndicate: beyond well-documented code and behavioral overlap (itself weak evidence on its own, since Conti's source code leaked publicly in March 2022), Arctic Wolf Labs traced three separate Bitcoin transactions totaling over $600,000 from Akira-controlled ransom wallets directly to addresses previously associated with Conti leadership. This places Akira within a broader "Conti diaspora" ecosystem that also appears to include the Fog and Frag ransomware operations, which share infrastructure and on-chain financial patterns with Akira and with each other.</p>
+      <p>Where this profile's compiling organization's operational context is concerned, Akira's sector targeting is broad but shows a documented preference for educational institutions alongside critical manufacturing, healthcare, IT, financial services, and food and agriculture — the group is opportunistic and CVE-driven rather than a strategic, hand-picked-target operation, meaning any organization running unpatched or MFA-less edge infrastructure in these sectors sits within its realistic targeting envelope regardless of size, though CISA notes a continuing preference for small- and medium-sized businesses even as larger organizations and critical infrastructure entities are increasingly affected.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">Akira</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val">None — independent eCrime RaaS collective; assessed Conti-diaspora lineage (see Analyst Assessment)</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">eCrime — Ransomware-as-a-Service (RaaS) operator</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial (double-extortion ransom)</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">March 2023</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Ongoing — sustained leak-site activity through Aug 2026</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G1024</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">No indictment, arrest, or OFAC sanction specific to Akira as of the Nov 2025 advisory — unlike several individually-sanctioned Conti/TrickBot members (Feb &amp; Sep 2023)</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">AKIRA</span>
+          <span class="alias-chip">STORM-1567 (Microsoft)</span>
+          <span class="alias-chip">HOWLING SCORPIUS (Palo Alto Unit 42)</span>
+          <span class="alias-chip">PUNK SPIDER</span>
+          <span class="alias-chip">GOLD SAHARA (Secureworks)</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p><strong>[HIGH]</strong> confidence that Akira, as a leak-site brand and RaaS toolset, is the entity described consistently across CISA/FBI/Europol reporting and independent vendor tracking (convergent naming: Storm-1567, Howling Scorpius, Gold Sahara, Punk Spider all resolve to the same observed infrastructure and TTPs). <strong>[MEDIUM]</strong> confidence on Conti-personnel continuity — supported by direct blockchain evidence (three Bitcoin transactions, &gt;$600K, traced from Akira wallets to known Conti leadership addresses per Arctic Wolf Labs), but code/behavioral overlap alone is discounted as weak evidence since Conti's source leaked publicly in March 2022 and is available to any operator. <strong>No confidence rating asserted</strong> on precise organizational structure, membership count, or leadership identity — these are not resolved in current public reporting, and no government indictment exists to formally anchor them.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">MAR 2023 – AUG 2023</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Emergence &amp; Windows-Only Phase</div>
+          <div class="timeline-desc">First observed March 2023 as a C++ Windows encryptor appending the <code>.akira</code> extension, launched alongside a distinctive 1980s "green-screen" Tor leak site. By late 2023, independent trackers documented at least 63 confirmed victims (Bushidotoken, TRM Labs).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">APR 2023 – EARLY 2024</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">ESXi/Linux Pivot &amp; First Federal Advisory</div>
+          <div class="timeline-desc">A Linux variant targeting VMware ESXi hypervisors was deployed starting April 2023; the group's encryptor shifted from C++ to a Rust-based tool ("Megazord") by August 2023. By January 1, 2024, joint FBI/CISA reporting counted over 250 impacted organizations and approximately $42 million in claimed ransom proceeds, prompting the original CISA/FBI/MS-ISAC/Europol advisory AA24-109A, published April 18, 2024.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2024 – MID-2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Edge-Device Exploitation Escalation</div>
+          <div class="timeline-desc">Sustained weaponization of Cisco ASA/FTD flaws (zero-day CVE-2023-20269 and the older CVE-2020-3259, both added to CISA's KEV catalog specifically due to Akira exploitation) and Veeam Backup &amp; Replication vulnerabilities (CVE-2023-27532, CVE-2024-40711). CISA's Aug 2025 threat brief and Rapid7/Darktrace reporting documented a sharp escalation once CVE-2024-40766 (SonicWall SonicOS improper access control, CVSS 9.3, disclosed Aug 23, 2024) entered wide exploitation — Akira accounted for roughly 40 ransomware incidents in July 2025 alone, the third-most-active group that month behind Qilin and INC Ransom, with encryption completed in as little as 55 minutes from initial SonicWall SSL VPN login (Arctic Wolf Labs).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JUN 2025 – NOV 2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Hypervisor Expansion &amp; Advisory Update</div>
+          <div class="timeline-desc">Trusted third-party reporting documented the first observed Akira encryption of Nutanix Acropolis Hypervisor (AHV) virtual machine disk files in a June 2025 incident — extending targeting beyond the historical VMware ESXi/Hyper-V focus. On November 13, 2025, FBI, CISA, DC3, HHS, Europol EC3, France's OFAC, Germany's Baden-Württemberg cybercrime authorities, and the Netherlands' NCSC-NL jointly reissued AA24-109A with updated TTPs documenting the Rust-based <code>Akira_v2</code> ESXi/Linux encryptor, POORTRY/STONESTOP BYOVD tooling, and the $244.17 million cumulative ransom-proceeds figure.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025 – 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Sustained High-Tempo Operations</div>
+          <div class="timeline-desc">The group posted approximately 980 new victims to its leak site between January 1 and December 11, 2025 alone. By August 31, 2026, cumulative publicly claimed victims reached 1,584 — making Akira, on leak-site volume, one of the most active ransomware brands currently tracked, with no law-enforcement disruption, seizure, or public indictment yet recorded against the operation as a whole (independent decryption research, not law enforcement action, has produced the only public recovery tooling — see Section 06).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Edge-device exploitation → living-off-the-land intrusion → hybrid double-extortion</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Entry vectors</strong> center overwhelmingly on internet-facing VPN and backup appliances lacking phishing-resistant MFA. CISA's advisory names eight specific CVEs Akira affiliates have weaponized — CVE-2020-3259 and CVE-2023-20269 (Cisco ASA/FTD), CVE-2020-3580, CVE-2023-28252, and CVE-2024-37085 (added in the Nov 2025 update), CVE-2023-27532 and CVE-2024-40711 (Veeam Backup &amp; Replication), and CVE-2024-40766 (SonicWall SonicOS, CVSS 9.3, the current primary vector) — alongside straightforward credential theft, password spraying via the tool SharpDomainSpray, spearphishing, and abuse of exposed SSH on routers as a tunneling foothold into internal networks (CISA AA24-109A).</p>
+      <p><strong>Toolchain</strong> is overwhelmingly living-off-the-land: AdFind, SoftPerfect NetScan, Advanced IP Scanner, and PCHunter64 for reconnaissance; <code>nltest /dclist</code> and <code>nltest /DOMAIN_TRUSTS</code> for domain-trust mapping; Mimikatz and LaZagne for credential dumping, with Kerberoasting used to extract credentials from LSASS process memory; and Impacket's <code>wmiexec.py</code> for remote command execution via WMI rather than disk-resident payloads. Defense evasion layers two distinct driver-abuse techniques: PowerTool exploiting the legitimate, signed Zemana AntiMalware driver to terminate AV processes, and the POORTRY/STONESTOP pairing — POORTRY is malware written as a signed vulnerable Windows driver, loaded via the STONESTOP installer, giving Akira operators kernel-level (Ring 0) EDR/AV termination through a genuine Bring-Your-Own-Vulnerable-Driver (BYOVD) technique.</p>
+      <p><strong>C2 methodology</strong> relies almost entirely on legitimate third-party infrastructure rather than actor-registered domains or IPs: Ngrok and Cloudflare Tunnel (<code>cloudflared</code>) establish encrypted, outbound-only tunnels that bypass perimeter monitoring without requiring inbound firewall exceptions, while AnyDesk, LogMeIn, RustDesk, and MobaXterm provide remote-access channels deliberately chosen to blend with legitimate administrator activity rather than trigger malware-signature detection.</p>
+      <p><strong>Lateral movement and persistence</strong> combine RDP, SSH, and WMIC with creation of a new domain administrative account — CISA's investigations repeatedly identified an account named <code>itadm</code> — and, in at least one documented intrusion, a distinctive privilege-escalation technique: temporarily powering down a domain controller's virtual machine, copying its VMDK disk file offline, attaching it to a newly created VM, and extracting the <code>NTDS.dit</code> database and SYSTEM registry hive from the dismounted disk to bypass live-host credential protections entirely.</p>
+      <p><strong>Exfiltration and impact</strong> follow a double-extortion model: FileZilla and WinRAR (with 7-zip added per the Nov 2025 update) collect and compress data, which WinSCP and RClone then exfiltrate via FTP/SFTP or sync directly to MEGA cloud storage — in some 2025 incidents completed in just over two hours from initial access. Encryption itself uses a hybrid ChaCha20 stream cipher with RSA public-key exchange, customizable to full or partial encryption by file type and size, with the Windows-focused Megazord and the newer Rust-based, Linux/ESXi/Nutanix-AHV-capable <code>Akira_v2</code> at times deployed simultaneously against different system architectures within a single intrusion. The encryptor (<code>w.exe</code>/<code>Win.exe</code>) deletes Volume Shadow Copy Service backups via PowerShell before completing encryption, and drops a ransom note (<code>fn.txt</code> or <code>akira_readme.txt</code>) in the <code>C:</code> root and every user directory — notably, the note contains no ransom figure; the amount is disclosed only after the victim initiates contact through a dedicated Tor negotiation portal.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework only — no ICS/ATLAS-relevant activity identified in current reporting</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Weaponizes 8 distinct CVEs across Cisco ASA/FTD, SonicWall SonicOS, and Veeam Backup &amp; Replication; CVE-2024-40766 (CVSS 9.3) is the current primary vector.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Primary foothold is VPN services (especially SonicWall) lacking phishing-resistant MFA; credentials stolen, brute-forced, or purchased from initial access brokers.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1110.003</div>
+        <div class="mitre-name">Password Spraying</div>
+        <div class="mitre-note">[HIGH] SharpDomainSpray tool used against VPN endpoints and account discovery.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.001</div>
+        <div class="mitre-name">PowerShell</div>
+        <div class="mitre-note">[HIGH] Used for VSS deletion, credential harvesting, and disabling services ahead of encryption.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1136.002</div>
+        <div class="mitre-name">Create Account: Domain Account</div>
+        <div class="mitre-note">[HIGH] Creates a domain administrator account — repeatedly observed named <code>itadm</code> — to establish a durable foothold.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.001</div>
+        <div class="mitre-name">OS Credential Dumping: LSASS Memory</div>
+        <div class="mitre-note">[HIGH] Kerberoasting extracts credentials from LSASS process memory; Mimikatz and LaZagne used as dumping tools.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Privilege Escalation</div>
+        <div class="mitre-id">T1003.002 / T1003.003</div>
+        <div class="mitre-name">OS Credential Dumping: Security Account Manager / NTDS</div>
+        <div class="mitre-note">[HIGH] Distinctive offline technique: powers down the domain controller VM, copies its VMDK, mounts it to a new VM, and extracts NTDS.dit + SYSTEM hive to bypass live-host protections.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1562.001</div>
+        <div class="mitre-name">Impair Defenses: Disable or Modify Tools</div>
+        <div class="mitre-note">[HIGH] PowerTool exploits the legitimate, signed Zemana AntiMalware driver to terminate antivirus-related processes.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1068</div>
+        <div class="mitre-name">Exploitation for Privilege Escalation (BYOVD)</div>
+        <div class="mitre-note">[HIGH] POORTRY (signed vulnerable Windows driver malware) loaded via STONESTOP for kernel-level (Ring 0) EDR/AV termination.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">[MEDIUM] HeartCrypt packer-as-a-service applied to payloads to defeat static/behavioral detection.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1018 / T1482</div>
+        <div class="mitre-name">Remote System Discovery / Domain Trust Discovery</div>
+        <div class="mitre-note">[HIGH] AdFind, SoftPerfect NetScan, Advanced IP Scanner; <code>nltest /dclist</code> and <code>/DOMAIN_TRUSTS</code> added per Nov 2025 update.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.001 / T1219</div>
+        <div class="mitre-name">Remote Desktop Protocol / Remote Access Software</div>
+        <div class="mitre-note">[HIGH] AnyDesk, LogMeIn, RustDesk, MobaXterm chosen to blend with legitimate administrator activity during lateral movement.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1572</div>
+        <div class="mitre-name">Protocol Tunneling</div>
+        <div class="mitre-note">[HIGH] Ngrok and Cloudflare Tunnel (<code>cloudflared</code>) establish encrypted, outbound-only C2 channels bypassing perimeter monitoring.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1567.002</div>
+        <div class="mitre-name">Exfiltration to Cloud Storage</div>
+        <div class="mitre-note">[HIGH] RClone syncs stolen data to MEGA; WinSCP for SFTP transfer; FileZilla/WinRAR/7-zip for collection and staging compression.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[HIGH] Hybrid ChaCha20 + RSA scheme; full/partial encryption customizable by file type and size; dual Windows (Megazord) + Linux/ESXi/Nutanix (Akira_v2) payloads at times deployed simultaneously.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] Double-extortion: ransom figure withheld until victim initiates contact via a dedicated Tor negotiation portal; threatens data leak regardless of encryption recovery.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Education</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Critical Manufacturing</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Healthcare &amp; Public Health</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Information Technology</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Financial Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Food &amp; Agriculture</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">North America (primary), Europe, Australia</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Primarily small- and medium-sized businesses; larger enterprises and critical infrastructure entities increasingly affected</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Internet-facing VPN/edge appliances (SonicWall, Cisco ASA/FTD) and unpatched Veeam backup servers lacking phishing-resistant MFA</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Opportunistic, CVE- and exposure-driven mass exploitation rather than bespoke pre-operation target selection</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">MEGAZORD</span>
+          <span class="tool-tag">ENCRYPTOR (WINDOWS) · RUST · CISA AA24-109A</span>
+        </div>
+        <div class="tool-desc">Windows-targeting Rust-based ransomware encryptor introduced August 2023, replacing the original C++ locker. Per CISA's Nov 2025 update, trusted third-party investigation determined Megazord "has likely fallen out of use since 2024," with Akira_v2 now the primary payload even on some Windows-adjacent deployments.</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">AKIRA_V2</span>
+          <span class="tool-tag">ENCRYPTOR (LINUX/ESXI/NUTANIX AHV) · RUST · CISA AA24-109A</span>
+        </div>
+        <div class="tool-desc">Current-generation encryptor targeting Linux, VMware ESXi, and (per the June 2025 incident) Nutanix Acropolis Hypervisor. Embeds a Build ID as a runtime execution condition — refuses to run without a matching ID, functioning as an anti-analysis gate. Supports <code>vmonly</code> (target only VMs) and <code>stopvm</code> (halt running VMs before encryption) flags; appends <code>.akira</code>, <code>.powerranges</code>, <code>.akiranew</code>, or <code>.aki</code> extensions depending on build.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">POORTRY / STONESTOP</span>
+          <span class="tool-tag">BYOVD DRIVER + LOADER · CISA AA24-109A</span>
+        </div>
+        <div class="tool-desc">POORTRY is malware written as a signed, vulnerable Windows driver, giving Akira operators kernel-level (Ring 0) code execution to terminate EDR/AV processes via a genuine Bring-Your-Own-Vulnerable-Driver (BYOVD) technique; STONESTOP serves as its loader/installer. Notably, this driver pair has been independently associated with other ransomware ecosystems in prior reporting, suggesting shared tooling supply rather than Akira-exclusive development.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">POWERTOOL</span>
+          <span class="tool-tag">AV/EDR KILLER · ABUSED LEGITIMATE DRIVER · CISA AA24-109A</span>
+        </div>
+        <div class="tool-desc">Exploits the legitimate, signed Zemana AntiMalware driver — rather than a bespoke malicious one — to terminate antivirus-related processes ahead of encryption; a second, distinct driver-abuse technique alongside POORTRY/STONESTOP.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">MIMIKATZ / LAZAGNE</span>
+          <span class="tool-tag">CREDENTIAL DUMPERS · OPEN SOURCE</span>
+        </div>
+        <div class="tool-desc">Open-source credential-dumping utilities used for Kerberos ticket extraction (Mimikatz) and stored-password recovery across Windows, Linux, and macOS (LaZagne), typically following Kerberoasting against LSASS process memory.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">IMPACKET (WMIEXEC.PY)</span>
+          <span class="tool-tag">PYTHON NETWORK PROTOCOL LIBRARY · OPEN SOURCE</span>
+        </div>
+        <div class="tool-desc"><code>wmiexec.py</code> specifically used for remote command execution via Windows Management Instrumentation, avoiding disk-resident payloads and standard process-creation detection.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">ANYDESK / LOGMEIN / RUSTDESK / MOBAXTERM</span>
+          <span class="tool-tag">LEGITIMATE RMM / REMOTE ACCESS · COTS</span>
+        </div>
+        <div class="tool-desc">Commercial remote-access and support software repurposed for lateral movement and persistence, chosen specifically to blend with legitimate helpdesk/administrator activity rather than trigger malware-signature detection.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">NGROK / CLOUDFLARE TUNNEL (CLOUDFLARED)</span>
+          <span class="tool-tag">TUNNELING / REVERSE PROXY UTILITIES · COTS</span>
+        </div>
+        <div class="tool-desc">Establish encrypted, outbound-only reverse-proxy channels to attacker infrastructure, avoiding inbound firewall rule requirements and blending with legitimate developer/DevOps use of the same widely-adopted tools.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">RCLONE / WINSCP / FILEZILLA / WINRAR / 7-ZIP</span>
+          <span class="tool-tag">DATA COLLECTION &amp; EXFILTRATION TOOLCHAIN · OPEN SOURCE / COTS</span>
+        </div>
+        <div class="tool-desc">RClone syncs staged archives to MEGA cloud storage; WinSCP performs SFTP transfer to actor-controlled accounts; FileZilla provides FTP-based exfiltration; WinRAR and (per the Nov 2025 update) 7-zip compress and split data into <code>.RAR</code> archives prior to transfer.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">HEARTCRYPT</span>
+          <span class="tool-tag">PACKER-AS-A-SERVICE</span>
+        </div>
+        <div class="tool-desc">Commercial crypter/obfuscation service applied to Akira payloads to defeat static signature and behavioral heuristic detection prior to delivery.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">SYSTEMBC</span>
+          <span class="tool-tag">RAT / PROXY BOT · COTS</span>
+        </div>
+        <div class="tool-desc">Dual-purpose remote access trojan and SOCKS5 proxy bot, used both for command-and-control and as a network pivot point — a long-running commodity tool shared across numerous ransomware ecosystems, not unique to Akira.</div>
+      </div>
+      <div class="tool-item green">
+        <div class="tool-header">
+          <span class="tool-name">ADFIND / SOFTPERFECT NETSCAN / ADVANCED IP SCANNER / PCHUNTER64</span>
+          <span class="tool-tag">RECON &amp; DISCOVERY TOOLCHAIN · COTS / OPEN SOURCE</span>
+        </div>
+        <div class="tool-desc">Command-line and GUI network/Active Directory enumeration tools for host and domain-trust discovery; <code>nltest /dclist</code> and <code>/DOMAIN_TRUSTS</code> added to the toolkit per the Nov 2025 advisory update.</div>
+      </div>
+    </div>
+    <div style="margin-top: 14px; padding: 10px 14px; background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--text-dim);">
+      <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">Vulnerability Cross-Reference — Gap</div>
+      <div class="tool-desc">None of the eight CVEs Akira has weaponized (CVE-2020-3259, CVE-2020-3580, CVE-2023-20269, CVE-2023-27532, CVE-2023-28252, CVE-2024-37085, CVE-2024-40711, CVE-2024-40766) currently have a companion vuln card in this project's <code>output/vulns/</code> library (Heartbleed, Spectre/Meltdown, PaperCut, PrintNightmare, Rockwell Logix Auth Bypass, and WatchGuard Firebox Auth Bypass cover unrelated flaws). <em>No companion vuln card on file</em> — CVE-2024-40766 (SonicWall, CVSS 9.3, the group's current primary vector) is the clearest candidate for a future vuln card given its centrality to the 2025 escalation documented in Section 02.</div>
+    </div>
+    <div style="margin-top: 10px; padding: 10px 14px; background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--text-dim);">
+      <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">Incident Cross-Reference</div>
+      <div class="tool-desc"><em>No companion incident card on file</em> — none of this project's existing incident cards (Sony BMG, Estonia 2007, Iceman Carding, Operation Aurora, Operation Ababil, JPMorgan Chase, Bangladesh Bank SWIFT, Maersk NotPetya, CYCLOPS BLINK, Morris Worm) attribute to Akira. Given Akira's diffuse, opportunistic mass-victim model (1,584+ organizations), no single incident is likely to warrant a dedicated incident card in the way a targeted nation-state operation would — this actor card is the appropriate primary record.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — No actor-registered IP or domain infrastructure was published in the referenced Nov 2025 CISA advisory; Akira's C2 relies almost entirely on legitimate third-party services (Ngrok, Cloudflare Tunnel, AnyDesk, MEGA) rather than actor-owned infrastructure, which is itself a notable OPSEC characteristic (see Section 10). All hashes below are reproduced verbatim from CISA/FBI Joint Advisory AA24-109A Table 2 (observation window: June 2023 – August 2025); vet against current threat-intel feeds before operational use. Reference URLs in Section 13 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">HASH (SHA-256)</td><td class="val">d2fd0654710c27dcf37b6c1437880020824e161dd0bf28e3a133ed777242a0ca — <code>w.exe</code>, Akira ransomware encryptor</td><td>CISA AA24-109A</td><td>Jun 2023 – Aug 2025</td></tr>
+        <tr><td class="type-label">HASH (SHA-256)</td><td class="val">dcfa2800754e5722acf94987bb03e814edcb9acebda37df6da1987bf48e5b05e — <code>Win.exe</code>, Akira ransomware encryptor</td><td>CISA AA24-109A</td><td>Jun 2023 – Aug 2025</td></tr>
+        <tr><td class="type-label">HASH (SHA-256)</td><td class="val">3298d203c2acb68c474e5fdad8379181890b4403d6491c523c13730129be3f75 — <code>Akira_v2</code> ransomware (build 1)</td><td>CISA AA24-109A</td><td>2025</td></tr>
+        <tr><td class="type-label">HASH (SHA-256)</td><td class="val">0ee1d284ed6630738720912c7bde7fac5ca1121403f1a5d2d5411317df282796c — <code>Akira_v2</code> ransomware (build 2)</td><td>CISA AA24-109A</td><td>2025</td></tr>
+        <tr><td class="type-label">HASH (SHA-256)</td><td class="val">2f629395fdfa11e713ea8bf11d40f6f240acf2f5fcf9a2ac50b6f7fbc7521c83 — Akira "Megazord" ransomware sample (1 of 11 published Megazord hashes; remainder in advisory Table 2, not reproduced here for brevity)</td><td>CISA AA24-109A</td><td>2023 – 2024</td></tr>
+        <tr><td class="type-label">HASH (SHA-256)</td><td class="val">58359209e215a9fc0dafd14039121398559790dba9aa2398c457348ee1cb8a4d — <code>Ladon.exe</code>, Akira ransomware file (Nov 2025 update)</td><td>CISA AA24-109A</td><td>2025</td></tr>
+        <tr><td class="type-label">HASH (SHA-256)</td><td class="val">cf3465d7e49b609defa1e2b6cfcc86ffa30c72246cb2744dbf50736c5f3d74d5 — <code>qKtul.vbs</code>, VBScript used by Akira threat actors</td><td>CISA AA24-109A</td><td>2025</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val"><code>fn.txt</code> / <code>akira_readme.txt</code> — ransom note, dropped in <code>C:\</code> root and every <code>C:\Users\&lt;user&gt;</code> directory</td><td>CISA AA24-109A / FBI reporting</td><td>2023 – 2025</td></tr>
+        <tr><td class="type-label">FILE EXT</td><td class="val"><code>.akira</code> / <code>.powerranges</code> / <code>.akiranew</code> / <code>.aki</code> — encrypted-file extension markers</td><td>CISA AA24-109A</td><td>2023 – 2025</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2024-40766 — SonicWall SonicOS improper access control (CWE-284), CVSS 9.3 — current primary initial-access vector</td><td>SonicWall / CISA KEV</td><td>Disclosed Aug 23, 2024</td></tr>
+        <tr><td class="type-label">ACCOUNT</td><td class="val"><code>itadm</code> — recurring name for Akira-created domain administrator account</td><td>CISA AA24-109A</td><td>Observed across multiple 2024–2025 intrusions</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">MEDIUM (Conti-diaspora lineage) / HIGH (brand-to-infrastructure attribution)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Escalating — expanding hypervisor targeting, sustained CVE-driven access, no disruption to date</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Speed-to-impact: encryption in as little as ~55 minutes from initial access</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">No published C2/staging infrastructure IOCs; no confirmed individual attribution</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Conti (diaspora / successor lineage)</span>
+          <span class="alias-chip">Frag ransomware (shared infrastructure)</span>
+          <span class="alias-chip">Fog ransomware (on-chain overlap w/ Frag)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Akira warrants a <strong>CRITICAL</strong> threat-level rating on the strength of scale and tempo alone: $244.17 million in claimed proceeds, 1,584 cumulative leak-site victims as of August 2026, and a documented ability to move from initial VPN compromise to completed encryption in under an hour in at least one campaign. What elevates this beyond a typical high-volume RaaS profile is the group's demonstrated adaptability — expanding from Windows-only encryption in March 2023 to ESXi (April 2023), to a Rust-rewritten <code>Akira_v2</code> encryptor with anti-analysis build-gating, to Nutanix AHV hypervisors (June 2025) — each expansion arriving roughly in step with, rather than lagging, broader industry adoption of the underlying virtualization platforms being targeted.</p>
+      <p>The central <strong>competing hypothesis</strong> worth stating plainly is whether "Akira is a Conti successor" describes organizational continuity (the same people, reconstituted) or merely personnel/tooling continuity within a much looser criminal labor market (former Conti-affiliated individuals now working across Akira, Fog, and Frag interchangeably as RaaS affiliates, without any of the three being a formal successor organization to Conti as an entity). The blockchain evidence — wallet-to-wallet Bitcoin transfers to known Conti leadership addresses — is genuinely strong for personnel/financial continuity but does not, on its own, resolve which hypothesis is correct; both are consistent with the available public evidence, and this profile does not assert one over the other beyond what TRM Labs' and Arctic Wolf's underlying data supports.</p>
+      <p><strong>Forward risk trajectory</strong> is upward: Akira has absorbed market share vacated by LockBit, BlackCat/ALPHV, and Hive's respective law-enforcement disruptions without experiencing a comparable takedown itself, and its edge-device exploitation model (patch-lag-driven, not zero-day-dependent) is durable against any single vendor's remediation efforts. <strong>What would change this assessment</strong>: a law-enforcement seizure or public indictment — comparable to the OFAC actions that formally anchored several Conti/TrickBot members to named individuals in 2023 — would sharply increase attribution confidence and could meaningfully disrupt operational tempo, as it has for peer RaaS brands; absent that, independent researcher-driven decryption breakthroughs (a GPU brute-force method for the Linux/ESXi variant was published in 2024, and Avast has released a free Windows decryptor) represent the only public counter-pressure currently observed, and neither appears to have measurably slowed the group's leak-site posting rate through mid-2026.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Enforce phishing-resistant MFA</strong> (FIDO2/WebAuthn, not SMS/TOTP alone) on every VPN and remote-access service, with no exceptions for legacy/service accounts.</div>
+            <div class="cm-ttp">Counters: T1133, T1078, T1110.003</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Prioritize patching the eight actively-weaponized CVEs</strong>, starting with CVE-2024-40766 (SonicWall, CVSS 9.3) and the Cisco ASA/FTD and Veeam Backup &amp; Replication flaws named in CISA AA24-109A.</div>
+            <div class="cm-ttp">Counters: T1190</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Allowlist and alert on RMM tool installation</strong> (AnyDesk, LogMeIn, RustDesk, MobaXterm); treat any unexpected new install on a server or domain controller as a high-priority alert.</div>
+            <div class="cm-ttp">Counters: T1219, T1021.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Deploy Microsoft's vulnerable-driver blocklist</strong> (or equivalent WDAC policy) to prevent POORTRY-class BYOVD kernel-level EDR/AV termination.</div>
+            <div class="cm-ttp">Counters: T1068, T1562.001</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Harden domain controller VM/hypervisor access</strong> — restrict console and snapshot/VMDK access to prevent offline NTDS.dit extraction; enable Credential Guard.</div>
+            <div class="cm-ttp">Counters: T1003.002, T1003.003</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Maintain immutable, offline, regularly-tested backups.</strong> Akira's hybrid ChaCha20+RSA encryption offers no recovery path without the attacker's key; VSS-copy deletion is standard across intrusions.</div>
+            <div class="cm-ttp">Counters: T1486, T1490</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Monitor and restrict outbound tunneling tools</strong> (Ngrok, Cloudflare Tunnel) via egress filtering, proxy inspection, and DNS monitoring for known tunneling-service domains.</div>
+            <div class="cm-ttp">Counters: T1572, T1090</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Alert on anomalous RClone/WinSCP/FileZilla execution</strong> and outbound traffic to MEGA.nz or similar cloud-sync destinations as a leading exfiltration indicator.</div>
+            <div class="cm-ttp">Counters: T1567.002, T1048</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Minimal actor-registered infrastructure has been publicly documented — no IP/domain IOCs appear in the Nov 2025 CISA advisory. Akira relies almost entirely on legitimate third-party services (Ngrok, Cloudflare Tunnel, MEGA, AnyDesk, LogMeIn) rather than owned C2 domains or IPs, which functionally eliminates traditional infrastructure-rotation tradecraft as an observable OPSEC pattern — there is little dedicated infrastructure for defenders to track rotating in the first place.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Overwhelmingly LOTL-driven: the large majority of the documented toolchain (AnyDesk, LogMeIn, RustDesk, MobaXterm, PuTTY, Impacket, PowerShell, WMIC, Ngrok, cloudflared, RClone, WinSCP, FileZilla, 7-zip, AdFind, SoftPerfect NetScan) is legitimate commercial or open-source software. Custom/malicious development is largely confined to the encryptors themselves (Megazord, Akira_v2) plus the POORTRY/STONESTOP BYOVD pairing and the commodity SystemBC RAT — a deliberate choice that maximizes blending with normal administrator and IT-support activity.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics Routines</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Volume Shadow Copy Service deletion via <code>vssadmin.exe</code>/PowerShell is standard practice across intrusions to inhibit recovery and impede forensic reconstruction. No source-documented log-clearing, timestomping, or memory-only execution specifics beyond VSS deletion were identified in current reporting — stated as a gap rather than inferred.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">[LOW]</span>
+        </div>
+        <div class="opsec-desc">No source-documented beacon-jitter configuration or victim-timezone-relative work-hour data was identified in the reviewed reporting. What is documented is speed-of-execution rather than stealth-of-timing: encryption completed in as little as 55 minutes, and full exfiltration-to-encryption in "just over two hours" in some 2025 incidents (CISA AA24-109A) — suggesting an operational preference for rapid completion over prolonged, low-and-slow dwell time.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">HeartCrypt, a commercial packer-as-a-service, is applied specifically to defeat static and behavioral detection ahead of payload delivery. The Akira_v2 encryptor's embedded Build ID execution gate — refusing to run without a matching identifier — functions as a distinct anti-sandbox/anti-research control layered on top of standard packing, indicating deliberate investment in complicating third-party sample analysis.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">BYOVD EDR/AV Termination</span>
+          <span class="evasion-ttp">T1068</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">POORTRY / STONESTOP</span>
+        </div>
+        <div class="evasion-desc">STONESTOP installs POORTRY — malware written as a signed, vulnerable Windows driver — to obtain kernel-mode (Ring 0) code execution and terminate EDR/AV processes operating above the driver's privilege level.</div>
+        <div class="evasion-detail">Per CISA AA24-109A Table 1: "POORTRY [is] malware written as a signed vulnerable Windows deriver [sic]. Akira threat actors used the malware to implement the Bring Your Own Vulnerable Driver (BYOVD) tactic." Specific load command, service-registration path, or driver-signing certificate details not publicly documented as of Nov 2025.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Legitimate-Driver AV Termination</span>
+          <span class="evasion-ttp">T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">PowerTool / Zemana AntiMalware driver</span>
+        </div>
+        <div class="evasion-desc">Distinct from the POORTRY/STONESTOP pairing: PowerTool exploits the legitimate, signed Zemana AntiMalware driver — rather than a purpose-built malicious one — to terminate antivirus-related processes prior to encryption.</div>
+        <div class="evasion-detail">Specific IOCTL calls or exploitation sequence not publicly documented as of Nov 2025 — CISA's advisory names the technique and driver but not the precise low-level invocation.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Living-off-the-Land Remote Access</span>
+          <span class="evasion-ttp">T1219 / T1021.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag network">NETWORK</span>
+        </div>
+        <div class="evasion-desc">Uses commercial remote-access software (AnyDesk, LogMeIn, RustDesk, MobaXterm) already common in enterprise environments rather than custom C2 implants, denying defenders a malware-signature detection surface and blending lateral movement with legitimate helpdesk/administrator traffic patterns.</div>
+        <div class="evasion-detail">No source-documented specific configuration flags or deployment sequence beyond tool selection itself.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Encrypted Tunnel Egress</span>
+          <span class="evasion-ttp">T1572</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">Establishes outbound-only encrypted tunnels via Ngrok and Cloudflare Tunnel (<code>cloudflared</code>), avoiding any inbound firewall rule requirement and blending with legitimate developer/DevOps traffic to the same widely-used services — complicating both network-based detection and simple domain-reputation blocking.</div>
+        <div class="evasion-detail">Specific Ngrok/cloudflared invocation arguments and tunnel-naming conventions not publicly documented as of Nov 2025.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Commercial Payload Packing</span>
+          <span class="evasion-ttp">T1027</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">HeartCrypt, a commercial packer-as-a-service, is applied to Akira payloads to defeat static signature and behavioral heuristic detection prior to delivery.</div>
+        <div class="evasion-detail">Specific packing/crypting parameters not publicly documented as of Nov 2025.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Anti-Analysis Build Gating</span>
+          <span class="evasion-ttp">Not formally ATT&amp;CK-mapped</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">The Rust-based Akira_v2 encryptor embeds a build identifier as a runtime execution condition, refusing to run without a matching ID — a bespoke anti-sandbox/anti-research control distinct from standard virtualization-detection techniques, making generic automated sandboxes ineffective against captured samples absent the correct build parameter.</div>
+        <div class="evasion-detail">Exact Build ID validation mechanism not publicly documented as of Nov 2025 — trusted third-party analysis confirmed the gate's existence and effect, not its internal implementation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — ADVERSARY EMULATION PLAN</span>
+        <span class="ctid-title">Not Available</span>
+      </div>
+      <div class="ctid-body">No MITRE CTID adversary emulation plan published for Akira as of 2026-09-03. The Center for Threat-Informed Defense's Adversary Emulation Library (confirmed via direct repository review) currently covers APT29, Blind Eagle, Carbanak Group, FIN6, FIN7, menuPass, OceanLotus, OilRig, Sandworm, Turla, and Wizard Spider as full emulation plans, plus a set of technique-focused micro-emulation plans — Akira is not among them.</div>
+      <div class="ctid-links">
+        <a class="ctid-link" href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library" target="_blank">CTID REPO →</a>
+      </div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/stopransomware" target="_blank">#StopRansomware — Validate Security Controls Guidance (AA24-109A §"Validate Security Controls")</a></div>
+          <div class="ref-date">Advisory-embedded ATT&amp;CK-mapped validation guidance · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">AttackIQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.attackiq.com/2025/11/18/updated-response-to-cisa-advisory-aa24-109a/" target="_blank">Updated Response to CISA Advisory (AA24-109A)</a></div>
+          <div class="ref-date">Vendor-published emulation/validation scenario mapped to the Nov 2025 advisory update · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Picus Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.picussecurity.com/resource/blog/akira-ransomware-analysis-simulation-and-mitigation-cisa-alert-aa24-109a" target="_blank">Akira Ransomware 2025: Updated CISA Advisory, TTPs, and Defense Strategies</a></div>
+          <div class="ref-date">Vendor threat-brief with simulation/detection guidance · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Gap Note</div>
+        <div>
+          <div class="ref-detail">Atomic Red Team and SigmaHQ repositories were checked for Akira-specific content; GitHub's code-search interface requires authenticated access not available in this research session, so presence/absence of dedicated Atomic tests or Sigma rules could not be conclusively verified. Check <a href="https://github.com/redcanaryco/atomic-red-team" target="_blank">redcanaryco/atomic-red-team</a> and <a href="https://github.com/SigmaHQ/sigma" target="_blank">SigmaHQ/sigma</a> directly for current coverage.</div>
+          <div class="ref-date">Verification incomplete · Noted 2026-09-03</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA/FBI/DC3/HHS/Europol/OFAC/NCSC-NL</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-109a" target="_blank">#StopRansomware: Akira Ransomware (AA24-109A)</a></div>
+          <div class="ref-date">Orig. published Apr 18, 2024; updated Nov 13, 2025 · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G1024/" target="_blank">Akira, GOLD SAHARA, PUNK SPIDER, Howling Scorpius — Group G1024</a></div>
+          <div class="ref-date">ATT&amp;CK v18 · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/software/S1129/" target="_blank">Akira — Software S1129</a></div>
+          <div class="ref-date">Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Arctic Wolf Labs</div>
+        <div>
+          <div class="ref-detail"><a href="https://arcticwolf.com/resources/blog/conti-and-akira-chained-together/" target="_blank">Conti and Akira: Chained Together</a></div>
+          <div class="ref-date">Blockchain-transaction attribution analysis · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Arctic Wolf</div>
+        <div>
+          <div class="ref-detail"><a href="https://arcticwolf.com/resources/blog/arctic-wolf-observes-july-2025-uptick-in-akira-ransomware-activity-targeting-sonicwall-ssl-vpn/" target="_blank">Arctic Wolf Observes July 2025 Uptick in Akira Ransomware Activity Targeting SonicWall SSL VPN</a></div>
+          <div class="ref-date">Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TRM Labs</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.trmlabs.com/resources/intel-library/akira" target="_blank">Akira Ransomware Group: Threat Profile and TTPs</a></div>
+          <div class="ref-date">Attribution / geolocation / financial analysis · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Unit 42 (Palo Alto)</div>
+        <div>
+          <div class="ref-detail"><a href="https://unit42.paloaltonetworks.com/threat-assessment-howling-scorpius-akira-ransomware/" target="_blank">Threat Assessment: Howling Scorpius (Akira Ransomware)</a></div>
+          <div class="ref-date">Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2025/09/sonicwall-ssl-vpn-flaw-and.html" target="_blank">SonicWall SSL VPN Flaw and Misconfigurations Actively Exploited by Akira Ransomware Hackers</a></div>
+          <div class="ref-date">Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/cisco-asa-zero-day-exploited-in-akira-ransomware-attacks/" target="_blank">Cisco ASA Zero-Day Exploited in Akira Ransomware Attacks</a></div>
+          <div class="ref-date">CVE-2023-20269 reporting · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ThreatMate</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.threatmate.com/post/cisa-adds-old-cisco-vpn-vulnerability-being-exploited-by-akira-ransomware-group-to-kev-list" target="_blank">CISA Adds Old Cisco VPN Vulnerability Being Exploited by Akira Ransomware Group to KEV List</a></div>
+          <div class="ref-date">CVE-2020-3259 KEV addition · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GuidePoint Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.guidepointsecurity.com/blog/gritrep-akira-sonicwall/" target="_blank">GRITREP: Observed Malicious Driver Use Associated with Akira SonicWall Campaign</a></div>
+          <div class="ref-date">BYOVD/driver-abuse technical detail · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SC Media</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.scworld.com/news/akira-ransomware-decryption-method-uses-gpus-to-brute-force-keys" target="_blank">Akira Ransomware Decryption Method Uses GPUs to Brute Force Keys</a></div>
+          <div class="ref-date">Independent researcher decryption breakthrough · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TechRadar / Yahoo Tech</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.techradar.com/pro/security/akira-ransomware-is-now-targeting-nutanix-vms-and-scoring-big-rewards" target="_blank">Akira Ransomware Is Now Targeting Nutanix VMs</a></div>
+          <div class="ref-date">Nutanix AHV targeting expansion · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">bushidotoken.net</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.bushidotoken.net/2023/09/tracking-adversaries-akira-another.html" target="_blank">Tracking Adversaries: Akira, Another Descendent of Conti</a></div>
+          <div class="ref-date">Early tracking / Conti-lineage code analysis · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">HIPAA Journal</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.hipaajournal.com/akira-ransomware-advisory-nov-2025/" target="_blank">Warning Issued About Akira Ransomware as Attacks on Critical Infrastructure Accelerate</a></div>
+          <div class="ref-date">Nov 2025 advisory-update reporting · Accessed: 2026-09-03</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-03 · 16 Sources (Government/Multi-National Advisory, MITRE, Vendor, Independent Research)</div>
+  <div>No companion incident or vuln card on file — see Section 06 cross-reference gaps</div>
+</div>
+
+</body>
+</html>
