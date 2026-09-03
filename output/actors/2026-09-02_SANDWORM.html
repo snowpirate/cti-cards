@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sandworm Team — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .sanctions-list { display: flex; flex-direction: column; gap: 5px; }
+  .sanctions-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 6px 0; border-bottom: 1px solid rgba(30,46,62,0.4); }
+  .sanctions-row:last-child { border-bottom: none; }
+  .sanctions-name { font-family: var(--body); font-size: 11.5px; color: var(--text); font-weight: 500; }
+  .sanctions-role { font-family: var(--body); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+  .sanctions-badge { font-family: var(--mono); font-size: 8.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
+
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge">⚠ NATION-STATE · GRU / MAIN INTELLIGENCE DIRECTORATE · RUSSIA</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Military Intelligence Cyber-Sabotage &amp; ICS/OT Destruction Unit</div>
+  <h1><span class="accent">SAND</span>WORM TEAM</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK, DOJ, U.S. Treasury, UK NCSC, CISA, Mandiant/Google Cloud, ESET, Dragos, Microsoft, CrowdStrike, Nozomi Networks, AttackIQ
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL</span></div>
+    <div>Primary Motive: <span>Sabotage / Military Advantage / Coercion</span></div>
+    <div>Active Since: <span>≥2009 (assessed)</span></div>
+    <div>MITRE ATT&amp;CK: <span>G0034</span></div>
+    <div>Also Tracked As: <span class="blue">APT44 (Mandiant)</span></div>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">$10B+</div>
+    <div class="stat-label">NotPetya global damage est. — White House, 2018</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">6</div>
+    <div class="stat-label">GRU Unit 74455 officers indicted — DOJ, Oct 2020</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">3</div>
+    <div class="stat-label">Confirmed cyber-caused grid disruptions — 2015 / 2016 / 2022</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">19+</div>
+    <div class="stat-label">Custom malware/tool families tracked — MITRE ATT&amp;CK G0034</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Sandworm Team is a Russian military cyber unit operated by the GRU's Main Center for Special Technologies (GTsST, military unit 74455), and is assessed by multiple governments and private-sector researchers to be the most destructive nation-state cyber actor documented to date. Active since at least 2009 and elevated by Mandiant to full named-APT status as <strong>APT44</strong> in April 2024 (Mandiant/Google Cloud, "APT44: Unearthing Sandworm," Apr 2024), the group is the only actor tracked in this project's roster with a confirmed, repeated record of using cyber intrusions to cause physical disruption to critical infrastructure — the December 2015 and December 2016 Ukrainian power grid attacks, and the April 2022 Industroyer2 operation against a Ukrainian transmission substation during the ongoing invasion.</p>
+      <p>The group matters acutely right now because it remains one of the most operationally active pieces of Russia's war effort against Ukraine. Independent OT telemetry from Nozomi Networks identified 29 confirmed Sandworm-linked incidents across ten industrial organizations in seven countries between July 2025 and January 2026 (Nozomi Networks, "Sandworm Activity in Industrial Environments," 2026), and the group sustained a wiper campaign against Ukrainian energy, logistics, and grain-sector organizations from October 2024 through at least March 2025 using a new destructive tool tracked as ZEROLOT. Separately, Fieldeffect and other researchers documented a 2025 tactical shift away from expensive zero-day exploitation toward compromising misconfigured or end-of-life edge devices — VPN concentrators, enterprise routers, remote-access gateways — against North American and European energy-sector targets, a shift significant enough that CISA issued a mandatory federal order to identify and replace unsupported edge devices in response (Fieldeffect, 2025; Federal News Network, 2026).</p>
+      <p>Sandworm is the direct originator of the Industroyer malware family — the first and, to date, only malware demonstrated to have caused an electrical blackout through purpose-built, ICS-protocol-native code rather than generic IT destruction — and its NotPetya wiper remains the single most expensive cyberattack in recorded history, with White House and industry loss estimates exceeding $10 billion globally despite the malware never having functioned as real ransomware. A full case-file account of NotPetya's impact on one victim organization, Maersk, is documented in this project's companion incident card (see incident card: Maersk NotPetya, 2017-06-27), which this profile treats as authoritative on that specific operation and does not duplicate here.</p>
+      <p>Operationally, nearly everything Sandworm has done since February 2022 sits inside the context of Russia's full-scale invasion of Ukraine — the group functions as a forward-deployed cyber-sabotage arm supporting battlefield and economic-pressure objectives, and its targeting has expanded in step with the war's phases, from initial destructive wiper waves at the invasion's outset, to sustained grid and logistics targeting through 2024–2025, to a 2025–2026 pivot toward pre-positioning inside Western critical infrastructure that several governments now assess as preparation for potential future leverage rather than purely Ukraine-focused activity.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">Sandworm Team</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">Russian GRU — Main Center for Special Technologies (GTsST), Military Unit 74455</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Nation-State Military Intelligence Unit</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Sabotage, military advantage, political coercion; secondary espionage</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">At least 2009 (assessed); BlackEnergy-linked activity traced from ~2014</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Ongoing — OT intrusions through Jan 2026 (Nozomi Networks)</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G0034</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">Under U.S. DOJ indictment (6 named officers, E.D. Pa., Oct 15 2020)</span></div>
+          <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">US, UK NCSC, EU, Australia, Canada, NZ — coordinated statements (NotPetya, Feb 2018; Georgia, 2020)</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">Sandworm Team</span>
+          <span class="alias-chip">APT44 (Mandiant)</span>
+          <span class="alias-chip">ELECTRUM (Dragos)</span>
+          <span class="alias-chip">Telebots (ESET)</span>
+          <span class="alias-chip">IRON VIKING</span>
+          <span class="alias-chip">BlackEnergy Group</span>
+          <span class="alias-chip">Quedagh</span>
+          <span class="alias-chip">Voodoo Bear (CrowdStrike)</span>
+          <span class="alias-chip">IRIDIUM (Microsoft, legacy)</span>
+          <span class="alias-chip">Seashell Blizzard (Microsoft, current)</span>
+          <span class="alias-chip">FROZENBARENTS</span>
+          <span class="alias-chip">UAC-0082 (CERT-UA)</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p><strong>[HIGH]</strong> — this identity rests on an unusually dense stack of independent, high-confidence corroboration for a nation-state APT: a named U.S. federal criminal indictment identifying six specific GRU officers by name and unit; formal UK NCSC attribution statements naming GTsST/Unit 74455 directly (Georgia, 2019/2020); coordinated multi-government attribution of NotPetya (Feb 2018); and a stable, continuously-tracked technical cluster followed independently by ESET (as Telebots/BlackEnergy since ~2014), Dragos (ELECTRUM), CrowdStrike (Voodoo Bear), and Microsoft (Seashell Blizzard) that converges on the same infrastructure and toolset lineage. Mandiant's April 2024 decision to graduate the cluster to APT44 status was itself a confirmation of this convergence rather than a new attribution claim. The one area of genuine attribution nuance is discussed in Section 08: several 2022 wiper incidents (notably WhisperGate) have been attributed by different vendors to an adjacent-but-distinct GRU-linked cluster (Cadet Blizzard/Ember Bear), and this profile does not fold that activity into Sandworm's core record.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2014–2015</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">BlackEnergy3 Pre-Positioning</div>
+          <div class="timeline-desc">Spearphishing with macro-laced Office documents delivers BlackEnergy3 against Ukrainian energy-sector personnel; long-dwell reconnaissance and credential harvesting inside ICS-adjacent IT networks precedes any destructive action (ESET; SANS/E-ISAC report, 2016).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Dec 2015</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">First Ukraine Grid Attack</div>
+          <div class="timeline-desc">Coordinated intrusion into three regional Ukrainian power distribution companies; operators' own SCADA workstations are hijacked in real time to open breakers, and KillDisk wipes systems and corrupts the master boot record afterward. ~230,000 customers lose power for 1–6 hours — the first publicly confirmed cyberattack to cause a blackout (CISA IR-ALERT-H-16-056-01; SANS/E-ISAC, 2016).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Dec 2016</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Second Grid Attack — Industroyer Debut</div>
+          <div class="timeline-desc">A Kyiv transmission substation is disrupted using Industroyer, the first malware framework built with native, protocol-specific modules (IEC 60870-5-101/104, IEC 61850, OPC DA) to directly command grid hardware — a qualitatively different capability from 2015's manual-hijack approach (MITRE ATT&amp;CK, Campaign C0025; Dragos).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jun 2017</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">NotPetya Global Wiper</div>
+          <div class="timeline-desc">A hijacked update to Ukrainian tax software M.E.Doc delivers a wiper disguised as ransomware that self-propagates via EternalBlue/EternalRomance and Mimikatz-derived credential theft, causing an estimated $10B+ in global collateral damage across dozens of countries (DOJ indictment, Oct 2020). Full case study: (see incident card: Maersk NotPetya, 2017-06-27).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Feb 2018</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Olympic Destroyer</div>
+          <div class="timeline-desc">Destructive malware disrupts IT systems supporting the PyeongChang Winter Olympics opening ceremony, deliberately salted with false-flag artifacts pointing toward North Korean and Chinese threat actors — among the most sophisticated attribution-deception operations publicly documented for this group (DOJ indictment, Oct 2020).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2018–2020</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Georgia, OPCW &amp; France Operations</div>
+          <div class="timeline-desc">Large-scale website defacement and disruption of Georgian government, court, media, and business sites (Oct 2019, UK NCSC formal attribution, 2020); targeting of the Organisation for the Prohibition of Chemical Weapons following the Novichok poisoning investigation; and operations against the 2017 French presidential campaign (DOJ indictment, Oct 2020).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Feb–Apr 2022</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Invasion-Phase Wiper Wave &amp; Industroyer2</div>
+          <div class="timeline-desc">Coinciding with the February 2022 invasion, Sandworm and adjacent GRU-linked clusters deploy a rotating cast of wipers (CaddyWiper among those confirmed to Sandworm; WhisperGate attributed with lower confidence to an adjacent cluster — see Section 08) against Ukrainian government and infrastructure targets. On 8 April 2022, ESET and CERT-UA jointly disclose and help foil a planned Industroyer2 attack against a high-voltage substation, purpose-compiled for the victim's exact IEC-104 configuration just weeks earlier and sequenced with CaddyWiper for anti-forensic cleanup (ESET WeLiveSecurity, Apr 2022).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2022–2025</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Sustained Destructive Campaign Against Ukraine</div>
+          <div class="timeline-desc">ESET documents Sandworm as responsible for the majority of wiper attacks against Ukraine throughout 2022 (ESET, "A Year of Wiper Attacks in Ukraine," Feb 2023). From October 2024 through March 2025, the group deploys a new wiper tracked as ZEROLOT against Ukrainian energy, logistics, and grain-sector organizations, extending destructive targeting beyond the power grid into the broader economic war effort.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025–2026</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Pivot to Edge Devices &amp; Western Critical Infrastructure</div>
+          <div class="timeline-desc">Researchers document a tactical shift away from costly zero-day exploitation toward compromising misconfigured or end-of-life edge devices (VPN concentrators, enterprise routers, remote-access gateways) at North American and European energy organizations, using exposed management interfaces and credential-replay attacks to pivot into cloud-hosted environments (Fieldeffect, 2025). CISA responds with a mandatory federal order to identify and replace unsupported edge devices. Independent OT telemetry (Nozomi Networks) confirms 29 Sandworm-linked industrial incidents across seven countries between Jul 2025–Jan 2026, though the rate of new-victim acquisition slowed roughly 2.2x over that window.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>From spearphishing pre-positioning to purpose-built ICS sabotage</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Sandworm's entry vectors have shifted materially across its operational lifetime without ever fully abandoning earlier techniques. The 2014–2016 grid-attack era relied on spearphishing with malicious Office macros against energy-sector staff, followed by long-dwell lateral movement into ICS-adjacent networks before any destructive action (SANS/E-ISAC, 2016). NotPetya (2017) used a software supply-chain compromise instead — a hijacked update mechanism for Ukrainian tax software M.E.Doc — demonstrating the group's willingness to weaponize trusted software distribution channels for indiscriminate, self-propagating impact (see incident card: Maersk NotPetya). Since 2025, the dominant entry vector has become opportunistic exploitation of internet-exposed, misconfigured, or end-of-life edge devices — VPN concentrators, routers, remote-access gateways — reached through exposed management interfaces rather than novel vulnerability research (Fieldeffect, 2025).</p>
+      <p>The group's toolchain splits cleanly into two tiers. For IT-layer access, lateral movement, and credential theft, Sandworm relies on a largely dual-use, commodity-adjacent kit — Cobalt Strike, Impacket, Mimikatz-derived credential dumping, PsExec/WMI for lateral tool transfer — indistinguishable at the tooling level from many other intrusion sets. For the OT/ICS layer, by contrast, the group has repeatedly demonstrated a rare, resource-intensive capability to build purpose-specific malware: Industroyer and Industroyer2 contain protocol-native modules for IEC 60870-5-101/104, IEC 61850, and OPC DA that issue what look like entirely legitimate operator commands directly to substation relays and RTUs, rather than exploiting a software vulnerability. Industroyer2 in particular was compiled specifically for one victim's exact substation configuration only weeks before its April 2022 deployment (ESET, 2022) — a level of target-specific OT engineering investment that most nation-state actors do not undertake.</p>
+      <p>Command and control has evolved from conventional web-protocol beaconing toward more resilient, harder-to-attribute infrastructure: Cyclops Blink, disclosed by NCSC/CISA in February 2022, embeds directly in WatchGuard Firebox and ASUS router firmware as a successor to the earlier VPNFilter botnet, giving the group a distributed, edge-device-resident C2 mesh that survives conventional endpoint remediation because it never touches the monitored host OS. Persistence at the IT layer uses account manipulation, scheduled tasks, and legitimate-service masquerading (the Exaramel backdoor registers as an ordinary Windows service). Exfiltration is comparatively limited and secondary to the group's core destructive/sabotage mission — data theft, where observed, appears oriented toward operational reconnaissance for follow-on targeting rather than bulk collection. The defining signature of Sandworm's most severe operations is the deliberate pairing of an ICS-impact payload with an anti-forensic wiper timed to detonate shortly afterward — Industroyer2 was followed roughly ten minutes later by CaddyWiper specifically to erase evidence of the substation-layer attack before defenders could triage it (ESET, 2022).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise + ICS frameworks</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1595.002</div>
+        <div class="mitre-name">Active Scanning: Vulnerability Scanning</div>
+        <div class="mitre-note">[HIGH] Systematic scanning of internet-facing edge devices (VPN concentrators, routers) preceding the 2025 intrusion wave against North American/European energy targets (Fieldeffect, 2025).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.001</div>
+        <div class="mitre-name">Spearphishing Attachment</div>
+        <div class="mitre-note">[HIGH] Macro-laced Office documents delivered BlackEnergy3 against Ukrainian energy-sector staff ahead of the 2015 grid attack (SANS/E-ISAC, 2016).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] 2025 shift toward abusing exposed management interfaces on misconfigured/EOL VPN and remote-access gateways rather than 0-day exploitation (Fieldeffect, 2025).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.001</div>
+        <div class="mitre-name">Command and Scripting Interpreter: PowerShell</div>
+        <div class="mitre-note">[MEDIUM] Used across post-exploitation tooling and NotPetya's spreader logic alongside native Windows utilities.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1543.003</div>
+        <div class="mitre-name">Create/Modify System Process: Windows Service</div>
+        <div class="mitre-note">[HIGH] The Exaramel backdoor installs and masquerades as a legitimate Windows service to blend into normal service inventories (ESET, TeleBots research).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1036.005</div>
+        <div class="mitre-name">Masquerading: Match Legitimate Name or Location</div>
+        <div class="mitre-note">[HIGH] Backdoors and droppers named/positioned to resemble legitimate system components; Olympic Destroyer additionally salted with false-flag artifacts implicating other nation-states (DOJ indictment, 2020).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.001</div>
+        <div class="mitre-name">OS Credential Dumping: LSASS Memory</div>
+        <div class="mitre-note">[HIGH] Mimikatz-derived credential theft is the standard mechanism enabling lateral spread in both NotPetya and the earlier grid intrusions.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1210</div>
+        <div class="mitre-name">Exploitation of Remote Services</div>
+        <div class="mitre-note">[HIGH] EternalBlue/EternalRomance (CVE-2017-0144/-0145) drove NotPetya's self-propagating worm behavior (DOJ indictment, 2020). No dedicated vuln card exists yet for the underlying CVE — flagged as an open cross-link gap.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1071.001</div>
+        <div class="mitre-name">Application Layer Protocol: Web Protocols</div>
+        <div class="mitre-note">[HIGH] Cyclops Blink's modular C2 embedded in WatchGuard/ASUS firmware, successor to VPNFilter (NCSC/CISA joint advisory, Feb 2022).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1561.002</div>
+        <div class="mitre-name">Disk Wipe: Disk Structure Wipe</div>
+        <div class="mitre-note">[HIGH] NotPetya overwrites the master boot record and encrypts the MFT with no functional decryption path — destructive by design, ransomware only in appearance (DOJ indictment, 2020).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1485</div>
+        <div class="mitre-name">Data Destruction</div>
+        <div class="mitre-note">[HIGH] CaddyWiper and the ZEROLOT wiper family deployed against Ukrainian energy, logistics, and grain-sector organizations, Oct 2024–Mar 2025.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impair Process Control</div>
+        <div class="mitre-id">T0831</div>
+        <div class="mitre-name">Manipulation of Control</div>
+        <div class="mitre-note">[HIGH] Industroyer2 issues properly-formatted IEC-104 protocol commands directly to substation relays to trip circuit breakers — the defining capability distinguishing this group from generic IT-destructive actors (ESET, Apr 2022).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0816</div>
+        <div class="mitre-name">Device Restart/Shutdown</div>
+        <div class="mitre-note">[HIGH] Industroyer's protocol-specific modules (IEC 101/104, IEC 61850, OPC DA) issued restart/shutdown commands to substation RTUs in the Dec 2016 Kyiv attack (Dragos; MITRE ATT&amp;CK C0025).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Inhibit Response Function</div>
+        <div class="mitre-id">T0813</div>
+        <div class="mitre-name">Denial of Control</div>
+        <div class="mitre-note">[MEDIUM] Industroyer2 was designed to disable circuit-breaker failure-protection functions ahead of the intended April 2022 disruption, per ESET's technical analysis.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Energy &amp; Critical Infrastructure</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Government &amp; Public Sector</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Logistics, Grain &amp; Transportation</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Media, Telecom &amp; Financial</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Ukraine (primary, sustained since 2014); Georgia; France (2017 election); South Korea (2018 Olympics); expanding NATO/Western Europe &amp; North America (2025–2026); global collateral via NotPetya's 65+ country spread</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Energy transmission/distribution operators, government agencies, defense-adjacent logistics; increasingly cloud-hosted enterprise environments reached via edge-device pivot</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Historically spearphishing + software supply chain (M.E.Doc); since 2025, internet-exposed misconfigured/EOL edge devices</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Hybrid directed/opportunistic — destructive strikes timed to military and political events, paired with opportunistic pre-positioning inside Western infrastructure for potential future leverage</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">NOTPETYA</span>
+          <span class="tool-tag">WIPER · CUSTOM</span>
+        </div>
+        <div class="tool-desc">MBR/MFT-destroying wiper disguised as Petya ransomware; self-propagates via EternalBlue/EternalRomance (CVE-2017-0144/-0145 — no dedicated vuln card on file yet, cross-link gap) plus Mimikatz-derived credential theft for PsExec/WMIC-based lateral spread. Generates a random installation ID that cannot map to any valid decryption key, confirming no functional ransomware capability was ever intended (DOJ indictment, 2020). Full incident treatment: (see incident card: Maersk NotPetya).</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">INDUSTROYER / INDUSTROYER2</span>
+          <span class="tool-tag">ICS MALWARE · CUSTOM</span>
+        </div>
+        <div class="tool-desc">Modular malware with protocol-native payload components for IEC 60870-5-101/104, IEC 61850, and OPC DA that issue legitimate-looking commands directly to substation RTUs and protection relays. Industroyer2 (2022) was purpose-compiled for a single victim's exact IEC-104 configuration weeks before deployment and paired with CaddyWiper for anti-forensic cleanup ~10 minutes post-execution (ESET, Apr 2022).</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">CADDYWIPER / ZEROLOT / STING</span>
+          <span class="tool-tag">WIPER FAMILY · CUSTOM</span>
+        </div>
+        <div class="tool-desc">A rotating cast of destructive wipers deployed against Ukraine 2022–2025. CaddyWiper was sequenced immediately after Industroyer2 to erase attack evidence (ESET, 2022); ZEROLOT and Sting were deployed against energy, logistics, and grain-sector targets Oct 2024–Mar 2025 (ESET APT Activity Report, 2025).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">CYCLOPS BLINK</span>
+          <span class="tool-tag">FIRMWARE IMPLANT / BOTNET · CUSTOM</span>
+        </div>
+        <div class="tool-desc">Modular malware embedded in WatchGuard Firebox and ASUS router firmware, successor to VPNFilter. Provides a distributed, resilient C2 mesh resident below the monitored host OS layer, complicating conventional endpoint-based detection and remediation (NCSC/CISA joint advisory, Feb 2022).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">EXARAMEL</span>
+          <span class="tool-tag">BACKDOOR · CUSTOM</span>
+        </div>
+        <div class="tool-desc">TeleBots-era backdoor, functional successor to Industroyer's backdoor component. Installs and masquerades as a legitimate Windows service for durable persistence (ESET, TeleBots research).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">P.A.S. WEBSHELL</span>
+          <span class="tool-tag">WEBSHELL · DUAL-USE</span>
+        </div>
+        <div class="tool-desc">PHP webshell used for persistent access to compromised web infrastructure; included as an emulated component in MITRE CTID's published Sandworm adversary emulation plan (see Section 12).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">COBALT STRIKE / IMPACKET / MIMIKATZ</span>
+          <span class="tool-tag">COTS / DUAL-USE TOOLKIT</span>
+        </div>
+        <div class="tool-desc">Standard post-exploitation toolkit for lateral movement, credential access, and IT-layer persistence across intrusions — largely indistinguishable at the tooling level from many other intrusion sets; the group's distinguishing capability sits at the OT/ICS layer, not here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">MALWARE</td><td class="val">NotPetya (aka ExPetr / "GoldenEye" variant)</td><td>DOJ indictment</td><td>2020-10-15</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">Industroyer2</td><td>ESET WeLiveSecurity</td><td>2022-04-12</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">Cyclops Blink (WatchGuard/ASUS firmware implant)</td><td>NCSC / CISA Joint Advisory</td><td>2022-02-23</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2017-0144 (EternalBlue) — NotPetya lateral-spread mechanism</td><td>DOJ indictment / ESET</td><td>2020-10-15</td></tr>
+        <tr><td class="type-label">PROTOCOL</td><td class="val">IEC 60870-5-104 (TCP/2404) — abused for Industroyer2 substation command injection</td><td>ESET WeLiveSecurity</td><td>2022-04-12</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">ZEROLOT / Sting wiper family</td><td>ESET APT Activity Report</td><td>2025-Q1</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val">Specific network indicators (C2 IPs/domains) for the active 2025–2026 edge-device campaign were not captured in this research pass — consult current CISA/joint advisory bulletins for operational indicator sets as of compile date.</td><td>—</td><td>2026-09-02</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Escalating &amp; diversifying — IT/OT sabotage expanding into edge-infrastructure prepositioning</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Purpose-built ICS protocol manipulation (Industroyer family)</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Real-time IOC visibility into current (2025–2026) edge-device C2 infrastructure</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Clusters</div>
+        <div class="alias-grid">
+          <span class="alias-chip">GTsST / Unit 74455 (parent)</span>
+          <span class="alias-chip">Cadet Blizzard / UNC2589 (adjacent, distinct)</span>
+          <span class="alias-chip">APT28 / Fancy Bear (sister GRU unit)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Sandworm is assessed at CRITICAL threat level on the strength of a record no other actor in this project's roster can match: it is the only group with confirmed, repeated success causing physical infrastructure disruption through cyber means (2015, 2016, and the foiled-but-otherwise-complete 2022 grid attacks), and it authored the single most expensive cyberattack in recorded history by direct and indirect cost. The most dangerous capability is not any single tool but the demonstrated willingness and engineering capacity to build victim-specific ICS protocol malware — Industroyer2's substation-specific compilation just weeks before use reflects an investment of OT-engineering effort that most nation-state actors, even sophisticated ones, do not undertake for a single target.</p>
+      <p>The clearest analytical gap in this profile is real-time indicator visibility. Open-source reporting through early 2026 documents the 2025 tactical shift toward edge-device compromise and credential-replay lateral movement in rich methodological detail, but the specific C2 infrastructure, IPs, and domains behind that campaign were not surfaced in this research pass — likely because the campaign is still active and current indicator sets are being managed operationally through CISA/vendor advisory channels rather than static public writeups. This is a meaningful limitation for anyone using this card for near-term defensive tuning; consult current advisories directly for that layer.</p>
+      <p>One attribution nuance deserves explicit flagging rather than silent smoothing-over: WhisperGate, deployed against Ukrainian government systems in January 2022, has been attributed with varying confidence to different clusters — CrowdStrike names Ember Bear, Microsoft names Cadet Blizzard, while ESET's broader assessment credits Sandworm with the majority of 2022 Ukraine wiper activity without necessarily including WhisperGate specifically in that count. This profile treats Cadet Blizzard/Ember Bear as an adjacent-but-distinct GRU-linked cluster and does not fold WhisperGate into Sandworm's confirmed record — a competing hypothesis exists that these are the same operators using deliberately inconsistent tradecraft, but the independent tracking convergence that supports Sandworm's core identity (Section 01) does not extend cleanly to this specific incident.</p>
+      <p>A separate non-finding is worth recording for anyone cross-referencing recent news: a self-replicating npm supply-chain worm publicly named "SANDWORM_MODE" was disclosed by Socket Research Team in February 2026, targeting JavaScript developer tooling and AI coding assistants. No source reviewed in this research pass provides a confirmed attribution link between that campaign and GRU Unit 74455 — the name appears to be a thematic reference (in the lineage of the "Shai-Hulud" npm worm, itself a Dune reference) rather than an attributed Sandworm operation, and this profile deliberately excludes it from Section 06 to avoid manufacturing a false attribution through name-matching alone. Forward trajectory: the group's 2025–2026 activity pattern — slower new-victim acquisition per Nozomi's OT telemetry, combined with a pivot toward lower-cost, higher-persistence edge-device and credential-based access — reads as a shift toward sustainable long-war positioning rather than a capability decline, consistent with an actor settling in for prolonged conflict rather than seeking rapid, high-visibility effects.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Enforce IT/OT segmentation with unidirectional gateways</strong> at ICS boundaries so that IT-layer compromise cannot reach protocol-level control of substation hardware.</div>
+            <div class="cm-ttp">Counters: T0831, T0816 (ICS)</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Identify and replace end-of-life edge devices</strong> (VPN concentrators, routers, remote-access gateways) per CISA's 2026 mandatory federal order; disable exposed management interfaces on any device that must remain in service.</div>
+            <div class="cm-ttp">Counters: T1133, T1595.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Disable SMBv1 and maintain aggressive patch cadence</strong> for remote-service exploitation vectors, given this group's history of worm-enabled lateral spread.</div>
+            <div class="cm-ttp">Counters: T1210</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Maintain offline, immutable, regularly-tested backups</strong> across both IT and OT domains with verified restore procedures — assume any online backup target is in scope for a wiper.</div>
+            <div class="cm-ttp">Counters: T1561.002, T1485</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Deploy ICS-protocol-aware monitoring</strong> capable of flagging anomalous IEC-104/61850/OPC-DA command sequences at substation boundaries, not just generic network IDS.</div>
+            <div class="cm-ttp">Counters: T0831, T0813 (ICS)</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Enforce replay-resistant MFA</strong> (FIDO2/hardware-token-based rather than OTP/push alone) given the 2025 shift toward credential-harvesting and replay attacks against cloud-hosted environments.</div>
+            <div class="cm-ttp">Counters: T1110, credential replay</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Harden software-supply-chain ingestion</strong> (dependency pinning, provenance verification, update-mechanism integrity checks) — the tradecraft class this group pioneered with the M.E.Doc/NotPetya compromise remains broadly relevant to the current supply-chain threat landscape.</div>
+            <div class="cm-ttp">Counters: supply-chain-class initial access</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Rehearse a coordinated IT+OT incident response plan</strong> including pre-authorized manual grid-operation fallback procedures, so that a destructive event does not require improvising manual control under pressure.</div>
+            <div class="cm-ttp">Counters: overall Impact-tactic techniques</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Cyclops Blink's firmware-resident design lets the group repurpose already-compromised WatchGuard/ASUS edge devices as a resilient, distributed C2 mesh rather than depending on freshly-registered attacker-owned domains — reducing the reusable registration-pattern signature that typically aids infrastructure tracking (NCSC/CISA, 2022).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Bifurcated approach: standard commodity/dual-use tooling (PsExec, WMI, Impacket, Mimikatz) for IT-layer lateral movement and credential access, but almost entirely native, protocol-legitimate commands at the OT layer — Industroyer2's substation commands are indistinguishable from valid operator traffic at the protocol level, which is a more extreme form of "living off the land" than binary-level LOLBin abuse.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics Routines</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Deliberate, well-documented wiper-chaining sequence: CaddyWiper execution was timed roughly ten minutes after Industroyer2's payload specifically to destroy host-level forensic evidence of the ICS-layer attack before defenders could triage it (ESET, Apr 2022) — this is a repeatable operational pattern, not incidental cleanup.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">[LOW]</span>
+        </div>
+        <div class="opsec-desc">Source material documents destructive operations timed to geopolitical and military milestones (invasion phases, the 2018 Olympics) rather than describing victim-timezone-based beaconing or dwell-time patterns — no specific beacon jitter or working-hours data was identified in this research pass; flagged as a genuine gap rather than inferred.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Victim-specific malware compilation for high-value OT targets — Industroyer2 was compiled specifically for one victim's exact substation configuration only weeks before deployment (ESET, 2022) — reflects deliberate minimization of reusable detection signatures for the group's highest-stakes operations, in contrast to the more standardized commodity toolkit used for routine IT-layer access.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, protocol abuse, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Legitimate ICS Protocol Abuse</span>
+          <span class="evasion-ttp">T0831 (ICS)</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag">IEC-104</span>
+        </div>
+        <div class="evasion-desc">Industroyer2 issues properly-formatted IEC-104 protocol commands that are indistinguishable from legitimate SCADA/operator traffic at the protocol level, defeating signature-based network detection that isn't ICS-protocol-aware (ESET, Apr 2022).</div>
+        <div class="evasion-detail">Specific command sequences/payload byte structures not publicly documented beyond protocol-family identification as of 2026-09-02.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Anti-Forensic Wiper Chaining</span>
+          <span class="evasion-ttp">T1561.002</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR</span>
+          <span class="evasion-tag siem">SIEM</span>
+        </div>
+        <div class="evasion-desc">CaddyWiper deployment sequenced approximately ten minutes after Industroyer2 execution specifically to destroy host-level evidence before defenders could complete triage (ESET, Apr 2022).</div>
+        <div class="evasion-detail">Approx. 10-minute delay between Industroyer2 execution and CaddyWiper detonation, per ESET's incident timeline reconstruction.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Legitimate-Service Masquerading</span>
+          <span class="evasion-ttp">T1036.005</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR</span>
+        </div>
+        <div class="evasion-desc">The Exaramel backdoor installs itself as, and is named to resemble, a legitimate Windows service — blending into normal service-inventory review rather than relying on process-hiding techniques (ESET, TeleBots research).</div>
+        <div class="evasion-detail">Specific service names/binary paths used per-campaign not consistently publicly documented as of 2026-09-02.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Firmware-Resident Persistence</span>
+          <span class="evasion-ttp">T1601-adjacent (firmware implant)</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR</span>
+          <span class="evasion-tag network">NETWORK</span>
+        </div>
+        <div class="evasion-desc">Cyclops Blink embeds directly in WatchGuard Firebox and ASUS router firmware rather than the host OS, placing it below the layer conventional endpoint EDR monitors and surviving typical remediation steps that don't include a full firmware reflash (NCSC/CISA joint advisory, Feb 2022).</div>
+        <div class="evasion-detail">Full reverse-engineered module/command set not entirely public as of the joint advisory's release; some modules documented, others withheld from public disclosure.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Credential Replay Against Cloud Environments</span>
+          <span class="evasion-ttp">T1110-adjacent (credential replay)</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM</span>
+        </div>
+        <div class="evasion-desc">The 2025 tactic shift uses harvested credentials for replay-based lateral movement into cloud-hosted environments, blending with legitimate authentication patterns and evading detection tuned to malware execution rather than valid-credential misuse (Fieldeffect, 2025).</div>
+        <div class="evasion-detail">Specific tooling/commands used for the replay mechanism not publicly documented as of 2026-09-02.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block">
+      <div class="ctid-header">
+        <span class="ctid-tag">MITRE CTID — ADVERSARY EMULATION PLAN</span>
+        <span class="ctid-title">Sandworm</span>
+      </div>
+      <div class="ctid-body">MITRE Center for Threat-Informed Defense publishes a full Sandworm plan in its Adversary Emulation Library, built around the group's 2015 Ukraine grid attack and NotPetya. The plan comprises a nine-step Detection Scenario and a three-test Protection Scenario, emulating five components of the group's documented toolset: the P.A.S. webshell, the Exaramel backdoor, NotPetya itself, an OraDump/LaZagne-variant credential harvester, and a Win64/Spy.KeyLogger.G-class keylogger. The repository includes an Intelligence Summary, Operations Flow diagrams, source code and password-protected executables for the emulated malware, file hashes, and YARA rules.</div>
+      <div class="ctid-links">
+        <a class="ctid-link" href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library/tree/master/sandworm" target="_blank">CTID PLAN →</a>
+        <a class="ctid-link" href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library" target="_blank">GITHUB REPO →</a>
+      </div>
+      <div class="ctid-phases">
+        <span class="ctid-phase-chip">Detection Scenario (9 steps)</span>
+        <span class="ctid-phase-chip">Protection Scenario (3 tests)</span>
+        <span class="ctid-phase-chip">P.A.S. Webshell</span>
+        <span class="ctid-phase-chip">Exaramel Backdoor</span>
+        <span class="ctid-phase-chip">NotPetya Wiper</span>
+        <span class="ctid-phase-chip">Credential Harvesting</span>
+      </div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">AttackIQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.attackiq.com/2025/11/14/sandworm/" target="_blank">Emulating the Destructive Sandworm Adversary</a></div>
+          <div class="ref-date">Vendor-published emulation plan · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Gap Note</div>
+        <div>
+          <div class="ref-detail">No Sandworm-specific Atomic Red Team test bundle or dedicated SigmaHQ-tagged rule set was confirmed in this research pass. Generic technique-level atomics (e.g., for T1561, T1003) may apply but are not actor-specific — stated explicitly rather than fabricating a coverage claim.</div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0034/" target="_blank">Sandworm Team, Group G0034</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Mandiant / Google Cloud</div>
+        <div>
+          <div class="ref-detail"><a href="https://cloud.google.com/blog/topics/threat-intelligence/apt44-unearthing-sandworm" target="_blank">APT44: Unearthing Sandworm</a></div>
+          <div class="ref-date">Apr 2024 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/archives/opa/pr/six-russian-gru-officers-charged-connection-worldwide-deployment-destructive-malware-and" target="_blank">Six Russian GRU Officers Charged in Connection with Worldwide Deployment of Destructive Malware and Other Disruptive Actions in Cyberspace</a></div>
+          <div class="ref-date">Oct 15, 2020 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">UK NCSC / FCDO</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.gov.uk/government/news/uk-condemns-russias-gru-over-georgia-cyber-attacks" target="_blank">UK Condemns Russia's GRU Over Georgia Cyber-Attacks</a></div>
+          <div class="ref-date">2020 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ESET WeLiveSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.welivesecurity.com/2022/04/12/industroyer2-industroyer-reloaded/" target="_blank">Industroyer2: Industroyer Reloaded</a></div>
+          <div class="ref-date">Apr 12, 2022 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NCSC / CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://media.defense.gov/2022/Feb/23/2002943421/-1/-1/0/CSA_NEW_SANDWORM_MALWARE_CYCLOPS_BLINK_REPLACES_VPNFILTER_20220223.PDF" target="_blank">New Sandworm Malware Cyclops Blink Replaces VPNFilter</a></div>
+          <div class="ref-date">Feb 23, 2022 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SANS / E-ISAC</div>
+        <div>
+          <div class="ref-detail"><a href="https://nsarchive.gwu.edu/sites/default/files/documents/3891751/SANS-and-Electricity-Information-Sharing-and.pdf" target="_blank">Analysis of the Cyber Attack on the Ukrainian Power Grid</a></div>
+          <div class="ref-date">2016 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/ics-alerts/ir-alert-h-16-056-01" target="_blank">Cyber-Attack Against Ukrainian Critical Infrastructure (IR-ALERT-H-16-056-01)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ESET WeLiveSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.welivesecurity.com/2023/02/24/year-wiper-attacks-ukraine/" target="_blank">A Year of Wiper Attacks in Ukraine</a></div>
+          <div class="ref-date">Feb 24, 2023 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Fieldeffect</div>
+        <div>
+          <div class="ref-detail"><a href="https://fieldeffect.com/blog/apt44-shifts-tactics-exploits-edge-devices-critical-infra" target="_blank">APT44 Shifts Tactics, Exploits Edge Devices Across Critical Infrastructure</a></div>
+          <div class="ref-date">2025 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Nozomi Networks</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nozominetworks.com/blog/sandworm-activity-in-industrial-environments-what-the-data-reveals" target="_blank">Sandworm Activity in Industrial Environments: What the Data Reveals</a></div>
+          <div class="ref-date">2026 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Kodem Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.kodemsecurity.com/resources/sandworm-mode-a-new-shai-hulud-style-npm-worm-threatening-developer-ai-toolchain-security" target="_blank">SANDWORM_MODE: A New Shai-Hulud-Style npm Worm</a></div>
+          <div class="ref-date">Feb 2026 · Accessed: 2026-09-02 (cited for naming-collision non-finding only, see Section 08)</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">AttackIQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.attackiq.com/2025/11/14/sandworm/" target="_blank">Emulating the Destructive Sandworm Adversary</a></div>
+          <div class="ref-date">Nov 14, 2025 · Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE CTID</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library/tree/master/sandworm" target="_blank">Adversary Emulation Library — Sandworm Plan</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 15 Sources (Government, MITRE, Vendor, Press)</div>
+  <div>Companion incident card on file: Maersk NotPetya (2017-06-27). No vuln card on file for CVE-2017-0144 (EternalBlue) — open cross-link gap.</div>
+</div>
+
+</body>
+</html>
