@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CYCLOPS BLINK — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: 12px; }
+  .casefile-label { font-family: var(--mono); font-size: 10px; color: var(--gold-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 58px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+  .actor-ref a { color: var(--gold2); text-decoration: none; }
+  .actor-ref a:hover { text-decoration: underline; }
+
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .kc-phase-name { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+  .vis-badge { font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 2px; font-weight: 700; }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body { font-family: var(--body); font-size: 12px; color: var(--text-mid); line-height: 1.7; margin-bottom: 10px; }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item { display: grid; grid-template-columns: 140px 1fr; gap: 14px; padding: 12px 14px; background: var(--bg3); border: 1px solid var(--border); border-left: 3px solid var(--red); }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--gold); padding: 10px 14px; }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel { background: var(--bg3); border: 1px solid var(--border); padding: 14px 16px; }
+  .consequence-label { font-family: var(--mono); font-size: 9px; color: var(--gold-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .consequence-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+
+  .attr-confidence { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; padding: 4px 12px; border-radius: 2px; margin-bottom: 14px; font-weight: 700; letter-spacing: 0.06em; }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 130px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 34px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-2022-0223-CBLINK<br/>
+    JUN 2019 – MAR 2022
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Nation-State Espionage / Worm-Enabled Botnet</div>
+  <h1><span class="gold">CYCLOPS</span> BLINK</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-02 &nbsp;|&nbsp; INCIDENT DATE RANGE: ~JUNE 2019 – MARCH 2022 (DISCLOSED FEB 23, 2022) &nbsp;|&nbsp;
+    SOURCES: CISA, NCSC-UK, DOJ, MITRE ATT&amp;CK, Kudelski Security, Trend Micro, Talos, Bleeping Computer
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>NATION-STATE ESPIONAGE (Infrastructure Pre-Positioning)</span></div>
+    <div>Secondary Type: <span>WORM / SELF-PROPAGATING</span></div>
+    <div>Attribution: <span class="green">HIGH</span></div>
+    <div>Severity: <span class="red">CRITICAL</span></div>
+    <div>Era: <span>Post-ATT&amp;CK (Enterprise Framework)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">~2.5 YRS</div>
+    <div class="stat-label">Undetected Before Public Disclosure</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">THOUSANDS</div>
+    <div class="stat-label">Devices In Botnet (WatchGuard + ASUS, Per DOJ)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">2ND</div>
+    <div class="stat-label">DOJ Disruption of a Sandworm Botnet (After VPNFilter, 2018)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">0 CONFIRMED</div>
+    <div class="stat-label">Documented Offensive Uses of the Botnet Before Takedown</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="name"><a href="../actors/2026-09-02_SANDWORM.html">Sandworm Team — GRU Unit 74455 (see actor card)</a></span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">CYCLOPS BLINK</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">~Jun 2019 – Mar 2022 (active); Feb 23 2022 (disclosed)</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Nation-State Espionage / Infrastructure Pre-Positioning</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Sandworm Team (GRU Unit 74455)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[HIGH]</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">WatchGuard Firebox/XTM firewalls; ASUS SOHO routers (global)</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">Thousands of devices, per DOJ (exact figure not independently published)</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">Feb 23, 2022 (public disclosure)</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">CISA / FBI / NSA / NCSC-UK joint advisory (AA22-054A)</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">~2.5 years (Jun 2019 – Feb 2022)</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Durable botnet infrastructure; no confirmed destructive/espionage payload delivered before disruption</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono dim">None identified — tracked as Software S0687 under Group G0034</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Not flagged historical — incident is within the standard 5-year detection-utility window as of 2026, though infrastructure has long since rotated post-disruption</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CYCLOPS BLINK is a modular botnet malware built and operated by Sandworm Team, the Russian GRU's Unit 74455, that quietly compromised thousands of WatchGuard Firebox/XTM firewalls and ASUS home/small-office routers around the world starting around June 2019 — roughly fourteen months after Sandworm's previous botnet, VPNFilter, was publicly exposed and disrupted by the FBI in May 2018 (CISA AA22-054A, Feb 23 2022). It sat undiscovered for approximately two and a half years before a joint CISA/FBI/NSA/NCSC-UK advisory revealed its existence on February 23, 2022 — one day before Russia's full-scale invasion of Ukraine — and a U.S. Department of Justice court-authorized operation remotely disabled the botnet's remaining command-and-control nodes the following month.</p>
+      <p>Why it matters: CYCLOPS BLINK is the clearest documented example of a nation-state building durable, long-term botnet infrastructure specifically on network-edge devices — firewalls and consumer/SOHO routers — precisely because those devices sit outside the reach of the endpoint monitoring, EDR telemetry, and internal-network logging that would normally catch a multi-year intrusion. Unlike a traditional espionage operation aimed at stealing a specific target's data, CYCLOPS BLINK's design and behavior (see Section 03) reflect infrastructure-building for future, unspecified use — a proxy and staging layer Sandworm could draw on when needed, not a campaign against any single victim.</p>
+      <p>Its proximity to the Ukraine invasion generated significant contemporaneous speculation that the botnet was being prepared for use in or alongside the war — CISA's advisory itself was published with explicit "shields up" framing amid heightened concern about Russian cyber activity tied to the invasion. It is important to be precise about what is and is not established here: public sources reviewed for this card document that the botnet existed, was operated by Sandworm, and was disabled before any confirmed offensive use — they do not establish a proven, specific intent to use it against Ukraine or NATO targets. That distinction between documented fact and contemporaneous framing is preserved throughout this card (see Section 07 and Section 09).</p>
+      <p>This is also the second time the exact same disruption playbook — a DOJ-authorized, FBI-executed remote remediation operation — was run against Sandworm-operated botnet infrastructure specifically, after VPNFilter in 2018. That repetition is itself analytically significant: it establishes court-authorized remote botnet remediation as a standing, repeatable U.S. government tool against this class of nation-state infrastructure, not a one-off legal improvisation (see Section 07C and Section 09).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Direct historical precedent — VPNFilter (2018).</strong> In May 2018, Cisco Talos and the FBI exposed and disrupted VPNFilter, a Sandworm-operated botnet that had compromised over 500,000 SOHO routers and network-attached storage devices across 54 countries (Cisco Talos, May 2018; DOJ, May 2018). The FBI seized a domain used in VPNFilter's command-and-control chain under a court-authorized warrant. CISA's later advisory on Cyclops Blink states plainly that the new malware appeared "fourteen months after VPNFilter was disrupted" and functions as its replacement framework — the same actor, the same target category (network-edge devices), and, as this incident shows, ultimately the same disruption mechanism.</p>
+      <p><strong>Technology landscape.</strong> By 2019, WatchGuard Firebox/XTM appliances and ASUS routers were widely deployed in small-business and home environments precisely because they are largely "install and forget" devices — appliances that receive periodic firmware updates but are not treated by their owners, or by the broader security industry, as endpoints requiring active monitoring the way a laptop or server would be. This operational reality is what makes the device class attractive to an actor building long-term infrastructure: low monitoring, wide deployment, and firmware-level access once compromised.</p>
+      <p><strong>Geopolitical climate.</strong> The campaign's active window (2019–2022) spans a period of steadily escalating tension between Russia and the West, culminating in the February 24, 2022 invasion of Ukraine. Sandworm has a well-documented history of destructive and disruptive operations tied to Russia's conflict with Ukraine specifically (see actor card, Section 02) — the 2015 and 2016 Ukrainian power grid attacks, NotPetya in 2017. CYCLOPS BLINK's discovery one day before the invasion, in an advisory explicitly framed around "shields up" concern, sits inside that pattern even though — as stated in Section 01 — no source reviewed confirms the botnet was built or earmarked specifically for use against Ukraine.</p>
+      <p><strong>Pre-incident indicators.</strong> No public source reviewed for this card documents any pre-2022 detection, alert, or customer report that identified Cyclops Blink activity before the joint advisory — this was, by all available evidence, a genuinely blind multi-year run for defenders (see Section 05).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Initial Device Compromise</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Sandworm's initial-access mechanism differed by device platform, and the two vectors are worth stating precisely rather than collapsing into one. On <strong>WatchGuard Firebox/XTM appliances</strong>, Sandworm exploited CVE-2022-23176, a privilege-escalation flaw in Fireware OS's management interface that let an attacker holding any unprivileged, authenticated credential escalate to full administrative control <em>(see vuln card: WatchGuard Firebox Auth Bypass)</em>. On <strong>ASUS routers</strong>, the documented vector is different and less exotic: ASUS's own guidance points to default administrator credentials and internet-exposed remote management as the practical access path, not a specific disclosed CVE (Bleeping Computer, Mar 2022; ASUS advisory). Neither vector required more than routine internet exposure and, on the WatchGuard side, a low-privilege foothold — no zero-click or highly sophisticated exploitation chain was documented on either platform.</div>
+        <div class="kc-pivot">A foothold on the device's management plane — however it was obtained — gave Sandworm the access level needed to tamper with the device's own firmware-update mechanism.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Firmware-Level Persistence</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Cyclops Blink deploys itself in the form of a malicious firmware "update," abusing the affected devices' standard upgrade process to install persistently (CISA AA22-054A). On WatchGuard devices specifically, this was possible because Firebox firmware validated update integrity using an HMAC computed with a hard-coded key shared across the product line — once Sandworm held a privileged session, it could recompute a valid HMAC for its own modified firmware image, and the device accepted it as a legitimate vendor update (Kudelski Security Research, Apr 2022). The malware has read/write access to the device filesystem and can replace legitimate binaries (e.g. the device's own <code>install_upgrade</code> component) with modified versions, meaning it survives reboots and ordinary restarts — the two things that would normally clear a less sophisticated implant (NCSC Malware Analysis Report, Feb 23 2022).</div>
+        <div class="kc-pivot">Reboot-surviving, firmware-level persistence meant Sandworm could treat compromised devices as durable, long-term infrastructure rather than a foothold that needed to be re-established after every restart or routine maintenance cycle.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Tiered, Encrypted C2 Infrastructure Assembly</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Cyclops Blink organizes infected devices into clusters, each configured with its own list of command-and-control IP addresses and ports (NCSC Malware Analysis Report). Communications between infected devices and C2 servers run over TLS with individually generated keys and certificates per deployment, layered with AES-256-CBC encryption and multiple redundant C2 channels — deliberate engineering to make the traffic both hard to detect at the network level and resilient to any single channel being taken down. Sandworm operators managed the C2 layer by connecting to it through the Tor network, adding a further layer of operator-side anonymity on top of the malware's own traffic obfuscation.</div>
+        <div class="kc-pivot">A resilient, redundant, Tor-fronted C2 architecture meant the botnet as a whole could not be meaningfully disrupted by taking down any single node or IP — a structural design choice that anticipated, and was built to survive, the kind of takedown attempt that eventually succeeded only because it operated at the scale of a coordinated, court-authorized, device-by-device remote remediation rather than a single infrastructure seizure.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Dormant Pre-Positioning</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Cyclops Blink's core functionality, as documented by CISA and NCSC, is comparatively modest by itself: send infected-device information back to a controller, and download and execute additional modules or files on command. The modular "add capability later" design is the operative feature — it lets Sandworm decide what any given device or cluster is used for at a later point, rather than committing to a fixed purpose at time of infection. No source reviewed for this card documents Cyclops Blink being used, at any point before the March 2022 disruption, to conduct DDoS attacks, exfiltrate specific victim data, or stage a destructive payload — the botnet's observed behavior throughout its known active life is consistent with infrastructure-building and readiness, not active operational use.</div>
+        <div class="kc-pivot">A large, dormant, globally distributed pool of compromised devices — capable of being tasked with new modules on short notice — represented a standing capability Sandworm could activate for offensive purposes at a time and for a use of its choosing, which is precisely the risk that triggered the eventual preemptive disruption rather than a wait-and-monitor response.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Discovery, Disclosure &amp; Court-Authorized Disruption</span>
+          <span class="vis-badge vis-detected">DETECTED — Feb 23, 2022, by CISA/FBI/NSA/NCSC-UK</span>
+        </div>
+        <div class="kc-body">On February 23, 2022, CISA, the FBI, NSA, and the UK's NCSC jointly published advisory AA22-054A, publicly naming Cyclops Blink, attributing it to Sandworm, and tying its WatchGuard-side initial access to CVE-2022-23176. WatchGuard worked with the four agencies to provide detection and non-standard remediation tooling for affected customers. On March 18, 2022, a U.S. court authorized the FBI to remotely and covertly copy and remove Cyclops Blink from remaining command-and-control devices on both WatchGuard and ASUS platforms, without the consent (and in most cases without the knowledge, until after the fact) of the devices' owners — the Justice Department announced the operation as complete and successful in early April 2022 (DOJ press release, Apr 6 2022).</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise Framework · Software S0687</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] WatchGuard Firebox/XTM devices compromised via CVE-2022-23176, an exposed management-interface privilege-escalation flaw.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">[MEDIUM] ASUS router compromise documented as credential/exposure-based (default or weak admin credentials, internet-exposed remote management) rather than a disclosed CVE.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence / Defense Evasion</div>
+        <div class="mitre-id">T1601.001</div>
+        <div class="mitre-name">Modify System Image: Patch System Image</div>
+        <div class="mitre-note">[HIGH] Malware installs as a malicious firmware "update," abusing a hard-coded HMAC signing key to pass integrity validation on WatchGuard devices.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1584.008</div>
+        <div class="mitre-name">Compromise Infrastructure: Network Devices</div>
+        <div class="mitre-note">[HIGH] Thousands of SOHO/edge devices compromised and organized into clusters as durable, reusable infrastructure rather than a single-use foothold.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1071.001</div>
+        <div class="mitre-name">Application Layer Protocol: Web Protocols</div>
+        <div class="mitre-note">[HIGH] C2 communications carried over TLS to blend with legitimate management-plane traffic.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1573.001</div>
+        <div class="mitre-name">Encrypted Channel: Symmetric Cryptography</div>
+        <div class="mitre-note">[HIGH] AES-256-CBC layered on top of TLS for C2 traffic, per NCSC malware analysis.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1090.003</div>
+        <div class="mitre-name">Proxy: Multi-hop Proxy</div>
+        <div class="mitre-note">[HIGH] Sandworm operators connected to the C2 layer via the Tor network for operator-side anonymity.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1105</div>
+        <div class="mitre-name">Ingress Tool Transfer</div>
+        <div class="mitre-note">[HIGH] Modular architecture allows new capability modules to be downloaded and executed on infected devices on command.</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1082</div>
+        <div class="mitre-name">System Information Discovery</div>
+        <div class="mitre-note">[HIGH] Core malware functionality sends infected-device information back to the controlling C2 server.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">PHASES 1–4<br/>(~2.5 YEARS)<br/>MISSED ENTIRELY</div>
+        <div class="pm-detail"><strong>No telemetry existed for defenders to miss.</strong> Network-edge appliances like Firebox/XTM firewalls and consumer ASUS routers are not, by design or by prevailing industry practice, instrumented with EDR-style monitoring the way a server or laptop endpoint would be. There was no log source, alert, or detection surface available to any individual device owner that could have surfaced firmware-level compromise during the ~2.5 years the botnet operated undetected. This is a genuinely different failure mode than "logs existed but went unreviewed" — the visibility gap was structural and industry-wide, not a specific organization's oversight.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">DEC 2021<br/>ACCIDENTAL PARTIAL REMEDIATION</div>
+        <div class="pm-detail">WatchGuard's routine December 2021 Fireware patch closed the CVE-2022-23176 authorization gap <strong>before</strong> the company or the public knew it was closing a live, multi-year nation-state intrusion vector. This is neither a "missed" detection nor a "detected" one in the normal sense — it is a case of a maintenance patch accidentally interrupting an active campaign months before anyone understood what had actually been happening, illustrating that routine patch hygiene has real, if unrecognized, security value even absent specific threat intelligence.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">Following disclosure, WatchGuard published dedicated detection and non-standard remediation tooling specifically because a routine firmware upgrade alone was documented as insufficient to remove an already-active infection (the malware's persistence mechanism lives inside the update-validation path itself). More broadly, this incident — alongside VPNFilter before it — contributed to a growing industry and CISA-level emphasis on treating network-edge/perimeter devices as a monitored asset class in their own right, including firmware-integrity verification and default-disabling of internet-facing management interfaces, rather than as "set and forget" infrastructure.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">CYCLOPS BLINK (MITRE ATT&amp;CK Software S0687)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">botnet</span>
+            <span class="artifact-tag">modular</span>
+            <span class="artifact-tag">firmware-persistent</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Modular botnet malware written to run on network-device firmware (WatchGuard Firebox/XTM, ASUS routers). Core module reports device information to C2 and can fetch/execute additional modules on command. Persists as a malicious firmware image; communications encrypted with TLS + AES-256-CBC over a tiered C2 architecture managed through Tor. Successor to VPNFilter (2018).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">CVE-2022-23176 — WatchGuard Firebox/XTM Privilege Escalation</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">initial access</span>
+            <span class="artifact-tag">CVSS 8.8</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Primary documented initial-access vulnerability on the WatchGuard side of this campaign — full root-cause analysis, CVSS breakdown, patch guidance, and purple-team content maintained in its own vuln card <em>(see vuln card: WatchGuard Firebox Auth Bypass)</em> rather than duplicated here.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Hard-coded HMAC Firmware-Signing Key (WatchGuard, undocumented separate CVE)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">persistence mechanism</span>
+            <span class="artifact-tag">not CVE-numbered</span>
+          </div>
+        </div>
+        <div class="artifact-desc">A static, hard-coded key used across the Firebox product line to compute the HMAC validating firmware update images. Once an attacker held a privileged session (via CVE-2022-23176), this weakness let them push a self-signed, malicious firmware image that the device accepted as legitimate. No source reviewed assigns this weakness its own CVE identifier — documented here as an artifact of the exploitation chain, not as a separately tracked vulnerability.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling. Infrastructure listed here was active during the 2019–2022 campaign window and has long since been rotated/dismantled following the March 2022 disruption — treat as historical/research reference, not a live blocklist.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">CVE</td><td class="val">CVE-2022-23176 (WatchGuard Firebox/XTM privilege escalation)</td><td>CISA / NVD</td><td>2022-02-23</td></tr>
+          <tr><td class="type-label">MALWARE ID</td><td class="val">MITRE ATT&amp;CK Software S0687 (Cyclops Blink)</td><td>MITRE ATT&amp;CK</td><td>2022</td></tr>
+          <tr><td class="type-label">BEHAVIORAL</td><td class="val">TLS-wrapped C2 traffic on device management plane, tiered/clustered C2 IP lists, AES-256-CBC-encrypted payload, Tor-relayed operator access</td><td>NCSC Malware Analysis Report</td><td>2022-02-23</td></tr>
+          <tr><td class="type-label">BEHAVIORAL</td><td class="val">Unauthorized firmware "update" event on WatchGuard Firebox/XTM device outside a logged, administrator-initiated upgrade action</td><td>WatchGuard / CISA remediation guidance</td><td>2022</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No specific C2 IP addresses, domains, or file hashes for Cyclops Blink samples were located in the public-source subset reviewed for this card (CISA/NCSC published detailed detection signatures and YARA/Snort rules in companion technical documents not fully mirrored in the sources retrieved here). This is stated as a research-pass gap, not a claim that no such IOCs exist publicly — an analyst needing operational IOCs should pull directly from the NCSC Malware Analysis Report PDF and CISA's companion indicator files.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">The disruption operation removed a standing, globally distributed capability from Sandworm's hands one day before Russia's invasion of Ukraine reached full scale — contemporaneous coverage widely framed this as a preemptive denial of potential wartime infrastructure, and CISA's own advisory carried explicit "shields up" framing tied to the invasion. That framing is a reasonable strategic reading of the timing, but it should be held separately from proven fact: <strong>no source reviewed for this card documents a confirmed, specific plan to use Cyclops Blink against Ukrainian or NATO targets</strong> — what is documented is that a large, flexible, dormant capability existed and was neutralized before any confirmed offensive use, at a moment when Russian cyber activity was under maximum global scrutiny.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">WatchGuard published dedicated, non-standard detection and remediation tooling for affected customers, since a routine firmware upgrade alone did not reliably remove an active infection. More broadly, the incident reinforced an industry-wide lesson (shared with VPNFilter before it) that network-edge and SOHO devices function as a durable, largely unmonitored attack surface — pushing renewed vendor and CISA emphasis on disabling internet-facing management interfaces by default and on firmware-integrity verification as a standard practice rather than an edge case.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">The March 2022 operation followed the same legal mechanism the FBI used against VPNFilter in 2018 — a court-authorized warrant permitting the government to remotely access and remediate malware on privately owned devices without the owners' consent or, in most cases, prior knowledge. Running that mechanism a second time against the same actor's infrastructure moves it from a one-off legal improvisation toward an established, repeatable government tool. This is not without genuine debate: remote government access to private devices, even for unambiguously remedial purposes and under judicial authorization, raises real questions about scope, oversight, and precedent that extend beyond this specific case — sources reviewed for this card document the operation's legal basis and its stated success, but do not resolve that broader debate, and this card does not take a position on it.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: HIGH</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Sandworm Team</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">Russian GRU, Unit 74455</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Joint CISA/FBI/NSA/NCSC-UK advisory (AA22-054A, Feb 23 2022)</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">None specific to this campaign; six GRU Unit 74455 officers previously indicted (2020) for related Sandworm activity including NotPetya and the 2018 Olympics attack</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue"><a href="../actors/2026-09-02_SANDWORM.html" style="color:var(--blue);">2026-09-02_SANDWORM.html</a></span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Multi-agency joint technical attribution (US + UK), consistent with established Sandworm/VPNFilter TTP lineage</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">None substantive identified — attribution is not contested in sources reviewed</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">A credible, independently corroborated alternative attribution has not been proposed in any source reviewed; this would require new, contradicting technical evidence, which has not surfaced</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution here rests on formal, joint technical assessment by four government cybersecurity agencies across two allied nations (CISA, FBI, and NSA in the U.S.; NCSC in the UK), publishing consistent findings under a shared advisory. This is a stronger evidentiary basis than a single-vendor private assessment, and it is consistent with — not standing apart from — the broader body of independent vendor tracking (CrowdStrike's VOODOO BEAR, ESET's TeleBots, Dragos's ELECTRUM, Microsoft's Seashell Blizzard/IRIDIUM, all converging on the same underlying actor cluster; see actor card Section 01 for the full alias/tracking-designation picture). No source reviewed for this card raises a serious competing attribution hypothesis. Full identity, sponsorship, and confidence-rationale detail for the actor itself lives in the companion Sandworm Team actor card rather than being duplicated here, per this card's relationship to actor cards.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CYCLOPS BLINK is the second confirmed case of the U.S. Department of Justice using a court-authorized, remote, non-consensual remediation operation to disable a Sandworm-operated botnet — the first being VPNFilter in 2018. Two data points is a thin base for declaring a "doctrine," but it is enough to establish that this specific legal and operational mechanism is now a standing, repeatable tool in the U.S. government's toolkit against nation-state edge-device botnet infrastructure, rather than a one-time legal improvisation. Any future incident card documenting a similar takedown should treat this pairing (VPNFilter → Cyclops Blink) as the baseline precedent, not a novel development.</p>
+      <p>It is also one of the clearest documented cases of a nation-state building large-scale botnet infrastructure as a standing capability rather than as a tool aimed at a specific target or objective — the "dormant pre-positioning" model described in Section 03. That distinction matters for how defenders and policymakers should think about network-edge device compromise generally: the absence of any confirmed offensive use of the botnet before it was disrupted does not mean the compromise was low-stakes while it lasted. It means the capability existed, fully formed and ready, for roughly two and a half years before anyone outside Sandworm knew about it — a genuinely different risk profile than an intrusion aimed at immediate data theft, and one that argues for treating "silent, purposeless-seeming" edge-device compromise as seriously as an active, damaging one.</p>
+      <p>Finally, the incident is a clean case study in how vulnerability disclosure interacts with active law-enforcement operations (see the companion vuln card's Section 04 and Section 07 for the fuller analysis) — WatchGuard patched the underlying CVE quietly in December 2021 and held back public framing of its severity for roughly two months at DOJ's direction, ahead of the March 2022 takedown. That is a genuinely different disclosure model than the standard researcher-vendor coordinated disclosure this field is usually taught around, and it remains a live, unresolved tension worth studying on its own terms rather than folding into ordinary CVD norms.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / NSA / NCSC-UK</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-054a" target="_blank">AA22-054A: New Sandworm Malware Cyclops Blink Replaces VPNFilter</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NCSC (UK)</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ncsc.gov.uk/files/Cyclops-Blink-Malware-Analysis-Report.pdf" target="_blank">Malware Analysis Report — Cyclops Blink</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Department of Justice</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/archives/opa/pr/justice-department-announces-court-authorized-disruption-botnet-controlled-russian-federation" target="_blank">Justice Department Announces Court-Authorized Disruption of Botnet Controlled by the Russian Federation's GRU</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Kudelski Security Research</div>
+        <div>
+          <div class="ref-detail"><a href="https://research.kudelskisecurity.com/2022/04/04/cyclops-blink-malware-targeting-watchguard-firewalls/" target="_blank">Cyclops Blink Malware Targeting WatchGuard Firewalls</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Trend Micro</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.trendmicro.com/en_us/research/22/c/cyclops-blink-sets-sights-on-asus-routers--.html" target="_blank">Cyclops Blink Sets Sights on Asus Routers</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bleeping Computer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/asus-warns-of-cyclops-blink-malware-attacks-targeting-routers/" target="_blank">ASUS Warns of Cyclops Blink Malware Attacks Targeting Routers</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2022/04/fbi-shut-down-russia-linked-cyclops.html" target="_blank">FBI Shut Down Russia-linked "Cyclops Blink" Botnet That Infected Thousands of Devices</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">TechCrunch</div>
+        <div>
+          <div class="ref-detail"><a href="https://techcrunch.com/2022/04/06/fbi-operation-botnet-sandworm/" target="_blank">FBI Operation Aims to Take Down Massive Russian GRU Botnet</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cisco Talos</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2018/05/vpnfilter-botnet-malware.html" target="_blank">FBI Seizes Control of a Massive Botnet That Infected Over 500,000 Routers (VPNFilter, 2018 precedent)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/software/S0687/" target="_blank">Cyclops Blink, Software S0687</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0034/" target="_blank">Sandworm Team, G0034</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/cisa-tells-orgs-patch-watchguard-flaw-exploited-months-disclosure/" target="_blank">CISA Tells Orgs to Patch WatchGuard Flaw Exploited for Months Before Disclosure</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 12 Sources (Government, MITRE, Vendor, Press)</div>
+  <div>Companion vuln card built via Vuln Auto-Dispatch: WatchGuard Firebox Auth Bypass (CVE-2022-23176)</div>
+</div>
+
+</body>
+</html>
