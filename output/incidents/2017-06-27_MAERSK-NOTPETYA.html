@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Maersk NotPetya Attack — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 54px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 34px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    ND-2017-06<br/>
+    2017-06-27
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Nation-State Destructive / Worm-Enabled Collateral Damage</div>
+  <h1><span class="gold">MAERSK</span> NOTPETYA ATTACK</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-02 &nbsp;|&nbsp; INCIDENT DATE: 2017-06-27 (global outbreak) — Maersk recovery through ~2017-07-07 &nbsp;|&nbsp;
+    SOURCES: 16
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>NATION-STATE DESTRUCTIVE · WORM/SELF-PROPAGATING</span></div>
+    <div>Attribution: <span class="green">Sandworm Team / GRU Unit 74455 [HIGH]</span></div>
+    <div>Severity: <span class="red">CRITICAL</span></div>
+    <div>Era: <span>2017 (Post-ATT&amp;CK launch)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">$300M</div>
+    <div class="stat-label">Ceiling of Maersk's own disclosed business-interruption cost (Aug 2017)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">10 DAYS</div>
+    <div class="stat-label">To reinstall 4,000 servers, 45,000 PCs &amp; 2,500 apps — vs. ~6 months normal</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">$10B+</div>
+    <div class="stat-label">Total global NotPetya damage across all victims (White House assessment)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">1 of ~150</div>
+    <div class="stat-label">Domain controllers to survive — saved by a Ghana office power outage</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="name">Sandworm Team / GRU Unit 74455 (tracked separately as APT44) — <span class="none">No companion actor card on file</span></span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">Maersk NotPetya Attack</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Backdoor planted: ~mid-May 2017 · Global outbreak: 2017-06-27 · Maersk recovery: ~10 days</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Nation-state destructive attack, worm-enabled global collateral damage</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Sandworm Team (Russia, GRU Main Center for Special Technologies, Unit 74455)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[HIGH]</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Ukrainian government &amp; economy (intended) — A.P. Møller-Maersk (collateral, this card's focus)</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">Maersk globally (all business units) + 80%+ of NotPetya's ~ hundreds of other corporate/government victims worldwide</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">2017-06-27, within hours — impact was immediately overt, not covertly discovered</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Maersk IT staff (real-time, as systems went dark company-wide)</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">~6 weeks (M.E.Doc backdoor present before detonation) · Maersk's own network compromised same-day as outbreak</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">~$200–300M business interruption; 4,000 servers/45,000 PCs/2,500 apps rebuilt from scratch</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None dedicated — tracked under Group G0034 (Sandworm Team) / Software S0368 (NotPetya)</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Yes — infrastructure/hashes are 9 years stale; archival value only</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On June 27, 2017, a piece of malware distributed through a hijacked software update for a Ukrainian tax-accounting program detonated across the internet, self-propagating through corporate networks worldwide using leaked NSA exploits and stolen credentials. Within Ukraine it hit government ministries, banks, energy utilities, the Kyiv metro, and even the radiation-monitoring systems at Chernobyl. Outside Ukraine, it caused what the White House would later call, in its formal February 2018 attribution statement, "the most destructive and costly cyber-attack in history" — over $10 billion in global damage by U.S. government estimate (The White House, 2018). This card examines that campaign specifically through the experience of one collateral victim: A.P. Møller-Maersk, the world's largest container shipping company, whose entire global IT estate — roughly 150 countries' worth of terminals, vessels, and back-office systems running on a single flat Windows domain — was wiped in minutes because one of its business units happened to run the compromised Ukrainian tax software.</p>
+      <p>Maersk was never the intended target. The malware, publicly named NotPetya (also tracked as Petya.A, GoldenEye, ExPetr, and Nyetya across vendor reporting), was built and deployed by Russia's military intelligence directorate as an instrument aimed squarely at Ukraine, timed one day before Ukraine's Constitution Day and amid the ongoing conflict following Russia's 2014 annexation of Crimea. Its worm-like propagation mechanism, however, recognized no border and no target list: any organization anywhere in the world with a network-connected machine running the trojanized M.E.Doc update, or with an unpatched or credential-exposed machine on the same flat network as one, was fair game. Maersk's exposure came through Maersk's Ukraine-based freight-forwarding operations; from there, the malware crossed onto Maersk's single global Windows domain and detonated company-wide.</p>
+      <p>What makes the Maersk case the canonical teaching example of NotPetya — more than Merck, more than FedEx/TNT Express, more than any of the incident's dozens of other major corporate victims — is the combination of the scale of destruction (every domain controller Maersk operated was wiped except one, saved purely by chance), the specificity of the recovery story (a hard drive physically flown out of a small West African office to rebuild the company's Active Directory), and the fact that Maersk's own leadership, notably then-Chairman Jim Hagemann Snabe, spoke publicly and in detail about the incident at forums including the World Economic Forum — producing an unusually well-documented, first-person account of what a full-enterprise wipe actually looks like from inside a Fortune Global 500 company.</p>
+      <p>Nearly a decade later, Maersk-NotPetya remains foundational reference material for business continuity planning, Active Directory security architecture, cyber insurance underwriting (via the parallel Merck and Mondelez litigation over "war exclusion" clauses triggered by the same campaign), and the broader doctrine of cyber-attack attribution, since the joint February 2018 statement by the U.S. and seven allied governments represented the most coordinated multinational attribution of a cyberattack to a nation-state that had occurred up to that point.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>By mid-2017, Sandworm Team — the GRU unit publicly tracked today under a long list of vendor names (ELECTRUM, Telebots, BlackEnergy, Voodoo Bear, Iron Viking, Seashell Blizzard, and, in Mandiant's later consolidated tracking, APT44) — had already conducted two confirmed disruptive attacks on Ukraine's power grid, in December 2015 and December 2016, using the BlackEnergy and Industroyer/CRASHOVERRIDE toolsets to trigger real blackouts (MITRE ATT&CK G0034; DOJ indictment, 2020). NotPetya extended that pattern from physical infrastructure disruption to a broader, IT-centric destructive campaign, timed to detonate on June 27 — the eve of Ukraine's Constitution Day — reinforcing the assessment that the operation was a deliberate act of hybrid warfare against Ukraine rather than a financially motivated ransomware campaign that happened to spread out of control.</p>
+      <p>The entry vector exploited a specific, structural weakness in Ukraine's software ecosystem: M.E.Doc, produced by the Ukrainian company Intellect Service, was the dominant tax-filing and accounting application used by companies doing business in Ukraine, reportedly present on a substantial share of all computers in the country and used by any foreign company with a Ukrainian subsidiary or filing obligation — Maersk's Ukraine-based freight forwarding unit among them. Forensic analysis after the fact found the attackers had compromised an employee account on M.E.Doc's own update servers and distributed the backdoor through at least three tainted software updates — April 14, May 15, and June 22, 2017 — meaning it sat live in a widely-trusted update channel for roughly ten weeks before the June 27 trigger (the same channel was separately used in May 2017 to distribute an unrelated ransomware family, XData, before being repurposed for NotPetya). M.E.Doc's own server software had not been patched since 2013 — a vendor security posture ESET later described the resulting operation as exploiting "thoroughly" (ESET, TeleBots, 2017; Cisco Talos, 2017).</p>
+      <p>Maersk's own internal architecture compounded the exposure once the malware crossed onto its network. Like many large, decades-old multinational conglomerates that had grown through acquisition (Maersk's structure spans Maersk Line, APM Terminals, Damco, Svitzer, and other units), the company ran essentially all of its global Windows infrastructure — vessels, terminals, back offices, across roughly 130 countries — on a single, largely flat Active Directory domain, with limited segmentation between business units or geographies. This is precisely the condition NotPetya's propagation mechanism was engineered to exploit: once inside any part of a flat, single-domain network, credential-harvesting and SMB-exploit-driven lateral movement could reach essentially everything.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Software Supply Chain Compromise — M.E.Doc Backdoor</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Sandworm operators compromised an employee account on the servers of Intellect Service, the Ukrainian developer of the M.E.Doc tax-accounting application, and used that access to plant a backdoor inside M.E.Doc's own software-update mechanism. The backdoor sat live, undetected, for at least six weeks before it was ever triggered — M.E.Doc's server software itself had not been patched since 2013, and the update mechanism carried no code-signing or integrity-verification step capable of catching a malicious update pushed from the vendor's own infrastructure (ESET, 2017; Cisco Talos, 2017). Because the compromise lived inside a trusted vendor's legitimate update channel rather than inside any individual victim's network, no customer of M.E.Doc — Maersk included — had any visibility into this phase at all.</div>
+        <div class="kc-pivot">A backdoored update channel inside a widely-deployed, government-adjacent piece of software gave the operators a single trigger capable of reaching an enormous, largely uncontrollable population of downstream victims simultaneously.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Trojanized Update Push &amp; Ukraine-Wide Detonation</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">At approximately 10:30 GMT on June 27, 2017 — the day before Ukraine's Constitution Day — the backdoored M.E.Doc update mechanism pushed the malicious payload to every machine configured to receive automatic M.E.Doc updates. Any organization with M.E.Doc installed and update-checking enabled, anywhere in the world, received the payload within minutes of that trigger, with no user interaction required. ESET's telemetry placed roughly 80% of initial infections inside Ukraine, consistent with M.E.Doc's userbase, but the mechanism did not restrict itself geographically — any foreign entity running a Ukraine-facing business unit that used the software, including Maersk's Ukrainian freight-forwarding operation, was infected on exactly the same trigger as domestic Ukrainian victims.</div>
+        <div class="kc-pivot">The malware was now executing with local administrative context on infected machines and immediately began harvesting credentials and scanning for lateral-movement opportunities rather than waiting for further instruction — the entire remaining kill chain from this point happened automatically, with no further attacker interaction required.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Worm-Enabled Lateral Spread Into Maersk's Global Network</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Once executing on an infected host, NotPetya used a modified build of the open-source credential-dumping tool Mimikatz to harvest Windows credentials cached in memory, then used those credentials — combined with the leaked NSA exploits EternalBlue (CVE-2017-0144) and EternalRomance (CVE-2017-0145), both released by the Shadow Brokers two months earlier — to spread over SMB to any reachable Windows host, patched or not: a host with valid cached admin credentials could be infected via PsExec or WMIC even without any exploitable vulnerability at all, meaning full patch compliance alone could not have stopped propagation once credentials were exposed anywhere on the network (Cisco Talos, 2017; CrowdStrike, 2017). Because Maersk's global IT estate sat on one largely unsegmented Active Directory domain, the malware's spread was not contained to the Ukrainian unit where it entered — contemporaneous and retrospective reporting describes the infection reaching Maersk's entire global network within minutes of first execution, a scale and speed of self-propagation that gave IT staff essentially no window in which to isolate the intrusion before impact.</div>
+        <div class="kc-pivot">With domain-wide credential reuse and unpatched SMB exposure both present somewhere on the network, the malware no longer needed to find new footholds — it had already reached every machine it would ever need to reach before the destructive payload activated.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Destructive Payload Execution — MBR/MFT Wipe Disguised as Ransomware</span>
+          <span class="vis-badge vis-detected">DETECTED (instantaneously, upon activation — not before)</span>
+        </div>
+        <div class="kc-body">The payload, executed via <code>rundll32.exe "C:\Windows\perfc.dat",#1</code> on infected hosts, overwrote each machine's Master Boot Record with a custom bootloader and displayed a fake CHKDSK repair screen while it encrypted the Master File Table and, on hosts where it obtained administrator rights, individual files matching a hard-coded extension list — rendering every affected machine completely unusable and demanding a $300 Bitcoin payment to a single hard-coded wallet address, with proof-of-payment instructions to email a fixed address at the German provider Posteo. Security researchers established within hours that the "ransomware" framing was a decoy: the malware generated a random installation ID with no cryptographic relationship to the actual per-victim encryption key, meaning the attackers could not have provided a working decryption key even to a victim who paid — a design choice, not a bug, that confirmed NotPetya's actual purpose was destruction, not extortion (Comae Technologies/Matt Suiche, 2017; Kaspersky, 2017). Posteo suspended the ransom-contact inbox within hours of the outbreak once it recognized its service was being used to facilitate a ransomware campaign, permanently severing the fictitious payment channel. This phase is marked "detected" in the sense that its effects were immediately and unmistakably obvious to every victim the moment it activated — there was no covert dwell time here to miss, only an instantaneous, total loss of the machine.</div>
+        <div class="kc-pivot">Within Maersk, this phase executed near-simultaneously across the company's entire global Windows estate — by the time any single business unit's IT staff recognized what was happening, the same destruction was already underway everywhere else in the company at once.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Maersk-Wide Operational Collapse &amp; the Ghana Domain Controller</span>
+          <span class="vis-badge vis-detected">DETECTED (by the victim, in real time)</span>
+        </div>
+        <div class="kc-body">Within roughly seven minutes of first detonation inside Maersk's network, by the account Chairman Jim Hagemann Snabe later gave publicly at the World Economic Forum in Davos and that Andy Greenberg's subsequent reporting corroborated in detail, Maersk's entire global IT infrastructure had gone dark — every one of the company's roughly 150 domain controllers wiped, taking with them the Active Directory data needed to authenticate and rebuild any of the company's 4,000 servers or 45,000 endpoints. Terminal operations halted at 76 ports Maersk-affiliated operators controlled worldwide, including major hubs at Los Angeles, Rotterdam, and Mumbai's Jawaharlal Nehru Port; ship-to-shore communications and container-booking systems went down company-wide. Frantic calls to data centers around the world eventually turned up exactly one surviving domain controller — in a small Maersk office in Ghana, which by pure chance had lost power and been disconnected from the network in the hours before the malware reached it, preserving the only intact copy of the company's Active Directory data left anywhere in the organization. Because the connection out of Ghana was too slow to transfer the several-hundred-gigabyte backup electronically in any workable timeframe, a Maersk staffer physically carried the drive to the airport, and the data was relayed onward by air to the company's technology recovery hub in Maidenhead, UK, where engineers used it as the seed to rebuild the company's entire identity infrastructure from scratch. Over the following ten days — a rebuild Snabe stated would normally take around six months — Maersk's IT organization reinstalled all 4,000 servers, 45,000 PCs, and roughly 2,500 applications, restoring core operations; Maersk's own public disclosures placed the resulting financial impact at $200–300 million in lost business, contributing to a $264 million net loss for the quarter in which the attack occurred (Maersk, Aug. 2017 trading update; Reuters, CNBC, Computer Weekly, 2017).</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise Framework — forward-mapped (post-dates ATT&amp;CK's 2015 launch)</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1195.002</div>
+        <div class="mitre-name">Supply Chain Compromise: Compromise Software Supply Chain</div>
+        <div class="mitre-note">Backdoor planted in M.E.Doc's legitimate update mechanism via a compromised employee account on the vendor's own servers — the explicit technique MITRE ATT&amp;CK attributes to Sandworm Team for this operation.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1218.011</div>
+        <div class="mitre-name">System Binary Proxy Execution: Rundll32</div>
+        <div class="mitre-note">Main payload executed via <code>rundll32.exe "perfc.dat",#1</code> on infected hosts, a technique consistently documented across vendor forensic writeups.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.001</div>
+        <div class="mitre-name">OS Credential Dumping: LSASS Memory</div>
+        <div class="mitre-note">Modified open-source Mimikatz build embedded in the payload harvested plaintext/hashed Windows credentials from memory on each newly infected host.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1210</div>
+        <div class="mitre-name">Exploitation of Remote Services</div>
+        <div class="mitre-note">EternalBlue (CVE-2017-0144) and EternalRomance (CVE-2017-0145) SMB exploits — leaked by the Shadow Brokers — used to spread to unpatched hosts regardless of credential exposure.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.002</div>
+        <div class="mitre-name">Remote Services: SMB/Windows Admin Shares</div>
+        <div class="mitre-note">Harvested credentials used with PsExec-style remote execution over admin shares, propagating even to fully patched hosts that shared a network with a compromised, credential-exposed machine.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1047</div>
+        <div class="mitre-name">Windows Management Instrumentation</div>
+        <div class="mitre-note">WMIC invoked with harvested credentials as an alternate remote-execution path alongside PsExec, documented in Talos and CrowdStrike technical breakdowns.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1070.001</div>
+        <div class="mitre-name">Indicator Removal: Clear Windows Event Logs</div>
+        <div class="mitre-note">Malware cleared Application, Security, System, and Setup event logs and the NTFS USN change journal on infected hosts prior to triggering the destructive payload, hindering post-incident forensic reconstruction.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1561.002</div>
+        <div class="mitre-name">Disk Wipe: Disk Structure Wipe</div>
+        <div class="mitre-note">Custom bootloader overwrote the Master Boot Record; Master File Table encrypted with no recoverable key relationship to the victim, rendering the technique functionally destructive rather than reversible.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">Individually encrypted files on hosts with elevated privileges, masquerading as conventional ransomware to delay recognition of the payload's true destructive intent.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft (adapted: Fraudulent Extortion Demand)</div>
+        <div class="mitre-note">$300 BTC ransom demand functioned as misdirection rather than a genuine monetization goal — a single hard-coded wallet address and an email channel that was severed by the provider within hours confirm no functioning payment-to-decryption pipeline ever existed.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">SUPPLY CHAIN TRUST<br/>MISSED — ARCHITECTURAL</div>
+        <div class="pm-detail">Maersk had no visibility into, or control over, the security posture of a third-party Ukrainian tax vendor its local subsidiary was legally required to use — a dependency essentially invisible to corporate IT risk management until it detonated. No amount of Maersk-side detection could have caught this phase; the failure point sat entirely inside M.E.Doc's own infrastructure.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">NETWORK SEGMENTATION<br/>MISSED — ARCHITECTURAL</div>
+        <div class="pm-detail">Maersk's global IT estate ran on a single, largely flat Active Directory domain spanning roughly 130 countries and dozens of business units acquired over decades — the single largest structural factor in why an infection entering through one small Ukrainian unit reached the entire global company within minutes rather than remaining contained.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">BACKUP ARCHITECTURE<br/>MISSED — ARCHITECTURAL</div>
+        <div class="pm-detail"><strong>The single most consequential control gap in this incident.</strong> Maersk's domain-controller backups were themselves network-connected and were destroyed by the same propagation wave as the production systems they were meant to protect — the company came within one lucky, unrelated power outage in Ghana of losing its Active Directory identity data entirely, with no accessible offline or immutable copy anywhere in the organization.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">DESTRUCTIVE-PAYLOAD ACTIVATION<br/>UNMISSABLE — NOT A DETECTION FAILURE</div>
+        <div class="pm-detail">Once triggered, the payload's effects were instantaneous and total; no plausible detection or SOC-alerting capability of the era could have intervened between activation and impact on an individual host. The only leverage point that mattered was everything upstream of this moment — patching, segmentation, and credential hygiene — not detection at the point of destruction.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">Maersk undertook a large-scale post-incident overhaul of its IT architecture and security investment, publicly discussed by Chairman Jim Hagemann Snabe; the incident became a widely cited catalyst for enterprise adoption of offline/immutable Active Directory backup practices specifically, cited repeatedly in identity-security vendor guidance (e.g., Semperis, 2020/2021) as the canonical cautionary example of why domain-controller backups must be isolated from the production network they protect.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">CISA/US-CERT's contemporaneous alert (TA17-181A / ICS-ALERT-17-181-01C) reinforced urgency around applying MS17-010, disabling SMBv1 entirely, and blocking TCP 139/445 at network boundaries — guidance that, alongside the same EternalBlue exploit's role one month earlier in WannaCry, accelerated industry-wide SMBv1 deprecation efforts that continued for years afterward.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">NotPetya (aka Petya.A, GoldenEye, ExPetr, Nyetya)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Wiper disguised as ransomware</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Core payload, distributed as <code>perfc.dat</code>, executed via <code>rundll32.exe "C:\Windows\perfc.dat",#1</code>. Overwrites the Master Boot Record with a custom bootloader, encrypts the Master File Table, and on hosts with elevated privileges encrypts individual files by extension. Displays a forged CHKDSK screen during MFT encryption to delay victim recognition. Confirmed non-recoverable by design — the victim installation ID has no cryptographic relationship to the actual encryption key.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">EternalBlue / EternalRomance (CVE-2017-0144 / CVE-2017-0145)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Leaked NSA SMBv1 remote-code-execution exploits</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Publicly released by the Shadow Brokers in April 2017; the same EternalBlue exploit had been used one month earlier by WannaCry. Enabled NotPetya to spread to unpatched Windows SMB hosts regardless of credential exposure. Patched by Microsoft's MS17-010 (March 2017), meaning both outbreaks targeted organizations that had not applied an already-available patch.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Modified Mimikatz Build</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Credential-harvesting component</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Custom-compiled variant of the open-source Mimikatz tool embedded directly in the NotPetya payload, used to extract plaintext and hashed Windows credentials from LSASS memory on each newly infected host, feeding the PsExec/WMIC lateral-movement stage.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">M.E.Doc Update Backdoor</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Software supply-chain implant</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Backdoor implanted in Intellect Service's M.E.Doc tax-software update mechanism via a compromised employee account on the vendor's own servers; present at least six weeks before the June 27, 2017 trigger. This was the sole confirmed initial-access vector for the global campaign — no other simultaneous infection vector has been documented in public reporting.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are archival. Infrastructure has long since rotated and this malware is broadly detected by any current-generation AV/EDR signature set. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">FILE</td><td class="val historical">C:\Windows\perfc.dat (primary payload DLL, no file extension executed via rundll32 export #1)</td><td>Cisco Talos, ESET</td><td>2017-06-27</td></tr>
+          <tr><td class="type-label">EXEC PATTERN</td><td class="val historical">rundll32.exe "C:\Windows\perfc.dat",#1</td><td>Cisco Talos, Microsoft MSTIC</td><td>2017-06-27</td></tr>
+          <tr><td class="type-label">EMAIL (extortion contact)</td><td class="val historical">wowsmith123456[at]posteo[.]net — suspended by provider within hours of outbreak</td><td>BleepingComputer, Motherboard/Vice</td><td>2017-06-27</td></tr>
+          <tr><td class="type-label">BTC WALLET</td><td class="val historical">1Mz7153HMuxXTuR2R1t78mGSdzaAtNbBWX8 — single hard-coded address for the entire global campaign</td><td>BleepingComputer, Fortune</td><td>2017-06-27/28</td></tr>
+          <tr><td class="type-label">CVE</td><td class="val historical">CVE-2017-0144 (EternalBlue) / CVE-2017-0145 (EternalRomance) — patched by MS17-010</td><td>Microsoft, MITRE CVE</td><td>2017-03-14</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No specific vendor-published file hashes (MD5/SHA) are reproduced in this card. Contemporaneous hash-based IOC packages were published by ESET, Kaspersky, and Microsoft at the time of the outbreak — see References for original vendor advisories rather than a value transcribed here from memory.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">On February 15, 2018, the United States, United Kingdom, Australia, Canada, Denmark, Estonia, Lithuania, New Zealand, and Norway issued coordinated statements formally attributing NotPetya to the Russian military — at the time, the broadest multinational cyberattack attribution ever conducted, treated by policy analysts as an early test case for collective attribution as a norm-enforcement tool. The operation also demonstrated a strategic vulnerability the Kremlin's own economic sphere shared with the rest of the world: NotPetya's uncontained spread inflicted significant collateral damage on Russian entities including oil major Rosneft and steelmaker Evraz, an outcome widely read as evidence the weapon's blast radius exceeded even its operators' apparent intent.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">NotPetya established, in a single incident, that a wiper disguised as ransomware — combining a software supply-chain trigger with leaked-exploit-plus-credential-harvesting worm propagation — could achieve total, simultaneous compromise of a multinational enterprise's entire IT estate in minutes, independent of that organization's individual patch compliance, so long as credential reuse existed anywhere on a flat network. It remains a frequently cited reference point for why "we patch everything" is an insufficient defense on its own against lateral movement chains that route around unpatched hosts via valid credentials.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">Maersk's own ~$200–300M impact was disclosed directly as an unmitigated business-interruption cost in its own quarterly trading update rather than pursued through public first-party insurance litigation; public reporting does not document a comparable war-exclusion coverage dispute specific to Maersk. The same campaign, however, produced two of the most closely watched cyber-insurance disputes in the industry's history: Merck & Co. prevailed against Ace American Insurance in New Jersey courts (ruling January 2022, affirmed on appeal 2023) after insurers invoked a policy's "act of war" exclusion, a dispute ultimately resolved by confidential settlement in January 2024 rather than further appeal to the state supreme court; reported claim figures vary by outlet and by point in the litigation timeline ($870M in early filings, $1.3B in 2019-era reporting, $1.4B at the litigation/settlement stage, and $700M in at least one settlement-era headline) — presented here as a range rather than a single resolved number, since no source reviewed reconciles the spread. Mondelez International separately settled a parallel dispute with Zurich Insurance in November 2022 over a claim reported as "$100M+" in some outlets and $188M in others (likely reflecting claim-denial amount vs. total business loss respectively), without a public ruling or precedent. Together these cases materially reshaped how war-exclusion language is drafted and litigated across the cyber-insurance industry.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: HIGH</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Sandworm Team (GRU Unit 74455 / Main Center for Special Technologies)</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">Russian Federation — GRU (military intelligence)</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Yes — joint statement, US + 7 allied governments, 2018-02-15</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">Yes — US DOJ, W.D. Pa., 2020-10-19: Yuriy Andrienko, Sergey Detistov, Pavel Frolov, Anatoliy Kovalev, Artem Ochichenko, Petr Pliskin</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file — see Section 00</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Malware code-lineage overlap with prior Sandworm operations; DOJ indictment names Pliskin specifically as a NotPetya malware developer; US Treasury CAATSA/EO 13694 sanctions, March 2018</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">None substantive in public record — attribution is not contested among Western governments or major vendors; some early (June–July 2017) reporting briefly entertained a purely criminal ransomware hypothesis before technical analysis ruled it out</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Credible alternative claim of authorship, or documented evidence the M.E.Doc backdoor and destructive payload were developed/deployed by an unrelated actor exploiting Sandworm's established access</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution here rests on a substantially stronger evidentiary base than most nation-state cyber incidents reach: a coordinated, multi-government formal statement naming the Russian military specifically; a detailed criminal indictment naming six individual GRU officers with role-specific allegations (Pliskin credited with developing NotPetya components, alongside his and Andrienko's separate work on Olympic Destroyer); Treasury sanctions applied under a named legal authority; and technical continuity between NotPetya's tradecraft and Sandworm's well-documented prior Ukrainian power-grid attacks. No companion threat-actor profile card exists yet in this repository for Sandworm Team / GRU Unit 74455 / APT44 — a gap worth closing given the group's broader operational history extends well beyond this single incident (Ukraine grid attacks 2015–2016, Olympic Destroyer 2018, ongoing Ukraine-conflict operations tracked into the 2020s).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Maersk-NotPetya endures as a teaching case for a reason distinct from most incidents in this repository: it is not primarily a story about a detection failure, but about what happens when detection is irrelevant — when a destructive payload's activation and its impact are the same instant, and every meaningful defensive decision had to have already been made beforehand. That reframing is itself the case's central lesson for defenders: patch management, network segmentation, and offline backup architecture are not merely best practices among many, but the entire available defense against a category of attack where there is no detection window to exploit once the payload fires.</p>
+      <p>The incident is also the canonical real-world illustration of why domain-controller backup isolation matters specifically, not backups in general — Maersk had backups, and lost them anyway, because they were reachable from the same network the malware was already spreading across. The company's survival hinged on an unrelated, unplanned power outage in a small West African office, a fact identity-security practitioners have cited for years since as the sharpest available argument for offline, immutable backup of directory-services infrastructure in particular.</p>
+      <p>Beyond its technical lessons, the incident helped establish coordinated multinational attribution as a functioning diplomatic tool: the February 2018 joint statement by nine governments set a template later incidents' attributions would follow, and the subsequent named indictment of individual GRU officers — with specific malware-development roles alleged — pushed nation-state cyber accountability further toward individualized, evidence-based legal action than prior incidents had achieved. Finally, through the parallel Merck and Mondelez litigation the same campaign generated, NotPetya reshaped how the insurance industry drafts and defends war-exclusion clauses against cyber losses — a regulatory and contractual legacy still actively cited in cyber-insurance underwriting discussions today.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Wired</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.wired.com/story/notpetya-cyberattack-ukraine-russia-code-crashed-the-world/" target="_blank">The Untold Story of NotPetya, the Most Devastating Cyberattack in History (Andy Greenberg)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS-ADJACENT REPORTING — 2018-08-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The White House</div>
+        <div>
+          <div class="ref-detail"><a href="https://trumpwhitehouse.archives.gov/briefings-statements/statement-press-secretary-25/" target="_blank">Statement from the Press Secretary — Formal Attribution of NotPetya to the Russian Military</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2018-02-15</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Dept. of Justice</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/opa/press-release/file/1328521/dl" target="_blank">Six Russian GRU Officers Charged in Connection with Worldwide Deployment of Destructive Malware and Other Disruptive Actions in Cyberspace</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2020-10-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0034/" target="_blank">Sandworm Team, G0034</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/software/S0368/" target="_blank">NotPetya, S0368</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / US-CERT</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/ics-alerts/ics-alert-17-181-01c" target="_blank">Petya Malware Variant (ICS-ALERT-17-181-01C)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2017-07-01 (updated through 2018)</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ESET (WeLiveSecurity)</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.welivesecurity.com/2017/06/30/telebots-back-supply-chain-attacks-against-ukraine/" target="_blank">TeleBots are back: Supply-chain attacks against Ukraine</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2017-06-30</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ESET (WeLiveSecurity)</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.welivesecurity.com/2017/07/04/analysis-of-telebots-cunning-backdoor/" target="_blank">Analysis of TeleBots' Cunning Backdoor (M.E.Doc update timeline detail)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2017-07-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Insurance Journal</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.insurancejournal.com/news/2022/11/23/696351.htm" target="_blank">Could Recent NotPetya Case Outcomes Pressure Insurers to Reword War Exclusions?</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2022-11-23</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cisco Talos</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.talosintelligence.com/worldwide-ransomware-variant/" target="_blank">New Ransomware Variant "Nyetya" Compromises Systems Worldwide</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2017-06-27</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CNBC</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cnbc.com/2017/08/16/maersk-says-notpetya-cyberattack-could-cost-300-million.html" target="_blank">Maersk says NotPetya cyberattack could cost $300 million</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2017-08-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bleeping Computer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/maersk-reinstalled-45-000-pcs-and-4-000-servers-to-recover-from-notpetya-attack/" target="_blank">Maersk Reinstalled 45,000 PCs and 4,000 Servers to Recover from NotPetya Attack</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS-ADJACENT REPORTING — 2019-01</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Insurance Journal</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.insurancejournal.com/news/national/2024/01/05/754582.htm" target="_blank">Merck Settles Coverage Dispute With Insurers Over War Exclusion in NotPetya Attack</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record (Recorded Future News)</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/mondelez-and-zurich-reach-settlement-in-notpetya-cyberattack-insurance-suit" target="_blank">Mondelez and Zurich Reach Settlement in NotPetya Cyberattack Insurance Suit</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/email-provider-shuts-down-petya-inbox-preventing-victims-from-recovering-files/" target="_blank">Email Provider Shuts Down Petya Inbox Preventing Victims From Recovering Files</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2017-06-28</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Petya_and_NotPetya" target="_blank">Petya and NotPetya (consolidated reference, cross-checked against primary sources above)</a></div>
+          <div class="ref-date">Accessed: 2026-09-02</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 16 Sources (Government, MITRE, Vendor, Press)</div>
+  <div>Companion actor card for Sandworm Team / GRU Unit 74455 not yet on file.</div>
+</div>
+
+</body>
+</html>
