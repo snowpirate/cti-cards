@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chrome WebGL OOB Write — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+  .kev-badge.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-now">PATCH NOW</div>
+      <!-- Not KEV-listed as of compile date — kev-badge omitted per template rule -->
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — Memory Corruption / Sandbox Escape · Google / Chrome (Android)</div>
+  <h1><span class="cyan">CHROME</span> WEBGL<br/><span class="dim">OOB WRITE</span></h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-04 &nbsp;|&nbsp;
+    CVE: CVE-2026-85050 &nbsp;|&nbsp;
+    CWE: CWE-787 &nbsp;|&nbsp;
+    SOURCES: CVE.org, NVD, ThreatINT, OffSeq, Help Net Security, The Hacker News, Security Affairs, Cyber Insider, VulDB (9)
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">9.6 (CRITICAL)</span></div>
+    <div>Affected: <span>Chrome on Android &lt; 152.0.7977.82</span></div>
+    <div>Disclosed: <span>2026-09-03</span></div>
+    <div>Patch Date: <span>2026-09-03</span></div>
+    <div>KEV Added: <span class="dim">NOT LISTED (as of compile date)</span></div>
+    <div>EPSS: <span class="dim">Not yet published</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">9.6</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2026-85050</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">No formally-linked variant CVE — see Section 04 re: CVE-2026-85051 (same release, unrelated bug)</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">9.6</div>
+    <div class="stat-label">CVSS v3.1 Score (Critical)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">1 DAY</div>
+    <div class="stat-label">Elapsed Since Public Disclosure</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">12</div>
+    <div class="stat-label">Total CVEs Fixed in Same Release</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">0</div>
+    <div class="stat-label">Confirmed ITW Exploits of This CVE (as of compile date)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CVE-2026-85050 is a critical flaw in the graphics-rendering code inside Google Chrome for Android — specifically in WebGL, the API that lets ordinary web pages ask the device's GPU to render 2D and 3D graphics. Under the right crafted conditions, a malicious web page can trigger an out-of-bounds write in this code path severe enough to let an attacker run their own code <strong>outside the browser's security sandbox</strong> — not just inside the constrained tab process the sandbox is designed to trap misbehaving web content in, but on the device itself, with no further steps required.</p>
+      <p>The CVSS v3.1 base score of <strong>9.6</strong> reflects exactly that distinction. Chrome patches memory-corruption bugs on a routine, almost weekly cadence, and the overwhelming majority stay contained to the sandboxed renderer process — serious, but survivable by design. This one didn't stay contained, and that single fact (formally, a CVSS Scope change — see Section 05) is what separates a 9.6 from the 8.8 sandbox-contained bugs patched in the very same release.</p>
+      <p>Everyone running Chrome for Android prior to version 152.0.7977.82 is at risk, which in practice means most of Chrome's global Android install base until the staged auto-update rollout completes. Android is the one platform in this release where patch adoption is least uniform: OEM-skinned builds, carrier-gated update channels, and devices running Android versions old enough to no longer receive current Chrome builds at all mean the fleet-wide patch tail here is meaningfully longer than on desktop Chrome.</p>
+      <p>This CVE shipped as one of twelve fixed in Google's September 3, 2026 stable-channel release — a release whose public narrative was almost entirely captured by a <em>different</em> bug in the same batch, CVE-2026-85046, which Google confirmed was already being actively exploited. CVE-2026-85050 was not reported as exploited as of this card's compile date. That gap between "most severe" and "most talked about" is itself the analytically interesting part of this card, and is developed further in Section 07.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-787</span>
+        <span class="cwe-name">Out-of-Bounds Write</span>
+      </div>
+      <div class="cwe-body">The software writes data past the end, or before the beginning, of the intended buffer. In memory-unsafe languages like the C++ that underlies Chrome's rendering engine, this class of bug lets an attacker corrupt adjacent memory — object headers, pointers, function tables — in ways that can be steered into arbitrary code execution rather than a simple crash. It is consistently one of the most common and most exploitable weakness classes in browser security bulletins, Chrome's included.</div>
+    </div>
+    <div class="prose">
+      <p>WebGL is Chrome's bridge between fully untrusted, attacker-controlled JavaScript running in a web page and the native, platform-specific graphics driver stack underneath it — a seam that has to accept arbitrary shader programs, buffer geometry, and texture data from web content and hand validated versions of that data down to GPU driver code that was never designed with a hostile caller in mind. That bridge has been a recurring source of memory-safety bugs across every major browser engine for over a decade, not because engineers are careless, but because the validation surface is large, GPU driver behavior varies by vendor and platform, and the performance cost of exhaustive bounds-checking on every graphics call is high enough that some validation gaps persist despite continuous fuzzing investment.</p>
+      <p>Google's own security bulletin for this release does not publish the specific function, commit, or validation check that failed here — this is standard, deliberate practice for Chrome security fixes: full technical detail is withheld for a period after the patch ships specifically to blunt the window in which an attacker could reverse-engineer the fix into a working exploit against still-unpatched devices (the "N-day" exploitation risk). As of this card's compile date, one day after disclosure, no independent technical writeup or proof-of-concept reproducing the specific bounds-check failure has surfaced in the sources reviewed. That is a genuine, stated gap in this card, not an oversight — see Section 04 for why that gap is expected to persist for some time.</p>
+      <p>What is confirmed, from the CVE description itself, is the consequence rather than the mechanism: the corruption this bug produces is severe enough to escape the renderer sandbox's security boundary entirely, rather than remaining confined to it. That is the architecturally significant fact this card centers on, developed fully in Sections 05 and 07.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>Undisclosed</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>2026-09-03</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">03</div>
+        <div class="lc-label">Patch<br/>2026-09-03</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node">04</div>
+        <div class="lc-label">Exploitation<br/>None Confirmed</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">05</div>
+        <div class="lc-label">Resolution<br/>Rollout In Progress</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>This lifecycle is unusually compressed compared to most vulnerabilities in this project's library, and that compression is itself informative about how Chrome's disclosure model works. The CVE record shows a <strong>reservation date of 2026-09-02</strong> — one day before the CVE was published — and the public disclosure, the patched release, and the CVE record all landed together on <strong>2026-09-03</strong>. There was no period of public "vulnerability known, patch not yet available" exposure, because Google does not publish security-relevant bug details before a fix ships. Discovery details (who found it, when, and how it was reported) have not been made public as of compile date — contrast this with the companion CVE-2026-85046 in the same release, which Google credited to an external researcher by name, a level of disclosure specificity CVE-2026-85050 has not (yet) received.</p>
+      <p>No public reporting reviewed for this card documents exploitation of CVE-2026-85050 specifically, before or after the patch. "Resolution" is marked in-progress rather than complete because Chrome's fix ships via a staged auto-update rollout — a meaningful fraction of the Android install base will not have received 152.0.7977.82 on day one, and Android's OEM/carrier update fragmentation means that tail is longer here than on desktop Chrome.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Coordinated (vendor-controlled)</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val dim">Not publicly named as of compile date</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val dim">Unknown — Chromium bug tracker entry likely still access-restricted</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val">None found publicly</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val dim">N/A — no public PoC as of compile date</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val green">Same-day disclosure-with-patch</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val">Minimal distinct coverage — overshadowed by CVE-2026-85046</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val green">Yes — Chrome Vulnerability Rewards Program norms</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Google's Chrome security team operates one of the more disciplined coordinated-disclosure models among major software vendors: bug reports (external or internal) are tracked in a restricted-access Chromium issue tracker entry — one source lists this bug as tracker issue #549350408, though the entry's access-restriction status was not independently confirmed for this card — and details stay non-public until a fix has shipped, and typically for a further window afterward (commonly cited in security community reporting as roughly a month, or until sufficient user population has updated) specifically to blunt N-day reverse-engineering-to-exploit windows. That practice is precisely why this card is honestly thinner on exploit mechanics than older, fully-elaborated CVEs elsewhere in this library — the gap is a disclosure-policy artifact, not a research shortfall.</p>
+      <p>The community-reaction gap is worth stating plainly rather than glossing over: of the searches run to compile this card, queries for "Chrome zero-day" or "Chrome vulnerability this week" surfaced CVE-2026-85046 by name repeatedly and prominently, while CVE-2026-85050 required searching its specific CVE identifier to find any coverage at all, and even then mostly on CVE-aggregation sites rather than dedicated security journalism. Reasonable, since confirmed active exploitation (85046's status) is the correct urgency signal for time-constrained defenders — but it means this card's own compile process is a small, live case study in exactly the severity-versus-salience gap discussed in Section 07.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>Per the vendor description, a maliciously crafted HTML page invokes WebGL rendering calls that trigger an out-of-bounds write within Chrome's graphics-handling code. Because the resulting memory corruption is severe enough to affect resources outside the vulnerable component's own security boundary, successful exploitation grants code execution beyond the renderer sandbox — a full escape, rather than the contained, tab-scoped compromise that most Chrome memory-safety bugs produce even when successfully exploited. No public source reviewed documents the specific exploitation chain, required heap-grooming technique, or whether a single bug alone is sufficient versus requiring chaining with an additional bug; this level of detail is exactly what Google's disclosure timing (Section 04) withholds at this stage.</p>
+      <p>Context from the same release sharpens what makes this bug distinct: the two other WebGL/rendering-adjacent CVEs patched alongside it, CVE-2026-85046 (V8 type confusion, CVSS 8.8, confirmed exploited in the wild) and CVE-2026-85051 (Compositing type confusion, CVSS 8.8), are both explicitly described in their own CVE records as producing code execution <em>inside the sandbox</em>. An attacker who only has one of those two bugs still needs a separate sandbox-escape primitive — like this one — to achieve full device compromise. CVE-2026-85050 supplies that primitive on its own. That is the entire reason it scores higher than either of its actively-exploited or better-known siblings in the same patch batch, despite carrying no confirmed exploitation of its own as of compile date.</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">Exploitable purely by getting the victim to load a web page — no physical or adjacent-network access needed.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">No special configuration or race condition dependent on victim environment beyond ordinary WebGL support, per vendor rating.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">Attacker needs no prior access or privileges on the victim device.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val amber">REQUIRED</div>
+          <div class="cvss-comp-meaning">Victim must open or navigate to the crafted page (a link, redirect, or embedded frame) — the one factor short of a fully zero-click bug.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">CHANGED</div>
+          <div class="cvss-comp-meaning">The decisive metric here: exploitation impacts resources beyond the vulnerable component's own security scope — the direct CVSS reflection of "outside the sandbox," and the reason this CVE outscores its sandbox-contained siblings.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Full data exposure once escaped — arbitrary code execution outside the sandbox is equivalent to full device compromise.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Full ability to modify device state once escaped.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Full ability to disrupt device operation once escaped.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
+      <table class="versions-table">
+        <thead><tr><th>Vendor</th><th>Product</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Google</td><td>Chrome (Android)</td><td class="vuln">&lt; 152.0.7977.82</td><td class="fixed">152.0.7977.82</td><td>Patched — staged auto-update rollout in progress at compile date</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block not-listed">
+      <div class="kev-header">
+        <span class="kev-tag not-listed">NOT KEV LISTED (as of 2026-09-04)</span>
+      </div>
+      <div class="kev-body">CISA's Known Exploited Vulnerabilities catalog did not include CVE-2026-85050 as of this card's compile date. That is expected and appropriate: no source reviewed for this card documents confirmed in-the-wild exploitation of this specific CVE. Contrast with the companion CVE-2026-85046 in the same release, which Google explicitly confirmed as actively exploited and which is the stronger near-term KEV-listing candidate of the two. Absence from KEV should not be read as "not dangerous" — a CVSS 9.6 sandbox escape is a valuable capability for any actor who develops a working exploit chain, independent of whether public exploitation has been observed yet.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">2026-09-03</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Public Disclosure &amp; Patch</div>
+            <div class="et-desc">CVE-2026-85050 published alongside the Chrome 152.0.7977.82 stable release. No proof-of-concept or PoC-derived exploitation reported in sources reviewed.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-04</div>
+          <div class="et-track"><div class="et-dot green"></div></div>
+          <div class="et-content">
+            <div class="et-event">Compile-Date Status Check</div>
+            <div class="et-desc">No public reporting, vendor statement, or KEV catalog entry confirms in-the-wild exploitation of this specific CVE as of this date. Monitor for updates given both the severity and the active-exploitation precedent set by the companion V8 bug (CVE-2026-85046) in the same release.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>No threat-actor group, APT, or eCrime operator has been publicly attributed exploitation of CVE-2026-85050 specifically as of compile date. This project's actor and incident card libraries were checked directly — no companion actor or incident card exists referencing this CVE. For comparison, CVE-2026-85046 in the same release is confirmed exploited, though Google's own bulletin does not name the exploiting party, which is standard practice for Chrome zero-day disclosures.</p>
+      <p>Given the sandbox-escape capability this CVE represents, the actors most likely to eventually weaponize it — commercial spyware vendors and well-resourced APT operators who specifically shop for full-chain mobile compromise primitives — are not the kind who typically surface in public exploitation telemetry quickly, if at all. Absence of public attribution one day after disclosure carries limited evidentiary weight either way.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The browser sandbox exists precisely so that a successful memory-corruption bug in the renderer process is survivable — contained to the tab, unable to touch the rest of the device. A Scope-Changed bug like this one defeats that entire design assumption in a single step, which is exactly why its CVSS math (9.6) exceeds its sandbox-contained siblings in the same patch batch (8.8 apiece) even though the underlying bug classes — out-of-bounds write versus type confusion — are not inherently more or less severe as isolated memory-safety issues. The sandbox escape, not the memory-corruption primitive itself, is what does the real architectural damage.</p>
+      <p>WebGL specifically recurs as a Chrome/Chromium bug source for a structural reason: it is an unusually wide API surface bridging fully untrusted, attacker-supplied web content directly down to native GPU driver code that spans many vendors, drivers, and operating-system combinations, none of which were designed with a hostile caller in mind. That is a seam the sandbox model has to work hardest to seal, and one that years of iterative hardening — site isolation, process sandboxing layers, continuous fuzzing investment — has narrowed without eliminating the underlying class of bug. This is not a Chrome-specific failure; every major browser engine with GPU-accelerated web graphics has shipped comparable sandbox-escape bugs rooted in the same architectural seam.</p>
+      <p>The disclosure-versus-salience gap documented in Sections 04 and 06 is itself a lesson worth stating explicitly: this release's public narrative was almost entirely captured by the actively-exploited, by-name-credited CVE-2026-85046, while the technically more severe, full-sandbox-escape CVE-2026-85050 required deliberate, CVE-ID-specific searching to find coverage of at all. Defenders and organizations that triage patch urgency primarily off security-news headlines rather than reading full vendor advisories will systematically under-prioritize bugs shaped exactly like this one — high CVSS, no (yet) confirmed exploitation, low public salience, and the single component in the whole release actually capable of a complete, one-bug device compromise.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — Version Compliance &amp; Fleet Telemetry</div>
+      <div class="query-block">
+        <div class="query-label">Chrome Version Compliance Report · Chrome Enterprise Browser Cloud Management / Android MDM</div>
+        <div class="query-code">Report: Managed Browsers &gt; Filter: Platform = Android AND Chrome Version &lt; 152.0.7977.82
+Action: Flag / quarantine devices below threshold for compliance review</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Renderer/GPU-Process Crash Correlation · MDM-integrated crash telemetry (where available)</div>
+        <div class="query-code">Hunt: Chrome renderer or GPU-process crash events tagged WebGL/graphics-context
+  followed within a short window by unexpected child-process creation outside
+  the normal Chrome process tree, on any device below patch threshold.</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>No public source reviewed documents a specific behavioral signature, IOC, or exploit artifact for CVE-2026-85050 — that is expected given the one-day age and Google's disclosure-timing practice (Section 04), and is stated here explicitly rather than invented. The only reliably actionable detection surface at this stage is <strong>Chrome version compliance</strong> across managed Android fleets, not behavioral detection of the exploit itself.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis:</strong> if an adversary already holds a foothold via a separate campaign and is layering in browser-based exploitation as an escalation or secondary-access vector, hunt for anomalous WebGL-context renderer/GPU-process crashes or restarts on managed Android devices, correlated with subsequent unexpected process behavior outside Chrome's normal process hierarchy — specifically on any device still reporting a pre-152.0.7977.82 version string.</p>
+        <p><strong>Primary hunt target in practice:</strong> Chrome version telemetry itself. With no public behavioral IOC yet available, device-management consoles flagging out-of-compliance browser versions is the most reliable, evidence-backed signal available to hunters today — this is a legitimate and correct purple-team conclusion for a client-side bug this fresh, not a placeholder.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Patch</span><span class="kv-val green">Chrome 152.0.7977.82 (Android)</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2026-09-03</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Not flagged as elevated in sources reviewed</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Standard enterprise browser regression testing per org policy</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">Chrome Releases blog — Stable Channel Update (Android), 2026-09-03</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val">No — shipped on Chrome's normal stable-channel cadence</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val dim">None as of compile date</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Because Chrome auto-updates for the overwhelming majority of installations, "patch guidance" here is less about scheduling a maintenance window than about <em>verifying</em> that auto-update actually completed across the fleet. Android is the layer most likely to lag: OEM-skinned builds, carrier-gated update channels, and devices on Android versions old enough to no longer receive current Chrome builds at all are the operationally relevant gap for any organization managing Android endpoints. Notably, despite the 9.6 severity, Google shipped this fix on its ordinary release cadence rather than as an emergency out-of-band patch — consistent with no confirmed in-the-wild exploitation of this specific bug at ship time.</p>
+      </div>
+    </div>
+
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>Enforce version compliance via Android Enterprise / MDM.</strong> Flag or conditionally block devices reporting a Chrome version below 152.0.7977.82 from accessing sensitive resources until the update completes.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Disable WebGL via Chrome Enterprise policy</strong> on managed devices that cannot immediately update, understanding this breaks legitimate WebGL-dependent web applications for the duration.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Route high-risk user populations through browser isolation / remote-browser rendering</strong> (privileged administrators, executives, or other high-value targets) so any renderer-level compromise occurs in a disposable remote container rather than on the managed endpoint itself.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2026-85050</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">9.6 (Critical)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-787 (Out-of-Bounds Write)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val dim">Not yet published as of 2026-09-04</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2026-85050" target="_blank" style="color:var(--cyan)">nvd.nist.gov</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://chromereleases.googleblog.com/" target="_blank" style="color:var(--cyan)">Chrome Releases Blog</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val dim">Not Listed</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val dim">N/A</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <div class="xref-none">No companion actor cards on file for this vulnerability as of compile date — no threat-actor exploitation of CVE-2026-85050 has been publicly attributed.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <div class="xref-none">No companion incident cards on file for this vulnerability as of compile date.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Network Exposure <small>Not applicable in the traditional sense — client-side vulnerability</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p><strong>This section does not apply in its usual form.</strong> CVE-2026-85050 is a client-side browser vulnerability triggered when a victim's device loads a malicious web page — there is no vulnerable network service listening on a port to scan, fingerprint, or dork for. Fabricating nmap output, service banners, or Shodan/Censys dorks for a browser rendering-engine bug would misrepresent what this vulnerability class actually is, so none are presented here. What follows instead is the genuine client-side analog to each of this section's usual sub-topics.</p>
+    </div>
+    <div class="kv" style="margin-bottom:8px;">
+      <div class="kv-row"><span class="kv-key">Delivery Surface</span><span class="kv-val">Any web content reaching the device's Chrome browser — malicious/compromised ad networks, watering-hole pages, drive-by-download campaigns. No delivery campaign has been publicly documented for this specific CVE as of compile date.</span></div>
+      <div class="kv-row"><span class="kv-key">Version Discrimination (analog to scan/banner check)</span><span class="kv-val">Chrome's User-Agent string reports the running version (e.g. <code>Chrome/152.0.7977.82</code>) and is the direct client-side analog to a version-discriminating network scan — any endpoint-visibility tool that logs outbound User-Agent strings can flag pre-patch devices this way.</span></div>
+      <div class="kv-row"><span class="kv-key">Fleet Visibility</span><span class="kv-val">Chrome Enterprise / Android Enterprise device management consoles report managed-device browser versions directly — this is the practical equivalent of an internal exposure scan for organizations managing Android endpoints, and is more reliable than passive User-Agent logging.</span></div>
+      <div class="kv-row"><span class="kv-key">NSE / Shodan / Censys Applicability</span><span class="kv-val dim">Not applicable — no listening service exists for this vulnerability class. No NSE script, Shodan dork, or Censys query is meaningful here.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CVE.org</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cve.org/CVERecord?id=CVE-2026-85050" target="_blank">CVE Record: CVE-2026-85050</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NVD</div>
+        <div>
+          <div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2026-85050" target="_blank">CVE-2026-85050 Detail</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ThreatINT</div>
+        <div>
+          <div class="ref-detail"><a href="https://cve.threatint.com/CVE/CVE-2026-85050" target="_blank">CVE-2026-85050 Summary</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">OffSeq Threat Radar</div>
+        <div>
+          <div class="ref-detail"><a href="https://radar.offseq.com/threat/cve-2026-85050-out-of-bounds-write-in-google-chrome-8048ae506c46bf6b" target="_blank">CVE-2026-85050: Out of Bounds Write in Google Chrome</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">OffSeq Threat Radar</div>
+        <div>
+          <div class="ref-detail"><a href="https://radar.offseq.com/threat/cve-2026-85051-type-confusion-in-google-chrome-2537858c3d7baf9a" target="_blank">CVE-2026-85051: Type Confusion in Google Chrome (companion CVE, same release)</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Help Net Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.helpnetsecurity.com/2026/09/04/google-chrome-zero-day-cve-2026-85046/" target="_blank">Google patches actively exploited Chrome zero-day (CVE-2026-85046)</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/09/google-releases-chrome-update-to-patch.html" target="_blank">Google Releases Chrome Update to Patch Actively Exploited V8 Zero-Day</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Security Affairs</div>
+        <div>
+          <div class="ref-detail"><a href="https://securityaffairs.com/198405/security/google-fixes-the-sixth-actively-exploited-chrome-zero-day-of-2026.html" target="_blank">Google fixes the sixth actively exploited Chrome zero-day of 2026</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cyber Insider</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberinsider.com/google-fixes-actively-exploited-chrome-v8-zero-day-vulnerability/" target="_blank">Google fixes actively exploited Chrome V8 zero-day vulnerability</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">VulDB</div>
+        <div>
+          <div class="ref-detail"><a href="https://vuldb.com/cve/CVE-2026-85050" target="_blank">CVE-2026-85050 in Chrome</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-04 · 10 Sources (Registry, Vendor, Press)</div>
+  <div>No companion actor/incident cards linked as of compile date — 1-day-old CVE, several technical details withheld by vendor disclosure timing (see Section 04).</div>
+</div>
+
+</body>
+</html>
