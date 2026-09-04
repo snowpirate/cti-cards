@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Melissa Virus — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    CF-99-0326-MEL<br/>
+    MAR 1999 – MAY 2002
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Worm / Self-Propagating</div>
+  <h1><span class="gold">MELISSA</span> VIRUS</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-04 &nbsp;|&nbsp; INCIDENT DATE: MARCH 26, 1999 (OUTBREAK) · LEGAL RESOLUTION MAY 1, 2002 &nbsp;|&nbsp;
+    SOURCES: FBI, DOJ, CERT/CC, U.S. GAO, Microsoft, Kaspersky, MITRE ATT&amp;CK, contemporaneous &amp; retrospective press
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>WORM / SELF-PROPAGATING</span></div>
+    <div>Attribution: <span class="green">HIGH — INDIVIDUAL (DAVID L. SMITH)</span></div>
+    <div>Severity: <span class="red">HIGH — WIDESPREAD DISRUPTION, NO DESTRUCTIVE PAYLOAD</span></div>
+    <div>Era: <span>1999 · EARLY MASS-INTERNET / MACRO-VIRUS ERA</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">ENTERPRISE [RETROSPECTIVE]</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">100,000+</div>
+    <div class="stat-label">Computers Infected (First 72 Hours)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">$80M</div>
+    <div class="stat-label">FBI Damage Estimate (USD)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">300+</div>
+    <div class="stat-label">Organizations Affected By Day 3</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">20 MO.</div>
+    <div class="stat-label">Federal Sentence (May 2002)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="none">David L. Smith (individual) — No companion actor card on file; see Section 08 for why one likely isn't warranted here</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">Melissa Virus (W97M.Melissa.A)</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Mar 26, 1999 (outbreak) – May 1, 2002 (sentencing)</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Worm / Self-Propagating (Macro Virus + Mass-Mailer)</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">David L. Smith (individual)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">HIGH — confirmed via guilty plea</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Indiscriminate — any Word/Outlook user reached via Usenet lure, then address-book propagation; no single targeted victim</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">100,000+ computers / 300+ orgs by day 3; ~1M email accounts disrupted (retrospective estimate)</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">March 26, 1999 (same day as outbreak)</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Independent corporate mail administrators + CERT/CC (Advisory CA-1999-04)</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">N/A — impact was immediate and self-evident; no concealment period</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Email infrastructure overload / DoS-like disruption; ~$80M damage; no data destruction</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise — all cells [RETROSPECTIVE]</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None assigned — pre-dates ATT&amp;CK Campaigns tracking by 14+ years</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">N/A — predates standardized hash/network IOC conventions</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On Friday, March 26, 1999, an infected Microsoft Word document masquerading as a list of passwords for paid pornographic websites began circulating faster than any virus the internet had yet seen. Within seventy-two hours it had reached more than 100,000 computers across more than 300 organizations, and forced Microsoft, Intel, and Lockheed Martin — among others — to shut their corporate email systems down entirely rather than try to filter the flood in place (CERT/CC, CA-1999-04, Mar 1999; FBI, 2019 retrospective). It did not steal data, encrypt a single file, or open a backdoor. It simply did exactly what its author built it to do: get itself opened, and get itself read.</p>
+      <p>Melissa (formally cataloged as W97M.Melissa.A) was the first mass-mailing macro virus to achieve genuinely internet-scale impact. It combined two things that already existed independently — a Word macro virus, and Microsoft Outlook's address book — into something neither had been on its own: a payload that could read a victim's own list of real contacts and impersonate that victim to fifty of them simultaneously, automatically, in minutes. Prior viruses spread the way a cold spreads: slowly, through physical contact, one floppy disk or file-sharing session at a time. Melissa spread the way a chain letter spreads, except the chain letter wrote and sent itself.</p>
+      <p>It still matters as a case study for reasons that outlived the outbreak itself. It is the direct ancestor, in both technique and consequence, of ILOVEYOU fourteen months later, which used the same macro-plus-mass-mail formula to infect an estimated 45–55 million machines — roughly fifty times Melissa's own reach (Kaspersky, ILOVEYOU retrospective). And the underlying pattern it proved — abuse a legitimate, trusted feature (macro auto-execution) and a victim's own social graph rather than a disclosed software flaw — resurfaced constantly in the following two decades, in the document-macro malspam campaigns (Locky, Dridex, and eventually Emotet) that dominated cybercrime email delivery well into the 2010s.</p>
+      <p>Melissa itself poses no ongoing operational threat — Smith served his sentence, and the specific mechanism (unwarned VBA macro auto-execution in Word 97/2000) has long since been patched out of any supported version of Office. Its continued relevance is historical and structural: it is one of the cleanest available examples of a still-recurring category of attack, and one of the first to produce a serious U.S. federal prosecution for a virus author, at a moment when neither the technical nor the legal apparatus for handling either problem existed yet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>In March 1999, Microsoft Office 97 and Office 2000 dominated corporate desktop computing, and both ran Visual Basic for Applications (VBA) macros embedded in documents automatically, by default, with no warning dialog of any kind. Word documents were near-universally treated as inert data files rather than as a potential vector for arbitrary code execution — a document was something you read, not something that could act. Email, meanwhile, had become a genuinely central business communication channel over the preceding several years, but almost no organization scanned inbound attachments for malicious macro content; email-gateway antivirus, where it existed at all, focused on known executable-file signatures, not on document macros.</p>
+      <p>The organizational and industry response infrastructure that exists today did not yet exist in any comparable form. CERT/CC (the Computer Emergency Response Team Coordination Center) had been founded a decade earlier, in the immediate aftermath of the 1988 Morris Worm, and functioned as a coordinating advisory body — but there was no equivalent of today's real-time, cloud-updated threat intelligence feeds; antivirus signature updates typically propagated on a days-to-weeks cycle, not hours. Most organizations had no formal incident-response function at all, and Usenet newsgroups (the alt.* hierarchy in particular) remained a mainstream file-sharing and community venue entirely outside any enterprise's visibility, making them, in retrospect, an ideal distribution point for exactly this kind of attack.</p>
+      <p>Melissa was not a bolt from the blue technically: document macro viruses were an established, if minor, category by 1999 — Concept, discovered in 1995, had already demonstrated that a Word macro could self-replicate between documents. What Melissa added, and what made it categorically more dangerous than anything before it, was automated propagation via the victim's own trusted address book rather than passive file-sharing. No prior incident had combined the two, and no defensive practice existed yet that anticipated the combination.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Compromised AOL Account &amp; Newsgroup Seeding</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">On March 26, 1999, using a hijacked America Online account, David L. Smith posted a file named <strong>LIST.DOC</strong> to the Usenet newsgroup <strong>alt.sex</strong>, presenting it as a compilation of passwords granting free access to dozens of paid pornographic websites. No corporate or academic network monitored Usenet postings for malicious payloads in 1999 — Usenet sat entirely outside any enterprise's telemetry — and the use of a stolen AOL identity meant even AOL itself had no reason to flag the posting account as compromised until well after the fact (FBI, 2019 retrospective).</div>
+        <div class="kc-pivot">A single anonymous post to an open forum, disguised as something the audience actively wanted, put the payload directly in the hands of exactly the population most likely to open it without hesitation.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Social-Engineered Execution</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Recipients who downloaded LIST.DOC and opened it in Word 97 or Word 2000 triggered an embedded VBA macro automatically. Word's default configuration in 1999 ran document macros without prompting the user at all — Microsoft's own contemporaneous guidance on the incident credits Melissa specifically with the later introduction of the macro-security warning dialog in subsequent Office releases; no such warning existed yet at the time of the outbreak (Microsoft, "Alert on Macro Virus Issues," Mar 30, 1999). Ordinary users, and most IT departments, had no operating expectation that a document file could execute a program on its own.</div>
+        <div class="kc-pivot">Opening what looked like a text file silently handed program execution to the virus, with no dialog, no prompt, and no available control to stop it.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Normal.dot Template Infection &amp; Persistence</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Once running, the macro copied itself into the victim's Normal.dot global template — the file Word loads automatically on every startup and uses as the base for every new document — so that every subsequent document the victim created or edited, not just LIST.DOC itself, carried the infection. The macro checked for a marker at <strong>HKCU\Software\Microsoft\Office\Melissa?</strong> and, if absent, wrote a registry value referencing <strong>"...by Kwyjibo"</strong> (a nod to a fictional Scrabble word from the Simpsons episode "Bart the Genius"), functioning purely as an infection flag to prevent re-triggering the mass-mail routine on an already-infected host (Kaspersky/Microsoft threat descriptions, retrospective). None of this produced any alert a 1999-era administrator would have recognized — endpoint security products of the period were signature-based and had, by definition, no coverage for a virus that was brand new.</div>
+        <div class="kc-pivot">By embedding itself in the template every future document would inherit, the virus guaranteed its own survival on the host — but its real force multiplier was what it did next, automatically, without waiting for another victim to make the same mistake twice.</div>
+      </div>
+
+      <div class="kc-phase visible">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Outlook-Driven Mass Self-Propagation</span>
+          <span class="vis-badge vis-unreviewed">VISIBLE — UNREVIEWED</span>
+        </div>
+        <div class="kc-body">On first execution, the macro read Microsoft Outlook's default MAPI address book and, if it had not already done so on that host, generated and sent an email to the first fifty entries it found — subject line <strong>"Important Message From [infected user's name],"</strong> body text <strong>"Here is that document you asked for ... don't show anyone else ;-),"</strong> and a copy of the now-infected document attached. Because the message appeared to come from someone the recipient actually knew, referencing a document they had (falsely) supposedly requested, it defeated the ordinary skepticism a user might apply to an unsolicited attachment from a stranger. Mail administrators watching queue depth in the first hours would have seen anomalous volume, but 1999-era operations teams had no established playbook connecting a sudden traffic spike to a document-borne virus — the correlation had never been observed at this scale before.</div>
+        <div class="kc-pivot">Each newly infected machine became an independent, fully automated re-transmitter, so the population of "patient zero" equivalents didn't grow linearly — it grew as a multiplying tree, fifty branches per infected host, every few minutes.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Email Infrastructure Overload &amp; Public Alert</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">By Monday, March 29 — three days after the initial posting — Melissa had reached more than 100,000 computers across more than 300 organizations, per CERT/CC's contemporaneous accounting (CA-1999-04). Microsoft, Intel, and Lockheed Martin were among the organizations reported to have shut down their email systems entirely rather than attempt to filter the flood in place. CERT/CC issued its formal advisory within days, and the U.S. General Accounting Office cited the incident in Congressional testimony as a demonstration of systemic weakness in handling email-borne threats (GAO, T-AIMD-99-146, 1999). This was less a case of skilled detection than of the virus making its own presence undeniable — backed-up mail queues and unresponsive servers were, in effect, Melissa's own alarm system.</div>
+        <div class="kc-pivot">Public alarm and vendor advisories moved the incident from a technical curiosity into a live FBI investigation within days of the first infection.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Forensic Identification via Embedded Metadata &amp; Arrest</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Independent researcher Richard Smith (unrelated to the perpetrator, then head of Phar Lap Software) obtained a copy of the Melissa macro code and identified a Globally Unique Identifier (GUID) — metadata Microsoft Office silently embeds in every document, tied to the specific machine and installation that created it. A Swedish graduate student pointed him toward earlier files authored under the handle "VicodinES" carrying the same GUID, and Richard Smith passed his findings to the FBI. Working with America Online — which identified the account used for the original alt.sex posting — and New Jersey state investigators, the FBI traced the trail to David L. Smith of Aberdeen Township, New Jersey, arrested April 1, 1999, six days after the outbreak began. Smith pleaded guilty in December 1999 to state and federal charges and was sentenced in May 2002 to 20 months in federal prison and a $5,000 fine — reduced from the 46–57 months prosecutors initially sought, credited to nearly two years of undercover cooperation with the FBI that reportedly contributed to at least two other international arrests (DOJ press release, May 2002; FBI, 2019 retrospective).</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Pre-ATT&amp;CK incident — every cell retrospective; framework post-dates event by 14 years</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:16px;">
+      <p><strong>Honest mapping gap, stated rather than papered over:</strong> Melissa's core propagation mechanism — automated mass-mailing using the victim's own trusted address book — has no single, precise modern ATT&amp;CK technique equivalent; the cells below map the closest available concepts (Collection for the address-book read, Impact for the resulting server overload) rather than a purpose-built "worm self-propagation via local contacts" technique, which the framework does not define. Equally notable by absence: <strong>no Command &amp; Control cell appears in this grid</strong>, because none applies — Melissa had no remote-control channel, no attacker-operated infrastructure, and no capability for Smith to direct infected machines after release. This predates the C2-driven malware architecture that later frameworks were largely built to describe.</p>
+    </div>
+    <div class="mitre-grid">
+
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1586.002</div>
+        <div class="mitre-name">Compromise Accounts: Email Accounts</div>
+        <div class="mitre-note">A hijacked America Online account was used to make the original alt.sex posting, obscuring the true poster's identity at the outset.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.001</div>
+        <div class="mitre-name">Phishing: Spearphishing Attachment</div>
+        <div class="mitre-note">LIST.DOC was distributed as a malicious Word attachment disguised as a compilation of adult-website passwords — an imperfect fit, since this was a public forum posting rather than a targeted 1:1 spearphish, but the closest available technique for a malicious-attachment lure.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1204.002</div>
+        <div class="mitre-name">User Execution: Malicious File</div>
+        <div class="mitre-note">The VBA macro executed automatically the moment the victim opened LIST.DOC in Word — no further user action was required to trigger the payload.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1137.001</div>
+        <div class="mitre-name">Office Application Startup: Office Template Macros</div>
+        <div class="mitre-note">The macro copied itself into Normal.dot, Word's global template, ensuring every subsequently created or edited document — not just the original lure — carried the infection.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1112</div>
+        <div class="mitre-name">Modify Registry</div>
+        <div class="mitre-note">A borderline fit, included for completeness: the "...by Kwyjibo" registry key functioned purely as a self-recognition marker to prevent re-infection, not as an active evasion mechanism against any defensive product.</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1114.001</div>
+        <div class="mitre-name">Email Collection: Local Email Collection</div>
+        <div class="mitre-note">The macro read the victim's local Outlook MAPI address book to identify the first fifty recipients for onward mass-mailing.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1499</div>
+        <div class="mitre-name">Endpoint Denial of Service</div>
+        <div class="mitre-note">Caveated explicitly: the email-server overload was an emergent side effect of exponential mass-mailing volume, not a deliberately engineered flood payload — Melissa contained no code purpose-built to deny service.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">MACRO EXECUTION<br/>(PHASES 2–3)<br/>MISSED</div>
+        <div class="pm-detail">No mainstream product or IT policy in 1999 treated Word documents as an executable-code risk. Macro auto-run was Word's default behavior industry-wide, and no organization represented in the outbreak had disabled it or deployed email-gateway content scanning capable of inspecting macro content prior to delivery — the capability essentially did not exist as a mainstream product category yet.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">MASS-MAIL<br/>PROPAGATION<br/>(PHASE 4)<br/>PARTIALLY DETECTED</div>
+        <div class="pm-detail">Individual mail administrators noticed abnormal queue growth and server load within hours at some organizations, but without any established signature, advisory, or precedent to reference, most treated it as a capacity or performance problem rather than a security incident until CERT/CC's advisory and cross-organizational news coverage connected the dots by March 29.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">Microsoft introduced the now-familiar "macros in this document have been disabled" security warning dialog in subsequent Office releases, explicitly citing Melissa (and the contemporaneous "Papa" variant) as the catalyzing threat. Email-gateway antivirus scanning capable of inspecting document attachments for macro content moved from a niche capability to a mainstream enterprise requirement within roughly a year, accelerated further by ILOVEYOU in May 2000.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">FORENSIC<br/>METHODOLOGY<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">The successful use of Microsoft Office's embedded GUID metadata to identify an anonymous virus author established document-metadata forensics as a viable, repeatable investigative technique — one that shaped how law enforcement approached anonymous malware-authorship cases in the years that followed.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">W97M.Melissa.A (aka WM97/Melissa-A)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">MACRO VIRUS</span>
+            <span class="artifact-tag">MASS-MAILER</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Visual Basic for Applications (VBA) macro virus targeting Microsoft Word 97 and Word 2000. On execution, infected the user's Normal.dot global template, then used Outlook's MAPI interface to mass-mail itself, with the infected document attached, to the first 50 entries in the victim's local address book. Carried a non-destructive Easter-egg payload — a Scrabble-themed quote referencing the Simpsons episode "Bart the Genius" — triggered only when the current day-of-month numerically matched the current minute. No single, clearly identifiable CVE underlies this incident: the root cause was VBA macro auto-execution, a legitimate Word feature enabled by default, not a disclosed software flaw with a patch. This predates the CVE system's meaningful adoption (CVE itself launched in 1999) and does not warrant a companion vulnerability card — see Section 08 for the corresponding attribution note on why this also doesn't warrant a companion actor card.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">LIST.DOC (initial lure document)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">DELIVERY VEHICLE</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">The original Word document posted to the alt.sex Usenet newsgroup on March 26, 1999, disguised as a compilation of passwords for paid pornographic websites. Contained the initial Melissa macro payload and served as patient zero for the entire outbreak.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged where present. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are archival, 27+ years old as of compile date. Use for research and retrospective analysis only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">REGISTRY KEY</td><td class="val historical">HKCU\Software\Microsoft\Office\Melissa? = "... by Kwyjibo"</td><td>Kaspersky / Microsoft threat encyclopedia (retrospective)</td><td>1999 (documented retrospectively)</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No public file-hash (MD5/SHA-family) or network IOCs (IP/domain) exist for this incident in the modern sense — 1999-era CERT/vendor reporting predates standardized hash-based IOC-sharing conventions, which became common practice only in the following decade.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body consequence-na">Not applicable — this was a purely criminal, individually-motivated act with no state sponsorship or foreign-policy dimension ever attributed to it.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Widely credited with catalyzing two lasting industry changes: Microsoft's introduction of the macro-security warning dialog in subsequent Office releases (explicitly citing Melissa in its own contemporaneous guidance), and the mainstream adoption of email-gateway antivirus scanning capable of inspecting document attachments for macro content — a capability that was niche before 1999 and a baseline enterprise expectation within a few years, further accelerated by ILOVEYOU in 2000.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">David L. Smith's prosecution under New Jersey state computer-tampering statutes and federal charges (18 U.S.C. § 1030, the Computer Fraud and Abuse Act) is frequently cited as one of the first cases to secure substantial federal prison time for a virus author, establishing a sentencing and cooperation-for-leniency precedent reused in subsequent malware-author prosecutions. The incident also prompted U.S. GAO testimony before Congress on email-borne malware as a distinct policy concern.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: HIGH</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">David L. Smith (individual)</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">None — financially/reputationally motivated individual, no state or organizational sponsorship</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Confirmed via guilty plea, December 9, 1999 (state + federal charges)</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">NJ state computer-tampering charge; federal charge under 18 U.S.C. § 1030 (CFAA)</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file — and arguably not warranted (see narrative below)</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Embedded Microsoft Office GUID metadata linking the macro code to files previously authored under the "VicodinES" handle; corroborating AOL account records; Smith's own guilty plea</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">None of substance — some contemporaneous reporting speculated "VicodinES" might be a distinct or additional author; resolved as the same individual via the metadata trail</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Nothing — this is a closed, adjudicated case with a guilty plea; as final as attribution gets in this project</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution here is unusually clean for an incident of this vintage: Smith was identified, arrested, and ultimately confessed, closing the question definitively. The more interesting judgment call for this project is the one raised explicitly rather than left implicit — whether Smith warrants a companion actor card at all. This project's actor-card format is built for persistent, ongoing threat clusters: a targeting profile, an evolving toolset, infrastructure that rotates and gets re-tracked release over release, an ecosystem of aliases and vendor tracking labels. None of that applies to a single individual who wrote one virus, released it once, was caught within a week, and was never linked to any other malicious campaign before or after. Building an actor card here would mean forcing sections — Targeting Profile, OPSEC Procedures, Detection Evasion — that have essentially nothing genuine to say about a one-time criminal defendant from 1999. The honest call is the one reflected above: no companion card, and no real gap left by its absence.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Melissa is widely regarded as the first mass-mailing macro virus to achieve genuinely internet-scale impact, and in doing so it proved a new category of attack was viable: self-propagation that rides on a victim's own trusted social graph — their actual email contacts — rather than relying on scanning random hosts or waiting for manual file-sharing. That structural insight, abusing a legitimate feature and a user's own trust network rather than exploiting a disclosed software flaw, recurred constantly in the following decades, from ILOVEYOU just fourteen months later to the document-macro malspam campaigns (Locky, Dridex, and eventually Emotet) that dominated cybercrime email delivery well into the 2010s.</p>
+      <p>It is also a foundational case study in digital forensics and malware-author attribution: the technique used to identify Smith — extracting a machine-and-installation-specific GUID silently embedded by Microsoft Office in every document — demonstrated that authorship metadata could be as forensically valuable as any network log, a lesson that shaped how investigators approached anonymous malware authorship in subsequent cases.</p>
+      <p>Finally, the case remains a reference point in cybercrime sentencing: it was among the first instances of a virus author receiving substantial federal prison time in the United States, and Smith's post-plea cooperation with the FBI — trading investigative assistance for a reduced sentence — established a cooperation-for-leniency model federal prosecutors would reuse in later malware-author cases. Twenty-seven years later, it remains a standard teaching example precisely because so little of its technical apparatus survives today, and so much of its underlying pattern still does.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CERT/CC</div>
+        <div>
+          <div class="ref-detail"><a href="https://seclists.org/bugtraq/1999/Mar/198" target="_blank">CERT Advisory CA-1999-04: Melissa Macro Virus (Bugtraq mirror)</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — March 1999</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. GAO</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.govinfo.gov/content/pkg/GAOREPORTS-T-AIMD-99-146/pdf/GAOREPORTS-T-AIMD-99-146.pdf" target="_blank">Information Security: The Melissa Computer Virus Demonstrates Urgent Need for Stronger Protection Over Systems and Sensitive Data (T-AIMD-99-146)</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 1999</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://news.microsoft.com/source/1999/03/30/alert-on-macro-virus-issues/" target="_blank">Alert on Macro Virus Issues</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — March 30, 1999</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/news/stories/melissa-virus-20th-anniversary-032519" target="_blank">The Melissa Virus (20th Anniversary Retrospective)</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/history/famous-cases/melissa-virus" target="_blank">Melissa Virus — Famous Cases &amp; Criminals</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/archive/criminal/cybercrime/press-releases/2002/melissaSent.htm" target="_blank">Creator of Melissa Computer Virus Sentenced to 20 Months in Federal Prison</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — May 2002</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Computerworld</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.computerworld.com/article/1327088/melissa-virus-creator-sentenced-to-20-months-in-prison.html" target="_blank">Melissa Virus Creator Sentenced to 20 Months in Prison</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Register</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2002/05/01/melissa_virus_author_jailed/" target="_blank">Melissa Virus Author Jailed</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/wdsi/threats/malware-encyclopedia-description?Name=Virus%3AW97M%2FMelissa.A" target="_blank">Virus:W97M/Melissa.A — Threat Description</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Kaspersky</div>
+        <div>
+          <div class="ref-detail"><a href="https://threats.kaspersky.com/en/threat/Virus.MSWord.Melissa/" target="_blank">Virus.MSWord.Melissa — Threat Description</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Kaspersky</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.kaspersky.com/blog/cybersecurity-history-iloveyou/45001/" target="_blank">ILOVEYOU: The Virus That Loved Everyone</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Melissa_(computer_virus)" target="_blank">Melissa (computer virus)</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/techniques/T1137/001/" target="_blank">T1137.001 — Office Application Startup: Office Template Macros</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/techniques/T1204/002/" target="_blank">T1204.002 — User Execution: Malicious File</a></div>
+          <div class="ref-date">Accessed: 2026-09-04</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-04 · 14 Sources (FBI, DOJ, CERT/CC, GAO, Microsoft, Kaspersky, MITRE, Press)</div>
+  <div>NO CVE — PRE-DATES MODERN VULNERABILITY DISCLOSURE INFRASTRUCTURE; VULN AUTO-DISPATCH DID NOT FIRE</div>
+</div>
+
+</body>
+</html>
