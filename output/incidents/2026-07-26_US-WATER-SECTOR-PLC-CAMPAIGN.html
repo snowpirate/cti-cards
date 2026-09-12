@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>US Water Sector PLC Campaign — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  /* Stamp watermark */
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  /* Defender visibility badge */
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-2026-0726-WWS<br/>
+    JAN 2025 – JUL 2026
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Nation-State Destructive · ICS/OT Disruption</div>
+  <h1><span class="gold">US WATER SECTOR</span> PLC CAMPAIGN</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-11 &nbsp;|&nbsp; INCIDENT DATE: JAN 2025 – JUL 2026 (culminating 26–27 JUL 2026) &nbsp;|&nbsp;
+    SOURCES: CISA/FBI/NSA/EPA/DOE/CNMF/Treasury AA26-097A · FBI WWS Alert · MNIT · CRS · GAO · Tenable · Dragos · Claroty · Censys · CSIS · Cybersecurity Dive · Washington Post · ABC News
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>NATION-STATE DESTRUCTIVE / ICS-OT DISRUPTION</span></div>
+    <div>Attribution: <span class="gold">IRANIAN-AFFILIATED (IRGC-CEC) [MEDIUM]</span></div>
+    <div>Severity: <span class="red">CRITICAL</span></div>
+    <div>Era: <span>2026 Iran War</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">ICS + ENTERPRISE</span></div>
+    <div>Sector: <span class="blue">WATER &amp; WASTEWATER · ENERGY · GOVT FACILITIES</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">~36</div>
+    <div class="stat-label">Minnesota community water systems hit in 48 hours (MNIT, 28 Jul 2026)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">100+</div>
+    <div class="stat-label">US facilities assessed as targeted (NYT, citing US investigators)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">12</div>
+    <div class="stat-label">US states with impacted utilities (Cybersecurity Dive, Aug 2026)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">9.8</div>
+    <div class="stat-label">CVSS — CVE-2021-22681, Rockwell Logix auth bypass, no vendor patch</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="name">CyberAv3ngers / IRGC-CEC-affiliated (see actor card: 2026-09-02_CYBERAV3NGERS)</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">US Water Sector PLC Campaign</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Jan 2025 – Jul 2026 (peak: 26–27 Jul 2026)</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Nation-state destructive · ICS/OT disruption</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">CyberAv3ngers (Bauxite / Storm-0784 / UNC5691); APT Iran co-claim</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[MEDIUM] — campaign-level USG attribution; event-level assessment preliminary</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Internet-exposed PLCs — Rockwell, Schneider, Siemens, Unitronics</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">~36 MN systems confirmed; 100+ US facilities assessed targeted</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">7 Apr 2026 (advisory AA26-097A); 26 Jul 2026 (mass disruption)</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">FBI/CISA/EPA joint reporting; MNIT and utility operators</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">Campaign infrastructure active from Jan 2025 — ~18 months before mass effect</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Loss of monitoring and control; safety/alarm logic suppression; operator lockout</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">ICS (primary) + Enterprise</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None assigned as of 2026-09-11</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Current — incident is under 5 years old; IOCs retain operational utility</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Between 26 and 27 July 2026, roughly three dozen Minnesota community water systems lost control of their own plants within a forty-eight-hour window. In Braham, malware shut down the automated operating controls and the water tower could not be filled for more than an hour (Braham city administrator Kevin Stahl, via FOX 9). Plymouth and South St. Paul reverted to manual operation. Maple Plain's mayor declared a local emergency. Minnesota IT Services put the confirmed total at approximately 36 systems (MNIT CISO John Israel, 28 Jul 2026). It was, in the plainest terms, the first time a foreign cyber operation degraded the operation of dozens of American drinking-water utilities simultaneously.</p>
+      <p>Minnesota was where the campaign surfaced, not where it began or ended. Within days the same pattern appeared in Georgia — where the Clayton County Water Authority issued a precautionary boil-water advisory after a pump station failed around 01:00 on 27 July, dropping pressure for customers until crews restored it near 04:00 — and in Michigan, South Dakota, New Jersey and elsewhere. Reporting ultimately placed impacted utilities in at least twelve states (Cybersecurity Dive, Aug 2026), and US investigators assessed that more than 100 facilities had been targeted nationally (New York Times, 30 Jul 2026). The technical common denominator was mundane and damning: internet-facing programmable logic controllers, reachable from the public internet, many still carrying vendor default credentials.</p>
+      <p>The July events were the loud end of a quiet eighteen-month operation. Joint advisory <strong>AA26-097A</strong> — signed by FBI, CISA, NSA, EPA, DOE, US Cyber Command's Cyber National Mission Force and the Treasury on 7 April 2026 — documented Iranian-affiliated actors exploiting exposed PLCs across water, energy and government facilities, with hostile infrastructure traceable to January 2025. The advisory's 22 July 2026 update, published four days before the Minnesota attacks, did two things that matter analytically: it expanded the confirmed targeting scope beyond Rockwell Automation to Schneider Electric and Siemens controllers, and it added detection guidance for malicious modification of Add-On Instructions — reusable code modules inside Rockwell PLC programs. That second addition signalled the campaign's real escalation. The actors were no longer merely accessing controllers; they were rewriting the logic that keeps a plant inside safe operating parameters, and specifically <em>disabling critical shutdown and alarm logic, allowing systems to enter unsafe conditions without notifying operators</em> (AA26-097A).</p>
+      <p>This case matters for three reasons that outlast the news cycle. First, it demonstrated that low-sophistication OT attacks scale: no zero-day, no bespoke implant, no insider — just exposure, default passwords, and the vendors' own engineering software, applied to dozens of victims at once. Second, it crossed a threshold. The 2023 Unitronics intrusions attributed to the same actor were defacement and nuisance; the 2026 campaign reached into safety instrumented logic. Third, it landed inside an active shooting war. The attacks came nineteen days after US aerial bombing of Iran resumed on 7–8 July 2026 and roughly a week after an Iranian strike on a US base in Jordan killed two American service members — and the claiming party said so out loud, describing the operation as a warning of capability and intent to retaliate against "any country that poses a threat to Iran" (APT Iran, via Telegram, reported by Check Point Research).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Geopolitical climate.</strong> The campaign's kinetic phase ran alongside the 2026 Iran war. A ceasefire agreed on 12 June 2026 and formalised in the Islamabad Memorandum of 17 June collapsed on 7 July when Iran struck three tankers in the southern Strait of Hormuz; the US resumed aerial bombardment that night and Trump declared the ceasefire over the following day. Over the weekend of 18–19 July, an Iranian strike on a US base in Jordan killed two American service members. The water-sector attacks began seven days later. Iranian cyber operations during the war had been assessed as running partly independent of the bombing campaign rather than tightly synchronised with it (Wikipedia, <em>Cyberwarfare during the 2026 Iran war</em>), which is consistent with what the water campaign looks like on the wire: pre-positioned access, built over eighteen months, actioned when a political moment called for a visible signal.</p>
+      <p><strong>Organisational posture of the victims.</strong> American drinking-water utilities are the softest large target set in US critical infrastructure, and this was documented well before July. More than 70% of water systems inspected by EPA since September 2023 were found in violation of basic cybersecurity assessment requirements, and 97 systems serving roughly 26.6 million people carried critical or high-risk vulnerabilities (EPA inspection data, cited in CRS and Congressional reporting). The sector is structurally fragmented — tens of thousands of small municipal utilities, most with no dedicated security staff, many with no OT logging at all — and the governing statute, Section 2013 of America's Water Infrastructure Act, requires larger systems to <em>assess</em> risk but gives EPA no authority to compel remediation of what the assessment finds. An EPA attempt to close that gap via sanitary-survey guidance in 2023 was withdrawn after legal challenge from industry groups and Republican state attorneys general.</p>
+      <p><strong>Technology landscape.</strong> The attack surface was measurable in advance. Censys reported in April 2026 that 5,219 internet-exposed hosts globally responded to industrial protocols as Rockwell Automation devices, with 3,891 — 74.6% — located in the United States, and a disproportionate share reachable over cellular networks rather than fixed broadband (Censys, Apr 2026; analysed by Tenable). That cellular detail turned out to be the operative one: Plymouth's compromised equipment sat at water towers and lift stations connected by cellular modem, precisely the architecture the advisory's Dropbear SSH observation describes. Compounding this, the single most relevant vulnerability has no fix. <strong>CVE-2021-22681</strong> (CVSS 9.8), an authentication bypass in Rockwell Logix controllers arising from an insufficiently protected cryptographic key, has no firmware patch; Rockwell directs customers to architectural controls instead. CISA added it to the Known Exploited Vulnerabilities catalog in March 2026 following confirmed exploitation by Iranian-affiliated actors — one month before AA26-097A.</p>
+      <p><strong>Known pre-incident indicators.</strong> This was a signposted incident. The same actor compromised at least 75 Unitronics Vision-series PLC and HMI devices beginning in November 2023 — reaching them on default TCP port 20256 with the shipped default password "1111" — and replaced valid ladder logic with malicious code, prompting advisory AA23-335A. The US Treasury sanctioned IRGC-CEC-linked individuals associated with that activity in February 2024. Claroty's Team82 documented the actor's IOCONTROL implant in December 2024. AA26-097A itself was published in April 2026 with an IP block list, and updated with fresh indicators and expanded vendor scope on 22 July 2026. By the time Minnesota was hit, the warning had been issued, reissued, and sharpened — four days earlier.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 1 — Internet-Exposed Asset Discovery</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">The campaign required no exploitation to find its victims. Water and wastewater PLCs sit on the public internet in the thousands, advertising themselves through the industrial protocols they speak. AA26-097A names the ports the actors worked against — <strong>44818</strong> (EtherNet/IP, Rockwell), <strong>2222</strong> (EtherNet/IP implicit messaging), <strong>102</strong> (ISO-TSAP/S7, Siemens) and <strong>502</strong> (Modbus, Schneider) — the standard vocabulary of the three vendor families ultimately targeted. Independent scanning corroborates the size of the pool: Censys counted 5,219 internet-exposed hosts globally responding as Rockwell Automation devices in April 2026, 3,891 of them in the United States, with a disproportionate share on cellular rather than fixed connections (Censys via Tenable, Apr 2026). The advisory does not document the actors' own scanning activity directly, so the reconnaissance method is inferred from the exposure-driven victimology rather than observed — but the target set was enumerable by anyone with a search engine for internet-connected devices, and required no privileged access to assemble. <strong>Defender visibility was nil:</strong> internet-wide scanning of an exposed device generates no alert at a utility with no OT monitoring, which describes most of the victim population.</div>
+        <div class="kc-pivot">A publicly enumerable target list meant the actors could skip initial access entirely as a problem to be solved — the only remaining question was authentication.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 2 — Direct Access to Exposed Controllers</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Access was achieved by connecting to controllers that lacked, in the advisory's language, "sufficient network and/or hardening security controls." The actors used <strong>leased, third-party hosted infrastructure</strong> together with the manufacturers' own PLC programming software to reach misconfigured victim devices (AA26-097A). Two authentication failures made this work. The first was credential hygiene: the advisory's remediation guidance leads with ensuring "device passwords are changed from their default," and the same actor's 2023 Unitronics campaign had already demonstrated the pattern at scale, reaching devices on default port 20256 with the shipped default password. The second was structural — <strong>CVE-2021-22681</strong> (CVSS 9.8), an authentication bypass in Rockwell Logix controllers caused by an insufficiently protected cryptographic key, for which no firmware patch exists and which CISA added to the Known Exploited Vulnerabilities catalog in March 2026 after confirmed exploitation by Iranian-affiliated actors <em>(see vuln card: 2026-09-02_ROCKWELL-LOGIX-AUTH-BYPASS)</em>. A controller reachable from the internet with this flaw cannot be patched into safety; it can only be taken off the internet. Most were not. <strong>Defender visibility was nil</strong> at the great majority of victims — small municipal utilities with no OT network monitoring and, in many cases, no awareness that the device was internet-reachable at all.</div>
+        <div class="kc-pivot">With authenticated interactive access to the controller, the actors held the same privileges as the plant's own engineer — and could now establish access that survived a reboot.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 3 — Modem Foothold &amp; Persistence (Dropbear SSH)</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">In at least one documented case, the actors moved off the controller and onto the network device in front of it: AA26-097A records that they "utilized Dropbear Secure Shell (SSH) software on victim modems to enable them to gain remote access through <strong>port 22</strong>." Dropbear is a legitimate lightweight SSH implementation common in embedded Linux, which is exactly why it is useful here — it is plausible software on a cellular modem, it is small, and it is not malware any signature engine will flag. Functionally this converted an opportunistic connection to an exposed PLC into durable remote access to the site's communications path, independent of whether the controller itself was later hardened. It also sat in the worst possible place for a defender: the cellular modems serving remote assets — water towers, lift stations, pump houses — are typically vendor- or carrier-managed, rarely logged to any SIEM, and frequently outside the utility's own asset inventory. Plymouth's response, disconnecting cellular equipment at water towers and lift stations, indicates the same architecture in the Minnesota victims. <strong>Defender visibility was nil:</strong> no source describes any victim detecting the Dropbear installation contemporaneously.</div>
+        <div class="kc-pivot">Persistent access to the site's communication path allowed the actors to work at their own pace — and what they wanted next was the plant's engineering intellectual property.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 4 — Project File Exfiltration via Vendor Engineering Software</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">The actors then did something that distinguishes this campaign from ordinary opportunistic OT meddling: they took the plant's source code. Running the vendors' own configuration software — <strong>Rockwell Automation Studio 5000 Logix Designer</strong>, <strong>Schneider Electric EcoStruxure Control Expert</strong> and <strong>Siemens Totally Integrated Automation (TIA) Portal</strong> — on leased third-party infrastructure, they <strong>exfiltrated device project files</strong> (AA26-097A). A project file is the controller's program: ladder logic and configuration settings, stored on Rockwell devices as an <strong>.ACD</strong> file. Possessing it means possessing a complete description of how that specific plant is instrumented, sequenced and interlocked — which pumps run in what order, which sensors trip which alarms, which conditions force a shutdown. This is the prerequisite for surgical rather than random manipulation, and it is why this phase is the analytic hinge of the whole case. Because the traffic was the legitimate vendor engineering protocol carrying a legitimate engineering operation, it is functionally indistinguishable from an integrator doing routine work — and <strong>defender visibility was nil</strong> at victims with no baseline of who is authorised to upload a program and when.</div>
+        <div class="kc-pivot">Holding the plant's logic and knowing its interlocks, the actors could now author modifications that would run correctly, look correct, and still be unsafe.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 5 — Safety Logic Suppression &amp; Weaponized Project Files</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">This is the escalation that prompted the 22 July 2026 advisory update, and it is the most serious conduct in the case file. The actors conducted "modification and deletion of project file logic, to include <strong>Add-On Instructions (AOIs)</strong>, and data manipulation on HMI and SCADA displays" (AA26-097A). AOIs are reusable, user-authored code modules inside a Rockwell program — the natural hiding place for logic tampering, because engineers treat them as trusted library components and rarely diff them line by line. The malicious project files retained functional ladder logic but carried "added logic that overrode specific instruction sets responsible for maintaining safe operating parameters." In the advisory's own words, those changes <strong>"disabled critical shutdown and alarm logic, allowing systems to enter unsafe conditions without notifying operators."</strong> Two properties make this qualitatively worse than the actor's 2023 defacement activity. The plant still appears to work — the program runs, the HMI renders, the operator sees a normal screen. And the specific functions removed are the ones that exist to catch the failure: the automatic trip and the alarm that would summon a human. Manipulating the HMI and SCADA display layer alongside the controller logic closes the loop, ensuring the operator's view agrees with the sabotaged process rather than with physical reality. <strong>Defender visibility was nil:</strong> detecting this requires comparing running PLC logic against a known-good baseline, which the advisory had to introduce as new guidance in July precisely because it was not standard practice.</div>
+        <div class="kc-pivot">With weaponized logic resident on controllers across multiple states and vendors, the campaign held a coordinated disruption capability it could trigger at a time of political choosing.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 6 — Coordinated Disruption &amp; Operator Lockout (26–27 Jul 2026)</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">On 26–27 July 2026 the campaign went loud across roughly 36 Minnesota community water systems and, within days, utilities in at least twelve states. The observed actions were blunt: <strong>remote password changes</strong> that locked legitimate operators out of their own controllers, <strong>IP address modifications</strong> that severed devices from monitoring systems, and the previously staged logic modifications disabling safety and alarm functions (Tenable; FBI water-sector alert, 30 Jul 2026). The FBI summarised the effect as a "loss of monitoring and control functionality." Impacts were real but bounded: in <strong>Braham</strong>, plant controls went down and the tower could not be filled for over an hour, restored in roughly two hours via manual procedures; <strong>Plymouth</strong> and <strong>South St. Paul</strong> ran manually; <strong>Maple Plain</strong> declared a local emergency; in <strong>Clayton County, Georgia</strong>, a pump station failed around 01:00 on 27 July, dropping pressure and triggering a precautionary boil-water advisory that was lifted on 28 July after testing confirmed the water safe. New Jersey's Office of Homeland Security reported two utilities where "staff shifted quickly to manual operations, and there was no disruption to service." No degradation of drinking water quality was confirmed at any victim, and no related illness was reported. <strong>Detection occurred at the moment of effect, by plant operators</strong> — not by security tooling — and the reason it was survivable is that water operators are trained and equipped to run their plants by hand.</div>
+        <div class="kc-pivot">Operational detection triggered a state and federal response — but by then the only remaining question was who had done it, and why they wanted it seen.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 7 — Claim, Signaling &amp; Response</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Minnesota IT Services activated a statewide response immediately on learning of the attack and issued a public statement on 28 July 2026, coordinating with CISA, EPA, FBI, the Minnesota Department of Public Safety's Bureau of Criminal Apprehension and Fusion Center, the Minnesota Department of Health and the Minnesota Pollution Control Agency, and pushing threat intelligence and indicators to affected utilities (MNIT; CISO John Israel: "Cyberattacks against critical infrastructure require a coordinated, whole-of-government response"). On 30 July the FBI and EPA issued a sector-wide alert on malicious actors targeting internet-facing WWS PLCs, and the New York Times reported that US investigators had preliminarily assessed Iranian hackers were "probably responsible," with the caveat that the assessment could change. The claiming came from the adversary side: a group posting as <strong>APT Iran</strong> stated on Telegram that "the attack on Minnesota was the work of the CyberAv3ngers group and us, and we take direct responsibility for it," later adding that "our intention in attacking Minnesota was only to warn" of its capability and its intent to retaliate against "any country that poses a threat to Iran" (reported by Check Point Research). The signal was also aimed domestically: Trump publicly downplayed the incidents and disputed Iranian responsibility while criticising Minnesota's governor, who countered that the administration was concealing the responsible party — a public disagreement over attribution between a president and a state governor that is itself part of the case record.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>ICS primary, Enterprise supporting · post-2013 incident, no retrospective mapping required · confidence per cell</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell green">
+        <div class="mitre-framework">ENTERPRISE</div>
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1595 — [MEDIUM]</div>
+        <div class="mitre-name">Active Scanning</div>
+        <div class="mitre-note">Victimology is entirely exposure-driven across four vendor families, implying internet-wide enumeration of OT protocol ports. AA26-097A does not document the actors' scanning directly — inferred from targeting pattern and Censys exposure data (3,891 US Rockwell hosts, Apr 2026).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T0883 — [HIGH]</div>
+        <div class="mitre-name">Internet Accessible Device</div>
+        <div class="mitre-note">Named explicitly in AA26-097A: actors "accessed and interacted with publicly exposed, internet-accessible PLCs." The single defining precondition of every confirmed compromise in this campaign.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T0822 — [HIGH]</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">Remote access reached controllers and cellular modems serving water towers and lift stations. Plymouth's remediation — physically disconnecting cellular equipment at remote assets — confirms the vector at a named victim.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ENTERPRISE</div>
+        <div class="mitre-tactic">Initial Access / Credential</div>
+        <div class="mitre-id">T1078 — [MEDIUM]</div>
+        <div class="mitre-name">Valid Accounts (Default Credentials)</div>
+        <div class="mitre-note">AA26-097A leads its remediation with changing device passwords "from their default." Same-actor precedent is direct: the Nov 2023 Unitronics campaign used the shipped default password on the vendor default port. Rated MEDIUM as the advisory does not confirm default-credential use at every 2026 victim.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ENTERPRISE</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190 — [HIGH]</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">CVE-2021-22681 (CVSS 9.8) authentication bypass in Rockwell Logix controllers — no vendor patch available. Added to CISA KEV in March 2026 after confirmed exploitation by Iranian-affiliated actors. See vuln card: 2026-09-02_ROCKWELL-LOGIX-AUTH-BYPASS.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-framework">ENTERPRISE</div>
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1219 — [HIGH]</div>
+        <div class="mitre-name">Remote Access Tools</div>
+        <div class="mitre-note">Dropbear SSH deployed on victim cellular modems to enable remote access via port 22 (AA26-097A). Legitimate embedded SSH software — no malware signature to detect, and modems typically fall outside utility asset inventory and logging.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Defense Evasion / Impair Process Control</div>
+        <div class="mitre-id">T0878 — [HIGH]</div>
+        <div class="mitre-name">Alarm Suppression</div>
+        <div class="mitre-note">Modified project logic "disabled critical shutdown and alarm logic, allowing systems to enter unsafe conditions without notifying operators" (AA26-097A, 22 Jul 2026 update). The defining escalation of this campaign over prior Iranian OT activity.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T0851 — [MEDIUM]</div>
+        <div class="mitre-name">Rootkit / Logic Concealment</div>
+        <div class="mitre-note">Weaponized project files preserved functional ladder logic while overriding safe-operating instruction sets, so a running plant appeared normal. Mapped as concealment by design rather than a discrete rootkit artifact; no rootkit binary is documented.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T0885 — [HIGH]</div>
+        <div class="mitre-name">Commonly Used Port</div>
+        <div class="mitre-note">Operations conducted over standard OT ports 44818 (EtherNet/IP), 2222, 102 (ISO-TSAP/S7) and 502 (Modbus), plus 22 for modem SSH — traffic indistinguishable from legitimate engineering activity absent an access baseline.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T0845 — [HIGH]</div>
+        <div class="mitre-name">Program Upload</div>
+        <div class="mitre-note">Device project files (.ACD on Rockwell) uploaded from controllers using vendor engineering software — Studio 5000 Logix Designer, EcoStruxure Control Expert, TIA Portal — run on leased third-party infrastructure.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-framework">ENTERPRISE</div>
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1041 — [HIGH]</div>
+        <div class="mitre-name">Exfiltration Over C2 Channel</div>
+        <div class="mitre-note">AA26-097A: actors used "remote, third-party hosted infrastructure as a C2 channel to transfer device project files." Stolen logic is the prerequisite for the targeted safety-function modification in Phase 5.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Impact / Inhibit Response Function</div>
+        <div class="mitre-id">T0889 — [HIGH]</div>
+        <div class="mitre-name">Modify Program</div>
+        <div class="mitre-note">"Modification and deletion of project file logic, to include Add-On Instructions (AOIs)" (AA26-097A). AOIs are reusable trusted code modules engineers rarely diff — the July advisory update added detection guidance specifically for anomalous AOI modification.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0880 — [HIGH]</div>
+        <div class="mitre-name">Loss of Safety</div>
+        <div class="mitre-note">Disabling automatic shutdown logic removed the plant's independent protective layer, leaving unsafe process conditions dependent on human noticing. No physical harm resulted at any confirmed victim — the capability, not the outcome, is what is evidenced.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0832 — [HIGH]</div>
+        <div class="mitre-name">Manipulation of View</div>
+        <div class="mitre-note">"Data manipulation on HMI and SCADA displays" (AA26-097A) — falsifying the operator's picture so it agrees with the sabotaged process rather than physical reality. Enterprise equivalent T1565 (Data Manipulation) is the advisory's own mapping.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0892 — [HIGH]</div>
+        <div class="mitre-name">Change Credential</div>
+        <div class="mitre-note">Remote PLC password changes locked legitimate operators out of their own controllers during the 26–27 July disruption (Tenable; FBI WWS alert). Directly forced the reversion to manual operation at multiple Minnesota utilities.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ICS</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0829 / T0827 — [HIGH]</div>
+        <div class="mitre-name">Loss of View / Loss of Control</div>
+        <div class="mitre-note">FBI characterised the campaign's effect as "loss of monitoring and control functionality." IP address modification severed controllers from monitoring systems; Braham lost automated plant control for roughly two hours.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 1–2<br/>MISSED</div>
+        <div class="pm-detail"><strong>Utilities did not know their own controllers were internet-reachable.</strong> The exposure was measurable from outside — Censys counted 3,891 US hosts responding as Rockwell devices in April 2026 — while the asset owners, in many cases, held no inventory recording that the device had a public route at all. The campaign required no exploit chain at the majority of victims because the front door was both open and unlisted. This is an asset-management failure before it is a detection failure: you cannot monitor a device you do not know you operate.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">ADVISORY-TO-ACTION<br/>MISSED — MOST CONSEQUENTIAL</div>
+        <div class="pm-detail"><strong>The warning arrived four days early and most utilities could not act on it in time.</strong> AA26-097A was published 7 April 2026 and updated 22 July — four days before the Minnesota attacks. Reporting indicates utilities that had disconnected their internet-facing PLCs before 26 July were unaffected, while those that had not were hit (FOX 9; SecureWorld). The mitigation was known, published, free and effective; the binding constraint was organisational capacity to execute it in a sector where most operators have no dedicated security staff. <strong>This is the sharpest finding in the case file:</strong> advisory efficacy is bounded not by the quality of the advisory but by the recipient's ability to act, and a four-day window is a test most small municipal utilities will fail.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 3<br/>MISSED</div>
+        <div class="pm-detail"><strong>Cellular modems at remote assets were an unmonitored blind spot.</strong> Dropbear SSH on victim modems gave persistence on equipment that is typically carrier- or vendor-managed, rarely forwards logs anywhere, and often sits outside the utility's inventory entirely. No source records any victim detecting the installation contemporaneously. The architecture that made remote water towers and lift stations economically supervisable is the same architecture that made them invisible.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 4–5<br/>MISSED</div>
+        <div class="pm-detail"><strong>No baseline existed to diff running PLC logic against known-good.</strong> Project file upload and modification used the vendors' legitimate engineering software over legitimate engineering protocols, which is indistinguishable from an integrator doing routine work unless the defender knows who is authorised to upload a program and when. That AA26-097A had to <em>introduce</em> AOI-modification detection guidance in its July update is itself the evidence: comparing running logic to a trusted baseline was not standard practice in this sector before this campaign.</div>
+      </div>
+
+      <div class="pm-item partial">
+        <div class="pm-phase">PHASE 6<br/>PARTIALLY DETECTED</div>
+        <div class="pm-detail"><strong>Detection happened at the moment of effect, by operators, not by security tooling.</strong> Plant staff noticed because controls stopped responding and they were locked out — the last possible point of discovery. The mitigating factor was operational rather than cyber: water operators are trained to run plants manually, so Plymouth, South St. Paul and the two New Jersey utilities absorbed the disruption without service loss. That resilience is real and worth crediting, but it caught the campaign at Phase 6 of 7, after eighteen months of access and after safety logic had already been modified.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">REGULATORY LAYER<br/>MISSED</div>
+        <div class="pm-detail"><strong>The sector's governing statute could not compel the fix.</strong> Section 2013 of America's Water Infrastructure Act requires larger systems to assess risk but gives EPA no authority to require remediation of what is found. More than 70% of systems EPA inspected since September 2023 violated basic assessment requirements, and 97 systems serving ~26.6 million people carried critical or high-risk vulnerabilities. EPA's 2023 attempt to close the gap through sanitary-survey guidance was withdrawn after industry and state legal challenge. The vulnerability data existed in government hands before the campaign; the authority to act on it did not.</div>
+      </div>
+
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail"><strong>Detection guidance, coordination doctrine and a live legislative response.</strong> AA26-097A's July update added the first authoritative federal guidance on detecting malicious AOI and project-file modification, directing defenders to vendor integrity-checking tools and visual comparison of running programs against known-good logic. MNIT's whole-of-government activation — pushing IOCs and response guidance across state health, environmental, law-enforcement and fusion-centre channels within 24–48 hours — is being treated as a template for state-level OT incident coordination. In Congress, the <strong>Water Cyber Shield Act of 2026</strong> (Klobuchar/Schiff) would grant EPA explicit authority to assess sector cyber threats, require utilities to remediate identified vulnerabilities, and direct tiered standards developed with CISA and NIST; the Water Resources Development Act of 2026 (S. 4949) carries wastewater cyber and digital infrastructure grant provisions. Whether these pass is unresolved as of this compile.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">CVE-2021-22681 — Rockwell Logix Authentication Bypass</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">CVE</span>
+            <span class="artifact-tag">CVSS 9.8</span>
+            <span class="artifact-tag">NO VENDOR PATCH</span>
+            <span class="artifact-tag">CISA KEV</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Authentication bypass in Rockwell Automation Logix controllers arising from an insufficiently protected cryptographic key shared between Studio 5000 Logix Designer and the controller. An attacker who extracts the key can authenticate as a legitimate engineering workstation and alter controller configuration and logic. <strong>No firmware patch exists</strong> — Rockwell directs customers to architectural controls (network segmentation, removing internet exposure, physical mode-switch discipline). Added to CISA's Known Exploited Vulnerabilities catalog in <strong>March 2026</strong> following confirmed exploitation by Iranian-affiliated actors, one month before AA26-097A. <em>(see vuln card: 2026-09-02_ROCKWELL-LOGIX-AUTH-BYPASS)</em></div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Dropbear SSH</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">LEGITIMATE SOFTWARE</span>
+            <span class="artifact-tag">PERSISTENCE</span>
+            <span class="artifact-tag">T1219</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Lightweight open-source SSH server and client designed for embedded Linux environments. Deployed by the actors on victim cellular modems to establish remote access via port 22 (AA26-097A). Its value to the operation is precisely that it is not malware: it is plausible, common embedded software that generates no signature-based detection, running on network equipment that most water utilities neither inventory nor log. Detection requires noticing an SSH listener that should not exist on a modem, not scanning for a malicious file.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Weaponized PLC Project Files (.ACD and vendor equivalents)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">CUSTOM LOGIC</span>
+            <span class="artifact-tag">SAFETY SUPPRESSION</span>
+            <span class="artifact-tag">T0889 / T0878</span>
+          </div>
+        </div>
+        <div class="artifact-desc">The campaign's primary offensive payload was not a binary but the plant's own program, rewritten. A project file contains a controller's ladder logic and configuration settings — stored as an <strong>.ACD</strong> file on Rockwell devices. The actors exfiltrated genuine project files, modified them, and redeployed them. Modified files retained functional ladder logic but carried added logic overriding "specific instruction sets responsible for maintaining safe operating parameters," which "disabled critical shutdown and alarm logic, allowing systems to enter unsafe conditions without notifying operators" (AA26-097A). Modification concentrated in <strong>Add-On Instructions (AOIs)</strong> — reusable user-authored code modules that engineers treat as trusted library components and rarely inspect line by line. Detection artifact: divergence between running controller logic and a known-good baseline; the July 2026 advisory update directs defenders to vendor integrity-checking tools and visual program comparison, with specific attention to anomalous AOI modification.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Vendor Engineering Software (dual-use)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">LOTL / DUAL-USE</span>
+            <span class="artifact-tag">COLLECTION</span>
+            <span class="artifact-tag">T0845</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Rockwell Automation <strong>Studio 5000 Logix Designer</strong>, Schneider Electric <strong>EcoStruxure Control Expert</strong> and Siemens <strong>Totally Integrated Automation (TIA) Portal</strong>, run by the actors on leased third-party hosted infrastructure to connect to victim controllers and exfiltrate device project files (AA26-097A). This is living-off-the-land applied to OT: the traffic is the legitimate vendor engineering protocol carrying a legitimate engineering operation, and is indistinguishable from authorised integrator work absent an access baseline recording who may upload or download a program and when.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Targeted Controller Hardware</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">TARGET SET</span>
+            <span class="artifact-tag">4 VENDOR FAMILIES</span>
+          </div>
+        </div>
+        <div class="artifact-desc"><strong>Rockwell Automation / Allen-Bradley:</strong> MicroLogix 1100 and 1400 series (named by FBI in the July 2026 water-sector activity), CompactLogix, Micro850. <strong>Schneider Electric:</strong> BMX P34 / Modicon M340. <strong>Siemens:</strong> S7-1200 series. <strong>Unitronics:</strong> Vision series PLC/HMI (same actor, Nov 2023 precedent campaign, default port 20256). The 22 July 2026 advisory update expanded confirmed scope beyond Rockwell to Schneider, Siemens "and potentially other branded/manufactured PLCs" — vendor-agnostic targeting driven by internet exposure rather than by any one product's flaws. Vendor security contacts per the advisory: Rockwell PSIRT (advisory SD1771), Schneider CPCERT, Siemens ProductCERT.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">IOCONTROL</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">CONTEXTUAL — NOT CONFIRMED IN THIS CAMPAIGN</span>
+            <span class="artifact-tag">MODULAR LINUX IMPLANT</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Custom modular Linux implant attributed to the same actor and documented by Claroty Team82 in December 2024, using MQTT over TLS (port 8883) and DNS-over-HTTPS for C2, targeting fuel dispensing systems, Unitronics and Rockwell controllers, and consumer network and camera devices. <strong>Included for actor-capability context only — no public source places IOCONTROL at any confirmed victim of the 2026 PLC campaign.</strong> Its relevance is that the actor holds a purpose-built OT implant capability it apparently did not need to use here, because exposure and default credentials sufficed. Full technical treatment lives in the companion actor card.</div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+      <div class="ioc-historical-note">⚠ CURRENT IOCs — This incident is under five years old and infrastructure indicators retain operational detection utility. Note however that AA26-097A Table 2 addresses were published 7 Apr 2026 and may have rotated; Table 1 addresses were published 22 Jul 2026. Treat port and behavioral indicators as the more durable detection surface.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date Observed</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]175</td><td>CISA AA26-097A Table 1</td><td>Sep 2025 – Feb 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">141.11.164[.]153</td><td>CISA AA26-097A Table 1</td><td>Jan 2026 – Jun 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">175.110.121[.]39</td><td>CISA AA26-097A Table 1</td><td>Feb 2026 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">175.110.121[.]41</td><td>CISA AA26-097A Table 1</td><td>Feb 2026 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">175.110.121[.]42</td><td>CISA AA26-097A Table 1</td><td>Feb 2026 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">175.110.121[.]107</td><td>CISA AA26-097A Table 1</td><td>Feb 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">192.142.54[.]79</td><td>CISA AA26-097A Table 1</td><td>May 2026 – Jun 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">84.200.205[.]165</td><td>CISA AA26-097A Table 1</td><td>May 2026 – Jun 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">185.225.17[.]225</td><td>CISA AA26-097A Table 1</td><td>Jun 2026 – Jul 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">79.133.46[.]209</td><td>CISA AA26-097A Table 1</td><td>Jul 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">88.80.150[.]199</td><td>CISA AA26-097A Table 1</td><td>Jul 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">88.80.150[.]200</td><td>CISA AA26-097A Table 1</td><td>Jul 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">88.80.150[.]202</td><td>CISA AA26-097A Table 1</td><td>Jul 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]162</td><td>CISA AA26-097A Table 2</td><td>Jan 2025 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]164</td><td>CISA AA26-097A Table 2</td><td>Jan 2025 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]165</td><td>CISA AA26-097A Table 2</td><td>Jan 2025 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]167</td><td>CISA AA26-097A Table 2</td><td>Jan 2025 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]168</td><td>CISA AA26-097A Table 2</td><td>Jan 2025 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]170</td><td>CISA AA26-097A Table 2</td><td>Jan 2025 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]171</td><td>CISA AA26-097A Table 2</td><td>Jan 2025 – Mar 2026</td></tr>
+          <tr><td class="type-label">IPV4</td><td class="val">135.136.1[.]133</td><td>CISA AA26-097A Table 2</td><td>Mar 2026</td></tr>
+          <tr><td class="type-label">INFRA</td><td class="val">Leased, third-party hosted infrastructure used to run vendor PLC programming software and serve as C2 for project-file transfer — not actor-owned bulletproof hosting in the classic sense</td><td>CISA AA26-097A</td><td>Jan 2025 – Jul 2026</td></tr>
+          <tr><td class="type-label">PORT</td><td class="val">TCP 44818 — EtherNet/IP explicit messaging (Rockwell); primary targeted OT port</td><td>CISA AA26-097A</td><td>2026</td></tr>
+          <tr><td class="type-label">PORT</td><td class="val">TCP/UDP 2222 — EtherNet/IP implicit (I/O) messaging</td><td>CISA AA26-097A</td><td>2026</td></tr>
+          <tr><td class="type-label">PORT</td><td class="val">TCP 102 — ISO-TSAP / S7 protocol (Siemens S7-1200)</td><td>CISA AA26-097A</td><td>2026</td></tr>
+          <tr><td class="type-label">PORT</td><td class="val">TCP 502 — Modbus (Schneider Modicon M340 / BMX P34)</td><td>CISA AA26-097A</td><td>2026</td></tr>
+          <tr><td class="type-label">PORT</td><td class="val">TCP 22 — SSH on victim cellular modems via actor-deployed Dropbear; anomalous on a water-utility modem and a high-value detection point</td><td>CISA AA26-097A</td><td>2026</td></tr>
+          <tr><td class="type-label">PORT</td><td class="val">TCP 20256 — Unitronics Vision series default remote-access port; precursor campaign (Nov 2023), retained as exposure indicator</td><td>CISA AA23-335A</td><td>Nov 2023</td></tr>
+          <tr><td class="type-label">BEHAVIOR</td><td class="val">Unauthorized PLC program upload or download outside a change window — vendor engineering protocol traffic from an IP that is not a known integrator or engineering workstation</td><td>CISA AA26-097A detection guidance</td><td>Jul 2026</td></tr>
+          <tr><td class="type-label">BEHAVIOR</td><td class="val">Divergence between running PLC logic and known-good baseline, with specific attention to modified or added Add-On Instructions (AOIs) on Rockwell controllers</td><td>CISA AA26-097A (22 Jul 2026 update)</td><td>Jul 2026</td></tr>
+          <tr><td class="type-label">BEHAVIOR</td><td class="val">Controller mode-switch state change to PROGRAM or REMOTE outside maintenance; ICS management protocol functions that change an asset's operating mode or modify programs</td><td>CISA AA26-097A detection guidance</td><td>Jul 2026</td></tr>
+          <tr><td class="type-label">BEHAVIOR</td><td class="val">Unexplained PLC credential change or device IP address reassignment resulting in operator lockout or loss of monitoring</td><td>Tenable; FBI WWS alert</td><td>Jul 2026</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val">No file hashes, malware samples, C2 domains or YARA signatures have been published for this campaign as of 2026-09-11. This is consistent with the tradecraft: the operation used legitimate vendor engineering software, legitimate embedded SSH, and the victims' own project files rather than distributable malware. Detection must be behavioral and baseline-driven, not signature-driven.</td><td>Analyst assessment</td><td>2026-09-11</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">The campaign converted American municipal water utilities into an instrument of state signalling during an active war. Timing is the argument: US bombing of Iran resumed 7–8 July 2026 after the Islamabad Memorandum ceasefire collapsed; an Iranian strike on a US base in Jordan killed two American service members over 18–19 July; the coordinated water-sector disruption followed on 26–27 July. The claiming party made the intent explicit — <strong>"our intention in attacking Minnesota was only to warn"</strong> of capability and willingness to retaliate against "any country that poses a threat to Iran" (APT Iran via Telegram, reported by Check Point Research). That is coercive signalling against civilian infrastructure, calibrated to demonstrate reach without causing casualties. A second-order consequence was domestic: attribution itself became contested political ground, with the President publicly downplaying Iranian responsibility and criticising Minnesota's governor, who countered that the administration was concealing the responsible party. CSIS assessed the administration would respond privately notwithstanding the public downplaying. The precedent set is that an adversary can impose visible domestic political cost on the US through low-sophistication attacks on small municipal utilities.</div>
+      </div>
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Three capability thresholds were crossed. <strong>First, scale without sophistication.</strong> Dozens of simultaneous OT compromises across four vendor families were achieved with no zero-day, no bespoke implant and no insider — only internet exposure, weak or default credentials, an unpatchable auth bypass, and the vendors' own engineering software. This overturns the working assumption that multi-victim OT effects require Stuxnet-class investment. <strong>Second, escalation from access to safety.</strong> The same actor's 2023 Unitronics activity was defacement and nuisance; the 2026 campaign reached into safety instrumented logic, disabling automatic shutdown and alarm functions while leaving the plant superficially normal — the actual object of OT attack, not a symbolic proxy for it. <strong>Third, project-file theft as a targeting prerequisite.</strong> Exfiltrating .ACD and equivalent files gave the actors a complete description of each plant's interlocks, enabling surgical rather than indiscriminate manipulation. Defensively, the campaign exposed the cellular-modem tier at remote assets as a systemic blind spot and forced the first authoritative federal guidance on detecting malicious Add-On Instruction modification.</div>
+      </div>
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">The campaign reopened the water-sector regulatory fight that EPA lost in 2023. The <strong>Water Cyber Shield Act of 2026</strong>, introduced by Senators Klobuchar and Schiff in August 2026, would give EPA explicit authority to assess sector cyber threats, require utilities to remediate vulnerabilities EPA identifies, mandate cyber risk assessment within existing risk and resilience planning for large systems, and direct tiered cybersecurity standards developed with CISA, NIST, states and sector stakeholders — substantially the approach EPA attempted via sanitary-survey guidance in 2023 before withdrawing it under industry and state legal challenge. The <strong>Water Resources Development Act of 2026 (S. 4949)</strong> carries wastewater cybersecurity and digital infrastructure grant provisions; Congress separately enacted a temporary extension of expiring cyber authorities and EPA issued new guidance. CRS produced <em>July 2026 Water System Cyber Incidents: Considerations for Congress</em> (IF13298) and GAO published <em>Critical Infrastructure Protection: Actions Needed to Address Persistent Cybersecurity Threats to the Water and Wastewater Sector</em> (GAO-26-109159). <strong>No indictments, sanctions or other legal actions specific to this campaign had been announced as of 2026-09-11</strong> — the Treasury sanctions against IRGC-CEC-linked individuals date to February 2024 and address the precursor Unitronics activity.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-medium">ATTRIBUTION CONFIDENCE: [MEDIUM]</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">CyberAv3ngers (IRGC-CEC-affiliated); APT Iran co-claim</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">Iran — IRGC Cyber Electronic Command (assessed)</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Designations</span><span class="kv-val">Bauxite (Dragos) · Storm-0784 (Microsoft) · UNC5691 (Mandiant) · Hydro Kitten · Shahid Kaveh Group</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">Campaign-level: YES — AA26-097A, 7 Apr 2026, seven USG agencies. Event-level (26–27 Jul): preliminary only</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">None for this campaign. Treasury sanctions Feb 2024 address the Nov 2023 Unitronics precursor</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">output/actors/2026-09-02_CYBERAV3NGERS.html</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Seven-agency USG advisory naming Iranian-affiliated actors; TTP and victimology continuity with the Nov 2023 Unitronics campaign; adversary self-claim on Telegram; WaterISAC member communication; US investigator assessment reported by NYT</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">(1) Opportunistic third parties exploiting the same exposed devices after public advisory; (2) multiple uncoordinated actors rather than one campaign; (3) hacktivist false claim of credit</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">A formal, event-level USG attribution statement for 26–27 Jul; indictment or sanctions naming individuals; forensic linkage of the Jul 2026 victim set to the AA26-097A infrastructure; or contrary evidence that the disruption was independent of the advisory-documented campaign</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p><strong>The assessment holds at [MEDIUM] because the campaign and the event are attributed to different standards, and conflating them would overstate the case.</strong> The eighteen-month PLC exploitation campaign carries a genuine formal attribution: AA26-097A was signed on 7 April 2026 by the FBI, CISA, NSA, EPA, DOE, US Cyber Command's Cyber National Mission Force and the Department of the Treasury, and names Iranian-affiliated, IRGC-CEC-linked actors operating as CyberAv3ngers. That is a seven-agency government statement backed by infrastructure indicators, and it is strong. The 26–27 July coordinated disruption is a weaker case: as of early August 2026 federal attribution for that specific event remained pending, with the New York Times reporting on 30 July that investigators assessed Iranian hackers were <em>"probably responsible"</em> while explicitly noting the assessment could change. A leaked WaterISAC member communication indicated Iranian-linked responsibility, and Minnesota officials — while calling the attacks coordinated — stated it was not clear whether all of them were carried out by the same actor.</p>
+        <p><strong>The adversary self-claim is corroborating but is not, on its own, evidence.</strong> A group posting as APT Iran stated on Telegram that "the attack on Minnesota was the work of the CyberAv3ngers group and us, and we take direct responsibility for it" (via Check Point Research). Claims of credit in this space are cheap, frequently opportunistic, and routinely made by groups with no involvement; APT Iran's subsequent framing — that the attack was "only to warn" — reads as narrative construction as much as confession. Its evidentiary weight here comes from consistency with the independently documented campaign, not from the claim itself.</p>
+        <p><strong>What genuinely supports the linkage is behavioral continuity.</strong> The July victim set matches the AA26-097A campaign's targeting logic precisely — internet-exposed PLCs, water sector priority, vendor-agnostic selection driven by exposure, Rockwell MicroLogix 1100/1400 named by the FBI, the same credential-abuse and logic-modification pattern documented four days earlier in the advisory update. The 2023 Unitronics precursor establishes that this actor specifically attacks US water utilities via exposed controllers with default credentials, and the February 2024 Treasury sanctions establish USG willingness to attribute that activity to IRGC-CEC-linked individuals by name. Dragos, which tracks the overlapping activity as BAUXITE, explicitly does not perform political attribution and states only that BAUXITE shows technical overlap with activity the US government assesses as aligned with CyberAv3ngers and IRGC-CEC — a caution worth preserving. The defensible conclusion is that AA26-097A activity is consistent with a CyberAv3ngers/BAUXITE-overlapping capability set, not that every vendor label maps one-to-one to a single organisational identity.</p>
+        <p><strong>The competing hypotheses are not merely formal.</strong> The most credible alternative is contamination of the victim set: AA26-097A published a detailed description of exploitable, internet-exposed PLCs on 7 April and updated it on 22 July, and any capable opportunist could have acted on that public roadmap in the following days. Distinguishing state-directed action from copycat exploitation of a published advisory requires per-victim forensics tying intrusions to the advisory's IP infrastructure, which is not public. A secondary alternative — that "coordinated" overstates what was in fact several loosely related actor sets hitting the same soft target simultaneously — is supported by Minnesota officials' own hedging. <strong>Finally, the domestic political dispute over attribution should be excluded from the analytic picture entirely.</strong> The President's public rejection of Iranian responsibility and the Governor's counter-claim are political statements, not intelligence judgments, and neither constitutes evidence for or against the technical assessment. They are recorded here as part of the incident's history, not as inputs to it.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>This is the case that ended the "too fragmented to attack at scale" assumption about the US water sector.</strong> The sector's own defence had long been implicit in its structure: roughly fifty thousand community water systems, no common vendor, no common architecture, no central chokepoint, and therefore — the reasoning went — no way for an adversary to achieve broad simultaneous effect. July 2026 disproved it by attacking not a chokepoint but a shared <em>condition</em>. Internet exposure plus weak authentication is common to thousands of small utilities regardless of vendor, and it turned out to be as good as a monoculture. Any future assessment of sector resilience has to reason about shared configuration failure modes, not just shared technology.</p>
+      <p><strong>It established safety-function suppression as live adversary practice against civilian infrastructure, not a theoretical worst case.</strong> Before this campaign, the canonical example of an adversary attacking safety systems was TRITON/TRISIS at a Saudi petrochemical plant in 2017 — a single, elaborately resourced operation against one industrial facility. AA26-097A documents disabling "critical shutdown and alarm logic" across a distributed victim set in American municipalities, achieved by editing the plant's own Add-On Instructions after stealing its project file. The distinction that will be taught is between attacking the process and attacking the <em>protections on</em> the process: one causes an incident, the other removes the layer designed to stop an incident from becoming a catastrophe. That the campaign produced no casualties is a fact about restraint and operator competence, not about capability.</p>
+      <p><strong>It is the clearest available case study in advisory efficacy — and its limits.</strong> The full mitigation was published on 7 April 2026, sharpened on 22 July, cost nothing, and worked: utilities that disconnected internet-facing PLCs before 26 July were spared. Utilities that had not were disrupted. The four-day gap between the updated advisory and the attack is an almost experimental measurement of the distance between federal warning and municipal capacity to act, in a sector where EPA had already found more than 70% of inspected systems non-compliant with basic assessment requirements and possessed no authority to compel remediation. The enduring lesson is uncomfortable for the warning-based model of critical infrastructure defence: a perfect advisory delivered to an organisation without staff to read or act on it is not a control. Whether the Water Cyber Shield Act converts that lesson into authority remains unresolved as of this compile, and is the single most consequential open question the campaign leaves behind.</p>
+      <p><strong>Finally, it is a data point in how cyber operations function inside a shooting war.</strong> Access built quietly over eighteen months was actioned within days of a lethal exchange, then publicly claimed as a warning rather than denied. That sequence — pre-position early, hold, trigger for political effect, claim for deterrent value — is a recognisable playbook, and its target selection tells defenders something durable: the adversary chose the infrastructure that maximises civilian salience and minimises escalation risk. Municipal water is visible enough to frighten a population and small enough to attack without crossing a threshold that compels a kinetic response. That calculation will not be unique to Iran, and it will not be unique to 2026.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / NSA / EPA / DOE / CNMF / TREASURY</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-097a" target="_blank">AA26-097A — Iranian-Affiliated Cyber Actors Exploit Programmable Logic Controllers Across US Critical Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">PRIMARY SOURCE — Published 7 Apr 2026, updated 22 Jul 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/news/cisa-fbi-epa-and-us-government-partners-update-warning-iran-affiliated-threat-actors-targeting" target="_blank">CISA, FBI, EPA and U.S. Government Partners Update Warning of Iran-Affiliated Threat Actors Targeting Critical Infrastructure Programmable Logic Controllers</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 22 Jul 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">FBI IC3</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ic3.gov/CSA/2026/260407.pdf" target="_blank">AA26-097A (PDF) — Iranian-Affiliated Cyber Actors Exploit Programmable Logic Controllers Across US Critical Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/investigate/cyber/alerts/2026/malicious-cyber-actors-targeting-water-and-wastewater-sector-internet--facing-programmable-logic-controllers-causing-operational-disruptions" target="_blank">Malicious Cyber Actors Targeting Water and Wastewater Sector Internet-Facing Programmable Logic Controllers, Causing Operational Disruptions</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 30 Jul 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-335a" target="_blank">AA23-335A — IRGC-Affiliated Cyber Actors Exploit PLCs in Multiple Sectors, Including U.S. Water and Wastewater Systems Facilities (precursor campaign)</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">MINNESOTA IT SERVICES</div>
+        <div>
+          <div class="ref-detail"><a href="https://mn.gov/mnit/media/blog/?id=38-761869" target="_blank">MNIT activates statewide cybersecurity response to support affected communities and protect critical infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 28 Jul 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WATERISAC</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.waterisac.org/tlpclear-cisa-updates-iranian-affiliated-plc-targeting-advisory-aa26-097a" target="_blank">(TLP:CLEAR) CISA Updates Iranian-Affiliated PLC Targeting Advisory (AA26-097A)</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">Source explicitly marked TLP:CLEAR by originator</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">TENABLE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.tenable.com/blog/coordinated-cyberattack-on-minnesota-water-utilities-what-you-need-to-know" target="_blank">Coordinated Cyberattack on Minnesota Water Utilities: What You Need to Know</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">Includes Censys Apr 2026 exposure analysis (5,219 global / 3,891 US Rockwell hosts)</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">TENABLE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.tenable.com/blog/what-to-know-about-cyberav3ngers-the-irgc-linked-group-targeting-critical-infrastructure" target="_blank">CyberAv3ngers: FAQ About Iran-Linked Threat Group Targeting U.S. Critical Infrastructure</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CYBERSECURITY DIVE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cybersecuritydive.com/news/what-we-know-so-far-about-the-hacking-campaign-against-us-water-systems/828374/" target="_blank">What we know so far about the hacking campaign against US water systems</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 20 Aug 2026; source for 12-state scope and APT Iran claim via Check Point Research</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CYBERSECURITY DIVE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cybersecuritydive.com/news/iran-linked-hackers-targeting-water-energy-in-us-fbi-and-cisa-warn/816949/" target="_blank">Iran-linked hackers target water, energy in US, FBI and CISA warn</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">THE HACKER NEWS</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/07/coordinated-cyberattack-targets-30.html" target="_blank">Coordinated Cyberattack Targets 30+ Minnesota Water Systems as One Plant Goes Offline</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — Jul 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SECURITYWEEK</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/dozens-of-minnesota-water-utilities-targeted-in-coordinated-ot-attacks/" target="_blank">Dozens of Minnesota Water Utilities Targeted in Coordinated OT Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — Jul 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">FOX 9 MINNEAPOLIS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fox9.com/news/30-minnesota-water-systems-targeted-cyber-attack" target="_blank">More than 30 Minnesota water systems targeted in cyberattack</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — Jul 2026; Braham city administrator Kevin Stahl account</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SECUREWORLD</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.secureworld.io/industry-news/cyberattack-taps-minnesota-water" target="_blank">Coordinated Cyberattack Taps into Minnesota's Water Systems</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">ABC NEWS</div>
+        <div>
+          <div class="ref-detail"><a href="https://abcnews.com/US/investigators-iran-connection-minnesota-water-system-hacks-us/story?id=135237777" target="_blank">Feds issue warning to local water systems over increased cyberattacks, following Minnesota incident</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — Jul/Aug 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">AL JAZEERA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.aljazeera.com/news/2026/7/30/us-authorities-probe-cyberattack-on-water-systems-in-minnesota" target="_blank">US authorities probe cyberattack on water systems in Minnesota</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 30 Jul 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">KSTP</div>
+        <div>
+          <div class="ref-detail"><a href="https://kstp.com/kstp-news/top-news/hacking-group-linked-to-iran-claims-responsibility-for-cyberattack-on-minnesota-water-systems-report-says/" target="_blank">Hacking group linked to Iran claims responsibility for cyberattack on Minnesota water systems, report says</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">THREAT BEAT</div>
+        <div>
+          <div class="ref-detail"><a href="https://threatbeat.com/attacks-and-incidents/minnesota-water-attacks-were-only-to-warn-iran-hackers-claim-while-taking-responsibility/" target="_blank">Minnesota water attacks were 'only to warn,' Iran hackers claim while taking 'direct responsibility'</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">Source for APT Iran Telegram claim language</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">GEORGIA RECORDER</div>
+        <div>
+          <div class="ref-detail"><a href="https://georgiarecorder.com/2026/08/04/expert-says-georgia-water-system-attack-highlights-critical-security-deficiencies/" target="_blank">Expert says Georgia water system attack highlights critical security deficiencies</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 4 Aug 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">ATLANTA NEWS FIRST</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.atlantanewsfirst.com/2026/08/04/clayton-county-boil-water-advisory-possibly-related-cyberattack/" target="_blank">Clayton County boil water advisory possibly related to cyberattack</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 4 Aug 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WASHINGTON POST</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.washingtonpost.com/national-security/2026/08/10/us-water-systems-are-low-hanging-fruit-cyberattacks-experts-warn-after-suspected-iranian-hacks/" target="_blank">Water systems are ripe for cyberattacks, experts warn after suspected Iranian hacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 10 Aug 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CSIS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csis.org/analysis/mapping-iranian-cyberattacks-us-water-systems" target="_blank">Mapping Iranian Cyberattacks on U.S. Water Systems</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">Source for 100+ targeted facilities figure and comparative impact assessment</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CONGRESSIONAL RESEARCH SERVICE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.congress.gov/crs-product/IF13298" target="_blank">July 2026 Water System Cyber Incidents: Considerations for Congress (IF13298)</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">US GAO</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.gao.gov/products/gao-26-109159" target="_blank">Critical Infrastructure Protection: Actions Needed to Address Persistent Cybersecurity Threats to the Water and Wastewater Sector (GAO-26-109159)</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">US SENATE — KLOBUCHAR</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.klobuchar.senate.gov/public/index.cfm/2026/8/sens-klobuchar-schiff-introduce-comprehensive-cybersecurity-bill-in-wake-of-recent-cyberattacks-on-water-infrastructure" target="_blank">Sens. Klobuchar, Schiff Introduce Comprehensive Cybersecurity Bill in Wake of Recent Cyberattacks on Water Infrastructure (Water Cyber Shield Act of 2026)</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — Aug 2026</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">E&amp;E NEWS / POLITICO</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.eenews.net/articles/frightening-cyberattacks-on-water-utilities-renew-calls-for-regulations/" target="_blank">'Frightening' cyberattacks on water utilities renew calls for regulations</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">INDUSTRIAL CYBER</div>
+        <div>
+          <div class="ref-detail"><a href="https://industrialcyber.co/utilities-energy-power-water-waste/us-water-systems-face-persistent-cybersecurity-gaps-as-july-attacks-renew-scrutiny-of-federal-protections-crs-says/" target="_blank">US water systems face persistent cybersecurity gaps as July attacks renew scrutiny of federal protections, CRS says</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NOSSAMAN LLP</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nossaman.com/newsroom-insights-water-utilities-congress-temporarily-extends-cyber-laws-epa-releases-new-guidance" target="_blank">Water Utilities: Congress Temporarily Extends Cyber Laws, EPA Releases New Guidance</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">DRAGOS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.dragos.com/resources/press-release/dragos-2026-year-in-review-new-ot-threats-ransomware" target="_blank">Dragos 2026 OT Cybersecurity Year in Review — Surge in Threat Groups and Ransomware (BAUXITE tracking and attribution caveats)</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">DENEXUS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.denexus.io/resources/aa26-097a-update-plc-safety-alarm-suppression" target="_blank">AA26-097A Update: The Escalation from PLC Access to Safety and Alarm Suppression</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WIKIPEDIA</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/2026_Minnesota_water_system_cyberattack" target="_blank">2026 Minnesota water system cyberattack</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">TERTIARY — used for timeline corroboration and named officials only; primary claims sourced independently</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WIKIPEDIA</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Cyberwarfare_during_the_2026_Iran_war" target="_blank">Cyberwarfare during the 2026 Iran war</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">TERTIARY — geopolitical context framing only</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WIKIPEDIA</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/July_2026_United_States_strikes_against_Iran" target="_blank">July 2026 United States strikes against Iran</a></div>
+          <div class="ref-date">Accessed: 2026-09-11</div>
+          <div class="ref-contemporary">TERTIARY — conflict timeline corroboration (ceasefire collapse 7–8 Jul 2026)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-11 · 34 sources, 19 web lookups</div>
+  <div>Companion actor card: 2026-09-02_CYBERAV3NGERS · Companion vuln card: 2026-09-02_ROCKWELL-LOGIX-AUTH-BYPASS</div>
+</div>
+
+</body>
+</html>
