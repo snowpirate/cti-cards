@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FAST16 — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  /* Stamp watermark */
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  /* Defender visibility badge */
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-2005-0830-FAST16<br/>
+    2005 · DISCLOSED 2026
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Nation-State Sabotage · Data Integrity Attack</div>
+  <h1><span class="gold">FAST</span>16</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-12 &nbsp;|&nbsp; INCIDENT DATE: 2005 (components compiled JUN–AUG 2005; deployment window unknown) &nbsp;|&nbsp; PUBLICLY DISCLOSED: 2026-04 &nbsp;|&nbsp;
+    SOURCES: SentinelLABS · Symantec/Security.com · Institute for Science and International Security · Zetter Zero Day · The Hacker News · SecurityWeek · Infosecurity · CSO Online · Tom's Hardware · NPR Planet Money · Schneier on Security
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>NATION-STATE SABOTAGE / DATA INTEGRITY</span></div>
+    <div>Attribution: <span class="gold">US-LINKED (EQUATION/TeDi-ADJACENT) [MEDIUM]</span></div>
+    <div>Assessed Target: <span class="gold">IRAN NUCLEAR WEAPONS PROGRAM [MEDIUM]</span></div>
+    <div>Severity: <span class="red">STRATEGIC</span></div>
+    <div>Era: <span>Pre-Stuxnet (2005)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">ENTERPRISE — RETROSPECTIVE</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">101</div>
+    <div class="stat-label">Byte-pattern patching rules in the kernel driver, across 9–10 hook groups</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">30 g/cm³</div>
+    <div class="stat-label">Uranium density gate — sabotage fires only above implosion-shock compression</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">21 yrs</div>
+    <div class="stat-label">From compile timestamp (2005) to public disclosure (2026)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">1</div>
+    <div class="stat-label">AV engines flagging the sample after ~9 years sitting on VirusTotal</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="none">No companion actor card on file — attribution is US-linked at [MEDIUM] and no named group is formally asserted by the discovering researchers</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">fast16</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Components compiled 2005-06-06 → 2005-08-30; operational window undetermined</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Nation-state sabotage · data integrity attack on computation</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">Unnamed state actor; US-linked via Shadow Brokers TeDi artifact [MEDIUM]</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[MEDIUM] — discovering researchers declined formal attribution</span></div>
+        <div class="kv-row"><span class="kv-key">Assessed Target</span><span class="kv-val">Nuclear weapons implosion simulation — Iran assessed most likely [MEDIUM]</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">Unknown — no victim has ever been publicly identified or self-disclosed</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">2017 (TeDi leak reference) → sample surfaced via Lua-fingerprint hunting; disclosed 2026-04</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Juan Andrés Guerrero-Saade &amp; Vitaly Kamluk, SentinelLABS</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">Undetermined at victim; ~21 years from build to public disclosure</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Falsified high-explosive implosion simulation results; assessed programme delay</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise — all mappings [RETROSPECTIVE]</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None assigned as of 2026-09-12</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">All artifacts are 21 years old — archival value only</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>In April 2026 SentinelLABS published analysis of a malware framework whose components carry compile timestamps from June, July and August <strong>2005</strong> — and whose purpose was not to steal, destroy, or deny anything. <strong>fast16</strong> was built to make a computer lie about physics. It hooked the floating-point arithmetic inside high-precision engineering simulation software and scaled specific output values to one percent of their true magnitude, but only when the simulated material passed a density of <strong>30 grams per cubic centimetre</strong> — a threshold, as Symantec later put it, that "uranium can only reach under the shock compression of an implosion device." The engineers running those simulations would not see a crash, a corrupted file, or a ransom note. They would see a weapon design that did not work.</p>
+      <p>The framework was found by following an oddity rather than an incident. Researchers Juan Andrés Guerrero-Saade and Vitaly Kamluk were hunting the earliest sophisticated use of embedded Lua virtual machines in Windows malware — searching on Lua's magic bytes <code>1B 4C 75 61</code> and telltale environment strings — when they surfaced a carrier binary, <code>svcmgmt.exe</code>, containing the PDB path <code>C:\buildy\driver\fd\i386\fast16.pdb</code>. That string connected the sample to a name already sitting in public view since 2017: an entry in <code>drv_list.txt</code>, part of the NSA "Territorial Dispute" collection dumped by The Shadow Brokers, reading <em>"fast16 *** Nothing to see here – carry on ***"</em>. Territorial Dispute was a deconfliction tool — operators used it to recognise implants and avoid colliding with other services' operations — and per CrySyS Lab analysis, that particular phrasing marks tooling as friendly rather than foreign. A sample had also been uploaded to VirusTotal in October 2017, where it sat for years attracting essentially no detections. At the time of SentinelLABS' disclosure it was still flagged by a single engine, with limited confidence.</p>
+      <p>What makes this a case file rather than a malware writeup is the level of domain knowledge the operation required. The kernel driver carried <strong>101 byte-pattern rules</strong>, which Symantec subsequently organised into nine or ten distinct hook groups tracking successive builds of the targeted software — evidence the operators maintained the capability across version updates over an extended period, and in at least one case re-applied hooks after a user reverted to an older release. The patched instruction sequences were x87 FPU operations manipulating Cauchy stress tensor values, the quantity representing thermodynamic pressure in a detonation model. Falsifying it obscures whether a compressed uranium core reaches supercriticality. Symantec's Vikram Thakur called the expertise needed to build this in 2005 "mind-blowing"; his colleague Eric Chien and independent physicist David Albright of the Institute for Science and International Security helped establish that the targeted calculations are precisely those an engineer would run when determining how much high explosive is needed to compress a core into a chain reaction.</p>
+      <p>The strategic claim SentinelLABS makes is deliberately narrow and, on the evidence, well supported: fast16 <em>"forces a re-evaluation of our historical understanding of the timeline of development for serious covert cyber sabotage operations."</em> Stuxnet has stood for fifteen years as the origin point of cyber-physical sabotage — the moment code first reached out and broke something in the world. fast16 was compiled and, on the available evidence, ready to deploy while Stuxnet was still in early development, and it attacked a subtler target: not the centrifuge, but the simulation that tells you whether your bomb design will work. The two operations sit in the same lineage and may well share a sponsor, but they represent different theories of sabotage — one degrades the machine, the other degrades the knowledge.</p>
+      <p><strong>A caution that belongs at the top of this file, not buried in Section 08:</strong> no victim has ever been identified. No government has claimed or acknowledged the operation. Exactly one code sample has been recovered. The target software identification is an informed hypothesis built from pattern-matching against period software corpora, and the discovering researchers said so explicitly. Almost everything strategically interesting about fast16 is inference — rigorous, well-argued inference from serious analysts, but inference. This card is written to keep that line visible.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Geopolitical climate, 2005.</strong> Iran suspended uranium enrichment in November 2004 under the Paris Agreement with the EU-3, then resumed conversion work at Isfahan in August 2005 following Mahmoud Ahmadinejad's election — the month <code>svcmgmt.exe</code> was compiled. The diplomatic track collapsed over the following months and the file was referred to the UN Security Council in early 2006. This is the same strategic problem that produced Operation Olympic Games: Washington and Jerusalem assessed that an Iranian weapons capability would trigger Israeli airstrikes and a regional war, and sought an option between acquiescence and bombing. Stuxnet is the well-documented answer to that question. fast16's timestamps place it inside the same window, attacking the same national programme from the opposite end — the design phase rather than the production floor.</p>
+      <p><strong>Technology landscape of the era.</strong> Every technical choice in fast16 is legible as period-appropriate engineering. Windows 2000 and XP dominated engineering workstations, and both shipped with weak defaults around administrative file shares — the propagation mechanism required no exploit, only a weak or default password. Kernel driver signing enforcement did not exist on 32-bit Windows and would not arrive on x64 until Vista in 2007, so loading an unsigned rootkit was routine. Endpoint security was signature-based and locally installed, with no telemetry pipeline, no behavioural analytics, and no notion of detecting a driver that modified floating-point results. The embedded Lua 5.0 virtual machine is the anomaly: SentinelLABS notes it predates the earliest Flame samples by roughly seven years, making fast16 the earliest known Windows malware to embed Lua for modularity.</p>
+      <p><strong>Organisational posture of the target.</strong> The victim environment must be inferred, and the inference is unusually informative. fast16's <code>ok_to_install()</code> routine checked the registry for <strong>18 security products</strong> — Symantec, Kaspersky, McAfee, F-Secure, Trend Micro, Agnitum Outpost, Sygate, Zone Labs, Panda, Norman, Kerio, Tiny, Computer Associates eTrust, Network Ice BlackIce, InfoTeCS TermiNET and others — and <em>aborted installation if any were present</em>. The operators therefore expected, and designed for, an environment where such software was largely absent, and accepted losing any host that ran it. That is consistent with an air-gapped or heavily isolated research network: the kind of environment where security software is considered unnecessary because the network is "not connected," and where the same assumption suppresses the monitoring that would have caught a wormlet moving over SMB.</p>
+      <p><strong>Pre-incident indicators.</strong> There were none available to the victim, and the one available to the wider world went unread for nine years. The <code>fast16</code> string was published in the Shadow Brokers' 2017 dump, sitting in a 250KB text file alongside the deconfliction signatures of an intelligence service's tooling. A sample reached VirusTotal in October 2017. Both artifacts were public, indexed and free to examine. The framework was nonetheless not identified until researchers went looking for something else entirely — early Lua in malware — and tripped over it. The gap is a standing lesson about the difference between data being available and intelligence being produced.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account — reconstructed from artifacts, as no victim-side telemetry exists</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 1 — Target Development &amp; Domain Research</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Before a line of the payload could be written, the operators had to know three separate things to expert level. First, nuclear weapons physics: which equation-of-state forms govern implosion modelling, what density a uranium core reaches under shock compression, and which output quantity — the Cauchy stress tensor — carries the pressure value that determines supercriticality. Second, the internals of specific commercial simulation binaries, down to the compiler-generated x87 instruction sequences performing that arithmetic. Third, which of those calculations could be corrupted without producing an obvious crash. Symantec's assessment of this combination is worth quoting in full: <em>"That degree of domain knowledge, such as understanding which EOS forms matter, which calling conventions are produced by which compilers, and which classes of simulation will or will not trip the gate, is unusual in any era and was very unusual in 2005."</em> Source-control artifacts left in the binaries (<code>@(#)par.h $Revision: 1.3 $</code>, an SCCS/RCS marker) suggested to SentinelLABS that the authors were long-term engineers whose toolchain and culture came from older high-security Unix environments — the signature of a sustained institutional programme rather than a project team. <strong>Defender visibility: nil by definition</strong> — this phase occurred entirely on the attacker's side.</div>
+        <div class="kc-pivot">Domain mastery converted an unremarkable Windows worm into a precision instrument aimed at one physical calculation.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 2 — Wormlet Propagation over Weak File-Share Credentials</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">The carrier, <code>svcmgmt.exe</code>, is described by SentinelLABS as <em>"a cluster munition in software form"</em> — a wrapper with internal compartments holding multiple independent "wormlets," releasing them repeatedly until a failure threshold or kill condition was met and sleeping between waves according to configuration. The identified Service Control Manager wormlet scanned configured IP ranges for reachable Windows 2000 and XP servers and spread using <strong>native service-control and file-sharing APIs against weak or default administrative passwords on file shares</strong>. No exploit, no vulnerability, no CVE — the propagation was entirely a function of era-normal credential hygiene. The carrier's behaviour was governed by command-line arguments: no arguments ran it as a Windows service, <code>-p</code> set the install flag and ran as a service, <code>-i</code> set the install flag and executed Lua, <code>-r</code> executed Lua without installing. <strong>Defender visibility was nil:</strong> lateral SMB authentication using valid administrative credentials on a 2005 research network generated no alert anyone was positioned to read.</div>
+        <div class="kc-pivot">Spreading broadly rather than surgically was not sloppiness — it was the precondition for defeating the victim's own verification behaviour in Phase 6.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 3 — Environment Vetting &amp; Installation</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">On each candidate host the framework called <code>ok_to_install()</code>, which enumerated registry keys for <strong>18 named security products</strong> and <em>aborted the installation entirely if any were found</em>. This is the inverse of the usual evasion posture: rather than attempting to defeat or disable endpoint security, fast16 conceded the host and moved on. For an operation whose entire value rested on remaining unobserved across a multi-year horizon, a single antivirus detonation was a worse outcome than losing a machine. Where the check passed, the framework escalated privileges, installed itself as the <code>SvcMgmt</code> service, optionally deployed the kernel driver, and — through the auxiliary user-mode module <code>svcmgmt.dll</code> — registered via the <code>AddConnectNotify()</code> API to capture remote and local connection names during RAS sessions, piping them to <code>\\.\pipe\p577</code> for onward targeting. <strong>Defender visibility was nil,</strong> and structurally so: the hosts that could have seen this were precisely the hosts the malware refused to infect.</div>
+        <div class="kc-pivot">A vetted, security-software-free host was the stable platform the kernel payload needed to run undisturbed for years.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 4 — Kernel-Mode Implantation (fast16.sys)</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">The payload was <code>fast16.sys</code>, a roughly 43KB filesystem driver compiled 19 July 2005 and incapable of running on Windows 7 or later. It intercepted filesystem I/O and <strong>modified executable code in transit as binaries were read from disk</strong>, meaning the on-disk application remained pristine while the copy that executed in memory was patched. It specifically targeted binaries compiled with Intel C/C++ compilers — the toolchain of the numerical software in scope. The patching engine was driven by a table of <strong>101 rules</strong>, each pairing a byte pattern with replacement logic, dispatched through a 256-byte array indexed on the first byte of each pattern, with wildcard support so one rule could match several compiler-optimised variants of the same routine, and state flags permitting multi-stage modification sequences. SentinelLABS observed that the architecture resembles an advanced antivirus scanning engine — built with the same care, pointed the other way. Unsigned kernel drivers loaded without friction in 2005, so <strong>defender visibility was nil.</strong></div>
+        <div class="kc-pivot">Control of code at the moment of execution meant the operators could edit the behaviour of software they had never touched on disk.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 5 — Simulation Tampering: The Sabotage Itself</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Most of the 101 rules hijacked ordinary execution flow, but one block was different: x87 <strong>floating-point unit instructions</strong> — sequences of the form <code>fstp</code> / <code>fld</code> / <code>fmul</code> against immediate operands, followed by a far call into an injected handler — scaling values inside the simulation's internal arrays. Symantec's analysis resolved the mechanism. The malware gates on the density of the simulated material and <strong>engages only once that value passes 30 g/cm³</strong>, the compression regime uranium reaches solely under implosion shock. Above the gate, targeted outputs — including Cauchy stress tensor values representing thermodynamic pressure — were <strong>scaled to one percent of their true magnitude</strong>, modelling greater compression than physics actually delivered and corrupting exactly the quantity that reveals whether the core goes supercritical. Timing constraints deepened the deception: in one mechanism the first and sixteenth invocations were skipped, so early sanity runs behaved correctly and confidence was established before results began to drift. The effect on the engineer is the point. Nothing crashes. No file is corrupted. The design simply appears not to work, and the physics appears to be the reason.</div>
+        <div class="kc-pivot">Falsified results were not the end state — they had to survive the victim's instinct to check the numbers somewhere else.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 6 — Defeating Cross-Machine Verification</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">An engineer who distrusts a result reruns it on a different machine. That instinct is the natural countermeasure to this entire class of attack, and fast16 was built to defeat it. Because the carrier propagated the driver across the facility's networked Windows hosts, <strong>the verification machine was tampered with too</strong>, and would reproduce the same wrong answer. SentinelLABS states the logic plainly: verification on separate systems would reveal divergence <em>unless those systems had also received the malicious driver through the wormable carrier</em>. This retroactively explains the design tension in Phase 2 — indiscriminate propagation looks careless for a precision sabotage tool until you recognise that facility-wide consistency <em>is</em> the payload. A single tampered workstation produces a discrepancy and an investigation; a uniformly tampered facility produces consensus, and consensus reads as truth. <strong>Defender visibility was nil,</strong> and worse than nil: the standard verification procedure actively manufactured false confidence.</div>
+        <div class="kc-pivot">With independent verification neutralised, the operators could hold the deception open for as long as the software estate stayed within reach.</div>
+      </div>
+
+      <div class="kc-phase unknown">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 7 — Sustained Version Tracking</span>
+          <span class="vis-badge vis-unknown">UNKNOWN</span>
+        </div>
+        <div class="kc-body">Symantec's organisation of the 101 rules into <strong>nine or ten hook groups, each tailored to a different build</strong> of the targeted software, is the strongest available evidence that this was a maintained campaign rather than a single shot. The groups appear to have been added sequentially as the victim upgraded, and in at least one instance hooks were re-applied to an older release after the user reverted to it — implying the operators retained visibility into the victim's software estate and could push updated tooling in response to changes. Symantec's framing: <em>"One may imagine at different stages of design, the targets were using the current version of the simulation software at that time, to which the attackers devised different tampering methods."</em> Duration cannot be bounded from a single recovered sample. <strong>Defender visibility is genuinely undeterminable</strong> — but Symantec notes an anecdotal signal worth recording: the pattern of a user alternating between software versions is what troubleshooting looks like. Someone may well have been chasing the anomaly without ever suspecting its cause.</div>
+        <div class="kc-pivot">Whatever its operational life, the campaign ended without discovery — and the framework then survived a decade in public view unrecognised.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 8 — Leak, Dormancy &amp; Discovery (2017–2026)</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">In April 2017 The Shadow Brokers published the "Territorial Dispute" collection, including a 250KB <code>drv_list.txt</code> of driver-name signatures NSA operators used to recognise implants and deconflict with other services' operations. One line read <em>"fast16 *** Nothing to see here – carry on ***"</em>. In October 2017 a matching sample was uploaded to VirusTotal, where it remained essentially undetected. Neither artifact was acted upon for years. The framework was eventually surfaced not by anyone hunting it, but by Guerrero-Saade and Kamluk tracing the earliest embedded Lua VMs in Windows malware — the <code>svcmgmt.exe</code> hit carried the <code>fast16.pdb</code> PDB path that tied sample to leak. <em>(Reporting is inconsistent on the internal discovery date: some accounts place the researchers' first contact with the sample around 2019, others describe the identification as 2026. Public disclosure is firm — SentinelLABS, April 2026.)</em> Symantec published confirmatory analysis in May 2026 establishing the nuclear-simulation targeting, credited to collaboration with the Institute for Science and International Security. Mainstream coverage followed, including NPR's <em>Planet Money</em> on 17 June 2026. <strong>Detection came 21 years late, from researchers, by accident, with no victim ever identified.</strong></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>ATT&amp;CK was published in 2013; this incident is from 2005 — every cell is a retrospective mapping</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1587.001 — [HIGH]</div>
+        <div class="mitre-name">Develop Capabilities: Malware</div>
+        <div class="mitre-note">Purpose-built multi-component framework — carrier, kernel driver, auxiliary user module — with embedded Lua 5.0 VM, custom symmetric cipher and a 101-rule patching engine. SCCS/RCS source-control artifacts indicate an institutional Unix engineering toolchain.</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1135 — [HIGH]</div>
+        <div class="mitre-name">Network Share Discovery</div>
+        <div class="mitre-note">The SCM wormlet scanned configured IP ranges for reachable Windows 2000/XP hosts and their administrative file shares; <code>svcmgmt.dll</code> separately captured remote and local connection names during RAS sessions via <code>AddConnectNotify()</code>.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access / Lateral Movement</div>
+        <div class="mitre-id">T1078.003 — [HIGH]</div>
+        <div class="mitre-name">Valid Accounts: Local Accounts</div>
+        <div class="mitre-note">Propagation relied on weak or default administrative passwords on Windows 2000/XP file shares. No exploit and no vulnerability was involved at any stage of movement — era-normal credential hygiene was the entire attack surface.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.002 — [HIGH]</div>
+        <div class="mitre-name">Remote Services: SMB / Windows Admin Shares</div>
+        <div class="mitre-note">Spread through native Windows file-sharing and service-control APIs rather than custom protocol implementations — indistinguishable from legitimate administration on a 2005 network with no authentication baseline.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1569.002 — [HIGH]</div>
+        <div class="mitre-name">System Services: Service Execution</div>
+        <div class="mitre-note">Carrier installed and ran as the Windows service <code>SvcMgmt</code>; operational mode selected by command-line argument (<code>-p</code> service + install, <code>-i</code> install + Lua, <code>-r</code> Lua only).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Persistence / Privilege Escalation</div>
+        <div class="mitre-id">T1543.003 — [HIGH]</div>
+        <div class="mitre-name">Create or Modify System Process: Windows Service</div>
+        <div class="mitre-note">Privilege escalation followed by service installation gave the framework the kernel-load capability it needed and survived reboot — the minimum requirement for a campaign measured in software-version cycles.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1014 — [HIGH]</div>
+        <div class="mitre-name">Rootkit</div>
+        <div class="mitre-note"><code>fast16.sys</code> intercepted filesystem I/O and patched executable code in transit, leaving on-disk binaries unmodified while the in-memory copy was altered. Hash and file-integrity checking of the application would have returned clean.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion / Discovery</div>
+        <div class="mitre-id">T1518.001 — [HIGH]</div>
+        <div class="mitre-name">Software Discovery: Security Software Discovery</div>
+        <div class="mitre-note"><code>ok_to_install()</code> enumerated registry keys for 18 named security products and aborted installation if any were present — conceding the host rather than risking a detonation. Evasion by refusal, not by defeat.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1480 — [HIGH]</div>
+        <div class="mitre-name">Execution Guardrails</div>
+        <div class="mitre-note">Sabotage fired only above a simulated material density of 30 g/cm³ and, in one mechanism, skipped the first and sixteenth invocations. Analysts detonating the sample without a matching simulation workload would observe nothing at all.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027 — [HIGH]</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">Lua bytecode carried in encrypted containers decrypted at the service entry point by a built-in symmetric cipher (function labelled <code>b</code>), with custom <code>wstring</code> extensions and bindings to NT filesystem, registry, service-control and network APIs.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059 — [HIGH]</div>
+        <div class="mitre-name">Command and Scripting Interpreter</div>
+        <div class="mitre-note">Embedded Lua 5.0 virtual machine drove configuration and propagation logic — the earliest known use of embedded Lua in Windows malware, predating Flame by roughly seven years. SentinelLABS found no evidence of shared provenance with later Lua families.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1565.001 — [HIGH]</div>
+        <div class="mitre-name">Data Manipulation: Stored Data Manipulation</div>
+        <div class="mitre-note">The defining technique of this case. x87 FPU instruction sequences were patched to scale simulation outputs — including Cauchy stress tensor pressure values — to 1% of true magnitude above the density gate, falsifying whether a compressed uranium core reaches supercriticality.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1491 — [MEDIUM]</div>
+        <div class="mitre-name">Defacement (Internal — Analytic Analogue)</div>
+        <div class="mitre-note">Mapped as the closest available analogue for corrupting the operator's displayed picture: modified output graphs presented falsified physics as authentic results. ATT&amp;CK has no clean technique for integrity attacks on scientific computation — a genuine framework gap this case exposes.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1499 — [MEDIUM]</div>
+        <div class="mitre-name">Endpoint Denial of Service (Effect Analogue)</div>
+        <div class="mitre-note">Mapped for effect rather than mechanism: the operational outcome was denial of a <em>capability</em> — trustworthy simulation — rather than of a service. Rated MEDIUM because no source documents the programme delay actually achieved; the impact is assessed, not measured.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>Assessed against 2005 tooling, knowledge and norms — not 2026 standards</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 2<br/>MISSED</div>
+        <div class="pm-detail"><strong>Lateral movement required no exploit, so there was nothing to patch against.</strong> The wormlet spread on weak or default administrative passwords over SMB against Windows 2000/XP. Judged by 2005 norms this is not negligence — default-credential administrative shares were ubiquitous and credential rotation on internal research networks was rare. The defensible criticism is narrower and still stands: a facility doing nuclear weapons design work had a flat, mutually-authenticable Windows estate with no segmentation between workstations running classified simulations.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 3<br/>MISSED — PERVERSELY</div>
+        <div class="pm-detail"><strong>Installing any antivirus product would have stopped the infection — not by detecting it, but by triggering its abort.</strong> <code>ok_to_install()</code> checked for 18 security products and refused to install where any was present. The victim hosts were therefore, by inference, running none. This is the single most actionable finding in the file and it is entirely era-appropriate: security software was widely regarded as unnecessary on isolated research networks and as an unacceptable source of numerical or performance interference on computation workloads. The malware's authors understood that assumption and built their targeting around it.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 4<br/>MISSED</div>
+        <div class="pm-detail"><strong>No mechanism existed to detect an unsigned kernel driver, and integrity checking would have returned clean anyway.</strong> Kernel driver signing enforcement did not exist on 32-bit Windows in 2005. More importantly, <code>fast16.sys</code> patched code <em>in transit</em> during filesystem reads, so the on-disk binaries stayed pristine — hashing the application, comparing it to vendor-supplied checksums, or reinstalling from media would all have produced a clean result while the running process remained compromised. The only detection surface was behavioural, and no behavioural tooling existed.</div>
+      </div>
+
+      <div class="pm-item partial">
+        <div class="pm-phase">PHASE 5 &amp; 7<br/>VISIBLE — MISATTRIBUTED</div>
+        <div class="pm-detail"><strong>Someone appears to have noticed the symptom and blamed the software.</strong> Symantec observed that hook groups were added sequentially as the victim upgraded, and that hooks were in at least one case re-applied after a user <em>reverted to an older version</em> — the signature of a user troubleshooting inconsistent results by rolling back. Anomalies were surfacing and being chased. They were attributed to bugs in the simulation suite rather than to tampering, which in 2005 was an entirely reasonable conclusion: the threat model "my numerical library is being edited in memory by a hostile state" did not exist for working engineers. This is the case's defining lesson — <strong>the attack was visible as a symptom for years while remaining invisible as an attack.</strong></div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 6<br/>MISSED BY DESIGN</div>
+        <div class="pm-detail"><strong>The correct countermeasure was executed and subverted.</strong> Re-running a suspect calculation on an independent machine is exactly the right response, and the facility's engineers plausibly did it. Because the carrier had propagated the driver estate-wide, the "independent" machine returned the same falsified answer, converting a sound verification procedure into a manufacturing line for false confidence. Genuine independence would have required verification on a differently-provisioned host — different OS, different build of the software, ideally a different architecture — a standard that essentially no organisation applied in 2005 and few apply now.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">PUBLIC RESEARCH LAYER<br/>MISSED FOR 9 YEARS</div>
+        <div class="pm-detail"><strong>The intelligence was public and unread.</strong> The <code>fast16</code> string was published in the Shadow Brokers' Territorial Dispute dump in April 2017 and a sample reached VirusTotal in October 2017, where it attracted essentially no detections — still just one engine, with limited confidence, at disclosure. Two public artifacts, indexed and free, sat unconnected for the better part of a decade until researchers hunting an unrelated question (early embedded Lua in malware) collided with them. The failure here belongs to the research community rather than the victim, and it is a standing argument for systematically mining leaked tooling manifests as intelligence rather than treating them as curiosities.</div>
+      </div>
+
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail"><strong>Much of what would have stopped fast16 arrived for unrelated reasons, and the central lesson is still only partly absorbed.</strong> Kernel-mode driver signing enforcement (Vista x64, 2007), Secure Boot, HVCI and driver blocklists closed the unsigned-rootkit path. Behavioural EDR replaced the signature-only model that fast16 was built to sidestep. Reproducible-build and scientific-reproducibility movements independently pushed toward cross-validating computational results on independently-provisioned toolchains. What has <em>not</em> been generally adopted is the threat model itself: treating the <strong>integrity of computation</strong> as an asset requiring protection alongside confidentiality and availability. Most research and engineering environments still lack any mechanism that would distinguish a wrong answer from a sabotaged one — and ATT&amp;CK, as noted in Section 04, still has no clean technique for this class of attack.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">svcmgmt.exe — Carrier / Service Module</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">CARRIER</span>
+            <span class="artifact-tag">LUA 5.0 VM</span>
+            <span class="artifact-tag">~308 KB</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Multi-modal carrier described by SentinelLABS as "a cluster munition in software form" — a wrapper with internal compartments holding multiple independent wormlets, released repeatedly until a failure threshold or kill condition was reached. Operating mode is selected by command-line argument: no arguments runs as a Windows service; <code>-p</code> sets the install flag and runs as a service; <code>-i</code> sets the install flag and executes Lua; <code>-r</code> executes Lua without installing. Embeds a customised <strong>Lua 5.0 virtual machine</strong> with a <code>wstring</code> Unicode module, a built-in symmetric cipher (function labelled <code>b</code>) for decrypting bytecode containers, and bindings to Windows NT filesystem, registry, service-control and network APIs. Link time <strong>2005-08-30 18:15:06 UTC</strong>; MD5 <code>dbe51eabebf9d4ef9581ef99844a2944</code>.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">fast16.sys — Kernel Sabotage Driver</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">KERNEL ROOTKIT</span>
+            <span class="artifact-tag">101 PATCH RULES</span>
+            <span class="artifact-tag">~43 KB</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">The payload and the reason this case file exists. A filesystem driver that intercepts I/O and <strong>patches executable code in transit as binaries are read from disk</strong>, leaving on-disk files unmodified. Targets binaries built with Intel C/C++ compilers. The patching engine holds <strong>101 rules</strong>, each pairing a byte pattern with replacement logic, dispatched via a 256-byte array indexed on each pattern's first byte, with wildcard support for compiler-optimised variants and state flags enabling multi-stage modification. Most rules hijack execution flow; one block consists of x87 <strong>FPU instructions</strong> (<code>fstp</code> / <code>fld</code> / <code>fmul</code> against immediates, then a far call to an injected handler) that scale values in the simulation's internal arrays. Symantec resolved these into <strong>9–10 hook groups</strong> tracking successive builds of the targeted software. Cannot execute on Windows 7 or later. Link time <strong>2005-07-19 15:15:41 UTC</strong>; MD5 <code>0ff6abe0252d4f37a196a1231fae5f26</code>.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">svcmgmt.dll — ConnotifyDLL Auxiliary Module</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">USER-MODE</span>
+            <span class="artifact-tag">CONNECTION HARVESTING</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">User-mode component registered via the <code>AddConnectNotify()</code> API to capture remote and local connection names during RAS (dial-up/remote access) sessions, writing them to the named pipe <code>\\.\pipe\p577</code>. Functionally a targeting feed — it told the operators which hosts and shares the victim actually reached, informing where the wormlets should be pointed next. Link time <strong>2005-06-06 18:42:45 UTC</strong>; MD5 <code>410eddfc19de44249897986ecc8ac449</code>.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Targeted Simulation Software</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">VICTIM SOFTWARE</span>
+            <span class="artifact-tag">PARTIALLY HYPOTHESISED</span>
+          </div>
+        </div>
+        <div class="artifact-desc"><strong>Confirmed by Symantec (May 2026):</strong> <strong>LS-DYNA</strong> and <strong>AUTODYN</strong> — explicit-dynamics finite element suites used for explosion, impact and high-strain-rate modelling. LS-DYNA has documented use in reporting on Iran's nuclear weapons research. <strong>Proposed by SentinelLABS (April 2026) as candidate matches, on pattern-correspondence rather than recovered target binaries:</strong> <strong>LS-DYNA 970</strong>, <strong>PKPM</strong> (Chinese structural engineering and seismic analysis CAD suite) and <strong>MOHID</strong> (hydrodynamic modelling for coastal water, sediment transport and oil spill simulation). SentinelLABS stated the limitation directly: <em>"Without identifying the original target binaries this remains an informed hypothesis."</em> The PKPM and MOHID candidates have not been confirmed and may reflect incidental pattern overlap rather than real targeting.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Root Cause — No CVE</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">NO VULNERABILITY EXPLOITED</span>
+          </div>
+        </div>
+        <div class="artifact-desc">No CVE is associated with this incident and no companion vulnerability card is warranted. Propagation used weak or default administrative credentials on Windows 2000/XP file shares via native APIs; installation used ordinary privilege escalation and service creation; the payload loaded as an unsigned kernel driver at a time when signing enforcement did not exist. The root cause is era-normal configuration and the absence of driver signing — a design-era condition, not a discrete flaw. Recording this explicitly per standing orders rather than manufacturing a vuln card around a fuzzy cause.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Stuxnet Reconstruction Repositories</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">THIRD-PARTY RESEARCH ARTIFACT</span>
+            <span class="artifact-tag">CONTEXTUAL — NOT FAST16</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Noted for contrast, not as a fast16 artifact. Public educational reconstructions of <strong>Stuxnet</strong> are maintained on GitHub — for example <code>Sadpainy/Stuxnet</code> (AGPL-3.0, ~453 stars, 85 forks, 93 commits), which holds reverse-engineered C sources, kernel driver and DLL hook code targeting Siemens ICS, analysis documents and archived Symantec papers, with README disclaimers stating it is non-deployable and intended for static analysis in controlled virtual environments. <strong>No equivalent body of public reconstruction, tooling or teaching material exists for fast16</strong>, which has exactly one recovered sample and a handful of published YARA rules. The asymmetry is the analytic point, developed in Section 09: Stuxnet became a public object of study while a contemporaneous operation of arguably greater conceptual novelty sat unexamined for two decades.</div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ No IP addresses or domains are associated with this incident — fast16 had no documented C2 infrastructure. Defanging is therefore not applicable to this table. Reference URLs in Section 10 are NOT defanged.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are 21 years old and target Windows 2000/XP. The kernel driver cannot execute on Windows 7 or later. Detection utility is archival and forensic only; the enduring value is the behavioural pattern, not the hashes.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">MD5</td><td class="val historical">dbe51eabebf9d4ef9581ef99844a2944 — svcmgmt.exe, carrier / service module</td><td>SentinelLABS</td><td>2026-04</td></tr>
+          <tr><td class="type-label">MD5</td><td class="val historical">0ff6abe0252d4f37a196a1231fae5f26 — fast16.sys, kernel sabotage driver</td><td>SentinelLABS</td><td>2026-04</td></tr>
+          <tr><td class="type-label">MD5</td><td class="val historical">410eddfc19de44249897986ecc8ac449 — svcmgmt.dll, ConnotifyDLL auxiliary module</td><td>SentinelLABS</td><td>2026-04</td></tr>
+          <tr><td class="type-label">PDB PATH</td><td class="val historical">C:\buildy\driver\fd\i386\fast16.pdb — the forensic link tying the recovered sample to the Shadow Brokers leak reference</td><td>SentinelLABS</td><td>2026-04</td></tr>
+          <tr><td class="type-label">SERVICE</td><td class="val historical">SvcMgmt — Windows service name used for carrier persistence</td><td>SentinelLABS</td><td>2026-04</td></tr>
+          <tr><td class="type-label">NAMED PIPE</td><td class="val historical">\\.\pipe\p577 — destination for connection names harvested by svcmgmt.dll during RAS sessions</td><td>SentinelLABS</td><td>2026-04</td></tr>
+          <tr><td class="type-label">LEAK ARTIFACT</td><td class="val historical">drv_list.txt entry: "fast16 *** Nothing to see here – carry on ***" — NSA Territorial Dispute deconfliction signature list, 250KB, published by The Shadow Brokers April 2017</td><td>Shadow Brokers leak / CrySyS Lab</td><td>2017-04</td></tr>
+          <tr><td class="type-label">BUILD ARTIFACT</td><td class="val historical">@(#)par.h $Revision: 1.3 $ — SCCS/RCS source-control marker indicating an older high-security Unix development toolchain</td><td>SentinelLABS</td><td>2026-04</td></tr>
+          <tr><td class="type-label">HUNTING</td><td class="val">Lua magic bytes 1B 4C 75 61 and LUA_PATH-style environment strings in Windows PE files — the fingerprint that surfaced fast16 and remains a viable hunting pattern for embedded-Lua malware generally</td><td>SentinelLABS methodology</td><td>2026-04</td></tr>
+          <tr><td class="type-label">BEHAVIOR</td><td class="val">Unsigned kernel filesystem-filter driver modifying executable code during disk reads — on-disk hashes stay clean while in-memory code diverges. Detection requires comparing loaded process memory to the on-disk image, not file integrity checking</td><td>Analyst assessment from SentinelLABS technical detail</td><td>2026-09-12</td></tr>
+          <tr><td class="type-label">BEHAVIOR</td><td class="val">Malware that aborts installation when security software is present — inverts the usual assumption that evasion means defeating AV. Hosts running endpoint protection were never infected, so victim-side sample recovery is biased toward unprotected estates</td><td>Analyst assessment from SentinelLABS technical detail</td><td>2026-09-12</td></tr>
+          <tr><td class="type-label">YARA</td><td class="val">SentinelLABS released YARA rules alongside the April 2026 disclosure and explicitly invited community contributions toward identifying further samples and the original target binaries</td><td>SentinelLABS</td><td>2026-04</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No C2 domains, IP addresses, network protocols or exfiltration channels are documented for fast16 — the framework had no apparent command-and-control capability at all. It was configured before deployment, propagated autonomously, and acted on a physics condition rather than an operator instruction. Only one sample has been publicly recovered as of 2026-09-12, and no victim has ever been identified, so the IOC picture should be treated as a single data point rather than a campaign profile.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">The consequences at the time are <strong>unmeasurable from public sources</strong>, and that should be stated before anything else: no victim is identified, no programme delay is documented, and no government has acknowledged the operation. What can be assessed is the effect of the <em>disclosure</em>. fast16 moves the credible origin of state cyber-physical sabotage back roughly five years, from Stuxnet's deployment to a framework already compiled and capability-complete in 2005. If the US-linkage holds, it indicates counter-proliferation sabotage was an operational instrument before Olympic Games rather than an innovation of it — reframing Stuxnet as an iteration rather than an invention. David Albright's assessment of the likely effect is deliberately modest: <em>"We're thinking it could have been very disruptive... waste time, resources, and lower morale."</em> Sabotaging a weapons programme's confidence in its own arithmetic is a slower and quieter instrument than destroying centrifuges, and correspondingly harder to attribute, retaliate against, or even notice. The disclosure landed in June 2026 amid an active US–Iran war, giving it a contemporary salience its authors could not have anticipated.</div>
+      </div>
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Three durable technical contributions. <strong>First, integrity attacks on computation as a distinct category.</strong> fast16 neither stole nor destroyed; it made trusted software produce confidently wrong answers, defeating cross-machine verification by ensuring the verifier was compromised too. ATT&amp;CK still has no clean technique for this, as Section 04 records. <strong>Second, the Lua precedent.</strong> The embedded Lua 5.0 VM predates the earliest Flame samples by around seven years, making fast16 the earliest known Windows malware using Lua for modularity — though SentinelLABS explicitly found <em>"no indication of direct shared provenance"</em> with Flame or Project Sauron, so this is convergent design, not a demonstrated family tree. <strong>Third, evidence of sustained campaign maintenance.</strong> Symantec's 9–10 hook groups tracking successive software builds — including hooks re-applied after a user rolled back a version — demonstrate an operational apparatus maintaining a sabotage capability against a moving software target over an extended period, which is a far higher bar than building the implant once.</div>
+      </div>
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body consequence-na">No legal or regulatory consequences are attributable to this incident. No prosecution, indictment, sanction, treaty action or regulatory change has followed — an unsurprising outcome given that no victim has come forward, no state has acknowledged the operation, and the conduct is 21 years old. Two adjacent legal-historical facts are worth recording without overstating their connection: the operation only became knowable because of The Shadow Brokers' 2017 publication of NSA tooling, itself the subject of extensive US law-enforcement and counterintelligence response; and fast16's assessed target sits inside the same non-proliferation dispute that produced the 2015 JCPOA and its subsequent collapse. Neither is a consequence <em>of</em> fast16. If the operation ever produced a legal or diplomatic response, it happened in channels that remain closed.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-medium">ATTRIBUTION CONFIDENCE: [MEDIUM] — ACTOR · [MEDIUM] — TARGET</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">Unnamed state actor; US/NSA-linked by inference</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">United States assessed most likely — not asserted by discovering researchers</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Designations</span><span class="kv-val">None assigned. Tertiary sources associate it with Equation Group; primary researchers do not</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">NONE — no government statement, indictment or sanction exists</span></div>
+        <div class="kv-row"><span class="kv-key">Assessed Target</span><span class="kv-val">Iran's nuclear weapons programme [MEDIUM]; DPRK and Syria not excluded</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val dim">No companion actor card on file</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">TeDi <code>drv_list.txt</code> deconfliction entry; PDB path linking sample to leak; SCCS/RCS Unix-heritage build artifacts; nuclear-physics domain expertise; 2005 timestamps coinciding with Iran's enrichment resumption</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">(1) TeDi entry marks a <em>foreign</em> implant NSA catalogued, not US tooling; (2) an allied service rather than the US; (3) target is DPRK or Syria rather than Iran; (4) PKPM/MOHID matches indicate non-nuclear targeting</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Recovery of additional samples or the original target binaries; a victim coming forward; declassification or official acknowledgement; forensic linkage to a known toolset's build infrastructure</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p><strong>The single most important fact in this section is that the researchers who found fast16 declined to attribute it, and several outlets reporting on their work did not.</strong> SentinelLABS framed the framework as <em>"a reference point for understanding how advanced actors think about long-term implants, sabotage, and a state's ability to reshape the physical world through software"</em> — a formulation that deliberately avoids naming anyone. SecurityWeek's rendering was appropriately hedged: evidence indicating fast16 <em>"may have been developed by the United States."</em> Wikipedia, by contrast, states flatly that the framework "is attributed to the Equation Group." That is a stronger claim than the primary research supports, and the gap between them is a caution worth generalising: on a case this thinly sourced, tertiary confidence tends to exceed primary confidence, because summarisation strips hedges. This card follows the primary researchers.</p>
+        <p><strong>The affirmative case for US linkage rests principally on one artifact, and it is a good one.</strong> In April 2017 The Shadow Brokers published <code>drv_list.txt</code>, a 250KB component of the NSA "Territorial Dispute" collection. TeDi was a deconfliction tool: operators ran it to recognise driver names associated with implants so they could identify friendly tooling and avoid colliding with other services' operations. The fast16 entry reads <em>"fast16 *** Nothing to see here – carry on ***"</em>, and per CrySyS Lab's analysis of TeDi, that phrasing marks tooling as friendly rather than foreign. Independently, the recovered carrier contains the PDB path <code>C:\buildy\driver\fd\i386\fast16.pdb</code>, tying the sample to that name. Supporting but weaker signals: SCCS/RCS source-control markers suggesting authors from an older high-security Unix engineering culture "often associated with government or military-grade work"; and a level of nuclear weapons domain knowledge that Symantec characterised as extraordinary for 2005 and which implies access to weapons-physics expertise.</p>
+        <p><strong>The case is nonetheless circumstantial, and the central artifact admits a second reading.</strong> Territorial Dispute catalogued <em>both</em> friendly tooling and foreign implants — that was its function. The friendly-marker interpretation of "nothing to see here" is an inference about phrasing conventions, derived from third-party analysis of a leaked file with no accompanying documentation. It is a reasonable inference and probably correct, but it is not proof, and a reading in which NSA catalogued fast16 as <em>someone else's</em> implant it had encountered cannot be formally excluded. Everything else is consistent with a capable Western service generally rather than the US specifically. Against all of this stands the evidentiary base: <strong>one recovered sample</strong>, no infrastructure, no victim, no second operation to correlate against, and a framework that had no C2 channel and therefore left no network trail anywhere. SentinelLABS' own negative finding is instructive — examining lineage toward later Lua families, they concluded <em>"We did not find an indication of direct shared provenance."</em></p>
+        <p><strong>Target attribution is separately assessed and deserves its own confidence level.</strong> Symantec confirmed LS-DYNA and AUTODYN as targeted, and the 30 g/cm³ density gate is dispositive as to <em>purpose</em>: that compression regime is reached by uranium only under implosion shock, so the operation was aimed at nuclear weapons design, not at civil engineering or reactor work. Who was running those simulations is the softer question. David Albright of the Institute for Science and International Security put it carefully: <em>"While we cannot exclude other target countries working on nuclear weapons in the early 2000s, such as North Korea or possibly Syria, the timing, the access required and the focus on uranium, point to Iran's nuclear weapons efforts being the target."</em> The supporting circumstance is real — LS-DYNA has documented association with Iranian nuclear weapons research, and the carrier's compile date falls in the month Iran resumed enrichment work — but it remains an argument from coincidence and plausibility rather than from victim evidence. <strong>Hence [MEDIUM] on both actor and target, and no assertion of nation-state sponsorship at [HIGH].</strong> One further caveat on the software list: SentinelLABS' inclusion of PKPM and MOHID, neither confirmed by Symantec, sits awkwardly with an exclusively nuclear reading — a Chinese structural-analysis suite and a coastal hydrodynamics platform are not obvious components of a weapons programme. Either the rule set covered a broader target portfolio than the nuclear framing suggests, or those two matches are pattern-correspondence artifacts. That tension is unresolved in the public record and is flagged here rather than smoothed over.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>It relocates the origin of cyber-physical sabotage.</strong> For fifteen years Stuxnet has served as the field's creation myth — the moment code first reached across the air gap and broke something physical, and the reference point against which every subsequent ICS attack is measured. fast16's components were compiled in June, July and August 2005, while Stuxnet was still in early development, and they implement a complete, maintained sabotage capability. SentinelLABS' claim is calibrated and holds: the discovery <em>"forces a re-evaluation of our historical understanding of the timeline of development for serious covert cyber sabotage operations."</em> The correction is not that Stuxnet was unimportant, but that it was an iteration within an established practice rather than the invention of one — and that the practice was mature enough by 2005 to include version-tracking campaign maintenance.</p>
+      <p><strong>It defines integrity attacks on computation as a category the field still has no vocabulary for.</strong> The CIA triad nominally covers integrity, but operational security practice overwhelmingly instruments confidentiality and availability: we detect exfiltration and we detect outage. fast16 produced neither. It attacked the trustworthiness of an answer — and then attacked the procedure by which an engineer would check that answer, by ensuring the second machine agreed with the first. This is a qualitatively different problem from every attack pattern in common detection engineering, and Section 04 documents the gap concretely: mapping the central technique required an analytic analogue because ATT&amp;CK has no technique for corrupting scientific computation. Any environment whose product is a number — weapons design, drug discovery, structural engineering, climate modelling, financial risk, and increasingly model training and evaluation — inherits this threat model, and almost none of them are instrumented for it.</p>
+      <p><strong>It is an unusually clean case study in the limits of detection-by-signature and detection-by-integrity-check.</strong> Three defensive measures that a competent 2005 engineer might have taken would each have failed for a different reason. Hashing the application against vendor checksums returns clean, because the driver patched code in transit and never touched the file on disk. Re-running the calculation elsewhere returns the same wrong answer, because the worm ensured facility-wide consistency. Submitting the sample to antivirus returns nothing — demonstrably so, since it sat on VirusTotal for roughly nine years drawing a single low-confidence detection. The only measure that <em>would</em> have worked is the ironic one: merely <em>installing</em> any of 18 named security products caused the malware to decline the host entirely. Protection came not from detection capability but from the attacker's unwillingness to risk being seen.</p>
+      <p><strong>And it illustrates how unevenly the field's attention is distributed.</strong> Stuxnet has been reverse-engineered, papered, taught and reconstructed — public educational repositories such as <code>Sadpainy/Stuxnet</code> host annotated C sources, kernel and ICS hook code and archived vendor analyses, drawing hundreds of stars and dozens of forks. fast16 has one recovered sample and a handful of YARA rules. For nine years the decisive clue sat in a public leak file and a public malware repository simultaneously, and the connection went unmade until researchers investigating an unrelated question — the earliest embedded Lua VMs in Windows malware — happened across it. The lesson is methodological and it generalises beyond this case: leaked tooling manifests are intelligence, not trivia, and systematic mining of them is a discipline the community performs sporadically at best. Guerrero-Saade reportedly had <em>"fast16 — NOTHING TO SEE HERE, CARRY ON"</em> tattooed after the find. The joke works because the line was hiding in plain sight for the better part of a decade, telling anyone who read it exactly what it wanted them to do.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+
+      <div class="ref-item">
+        <div class="ref-source">SENTINELLABS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.sentinelone.com/labs/fast16-mystery-shadowbrokers-reference-reveals-high-precision-software-sabotage-5-years-before-stuxnet/" target="_blank">fast16 — Mystery Shadow Brokers Reference Reveals High-Precision Software Sabotage 5 Years Before Stuxnet</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">PRIMARY SOURCE — Original disclosure, April 2026. Guerrero-Saade &amp; Kamluk.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SYMANTEC / SECURITY.COM</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.security.com/threat-intelligence/fast16-nuclear-sabotage" target="_blank">Fast16: Pre-Stuxnet Sabotage Tool Was Built to Subvert Nuclear Weapons Simulations</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">PRIMARY SOURCE — Confirmatory analysis, May 2026. Source for the 30 g/cm³ gate, Cauchy stress tensor mechanism and 9–10 hook groups.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">ZETTER ZERO DAY</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.zetter-zeroday.com/experts-confirm-the-fast16-malware-was-sabotaging-nuclear-weapons-tests-likely-in-iran/" target="_blank">Experts Confirm the Fast16 Malware Was Sabotaging Nuclear Weapons Tests, Likely in Iran</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Source for Albright, Thakur and Chien quotations and the discovery/VirusTotal timeline.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NPR — PLANET MONEY</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.npr.org/2026/06/17/nx-s1-5859441/computer-malware-security-iran-stuxnet-fast16" target="_blank">Fast16, Stuxnet, Iran, and the lessons of cyber sabotage operations</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — 17 Jun 2026. Mainstream coverage; hosts Nick Fountain and Erika Beras, produced by Willa Rubin, featuring Guerrero-Saade.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">THE HACKER NEWS</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/04/researchers-uncover-pre-stuxnet-fast16.html" target="_blank">Researchers Uncover Pre-Stuxnet 'fast16' Malware</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — April 2026. Source for module timestamps, Lua VM detail and propagation mechanics.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">THE HACKER NEWS</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/05/pre-stuxnet-fast16-malware-tampered.html" target="_blank">Pre-Stuxnet Fast16 Malware Tampered with Nuclear Weapons Simulations</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — May 2026. Coverage of the Symantec confirmation.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SECURITYWEEK</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/pre-stuxnet-sabotage-malware-fast16-linked-to-us-iran-cyber-tensions/" target="_blank">Pre-Stuxnet Sabotage Malware 'Fast16' Linked to US-Iran Cyber Tensions</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Source for the hedged attribution wording ("may have been developed by the United States").</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">INFOSECURITY MAGAZINE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.infosecurity-magazine.com/news/fast16-sabotage-malware-winds/" target="_blank">Researchers Identify Fast16 Sabotage Malware That Pre-Dates Stuxnet</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CSO ONLINE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csoonline.com/article/4165214/researchers-unearth-industrial-sabotage-malware-that-predated-stuxnet-by-5-years.html" target="_blank">Researchers unearth industrial sabotage malware that predated Stuxnet by 5 years</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">TOM'S HARDWARE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.tomshardware.com/software/security-software/decades-old-pre-stuxnet-cyber-sabotage-tool-breaks-cover-nsa-listed-it-as-nothing-to-see-here-fast16-targeted-nuclear-reactors-dam-design-and-other-high-precision-civil-engineering-software-years-before-stuxnet-broke-cover" target="_blank">Decades-old pre-Stuxnet cyber sabotage tool breaks cover, NSA listed it as 'nothing to see here'</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Source for the broader civil-engineering targeting framing derived from the PKPM/MOHID candidates.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">DARK READING</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/cyber-risk/20-year-old-malware-rewrites-history-of-cyber-sabotage" target="_blank">20-Year-Old Malware Rewrites History of Cyber Sabotage</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Listed as located but not retrievable — returned HTTP 403 at compile time; no content from this source is relied upon in the card.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SCHNEIER ON SECURITY</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.schneier.com/blog/archives/2026/04/fast16-malware.html" target="_blank">Fast16 Malware</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CYBERNEWS</div>
+        <div>
+          <div class="ref-detail"><a href="https://cybernews.com/security/pre-stuxnet-malware-iran-nuclear-program/" target="_blank">Two researchers stumble on pre-Stuxnet malware that may have targeted Iran's nuclear program</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SC MEDIA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.scworld.com/brief/fast16-malware-pre-stuxnet-sabotage-tool-discovered" target="_blank">Fast16 malware: Pre-Stuxnet sabotage tool discovered</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">IBM X-FORCE EXCHANGE</div>
+        <div>
+          <div class="ref-detail"><a href="https://exchange.xforce.ibmcloud.com/osint/guid:0cce676c0a36409ba8316a420cb5b380" target="_blank">OSINT Advisory — fast16: Mystery ShadowBrokers Reference Reveals High-Precision Software Sabotage</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WIKIPEDIA</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Fast16" target="_blank">Fast16</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">TERTIARY — cited only to document that it asserts Equation Group attribution more strongly than the primary research supports (see Section 08). Not relied upon for technical claims.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">GITHUB — THIRD PARTY</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/Sadpainy/Stuxnet" target="_blank">Sadpainy/Stuxnet — educational Stuxnet reconstruction repository (AGPL-3.0)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEXTUAL — a Stuxnet artifact, not a fast16 one. Cited in Sections 06 and 09 solely to evidence the asymmetry in public study material between the two operations. Examined via its public web page only; not cloned.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CRYSYS LAB</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.crysys.hu/publications/files/territorial_dispute.pdf" target="_blank">Territorial Dispute — NSA's perspective on APT landscape (analysis of the Shadow Brokers TeDi component and drv_list.txt)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Basis for the friendly-vs-foreign reading of the drv_list.txt deconfliction entries, referenced via SentinelLABS. The competing reading is set out in Section 08.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-12 · 18 sources, 16 web lookups</div>
+  <div>Attribution: [MEDIUM] actor / [MEDIUM] target · ATT&amp;CK: 14 techniques, all [RETROSPECTIVE] · No companion actor card · No root-cause CVE</div>
+</div>
+
+</body>
+</html>
