@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GitLab Commits API Path Traversal — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  /* Patch status badge */
+  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  /* KEV badge */
+  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  /* ── CVSS SCORE CALLOUT ── */
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  /* ── CWE BLOCK ── */
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── LIFECYCLE TRACK ── */
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── CVSS VECTOR BREAKDOWN ── */
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+
+  /* ── AFFECTED VERSIONS TABLE ── */
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  /* ── EXPLOITATION TIMELINE ── */
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── KEV BLOCK ── */
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ── PURPLE TEAM TABS ── */
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  /* Query blocks */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── CROSS-REFERENCE LINKS ── */
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  /* ── CVE METADATA BLOCK ── */
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  /* ── NETWORK EXPOSURE ── */
+  .nmap-window {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-top: 2px solid var(--cyan);
+    margin-bottom: 12px;
+  }
+  .nmap-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+  .nmap-titlebar .cmd { color: var(--cyan); }
+  .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+  .nmap-titlebar .dot.green { background: var(--green); }
+  .nmap-output {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    color: #8ab4c8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .nmap-output .port-open   { color: var(--green); }
+  .nmap-output .port-closed { color: var(--red); }
+  .nmap-output .port-filter { color: var(--amber); }
+  .nmap-output .service     { color: var(--cyan); }
+  .nmap-output .version     { color: #fff; }
+  .nmap-output .vuln-flag   { color: var(--red); font-weight: 700; }
+  .nmap-output .comment     { color: var(--text-dim); }
+  .nmap-output .highlight   { background: rgba(0,212,255,0.08); display: inline; }
+
+  .nse-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--purple);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .nse-name   { font-family: var(--mono); font-size: 10.5px; color: var(--purple); font-weight: 700; }
+  .nse-tags   { display: flex; gap: 5px; }
+  .nse-tag    { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
+  .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .nse-cmd  { font-family: var(--mono); font-size: 10px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 10px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+  .nse-output .vuln-flag { color: var(--red); font-weight: 700; }
+  .nse-output .safe-flag { color: var(--green); font-weight: 700; }
+
+  .shodan-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--amber);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .shodan-label  { font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 11px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .banner-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--cyan2);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .banner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .banner-label  { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.07em; }
+  .banner-status { font-family: var(--mono); font-size: 8.5px; padding: 1px 7px; }
+  .banner-status.vulnerable { border: 1px solid rgba(255,77,77,0.4); color: var(--red); }
+  .banner-status.patched    { border: 1px solid rgba(74,158,106,0.4); color: var(--green); }
+  .banner-text   { font-family: var(--mono); font-size: 10px; color: #8ab4c8; line-height: 1.6; white-space: pre-wrap; }
+  .banner-text .vuln-string { color: var(--red); }
+  .banner-text .safe-string { color: var(--green); }
+
+  .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .port-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
+  .port-table td.port-open { color: var(--green); }
+  .port-table td.svc-name  { color: #fff; }
+  .port-table td.version-vuln { color: var(--red); }
+  .port-table td.version-safe { color: var(--green); }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO / THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-now">PATCH NOW</div>
+      <div class="kev-badge">KEV LISTED</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — Path Traversal / Unauthenticated Arbitrary File Read · GitLab / CE &amp; EE (Self-Managed)</div>
+  <h1><span class="cyan">GITLAB</span> COMMITS API TRAVERSAL</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-12 &nbsp;|&nbsp;
+    CVE: CVE-2026-85706 &nbsp;|&nbsp;
+    CWE: CWE-22 · CWE-306 &nbsp;|&nbsp;
+    SOURCES: GitLab Critical Patch Release · CISA KEV &amp; BOD 26-04 · watchTowr · Horizon3 · Field Effect · BleepingComputer · The Hacker News · SC Media · CyCognito
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">10.0 (CRITICAL)</span></div>
+    <div>Affected: <span>GitLab CE/EE self-managed 18.7 – 19.3.1</span></div>
+    <div>Disclosed: <span>2026-09-10</span></div>
+    <div>Patch Date: <span>2026-09-10</span></div>
+    <div>KEV Added: <span class="cyan">2026-09-11</span></div>
+    <div>EPSS: <span>Not published as of compile</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">10.0</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2026-85706</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">Companion critical in same release: CVE-2026-87719 (9.9, EE only)</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">10.0</div>
+    <div class="stat-label">Maximum possible CVSS v3.1 base score — unauthenticated, network, no user interaction</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">~20 hrs</div>
+    <div class="stat-label">Patch release to first observed in-the-wild probing (watchTowr, 06:00 UTC 11 Sep)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">20,000+</div>
+    <div class="stat-label">Self-managed GitLab instances reachable on standard web ports (CyCognito, via Shodan/Censys)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">3 days</div>
+    <div class="stat-label">CISA BOD 26-04 remediation tier — plus mandatory forensic triage before patching</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>An attacker with no account, no credentials and no user interaction can send one HTTP request to a self-managed GitLab server and read files off its filesystem.</strong> That is the whole vulnerability, and it is why GitLab scored it <strong>10.0</strong> — the maximum the CVSS v3.1 scale permits. CVE-2026-85706 lives in GitLab's repository commits API, where improper path confinement combines with missing authentication enforcement on the same endpoint. The only precondition, per watchTowr's Jake Knott, is that <em>"at least one public project must exist"</em> on the instance — a condition most GitLab deployments satisfy by default.</p>
+      <p><strong>The files at risk are the reason a read primitive rates as critical here rather than merely serious.</strong> Anything readable by the GitLab service account is in scope: <code>gitlab-secrets.json</code>, <code>gitlab.rb</code>, database credentials, CI/CD variables, SSH keys, cloud access keys, application tokens. On a source-control and pipeline platform these are not incidental configuration — they are the keys to the software supply chain. watchTowr's assessment is that attackers are after exactly this: source code, CI/CD secrets, credentials, and the ability to inject code into build pipelines. A file read on a web server is an information disclosure. A file read on GitLab is a foothold in everything GitLab deploys to.</p>
+      <p><strong>The timeline is unusually compressed.</strong> GitLab shipped patched versions 19.1.8, 19.2.6 and 19.3.2 on <strong>10 September 2026</strong>. By <strong>06:00 UTC on 11 September</strong> — roughly twenty hours later — watchTowr's honeypot network was already observing internet-wide behavioural probes, indicating attackers had reverse-engineered the fix from the patch diff. CISA added the CVE to the Known Exploited Vulnerabilities catalog the same day and set a federal remediation deadline of <strong>14 September 2026</strong>, placing it in the three-day tier of Binding Operational Directive 26-04. Affected are self-managed CE and EE installations from 18.7 through 19.3.1; GitLab.com SaaS was already patched and GitLab Dedicated required no action.</p>
+      <p><strong>The most important operational point in this card is not in GitLab's advisory: patching does not remediate this vulnerability.</strong> If an attacker read your secrets during the exposure window, upgrading GitLab closes the door on a room that has already been emptied. Those tokens, keys and database credentials remain valid until they are rotated. CISA's decision to attach a <em>mandatory forensic triage</em> requirement to the three-day tier exists precisely for this failure mode, and GitLab's own release notes contain no credential-rotation guidance whatsoever. Section 08 treats rotation as the actual remediation and the version upgrade as the prerequisite to it.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-22</span>
+        <span class="cwe-name">Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')</span>
+      </div>
+      <div class="cwe-body">Software constructs a filesystem path from externally supplied input but fails to neutralise sequences that escape the intended directory. The canonical form is <code>../</code> traversal, though encoded, doubled, absolute-path and normalisation-order variants all belong to the same class. The weakness is not that user input reaches a path — that is often unavoidable — but that the resolved path is never validated as falling <em>inside</em> the permitted root after all normalisation has occurred. CWE-22 has appeared in the CWE Top 25 every year it has been published.</div>
+    </div>
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-306</span>
+        <span class="cwe-name">Missing Authentication for Critical Function</span>
+      </div>
+      <div class="cwe-body">A function with security-relevant consequences can be invoked without the caller proving identity. In API surfaces this typically arises not from a deliberate decision but from authentication being applied per-route rather than centrally — one route is added, extended or refactored, and the middleware that should gate it is not attached. The result is a single endpoint that behaves as though it were public while sitting alongside dozens that are correctly protected.</div>
+    </div>
+    <div class="prose">
+      <p><strong>Two independent controls were absent at the same route, and either one alone would have contained the damage.</strong> GitLab's own description of the flaw names both failures explicitly: <em>"improper path confinement combined with missing authentication enforcement"</em> in the repository commits API. Had path confinement held, an unauthenticated caller would have been able to reach the endpoint but not escape the repository directory — an access-control problem, not a filesystem disclosure. Had authentication been enforced, the traversal would still have existed but would have required a valid account with project access, dropping the CVSS score substantially and removing it from the mass-exploitation category entirely. The 10.0 rating is the product of the intersection, not of either bug.</p>
+      <p><strong>The defect sits at a recognised structural weak point: an API endpoint that accepts a path-like parameter.</strong> Public reporting identifies the vector as a <code>file.path</code> parameter on <code>/api/v4/projects/{id}/repository/commits/</code>. This is a genuinely hard surface to secure, because the endpoint's legitimate purpose <em>is</em> to return file content from a repository at a given commit — user-supplied paths are the feature. Confinement therefore cannot be achieved by rejecting path-like input; it requires resolving the candidate path to its canonical absolute form and then verifying that the result remains within the repository root before any read occurs. Ordering matters: validation performed before normalisation is routinely defeated by encoding and by sequences that only resolve to an escape after the filesystem layer has canonicalised them.</p>
+      <p><strong>What is not publicly documented deserves stating plainly.</strong> As of this compile, neither GitLab's advisory nor the analyses from watchTowr and Horizon3 publish the vulnerable code path, the precise traversal syntax, or a working request. Horizon3's writeup explicitly lacks <em>"specific details about the vulnerable code path, exact request syntax, parameter names, or precise reachability scope."</em> GitLab's practice is to make the underlying security issue public in its tracker 90 days after the patch, which would place full root-cause detail around <strong>December 2026</strong>. This card therefore describes the defect at the level the sources support and does not reconstruct exploitation mechanics — a deliberate limitation given the vulnerability is under active exploitation with a patch only two days old.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>Not disclosed</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>2026-09-10</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">03</div>
+        <div class="lc-label">Patch<br/>2026-09-10</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">Exploitation<br/>2026-09-11</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">05</div>
+        <div class="lc-label">Resolution<br/>ONGOING</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p><strong>Discovery and report.</strong> The vulnerability was found by a researcher operating under the handle <strong>s3ntago</strong> and reported through GitLab's HackerOne bug bounty programme. GitLab's patch release credits the reporter by handle but does not publish the report date, so the duration of the private window — the interval between GitLab learning of the flaw and shipping a fix — is not publicly known. That gap matters for assessing the response and is recorded here as an open question rather than estimated.</p>
+      <p><strong>Disclosure and patch were simultaneous.</strong> On <strong>10 September 2026</strong> GitLab published a critical patch release covering versions 19.3.2, 19.2.6 and 19.1.8, and CVE-2026-85706 was disclosed within it. GitLab.com was already running patched code and GitLab Dedicated customers required no action; the exposure was entirely to self-managed CE and EE installations. Notably the release was not a single-CVE emergency bulletin — it carried <strong>18 vulnerabilities</strong> across all severity bands, including a second critical, CVE-2026-87719 (CVSS 9.9, insecure deserialization in the GraphQL subscription serializer, EE only, reported by <em>kyyblin</em>).</p>
+      <p><strong>Exploitation followed within a day.</strong> By <strong>06:00 UTC on 11 September</strong>, watchTowr's "Attacker Eye" honeypot network was observing behavioural probes consistent with attackers having reverse-engineered the vulnerability — almost certainly from the patch diff, which is the standard path for an open-source codebase where the fix is public the moment it ships. This is the defining dynamic of the case and it is structural rather than accidental: for open-source software, publishing a patch is publishing a vulnerability disclosure, and the defender's window is bounded by how fast an adversary can read a commit.</p>
+      <p><strong>Escalation to federal mandate the same day.</strong> CISA added CVE-2026-85706 to the Known Exploited Vulnerabilities catalog on <strong>11 September 2026</strong>, with a remediation deadline of <strong>14 September</strong> for Federal Civilian Executive Branch agencies. Under BOD 26-04 this places the CVE in the three-day tier, which carries an additional obligation beyond patching: agencies must perform <strong>forensic triage of the affected asset to determine whether it was already compromised during the exposure window</strong>. That requirement is the directive's recognition that for a credential-disclosure flaw, patching and remediating are not the same act.</p>
+      <p><strong>Resolution is not yet reached and this card should be treated as a live document.</strong> A patch exists and is effective against future exploitation, but the population of unpatched internet-facing instances remains large — CyCognito's Shodan and Censys analysis put self-managed GitLab servers reachable on standard web ports at <strong>more than 20,000</strong>, a meaningful share still inside the vulnerable range days after the fix shipped. No public proof-of-concept had been released at compile time, and full root-cause detail is expected in GitLab's issue tracker around December 2026 under its 90-day disclosure practice. Both of those will change the exploitation picture when they land.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Coordinated — vendor bug bounty</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">s3ntago (via GitLab HackerOne programme)</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val">Not published — private window duration unknown</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val green">None public as of 2026-09-12</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val">No public PoC; probing derived from patch diff within ~20 hrs</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val amber">Fast and complete on code; incomplete on remediation guidance</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val">Rapid — vendor analyses within 24 hrs, KEV listing same day</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val green">Yes — no evidence of premature disclosure by any party</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p><strong>By the conventional measures this was a well-run coordinated disclosure, and it deserves credit before criticism.</strong> A researcher found a maximum-severity flaw, reported it through the vendor's established bug bounty channel rather than dropping it publicly, and GitLab shipped fixes across three supported release branches simultaneously, credited the reporter by handle, and pre-patched its own SaaS and Dedicated offerings so that the disclosure did not expose its own hosted customers. No PoC preceded the patch. No researcher went public early. Nothing in the public record suggests friction between reporter and vendor. Measured against the disclosure disasters this card series has documented elsewhere, this is an unremarkable and competent process — which is precisely why the two things GitLab got wrong are worth examining.</p>
+      <p><strong>First: a CVSS 10.0 unauthenticated file read was shipped inside an 18-CVE omnibus patch release.</strong> The same bulletin carried a second critical (CVE-2026-87719, 9.9), six high-severity issues, and a tail of medium and low findings. Omnibus releases are operationally sensible for a vendor — they batch migrations, reduce upgrade churn, and suit a predictable patch cadence. They are considerably less useful for a defender triaging at speed, because the signal that <em>this one is different</em> has to compete with seventeen other entries in the same table. A maximum-severity unauthenticated vulnerability on an internet-facing developer platform arguably warranted an out-of-band emergency bulletin with its own headline, not a row in a release-notes grid. The ~20-hour gap between patch and mass probing is the window in which that framing decision mattered.</p>
+      <p><strong>Second, and more consequential: GitLab's release notes contain no credential-rotation guidance.</strong> For a vulnerability whose entire impact is the disclosure of secrets readable by the service account — <code>gitlab-secrets.json</code>, database credentials, CI/CD variables, SSH keys, cloud tokens — the upgrade instruction is necessary but not sufficient advice. An administrator who follows GitLab's guidance exactly, upgrades promptly, and does nothing else may be left with an attacker holding valid credentials to their pipelines and cloud environments. Third parties filled the gap: Field Effect's response guidance explicitly lists assessing and rotating exposed credentials, tokens and keys, and CISA's BOD 26-04 forensic-triage requirement encodes the same logic as a federal obligation. That the vendor's own advisory omits it, while a national cyber authority felt the need to mandate compromise assessment before patching, is the most instructive disclosure finding in this case.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p><strong>The attack shape, at the level public sources document it.</strong> An unauthenticated request is sent to the repository commits API — reported as <code>/api/v4/projects/{id}/repository/commits/</code> — carrying a <code>file.path</code> parameter whose value escapes the intended repository directory. Because authentication is not enforced on the affected path and the resolved filesystem location is not confined to the repository root, the application returns the content of the requested file. watchTowr and Field Effect both characterise it as exploitable in <strong>a single HTTP request</strong>. The one documented precondition, per watchTowr's Jake Knott, is that the instance must host <strong>at least one public project</strong> — the <code>{id}</code> in the path must resolve to a project the unauthenticated caller is permitted to address, even though the file it ultimately reads is not part of that project.</p>
+      <p><strong>Deliberate limitation of this section.</strong> No working request syntax, encoding, or traversal payload is reproduced here. No public proof-of-concept existed at compile time; GitLab has not published the vulnerable code path; and Horizon3's analysis explicitly notes the absence of <em>"exact request syntax, parameter names, or precise reachability scope"</em> in the public record. Given active in-the-wild exploitation against a patch that is two days old and more than 20,000 exposed instances, reconstructing exploitation detail beyond what sources document would serve attackers more than defenders. The detection content in Section 08 is built from the published defensive guidance, which is sufficient to hunt this without knowing how to weaponise it.</p>
+      <p><strong>Why a read primitive scores 10.0.</strong> The instinct to rank arbitrary file read below remote code execution is usually sound and is wrong here, for a reason specific to the asset class. On a GitLab server the files readable by the service account are <code>gitlab-secrets.json</code>, <code>gitlab.rb</code>, database credentials, CI/CD variables, SSH keys and cloud access tokens. Reading them does not execute code on the GitLab host — it grants the attacker legitimate authenticated access to the systems GitLab builds and deploys to, and the ability to inject code into build pipelines. The read is the beachhead; the pipeline is the objective. This is what the <strong>Scope: Changed</strong> metric is capturing, and it is what justifies an Integrity rating on a vulnerability that writes nothing.</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">Exploitable over the network against the HTTP/HTTPS listener. Self-managed GitLab is routinely internet-facing by design, so the exposed population is large — 20,000+ instances on standard web ports.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">A single HTTP request. No race condition, no memory-layout dependency, no per-target reconnaissance. The only precondition — at least one public project — is satisfied by default on most instances.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No account, token or session. This is the metric that converts the flaw from a serious authorisation bug into a mass-exploitation candidate, and the reason CISA reached KEV within 24 hours.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No victim action required. Fully scriptable against an enumerated target list, which is exactly the behaviour watchTowr observed beginning 06:00 UTC on 11 September.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">CHANGED</div>
+          <div class="cvss-comp-meaning">The vulnerable component (the GitLab application) is used to compromise resources beyond its own security authority — CI/CD pipelines, cloud accounts and downstream systems reachable with the disclosed credentials. Scope:Changed is what lifts this vector to a full 10.0.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Total loss. Any file readable by the GitLab service account is retrievable, including the instance's own secret material and every credential stored for pipeline use.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">The most debatable component in the vector, and worth reading carefully. The vulnerability itself writes nothing — it is a pure read. The I:H rating only holds via Scope:Changed: disclosed CI/CD credentials permit code injection into build pipelines, an integrity compromise of downstream systems rather than of GitLab. Defensible, but it is a second-order rating and should not be read as "the attacker can modify your repositories."</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val cyan">NONE</div>
+          <div class="cvss-comp-meaning">No availability impact. Nothing is deleted, crashed or denied. Note that the score reaches 10.0 despite A:N — a useful reminder that maximum severity does not require impact across all three CIA metrics when scope changes.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
+      <table class="versions-table">
+        <thead><tr><th>Vendor</th><th>Product</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>GitLab</td><td>CE / EE (self-managed)</td><td class="vuln">18.7 – 19.1.7</td><td class="fixed">19.1.8</td><td>PATCH NOW</td></tr>
+          <tr><td>GitLab</td><td>CE / EE (self-managed)</td><td class="vuln">19.2 – 19.2.5</td><td class="fixed">19.2.6</td><td>PATCH NOW</td></tr>
+          <tr><td>GitLab</td><td>CE / EE (self-managed)</td><td class="vuln">19.3 – 19.3.1</td><td class="fixed">19.3.2</td><td>PATCH NOW</td></tr>
+          <tr><td>GitLab</td><td>GitLab.com (SaaS)</td><td class="fixed">Not affected at disclosure</td><td class="fixed">Pre-patched</td><td>NO ACTION</td></tr>
+          <tr><td>GitLab</td><td>GitLab Dedicated</td><td class="fixed">Not affected at disclosure</td><td class="fixed">Pre-patched</td><td>NO ACTION</td></tr>
+          <tr><td>GitLab</td><td>CE / EE — companion CVE-2026-87719</td><td class="vuln">18.3 – 19.1.7, 19.2 – 19.2.5, 19.3 – 19.3.1 (EE only)</td><td class="fixed">19.1.8 / 19.2.6 / 19.3.2</td><td>PATCH NOW</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block">
+      <div class="kev-header">
+        <span class="kev-tag">CISA KEV LISTED</span>
+        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2026-09-11 · Required Remediation: 2026-09-14 · BOD 26-04 three-day tier</span>
+      </div>
+      <div class="kev-body">Added to the Known Exploited Vulnerabilities catalog one day after patch release, with a three-day federal remediation deadline. Critically, CISA also flagged the CVE as requiring <strong>mandatory forensic triage under BOD 26-04</strong> — Federal Civilian Executive Branch agencies must assess whether the asset was already compromised during the exposure window <em>before</em> applying the patch, not merely upgrade it. This tier applies to CVEs that are both KEV-listed and capable of yielding total system control, and it exists because patching a system that has already had its credentials read leaves the adversary holding valid access that survives the upgrade.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">2026-09-10</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Patch release and simultaneous disclosure</div>
+            <div class="et-desc">GitLab ships 19.3.2, 19.2.6 and 19.1.8 — an 18-CVE critical patch release. CVE-2026-85706 disclosed at CVSS 10.0. For an open-source codebase, the published fix is itself a disclosure of the vulnerable code path.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-11<br/>06:00 UTC</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Internet-wide behavioural probing begins</div>
+            <div class="et-desc">watchTowr's "Attacker Eye" honeypot network observes probes indicating attackers have reverse-engineered the vulnerability from the patch diff — approximately 20 hours after release. Activity is characterised as reconnaissance and target enumeration rather than confirmed mass compromise.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-11</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">CISA KEV listing and BOD 26-04 three-day tier</div>
+            <div class="et-desc">CISA adds the CVE to KEV the same day, warning of active exploitation, with FCEB remediation due 2026-09-14 and mandatory forensic triage attached.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-12</div>
+          <div class="et-track"><div class="et-dot amber"></div></div>
+          <div class="et-content">
+            <div class="et-event">Compile date — exposure still substantial</div>
+            <div class="et-desc">CyCognito telemetry via Shodan and Censys places self-managed GitLab instances on standard web ports at more than 20,000, with a meaningful share still inside the vulnerable range. No public PoC released. No named threat actor or campaign attributed.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p><strong>No threat actor attribution exists for this vulnerability, and none should be inferred.</strong> The observed activity is internet-wide scanning and behavioural probing — the undifferentiated background of mass exploitation that follows any unauthenticated flaw in a widely deployed product. No APT group, ransomware operation or eCrime crew has been publicly linked to exploitation of CVE-2026-85706 as of 2026-09-12, and CISA's KEV entry asserts active exploitation without naming an operator. Treat claims of specific actor involvement appearing in the coming weeks with appropriate scepticism unless they carry forensic evidence.</p>
+      <p><strong>The likely exploitation trajectory is worth stating as an assessment rather than a fact.</strong> Unauthenticated file-read flaws in developer platforms have a consistent pattern: broad opportunistic harvesting first, targeted follow-on later, with the value realised not against the vulnerable host but against whatever the stolen credentials unlock. The relevant precedent is not a GitLab-specific one but the general shape of CI/CD platform compromise — secrets harvested at scale, triaged offline, and used weeks or months afterwards against cloud environments and build pipelines where the intrusion looks like legitimate authenticated activity. This matters for hunting: the indicator of a successful attack against this CVE may never appear in GitLab logs at all, but in anomalous use of a GitLab-held cloud credential elsewhere in the estate. Section 08's hunting guidance is built on that assumption.</p>
+      <p><strong>Context worth carrying: this is GitLab's second unauthenticated critical in under a month.</strong> CVE-2026-19478, disclosed 17 August 2026 at CVSS 9.4, allowed unauthenticated attackers to delete or rewrite public projects on self-managed CE and EE servers. Two maximum-or-near-maximum severity unauthenticated flaws in the same product within four weeks is a pattern rather than an incident, and organisations running self-managed GitLab on the public internet should be reading it as a statement about that deployment model's exposure rather than about either individual bug.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Path traversal persists because the defect lives in the seam between two correctly-built layers, and seams have no owner.</strong> CWE-22 has appeared in the CWE Top 25 every year the list has existed, which should be embarrassing for a weakness class understood since the 1990s and trivially preventable in isolation. It survives because modern API surfaces separate the concerns that would catch it. Authentication is middleware. Path confinement is handler logic. Each is written by different people, reviewed against different checklists, and tested by different suites. A route that quietly lacks both is not a failure either team would recognise as theirs — the middleware team sees a route list, not a route's file access; the handler team assumes it is operating on an authenticated request. The fix that actually prevents recurrence is not "sanitise input" but making <strong>resolve-then-verify-containment</strong> a property of a shared filesystem-access primitive that no handler can bypass, so that confinement is structurally impossible to omit rather than merely mandatory to remember.</p>
+      <p><strong>The industry systematically under-rates read primitives, and this CVE is the counter-example that should recalibrate it.</strong> Triage convention ranks remote code execution above arbitrary file read, and for a typical web server that ordering is correct. It inverts when the asset's filesystem <em>is</em> a credential store. A GitLab server holds the secrets that grant access to every environment it deploys to; reading them yields authenticated, legitimate-looking access to cloud accounts and build pipelines without ever executing code on the GitLab host. The severity of a read primitive is a function of what is readable, not of the primitive. Any system whose local files are keys to other systems — CI/CD platforms, secret managers, orchestrators, identity providers, configuration management servers — should be triaged with file-read flaws treated as equivalent to RCE by default, and the burden placed on the defender to argue otherwise.</p>
+      <p><strong>Patching and remediating are different acts, and almost nothing in the security ecosystem is built to distinguish them.</strong> Vulnerability management programmes measure patch latency: percentage of assets on a fixed version, mean time to remediate, KEV compliance. Every one of those metrics will report green for an organisation that upgraded GitLab on 11 September and rotated nothing — while an attacker retains valid credentials harvested on the 10th. The patch closes the door on an emptied room. This is the exact gap CISA's BOD 26-04 forensic-triage requirement was written to close, and its significance extends well past federal agencies: it is the first binding directive to formalise that for credential-disclosure vulnerabilities, <em>compromise assessment is part of remediation, not a separate optional exercise</em>. That GitLab's own release notes contain no rotation guidance while a national cyber authority mandated compromise assessment for the same CVE is the sharpest illustration available of how far vendor advisory convention lags the actual threat model.</p>
+      <p><strong>Finally, open-source patch releases have a structural disclosure problem that no amount of process discipline solves.</strong> GitLab did everything correctly by conventional standards — coordinated report, simultaneous multi-branch fix, pre-patched SaaS, credited researcher — and attackers were probing the internet approximately twenty hours later, because the fix commit <em>is</em> the vulnerability disclosure for anyone willing to read a diff. The defender's window is therefore not set by the vendor's communication strategy but by adversary diff-reading speed, which for a high-value target is now measured in hours. Two consequences follow. Bundling a CVSS 10.0 into an 18-CVE omnibus release spends some of that scarce window on triage ambiguity for no defensive benefit. And organisations running internet-facing self-managed open-source infrastructure need patch pipelines measured against a sub-24-hour clock, or they need to stop exposing those services directly — because "we patched within the week" is a posture calibrated to a threat model that no longer exists.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <!-- A: DETECTION -->
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+
+      <div class="query-block">
+        <div class="query-label">Core exploitation indicator — GitLab api_json.log / production_json.log</div>
+        <div class="query-code">// Published detection guidance (watchTowr, Field Effect): look for requests to the
+// commits API carrying a file.path parameter. Adjust field names to your shipper's schema.
+
+source="gitlab:api_json" 
+  path="/api/v4/projects/*/repository/commits*"
+  AND (params="*file.path*" OR params="*file[path]*")
+| stats count, values(remote_ip) AS src, values(status) AS http_status BY path, ua
+| sort -count
+
+// Escalate on: unauthenticated requests (no user_id / token_id field populated)
+// returning HTTP 200 with a response_bytes value inconsistent with commit metadata.</div>
+      </div>
+
+      <div class="query-block">
+        <div class="query-label">Reverse-proxy corroboration — NGINX / HAProxy / CDN access logs</div>
+        <div class="query-code">// GitLab's own logs may be incomplete if the request was rejected upstream or if
+// log rotation has already run. Always corroborate at the proxy tier.
+
+index=web sourcetype=nginx:access uri_path="/api/v4/projects/*/repository/commits*"
+| search uri_query="*file.path*" OR uri_query="*file%2Epath*" OR uri_query="*file%5Bpath%5D*"
+| eval suspicious=if(match(uri_query,"(?i)(%2e%2e|\.\.|%252e)"),1,0)
+| where suspicious=1 OR status=200
+| table _time, src_ip, http_method, uri_path, uri_query, status, bytes_out, http_user_agent</div>
+      </div>
+
+      <div class="query-block">
+        <div class="query-label">Network-tier detection — Zeek http.log</div>
+        <div class="query-code">// Zeek — surface commits-API requests with path-like parameters to GitLab hosts.
+// Useful where TLS is terminated at a proxy you control and Zeek sees decrypted traffic.
+
+cat http.log | zeek-cut -d ts id.orig_h id.resp_h method uri status_code resp_body_len user_agent \
+  | grep -E "/api/v4/projects/[0-9]+/repository/commits" \
+  | grep -Ei "file(\.|%2e|%5b)path"
+
+// Suricata: alert on the same URI pattern to GitLab server groups. Tune on resp_body_len —
+// a commits-API response returning an unusually large or unusually shaped body is the signal.</div>
+      </div>
+
+      <div class="prose" style="margin-top:12px;">
+        <p><strong>Behavioural indicators, in priority order.</strong> (1) <em>Unauthenticated 200s on the commits API</em> — the endpoint should not be serving successful responses to requests with no associated user or token identity; this is the single highest-fidelity signal available. (2) <em>Response-size anomaly</em> — commit metadata has a predictable size envelope; a response whose body length is inconsistent with that envelope suggests file content is being returned instead. (3) <em>Enumeration shape</em> — a single source iterating <code>{id}</code> values or repeatedly requesting the same endpoint with varying path parameters, which is what internet-wide probing looks like at the target end. (4) <em>Encoding variation from one source</em> — a client cycling through <code>../</code>, <code>%2e%2e</code>, double-encoded and mixed-separator forms is testing traversal filters, not using the API. <strong>Caveat worth stating: because no public PoC exists and GitLab has not published the vulnerable code path, these detections are built from published defensive guidance and the general shape of traversal exploitation, not from an observed exploit sample.</strong> Validate against your own traffic before alerting on them, and expect to tune.</p>
+      </div>
+    </div>
+
+    <!-- B: HUNTING -->
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hunt 1 — "We were read before we patched." </strong>Hypothesis: an unauthenticated actor retrieved secret material from our GitLab host between 2026-09-10 and the moment we upgraded. Scope the hunt to that exact window rather than a generic lookback. Pull GitLab <code>api_json.log</code>, <code>production_json.log</code> and the upstream proxy access logs for the window and apply the Section A queries. <strong>Assume log gaps</strong> — GitLab log rotation is aggressive on busy instances and many teams do not ship API logs centrally, so absence of evidence here is weak evidence of absence. If the window cannot be reconstructed from logs at all, that is itself the finding, and the hunt should escalate directly to Hunt 3 on a presumption of compromise.</p>
+        <p><strong>Hunt 2 — "What was reachable?"</strong> Hypothesis: if a read occurred, specific high-value files were the target. Enumerate what the GitLab service account could actually read on your deployment — <code>gitlab-secrets.json</code>, <code>/etc/gitlab/gitlab.rb</code>, <code>database.yml</code>, any mounted secret files, runner registration tokens — and build the rotation inventory from that list <em>before</em> you find evidence of a read, not after. This turns an unbounded incident-response question into a bounded remediation task, and it is worth doing even if Hunt 1 comes back clean, because the inventory is the input to every subsequent decision.</p>
+        <p><strong>Hunt 3 — "The credential is being used somewhere else." </strong>This is the hunt that actually matters and the one most teams skip. Hypothesis: a credential harvested from GitLab is now being used against cloud, registry or pipeline infrastructure, where it will appear as <em>legitimate authenticated activity</em> and generate no GitLab-side signal whatsoever. Pivot entirely off the GitLab host: review cloud provider audit logs (CloudTrail, Azure Activity, GCP Audit) for use of GitLab-held access keys from new ASNs, geographies or user agents since 2026-09-10; review container registry pulls and pushes authenticated with runner or deploy tokens; review pipeline execution history for jobs triggered outside normal commit flow or with modified job definitions; and review SSH key usage for deploy keys held in GitLab. <strong>A clean GitLab log does not close this hunt</strong> — the entire point of a credential theft is that subsequent use looks authorised.</p>
+        <p><strong>Hunt 4 — "Are we sure we know where all our GitLab is?"</strong> Hypothesis: the exposed instance is one nobody owns. Self-managed GitLab is frequently stood up by engineering teams outside central IT visibility. Reconcile your external attack surface inventory against known GitLab assets, and check for instances on non-standard ports — the 20,000+ exposure figure counts standard web ports only, so the true exposed population is larger than the published number.</p>
+      </div>
+    </div>
+
+    <!-- C: PATCH GUIDANCE -->
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Patch</span><span class="kv-val green">19.3.2 · 19.2.6 · 19.1.8</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2026-09-10</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Moderate — 19.3.2 includes post-deploy DB migrations</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Minimal justified — exploitation is active; patch first, test after</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">GitLab Critical Patch Release 19.3.2 / 19.2.6 / 19.1.8</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val">No — shipped in a scheduled 18-CVE critical release</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val">None as of 2026-09-12</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p><strong>Upgrade to the patch level matching your branch</strong> — 18.7–19.1.x to <strong>19.1.8</strong>, 19.2.x to <strong>19.2.6</strong>, 19.3.x to <strong>19.3.2</strong>. Database migrations are required and must complete before GitLab restarts; 19.3.2 additionally carries post-deploy migrations. Multi-node deployments should follow GitLab's zero-downtime upgrade procedure; single-node instances should expect downtime during migration and plan for it rather than aborting mid-upgrade. GitLab.com and GitLab Dedicated customers require no action.</p>
+        <p><strong>The patch is necessary and insufficient — treat credential rotation as the actual remediation.</strong> GitLab's release notes provide no rotation guidance, and following them alone leaves any secret disclosed during the exposure window valid indefinitely. After upgrading, rotate at minimum: GitLab secrets (<code>gitlab-secrets.json</code> — note this invalidates existing 2FA tokens and stored CI/CD variable encryption, so plan the blast radius), database credentials, all CI/CD variables holding cloud or third-party credentials, runner registration tokens, deploy keys and deploy tokens, personal and project access tokens, and any SSH keys stored on or accessible to the instance. Sequence this against Hunt 2's inventory. For FCEB agencies this is not discretionary — BOD 26-04's three-day tier requires forensic triage of the asset to assess prior compromise <em>alongside</em> remediation, with the deadline of 2026-09-14.</p>
+      </div>
+    </div>
+
+    <!-- D: COMPENSATING CONTROLS -->
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>Remove the documented precondition.</strong> Exploitation requires that at least one public project exists on the instance (watchTowr). Setting all projects to internal or private removes the reported prerequisite and is the single most targeted mitigation available short of patching. Verify at the instance level — a project made private while a fork or mirror remains public does not close it. Treat this as risk reduction, not elimination: the precondition is as published, and the full reachability scope has not been disclosed by GitLab.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Block or restrict the affected endpoint at the reverse proxy.</strong> Deny unauthenticated requests to <code>/api/v4/projects/*/repository/commits*</code> carrying a <code>file.path</code> parameter at NGINX, HAProxy, a WAF or the CDN tier. Account for encoding variants (<code>%2e</code>, double-encoding, bracket notation) rather than string-matching a single form, and log every block — those logs become your exploitation-attempt evidence. This will break legitimate API consumers that use the parameter, which is an acceptable trade for a short window and an unacceptable one as a permanent state.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Remove the instance from the public internet.</strong> Self-managed GitLab does not need to be internet-reachable for most organisations. Place it behind a VPN, an identity-aware proxy or a source-IP allowlist covering developer networks, CI runners and any required webhook sources. This is the control that would have neutralised both this CVE and CVE-2026-19478 four weeks earlier, and it addresses the deployment pattern rather than the individual bug.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div class="cm-text"><strong>Reduce what the service account can read.</strong> The impact ceiling of any file-read flaw is set by the filesystem reachable from the application process. Move CI/CD secrets out of GitLab-stored variables into an external secret manager with short-lived dynamic credentials, so that a disclosed value expires on its own; ensure cloud access uses OIDC federation rather than long-lived static keys held in GitLab; and confirm the GitLab service account cannot read unrelated material on a shared host. This is slow, structural work that pays out against the next instance of this bug class rather than this one.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div class="cm-text"><strong>Rotate on suspicion, not on evidence.</strong> If the instance was internet-facing and unpatched at any point after 2026-09-10, and you cannot positively reconstruct the request logs for that window, rotate as though a read occurred. The cost of unnecessary rotation is operational disruption measured in hours; the cost of a missed rotation is an adversary with valid pipeline credentials and no detection signal. Given active exploitation and a 20 hour patch-to-probe interval, the prior probability does not favour waiting for proof.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2026-85706</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">10.0 — CRITICAL</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-22 (Path Traversal) · CWE-306 (Missing Authentication)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val">Not published as of 2026-09-12</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2026-85706" target="_blank" style="color:var(--cyan)">nvd.nist.gov</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://docs.gitlab.com/releases/patches/patch-release-gitlab-19-3-2-released/" target="_blank" style="color:var(--cyan)">GitLab Critical Patch Release 19.3.2</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">LISTED — active exploitation</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2026-09-11 · FCEB due 2026-09-14 · BOD 26-04 three-day tier with mandatory forensic triage</span></div>
+          <div class="kv-row"><span class="kv-key">Reported By</span><span class="kv-val">s3ntago — GitLab HackerOne bug bounty programme</span></div>
+          <div class="kv-row"><span class="kv-key">Affected</span><span class="kv-val">GitLab CE/EE self-managed 18.7–19.1.7, 19.2–19.2.5, 19.3–19.3.1</span></div>
+          <div class="kv-row"><span class="kv-key">Fixed In</span><span class="kv-val green">19.1.8 · 19.2.6 · 19.3.2</span></div>
+        </div>
+      </div>
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2026-87719 <span style="font-size:9px; color:var(--text-dim);">— companion critical, same release</span></div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">9.9 — CRITICAL</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H</span></div>
+          <div class="kv-row"><span class="kv-key">Weakness</span><span class="kv-val cyan">Insecure deserialization — GraphQL subscription serializer</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val">NOT LISTED as of 2026-09-12</span></div>
+          <div class="kv-row"><span class="kv-key">Reported By</span><span class="kv-val">kyyblin — GitLab HackerOne bug bounty programme</span></div>
+          <div class="kv-row"><span class="kv-key">Affected</span><span class="kv-val">GitLab EE only — 18.3–19.1.7, 19.2–19.2.5, 19.3–19.3.1</span></div>
+          <div class="kv-row"><span class="kv-key">Relationship</span><span class="kv-val">Independent vulnerability, not a variant. Included because the same upgrade remediates both and EE operators triaging CVE-2026-85706 should not overlook it — it requires only low privileges and carries full CIA impact.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="prose" style="margin-top:16px;">
+      <p><strong>Note on completeness:</strong> the 2026-09-10 release addressed <strong>18 CVEs</strong> in total across critical, high, medium and low severity. Only the two criticals are detailed here. Operators planning the upgrade should review the full vendor release notes rather than treating this card as the complete patch inventory — the high-severity set alone includes a buffer overflow in the Unicode conversion wrapper (CVE-2026-88765, 8.5, EE), a pipeline execution policy privilege escalation (CVE-2026-79708, 8.5, EE), a stored XSS in the Markdown JSON table renderer (CVE-2026-78252, 8.2), and an incorrect authorization flaw in CI/CD environment variables (CVE-2026-13210, 7.7).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <div class="xref-none">No companion actor cards on file for this vulnerability. No threat actor, ransomware operation or eCrime group has been publicly attributed to exploitation of CVE-2026-85706 as of 2026-09-12 — observed activity is undifferentiated internet-wide scanning and behavioural probing. This entry should be revisited if named-actor exploitation is later reported.</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <div class="xref-none">No companion incident cards on file. No breach or intrusion has been publicly documented as originating from this CVE as of 2026-09-12. Given the typical lag between credential harvesting and observable downstream compromise, absence of a documented incident two days after disclosure is expected and should not be read as evidence that exploitation has been unsuccessful.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Network Exposure <small>Ports · Protocols · Banners · Nmap · Shodan</small></div>
+  </div>
+  <div class="section-body">
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <table class="port-table" style="margin-bottom:20px;">
+      <thead>
+        <tr><th>Port</th><th>Proto</th><th>Service</th><th>Vulnerable Condition</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="port-num">443</td>
+          <td>TCP</td>
+          <td class="svc-name">HTTPS — GitLab web/API</td>
+          <td class="version-vuln">GitLab CE/EE self-managed 18.7–19.1.7, 19.2–19.2.5, 19.3–19.3.1 with ≥1 public project</td>
+          <td>Default deployment. The API is served from the same listener as the web UI — there is no separate API port to firewall independently.</td>
+        </tr>
+        <tr>
+          <td class="port-num">80</td>
+          <td>TCP</td>
+          <td class="svc-name">HTTP — GitLab web/API</td>
+          <td class="version-vuln">Same version ranges where TLS is not enforced or redirect is absent</td>
+          <td>Commonly a redirect to 443, but instances terminating plaintext directly expose the same API surface.</td>
+        </tr>
+        <tr>
+          <td class="port-num">Other</td>
+          <td>TCP</td>
+          <td class="svc-name">Non-standard web ports</td>
+          <td class="version-vuln">Same version ranges</td>
+          <td>Self-managed GitLab is frequently published on non-standard ports. The 20,000+ exposure figure counts standard web ports only, so the true exposed population is larger.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Service Scan</div>
+    <div class="nmap-window">
+      <div class="nmap-titlebar">
+        <div class="dot green"></div>
+        <span class="cmd">nmap -sV -p 80,443 &lt;target&gt;</span>
+      </div>
+      <div class="nmap-output"><span class="comment"># NOTE: No source-documented nmap output exists for CVE-2026-85706 as of 2026-09-12.</span>
+<span class="comment"># Nothing is reproduced here rather than fabricating representative output.</span>
+<span class="comment">#</span>
+<span class="comment"># What a service scan can and cannot establish for this CVE:</span>
+<span class="comment">#</span>
+<span class="comment">#   CAN:    identify that an HTTP/HTTPS service is present and that it is GitLab,</span>
+<span class="comment">#           via the title element, the gitlab-session cookie, or static asset paths.</span>
+<span class="comment">#   CANNOT: determine the patch level. GitLab does not advertise its precise version</span>
+<span class="comment">#           in unauthenticated HTTP responses, and /api/v4/version requires a token.</span>
+<span class="comment">#</span>
+<span class="comment"># Consequence: remote version discrimination between vulnerable (19.3.1) and patched</span>
+<span class="comment"># (19.3.2) is NOT reliably achievable from an unauthenticated network position.</span>
+<span class="comment"># Determine patch state from the asset itself — `gitlab-rake gitlab:env:info`, the</span>
+<span class="comment"># admin area, or your configuration management inventory — not by scanning.</span></div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Version Identification</div>
+    <div class="banner-block">
+      <div class="banner-header">
+        <span class="banner-label">GitLab HTTPS · Port 443</span>
+        <span class="banner-status vulnerable">NOT DISCRIMINATING</span>
+      </div>
+      <div class="banner-text"><span class="comment"># Version not reliably discriminated via banner.</span>
+<span class="comment">#</span>
+<span class="comment"># GitLab identifies itself through generic markers — a `_gitlab_session` cookie,</span>
+<span class="comment"># the page title, and versioned static asset paths — none of which expose the</span>
+<span class="comment"># patch-level version to an unauthenticated client. No published source documents</span>
+<span class="comment"># a banner delta between 19.3.1 and 19.3.2.</span>
+<span class="comment">#</span>
+<span class="comment"># No vulnerable/patched banner pair is shown here because none is documented.</span>
+<span class="comment"># Use host-side version verification (Patch Guidance, Section 08C) instead.</span></div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
+    <div class="nse-block">
+      <div class="nse-header">
+        <span class="nse-name">No dedicated NSE script</span>
+        <div class="nse-tags">
+          <span class="nse-tag detect">NOT AVAILABLE</span>
+        </div>
+      </div>
+      <div class="nse-cmd"># No NSE script exists for CVE-2026-85706 as of 2026-09-12</div>
+      <div class="nse-output"><span class="comment"># No script in the nmap NSE library targets this CVE, and none should be expected</span>
+<span class="comment"># this early — the vulnerability is two days old and no public PoC has been released.</span>
+<span class="comment">#</span>
+<span class="comment"># Generic GitLab identification is available via http-title and http-headers, but</span>
+<span class="comment"># neither establishes patch state (see nmap note above).</span>
+<span class="comment">#</span>
+<span class="comment"># A future detection script would necessarily send a traversal request to a live</span>
+<span class="comment"># host — i.e. it would exploit the vulnerability to test for it. For an actively</span>
+<span class="comment"># exploited, barely-patched CVE that is an unsafe detection method against any</span>
+<span class="comment"># system you do not own, and no such command is published here.</span></div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">WITHHELD — ACTIVE EXPLOITATION</span>
+      </div>
+      <div class="shodan-dork"># Ready-to-run target-discovery dork intentionally not published.</div>
+      <div class="shodan-note"><strong>Per standing orders, no operational dork is provided for a recent high-severity vulnerability under active exploitation.</strong> CVE-2026-85706 was patched on 2026-09-10, probing began 2026-09-11, and more than 20,000 self-managed instances remain reachable on standard web ports with a meaningful share unpatched. A working dork here would principally serve target selection, not defence. <strong>Conceptual structure, for defenders auditing their own estate:</strong> GitLab instances are discoverable through generic product fingerprints — the HTTP title element, the session cookie name, and favicon hashing — combined with an organisation filter scoped to your own ASN, netblocks or registered domains. Run that scoped to assets you own, as an inventory reconciliation against Hunt 4 in Section 08B. <strong>Do not run unscoped product-wide queries against this CVE.</strong></div>
+    </div>
+    <div class="shodan-block">
+      <div class="shodan-header">
+        <span class="shodan-label">Documented Exposure — Point-in-Time</span>
+      </div>
+      <div class="shodan-dork"># CyCognito, via Shodan and Censys lookups, September 2026</div>
+      <div class="shodan-note">More than <strong>20,000</strong> self-managed GitLab instances reachable on standard web ports, with a meaningful share still running versions inside the vulnerable range days after patches shipped. Point-in-time figure; counts standard web ports only and therefore understates total exposure. Cited as scale context, not as a target set.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+
+      <div class="ref-item">
+        <div class="ref-source">GITLAB</div>
+        <div>
+          <div class="ref-detail"><a href="https://docs.gitlab.com/releases/patches/patch-release-gitlab-19-3-2-released/" target="_blank">GitLab Critical Patch Release: 19.3.2, 19.2.6, 19.1.8 — 10 Sep 2026</a></div>
+          <div class="ref-date">Accessed: 2026-09-12 — PRIMARY VENDOR ADVISORY. Source for all 18 CVEs, CVSS vectors, affected version ranges, reporter credits and SaaS/Dedicated status.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/alerts/2026/09/11/cisa-adds-one-known-exploited-vulnerability-catalog" target="_blank">CISA Adds One Known Exploited Vulnerability to Catalog — 11 Sep 2026</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank">Known Exploited Vulnerabilities Catalog</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk" target="_blank">BOD 26-04: Prioritizing Security Updates Based on Risk</a></div>
+          <div class="ref-date">Accessed: 2026-09-12 — Source for the three-day tier and the mandatory forensic-triage requirement.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk" target="_blank">BOD 26-04: Implementation Guidance</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WATCHTOWR</div>
+        <div>
+          <div class="ref-detail"><a href="https://watchtowr.com/resources/rapid-reaction-gitlab-critical-path-traversal-vulnerability-cve-2026-85706/" target="_blank">Rapid Reaction: GitLab Critical Path Traversal Vulnerability (CVE-2026-85706)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12 — Source for the endpoint and file.path detection guidance, the public-project precondition, and the 06:00 UTC probing observation.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">HORIZON3</div>
+        <div>
+          <div class="ref-detail"><a href="https://horizon3.ai/attack-research/vulnerabilities/cve-2026-85706/" target="_blank">CVE-2026-85706: GitLab Path Traversal</a></div>
+          <div class="ref-date">Accessed: 2026-09-12 — Source for the CVSS vector and the explicit statement that vulnerable code path and request syntax are not public.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">THE HACKER NEWS</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/09/gitlab-cvss-10-file-read-flaw-draws-in.html" target="_blank">GitLab CVSS 10 File-Read Flaw Draws In-the-Wild Probes After Disclosure</a></div>
+          <div class="ref-date">Accessed: 2026-09-12 — Source for Jake Knott's public-project precondition quote and the attacker-objective framing.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">BLEEPINGCOMPUTER</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/gitlab-urges-users-to-patch-max-severity-path-traversal-flaw/" target="_blank">GitLab urges users to patch max severity path traversal flaw</a></div>
+          <div class="ref-date">Accessed: 2026-09-12 — Source for the s3ntago HackerOne reporter credit and the CVE-2026-87719 companion critical.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">FIELD EFFECT</div>
+        <div>
+          <div class="ref-detail"><a href="https://fieldeffect.com/blog/gitlab-fixes-critical-vulnerability-probing-begins" target="_blank">GitLab fixes critical vulnerability as internet-wide probing begins</a></div>
+          <div class="ref-date">Accessed: 2026-09-12 — Source for the credential-rotation response guidance absent from the vendor advisory.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SC MEDIA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.scworld.com/news/max-severity-gitlab-path-traversal-flaw-under-active-reconnaissance" target="_blank">Max severity GitLab path traversal flaw under active reconnaissance</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CYBERSECURITYNEWS</div>
+        <div>
+          <div class="ref-detail"><a href="https://cybersecuritynews.com/cisa-gitlab-path-traversal/" target="_blank">CISA Warns of GitLab Path Traversal Vulnerability Exploited in Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SECURITYONLINE</div>
+        <div>
+          <div class="ref-detail"><a href="https://securityonline.info/gitlab-vulnerabilities-cve-2026-85706-cvss-10/" target="_blank">CVE-2026-85706: GitLab Vulnerabilities Reach CVSS 10.0</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">TECH-INSIDER</div>
+        <div>
+          <div class="ref-detail"><a href="https://tech-insider.org/gitlab-cve-2026-19478-cvss-9-4-exploit-2026/" target="_blank">GitLab CVE-2026-19478: CVSS 9.4 Flaw Exploited in Days</a></div>
+          <div class="ref-date">Accessed: 2026-09-12 — Source for the CyCognito 20,000+ exposure figure and the prior GitLab unauthenticated critical of 17 Aug 2026.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NIST NVD</div>
+        <div>
+          <div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2026-85706" target="_blank">CVE-2026-85706 — National Vulnerability Database</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">MITRE CWE</div>
+        <div>
+          <div class="ref-detail"><a href="https://cwe.mitre.org/data/definitions/22.html" target="_blank">CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">MITRE CWE</div>
+        <div>
+          <div class="ref-detail"><a href="https://cwe.mitre.org/data/definitions/306.html" target="_blank">CWE-306: Missing Authentication for Critical Function</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">TENABLE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.tenable.com/blog/cisa-bod-26-04-FAQ-vulnerability-remediation-impact" target="_blank">What is CISA BOD 26-04: Impact on vulnerability remediation</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-12 · 18 sources, 11 web lookups</div>
+  <div>CVE-2026-85706 · CVSS 10.0 · CWE-22 + CWE-306 · KEV listed 2026-09-11 · LIVE THREAT — exploitation ongoing at compile time</div>
+</div>
+
+</body>
+</html>

@@ -797,6 +797,28 @@
 
       <!-- ↓↓↓ AGENT-MAINTAINED VULN CARDS BEGIN ↓↓↓ -->
 
+      <a class="lib-card vuln" href="output/vulns/2026-09-12_GITLAB-COMMITS-API-PATH-TRAVERSAL.html"
+         data-name="GitLab Commits API Path Traversal"
+         data-type="path-traversal"
+         data-tags="CVE-2026-85706 CVE-2026-87719 CWE-22 CWE-306 GITLAB CE EE SELF-MANAGED PATH-TRAVERSAL ARBITRARY-FILE-READ UNAUTHENTICATED COMMITS-API CI-CD SUPPLY-CHAIN SECRETS KEV BOD-26-04 CVSS-10">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">GitLab Commits API Path Traversal</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge patch-now">PATCH NOW</span>
+              <span class="badge kev">KEV LISTED</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">CVE-2026-85706 · CWE-22 + CWE-306 · CVSS 10.0 · GitLab CE/EE (self-managed)</div>
+          <div class="lib-card-desc">One unauthenticated HTTP request reads arbitrary files off a self-managed GitLab server — and on a CI/CD platform those files are the secrets that unlock every pipeline and cloud account it deploys to. Patched 10 Sep 2026, probed internet-wide within 20 hours, KEV-listed the next day; the patch closes the door on a room already emptied, so credential rotation is the real remediation.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: 2026-09-12</span>
+            <span class="open">OPEN ADVISORY →</span>
+          </div>
+        </div>
+      </a>
+
       <a class="lib-card vuln" href="output/vulns/2026-09-04_CHROME-WEBGL-OOB-WRITE.html"
          data-name="Chrome WebGL OOB Write"
          data-type="memory-corruption"
