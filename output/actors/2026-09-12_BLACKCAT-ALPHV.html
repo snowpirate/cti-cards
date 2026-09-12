@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BlackCat / ALPHV — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); font-size: 0.5em; vertical-align: middle; }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .sanctions-list { display: flex; flex-direction: column; gap: 5px; }
+  .sanctions-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 6px 0; border-bottom: 1px solid rgba(30,46,62,0.4); }
+  .sanctions-row:last-child { border-bottom: none; }
+  .sanctions-name { font-family: var(--body); font-size: 11.5px; color: var(--text); font-weight: 500; }
+  .sanctions-role { font-family: var(--body); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+  .sanctions-badge { font-family: var(--mono); font-size: 8.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
+
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge ecrime">⚠ ECRIME · RUSSIA / EASTERN-EUROPE-BASED RAAS OPERATION · ASSESSED DARKSIDE/BLACKMATTER LINEAGE</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Ransomware-as-a-Service (RaaS) Operation / Triple-Extortion Ransomware</div>
+  <h1><span class="accent">BLACK</span>CAT <span class="dim">/ ALPHV</span></h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-12 &nbsp;|&nbsp;
+    SOURCES: CISA/FBI/HHS AA23-353A, U.S. DOJ, U.S. Dept. of State (Rewards for Justice), MITRE ATT&amp;CK (S1068), MITRE ATT&amp;CK Evaluations, Mandiant/Google Cloud, CrowdStrike, Microsoft, Flashpoint, Krebs on Security, Picus Security, SentinelOne, 15+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ORIGINAL GROUP INACTIVE SINCE MAR 2024 (APPARENT EXIT SCAM) — AFFILIATE DIASPORA TO RANSOMHUB / EMBARGO</span></div>
+    <div>Threat Level: <span class="danger">HIGH (Historical) / RESIDUAL VIA SUCCESSOR RAAS</span></div>
+    <div>Primary Motive: <span class="warn">Financial Extortion — Triple-Extortion Ransomware</span></div>
+    <div>Active Since: <span>November 2021</span></div>
+    <div>MITRE ATT&amp;CK: <span>S1068 (Software: BlackCat, aka ALPHV, Noberus) — no Group/G-ID assigned</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">1,000+</div>
+    <div class="stat-label">Victims compromised globally as of Sep 2023 (~75% U.S.) — FBI</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">$300M+</div>
+    <div class="stat-label">Ransom payments received (of $500M+ demanded) as of Sep 2023 — FBI</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">$22M</div>
+    <div class="stat-label">Change Healthcare ransom (Mar 2024) — allegedly withheld from affiliate in exit scam</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">$10M</div>
+    <div class="stat-label">U.S. State Dept. reward for information on ALPHV/BlackCat leadership</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>BlackCat — publicly better known as ALPHV, and tracked in its malware form by MITRE ATT&amp;CK as Noberus (Software S1068) — was, at its peak, the most prolific ransomware-as-a-service operation in the world. Emerging in November 2021 as the first major RaaS family written in Rust, it compromised more than 1,000 organizations worldwide (roughly 75% in the United States), demanded over $500 million in ransom, and collected an estimated $300 million before a coordinated international law-enforcement operation disrupted its infrastructure in December 2023. It is the third documented generation of a single lineage that began with DarkSide: DarkSide's 2021 collapse produced BlackMatter, and BlackMatter's 2021 collapse — corroborated by an April 2022 FBI advisory naming shared developers and money launderers — produced BlackCat/ALPHV (see this repository's companion card: <code>output/actors/2026-09-12_DARKSIDE.html</code>).</p>
+      <p>BlackCat matters for reasons that go beyond scale. Technically, it was genuinely more capable than its predecessors: a single Rust codebase compiled cleanly across Windows, Linux, and VMware ESXi; a February 2023 "Sphynx" rewrite that embedded legitimate remote-execution tooling (Impacket, RemCom) directly into the payload and reworked its command-line signature specifically to defeat existing detections; and a documented practice, alongside its most capable affiliates, of using malicious signed kernel drivers to forcibly kill endpoint security software before deploying ransomware. Operationally, it attracted — and was, in turn, made devastating by — some of the most capable criminal affiliates in the ecosystem, most notably Scattered Spider (tracked elsewhere as UNC3944/Octo Tempest/0ktapus; see this repository's companion card: <code>output/actors/2026-08-30_SCATTERED-SPIDER.html</code>), whose September 2023 social-engineering intrusions into MGM Resorts and Caesars Entertainment, both deploying BlackCat/ALPHV ransomware, became two of the most closely studied ransomware incidents of the decade.</p>
+      <p>BlackCat's end was as instructive as its operation. After the FBI's December 2023 disruption — which the group publicly, and accurately, undermined within days by retaining control of its own leak-site signing keys — BlackCat's operators went on to orchestrate what independent researchers assess as a deliberate exit scam: extracting an alleged $22 million ransom from the February 2024 Change Healthcare attack (one of the most disruptive single cyberattacks on U.S. healthcare billing infrastructure in history) and then staging a fake law-enforcement seizure notice to disappear with the funds rather than pay their own affiliate. The group has been inactive since March 2024, but its affiliates did not retire — they are assessed to have substantially migrated to RansomHub and, per infrastructure and code overlap, to Embargo, meaning the operational risk BlackCat represented has not disappeared so much as changed its letterhead once again.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">BlackCat</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">None confirmed — independent financially motivated RaaS operation; assessed direct organizational descendant of BlackMatter/DarkSide</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Ransomware-as-a-Service (RaaS) — core developer group + large affiliate network (~90+ affiliates at peak)</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial — triple-extortion ransomware (encryption + data leak + DDoS threat)</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">November 2021</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Original group inactive since March 2024 (apparent exit scam following the Change Healthcare ransom). No attacks independently attributed to the original operators since.</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">None assigned — no dedicated Group/intrusion-set page as of 2026-09-12. Tracked as Software S1068 ("BlackCat," associated names ALPHV and Noberus). A full MITRE ATT&amp;CK Evaluations adversary-emulation scenario also exists (see Section 12).</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">FBI-led international disruption (US, UK, Australia, Germany, Spain, Denmark), Dec 2023, incl. seizure of 900+ leak-site key pairs and a decryptor issued to 500+ victims. U.S. State Dept. Rewards for Justice: $10M for leadership identification, $5M for affiliate arrest/conviction. DOJ indicted/sentenced Americans Ryan Goldberg and Kevin Martin, plus co-conspirator Angelo Martino — former employees of incident-response firms DigitalMint and Sygnia — for deploying ALPHV BlackCat against 5 U.S. companies (Apr–Dec 2023).</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">BlackCat</span>
+          <span class="alias-chip">ALPHV (most common public name)</span>
+          <span class="alias-chip">Noberus (MITRE ATT&amp;CK malware name, S1068)</span>
+          <span class="alias-chip">ALPHA SPIDER (CrowdStrike)</span>
+          <span class="alias-chip">AlphaVM</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>[HIGH] on Russian-speaking origin and financially motivated, non-state-directed operation — consistent across all vendor reporting and the group's own conduct. [HIGH] on organizational continuity from BlackMatter/DarkSide: this is corroborated independently by an April 2022 FBI advisory naming shared developers and money launderers, by BlackCat operators' own public acknowledgment of the lineage, and by CrowdStrike's ALPHA SPIDER profile — a stronger evidentiary basis than the still-contested DarkSide-to-FIN7/Carbon Spider question documented in the companion DarkSide card. [LOW] on the specific individual identities of BlackCat's core operators: despite a $10M U.S. reward, no core developer has been publicly named, arrested, or indicted as of 2026-09-12 — only affiliates (e.g., the DigitalMint/Sygnia insiders) have faced prosecution.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Nov 2021</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Emergence</div>
+          <div class="timeline-desc">BlackCat/ALPHV surfaces on Russian-language cybercrime forums as one of the first major RaaS families written in Rust, marketed to affiliates on capability (cross-platform Windows/Linux/ESXi compilation, configurable AES or ChaCha20 encryption) rather than on any professed code of conduct.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2022</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Scaling &amp; Vulnerability Exploitation</div>
+          <div class="timeline-desc">Affiliates begin shifting from credential-based access toward opportunistic exploitation of known vulnerabilities: Mandiant tracks affiliate UNC4466 exploiting exposed Veritas Backup Exec installations (CVE-2021-27876/-27877/-27878) for initial access. In December 2022, FIN8 (aka Syssphinx) is observed delivering BlackCat via a modified, C-rewritten variant of its Sardonic backdoor — an APT-adjacent group operating as a BlackCat affiliate.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Feb 2023</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">"Sphynx" 2.0 Rewrite</div>
+          <div class="timeline-desc">ALPHV administrators announce the Sphynx update: a reworked build that removes the previous variant's <code>--access-token</code> command-line parameter (specifically to break existing detection signatures) and embeds Impacket and RemCom directly into the payload for lateral movement and remote execution. BlackCat affiliates separately begin exploiting Fortra's GoAnywhere MFT (CVE-2023-0669).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Aug–Sep 2023</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Caesars &amp; MGM Resorts Attacks</div>
+          <div class="timeline-desc">Scattered Spider, acting as a BlackCat/ALPHV affiliate, breaches Caesars Entertainment in late August via help-desk vishing and Okta/Azure privilege escalation; Caesars reportedly pays roughly $15M of a $30M demand. On September 10, the same affiliate breaches MGM Resorts using an identical vishing technique — a ten-minute phone call to MGM's IT help desk impersonating a LinkedIn-identified employee — but MGM refuses to pay, resulting in a multi-day outage of slot machines, digital room keys, and reservation systems (see companion card: <code>output/actors/2026-08-30_SCATTERED-SPIDER.html</code>).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Sep 2023</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">FBI Scale Assessment</div>
+          <div class="timeline-desc">The FBI reports that ALPHV/BlackCat affiliates have compromised over 1,000 entities globally (~75% U.S.), demanded over $500 million, and received nearly $300 million in ransom payments — establishing BlackCat as the most financially successful ransomware operation tracked to date.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Dec 19, 2023</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">International Law-Enforcement Disruption</div>
+          <div class="timeline-desc">The DOJ and FBI, with the UK, Australia, Germany, Spain, and Denmark, announce a disruption campaign against ALPHV/BlackCat: a confidential source provided access to more than 900 public/private key pairs controlling the group's darknet leak-site infrastructure, enabling the FBI to seize the site and issue a decryption tool to over 500 victims. Within days, ALPHV — having retained a copy of the same keys — "un-seizes" the site and posts a message announcing affiliates are now free to target hospitals and critical infrastructure in retaliation, breaking from earlier DarkSide-lineage norms against such targets.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Feb 2024</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Change Healthcare Attack</div>
+          <div class="timeline-desc">A BlackCat affiliate exploits CVE-2024-1709 (a trivially exploitable authentication-bypass flaw, CVSS 10.0) and CVE-2024-1708 in ConnectWise ScreenConnect to breach Change Healthcare, a UnitedHealth subsidiary processing a large share of U.S. medical claims and pharmacy transactions. The resulting outage disrupts prescription processing, insurance claims, and billing across the U.S. healthcare system for weeks — one of the most consequential single ransomware incidents on record for the sector.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Mar 2024</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Apparent Exit Scam &amp; Collapse</div>
+          <div class="timeline-desc">Change Healthcare allegedly pays a $22 million ransom. On March 3, an affiliate using the handle "Notchy" publicly claims on a cybercrime forum that ALPHV/BlackCat operators took the entire payment and withheld the affiliate's contractual cut. Days later, BlackCat's leak site displays a fabricated law-enforcement seizure banner and goes permanently dark — assessed by researchers (Emsisoft and others) as a deliberate exit scam rather than a genuine takedown. The group has been inactive since.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2024–present</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Affiliate Diaspora</div>
+          <div class="timeline-desc">Displaced BlackCat affiliates are assessed to have substantially migrated to RansomHub, a RaaS brand some analysts assess is partly staffed by former ALPHV insiders, and separately to Embargo, identified as a probable successor based on infrastructure and code overlaps. No core BlackCat developer has surfaced under a new confirmed identity as of this writing.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Affiliate-driven intrusion chain over a technically capable shared toolkit</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Entry vectors.</strong> BlackCat's affiliate base used a wider and more opportunistic range of initial-access techniques than its DarkSide-lineage predecessor. Documented vectors include exploitation of public-facing enterprise software vulnerabilities — Veritas Backup Exec (CVE-2021-27876/-27877/-27878, per Mandiant's UNC4466 tracking), Fortra GoAnywhere MFT (CVE-2023-0669), and, most consequentially, ConnectWise ScreenConnect (CVE-2024-1709/-1708) in the Change Healthcare attack — alongside stolen or IAB-purchased VPN/RDP credentials, and, in the group's most damaging documented intrusions, sophisticated social engineering: Scattered Spider's helpdesk-impersonation vishing calls, which secured full administrative access to MGM Resorts' Okta and Azure environments in a single ten-minute phone call.</p>
+      <p><strong>Toolchain and internal operations.</strong> Once inside, BlackCat affiliates favor a mix of native Windows tooling and a small set of dual-use utilities embedded directly into later payload builds. The February 2023 "Sphynx" rewrite bundled Impacket (for remote service manipulation and lateral movement) and RemCom (a PsExec-style remote command-execution tool) into the ransomware build itself, reducing the affiliate's need to stage separate tooling. Malicious Group Policy Objects, deployed via Windows Task Scheduler, and a sequence of staging batch/PowerShell scripts (publicly documented as <code>start.bat</code>, <code>est.bat</code>, and <code>run.bat</code>) orchestrate credential harvesting from local password stores, network discovery, and eventual payload execution across compromised hosts.</p>
+      <p><strong>Defense evasion, exfiltration, and impact.</strong> Before deploying the ransomware payload, BlackCat-affiliated intrusions are documented using Bring-Your-Own-Vulnerable-Driver (BYOVD) techniques — most notably the POORTRY/STONESTOP malicious signed-driver loader (also associated with Scattered Spider/UNC3944 activity) and separately the commercial "Terminator" tool from the SpyBoy marketplace — to forcibly disable endpoint security agents before encryption begins. Data exfiltration for the group's double/triple-extortion model runs primarily through ExMatter, a purpose-built .NET exfiltration tool. Immediately pre-encryption, the toolkit clears Windows Event Logs (documented via <code>wevtutil.exe el</code> to enumerate available logs, followed by <code>wevtutil.exe cl</code> against each) and deletes Volume Shadow Copies via <code>vssadmin</code> and <code>wmic</code>, disabling Windows automatic repair. The Rust-based payload itself then encrypts the environment — Windows, Linux, and ESXi hosts alike — using a configurable ChaCha20 or AES scheme wrapped in an RSA key-encapsulation layer, before the victim receives a ransom note directing them to a Tor negotiation portal under the threat of encryption, public data leak, and (per the group's own "triple extortion" branding) a DDoS attack against public-facing infrastructure if demands are not met.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; confidence reflects strength and specificity of source documentation</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] Veritas Backup Exec (CVE-2021-27876/-27877/-27878), Fortra GoAnywhere MFT (CVE-2023-0669), and ConnectWise ScreenConnect (CVE-2024-1709/-1708, the Change Healthcare vector) all independently confirmed.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1656</div>
+        <div class="mitre-name">Impersonation</div>
+        <div class="mitre-note">[HIGH] Scattered Spider's helpdesk-vishing impersonation of a real employee secured admin access to MGM's Okta/Azure environment in a single 10-minute call — a confirmed, extensively documented vector.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Stolen or IAB-purchased VPN/RDP credentials documented as a recurring initial-access vector across affiliate operations.</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1588.002</div>
+        <div class="mitre-name">Obtain Capabilities: Tool</div>
+        <div class="mitre-note">[HIGH] Core RaaS operators develop the Rust payload and lease it to affiliates for a revenue share; the Sphynx (v2.0) rewrite is a documented deliberate capability update.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1555</div>
+        <div class="mitre-name">Credentials from Password Stores</div>
+        <div class="mitre-note">[MEDIUM] Documented in the MITRE ATT&amp;CK Evaluations emulation scenario: credentials harvested from a local password store on the initial workstation to pivot to a backup server.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1053.005</div>
+        <div class="mitre-name">Scheduled Task/Job</div>
+        <div class="mitre-note">[MEDIUM] Windows Task Scheduler used to deploy malicious Group Policy Objects across compromised environments (CISA AA23-353A; CloudSEK).</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1018</div>
+        <div class="mitre-name">Remote System Discovery</div>
+        <div class="mitre-note">[MEDIUM] Network discovery documented as a standard early-stage step following initial workstation compromise.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.002</div>
+        <div class="mitre-name">SMB/Windows Admin Shares</div>
+        <div class="mitre-note">[HIGH] Impacket and RemCom embedded directly into the Sphynx payload for remote service manipulation and command execution (Microsoft).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1562.001</div>
+        <div class="mitre-name">Disable or Modify Tools</div>
+        <div class="mitre-note">[HIGH] BYOVD EDR/AV termination via POORTRY/STONESTOP malicious signed drivers and the commercial "Terminator" (SpyBoy) tool — confirmed across multiple independent vendor reports.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1070.001</div>
+        <div class="mitre-name">Clear Windows Event Logs</div>
+        <div class="mitre-note">[HIGH] Documented sequence: <code>wevtutil.exe el</code> to enumerate logs, then <code>wevtutil.exe cl</code> against each (CISA AA23-353A; Stonefly).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027</div>
+        <div class="mitre-name">Obfuscated Files or Information</div>
+        <div class="mitre-note">[HIGH] Sphynx rewrite deliberately altered command-line arguments (removing the prior <code>--access-token</code> flag) specifically to defeat existing detection signatures tied to earlier variants.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1490</div>
+        <div class="mitre-name">Inhibit System Recovery</div>
+        <div class="mitre-note">[HIGH] Volume Shadow Copy deletion via <code>vssadmin</code> and <code>wmic</code>, and disabling of Windows automatic repair, documented immediately pre-encryption.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1567.002</div>
+        <div class="mitre-name">Exfiltration to Cloud Storage</div>
+        <div class="mitre-note">[HIGH] ExMatter, a purpose-built .NET exfiltration tool, documented across the MITRE ATT&amp;CK Evaluations emulation scenario and independent vendor reporting.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[HIGH] Rust-based, cross-platform (Windows/Linux/ESXi) payload using configurable ChaCha20 or AES with an RSA key-encapsulation layer (S1068; multiple vendor technical analyses).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] Triple-extortion model: encryption, leak-site data-publication threat, and a threatened DDoS attack against public-facing infrastructure if demands go unmet.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Healthcare</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Hospitality / Gaming</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Professional / Financial Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Manufacturing</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Legal Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Retail</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">~75% U.S.-based victims of the >1,000 compromised globally as of Sep 2023; remainder distributed internationally, corroborated by the multinational composition of the Dec 2023 law-enforcement coalition (UK, Australia, Germany, Spain, Denmark)</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Both large-scale, high-profile enterprises (MGM Resorts, Caesars Entertainment, Change Healthcare/UnitedHealth) and mid-size opportunistic targets reached via public-facing vulnerability exploitation</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Exploitable public-facing backup/MFT/remote-support software; stolen or purchased VPN/RDP credentials; help-desk social-engineering/vishing via elite affiliates</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">No stated exclusion policy (a break from the DarkSide-lineage "no hospitals" norm); explicitly directed affiliates toward hospitals and critical infrastructure in retaliation following the Dec 2023 law-enforcement disruption</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item green">
+        <div class="tool-header">
+          <span class="tool-name">BlackCat / ALPHV / Noberus Ransomware</span>
+          <span class="tool-tag">RaaS Payload · Custom (MITRE S1068)</span>
+        </div>
+        <div class="tool-desc">Rust-based, cross-platform (Windows, Linux, VMware ESXi) ransomware using configurable ChaCha20 or AES encryption wrapped in RSA key encapsulation. The February 2023 "Sphynx" (v2.0) rewrite embeds Impacket and RemCom directly into the payload and reworks command-line arguments — removing the earlier <code>--access-token</code> parameter — specifically to evade detections keyed to prior versions. Weaponized in the MGM Resorts, Caesars Entertainment, and Change Healthcare attacks.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">ExMatter</span>
+          <span class="tool-tag">.NET Exfiltration Tool · Custom</span>
+        </div>
+        <div class="tool-desc">Purpose-built .NET data-exfiltration tool used to move stolen data to attacker-controlled infrastructure ahead of encryption, underpinning the group's double/triple-extortion leverage. Documented in the MITRE ATT&amp;CK Evaluations emulation scenario as the exfiltration mechanism used after a backup-server compromise.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">Sardonic Backdoor (FIN8 variant)</span>
+          <span class="tool-tag">C/C++ Backdoor · Third-Party Affiliate Tool</span>
+        </div>
+        <div class="tool-desc">A modified, C-rewritten variant of FIN8's (Syssphinx) Sardonic backdoor, observed in December 2022 delivering BlackCat/Noberus. Supports system-information harvesting, command execution, and a DLL-based plugin system for loading additional payloads; the rewrite deliberately diverges from the original C++ codebase to avoid signature reuse.</div>
+      </div>
+      <div class="tool-item red">
+        <div class="tool-header">
+          <span class="tool-name">POORTRY / STONESTOP</span>
+          <span class="tool-tag">Malicious Signed Driver · BYOVD EDR Killer</span>
+        </div>
+        <div class="tool-desc">A malicious kernel-mode driver (POORTRY) loaded via a legitimate but abusable signed driver, paired with a userland loader/controller (STONESTOP), used to forcibly terminate endpoint security agent processes before ransomware deployment. Also documented in Scattered Spider/UNC3944 activity — one of several shared-tooling links between the affiliate and BlackCat's core toolkit.</div>
+      </div>
+      <div class="tool-item red">
+        <div class="tool-header">
+          <span class="tool-name">"Terminator" (SpyBoy)</span>
+          <span class="tool-tag">Commercial EDR/AV Killer</span>
+        </div>
+        <div class="tool-desc">A commercially sold security-software-termination tool from the SpyBoy cybercrime marketplace, separately documented as leveraged by BlackCat-affiliated operators to disable AV/EDR protections prior to payload execution.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Impacket / RemCom</span>
+          <span class="tool-tag">COTS / Open Source — Embedded in Payload</span>
+        </div>
+        <div class="tool-desc">Legitimate open-source remote-service-manipulation (Impacket) and PsExec-style remote-execution (RemCom) tooling, embedded directly into the Sphynx-era ransomware build for lateral movement and remote command execution (Microsoft).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">start.bat / est.bat / run.bat</span>
+          <span class="tool-tag">Staging Scripts</span>
+        </div>
+        <div class="tool-desc">Documented batch/PowerShell staging scripts used to orchestrate discrete phases of the intrusion — credential harvesting, GPO deployment, and final payload execution — across compromised hosts.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No specific host, network, or file-hash IOC values are reproduced in this card. CISA/FBI/HHS published a dedicated STIX/XML indicator package specific to ALPHV BlackCat (Joint Advisory AA23-353A, updated March 2024); consult that primary source directly for reconstructable indicator values, as this group's infrastructure has fully rotated since its March 2024 collapse and any values transcribed here would carry only archival value.</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2021-27876, CVE-2021-27877, CVE-2021-27878 — Veritas Backup Exec (initial-access vector, UNC4466)</td><td>Mandiant</td><td>2022</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2023-0669 — Fortra GoAnywhere MFT (initial-access vector)</td><td>Multiple vendors</td><td>2023</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2024-1709 (auth bypass, CVSS 10.0), CVE-2024-1708 (path traversal/RCE, CVSS 8.4) — ConnectWise ScreenConnect (Change Healthcare vector)</td><td>Unit 42; NVD</td><td>2024-02</td></tr>
+        <tr><td class="type-label">TOOL</td><td class="val">POORTRY / STONESTOP malicious signed driver loader (specific driver hash/certificate not independently reproduced here — rotates per campaign)</td><td>Microsoft; Mandiant</td><td>2022–2023</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">HIGH (Historical) — original group defunct, residual risk high via affiliate diaspora</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">[HIGH] region/motivation and DarkSide/BlackMatter lineage; [LOW] core-operator identity</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Original brand extinct since Mar 2024; affiliates (and possibly some core infrastructure/personnel) assessed to persist through RansomHub and Embargo</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">The pairing of a technically capable, actively iterated payload (cross-platform Rust, BYOVD EDR killing, signature-evading rewrites) with elite social-engineering affiliates — the combination, not either alone, is what produced incidents at the scale of MGM/Caesars/Change Healthcare</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">No core-operator identity established despite a $10M reward; whether the Mar 2024 "exit scam" reflects genuine internal collapse or a deliberate strategy to evade the Dec 2023 law-enforcement pressure remains unresolved</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">DarkSide (originating lineage — see companion card)</span>
+          <span class="alias-chip">BlackMatter (intermediate lineage)</span>
+          <span class="alias-chip">Scattered Spider / UNC3944 / Octo Tempest (top-tier affiliate — see companion card)</span>
+          <span class="alias-chip">FIN8 / Syssphinx (affiliate, Sardonic backdoor)</span>
+          <span class="alias-chip">RansomHub (assessed successor, partial ex-affiliate staffing)</span>
+          <span class="alias-chip">Embargo (assessed successor, infra/code overlap)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>BlackCat represents the maturation point of the DarkSide-originated RaaS lineage: technically more capable than either predecessor, and — critically — willing to recruit and retain affiliates capable of far more sophisticated intrusions than credential-stuffing or opportunistic vulnerability scanning. The MGM Resorts and Caesars Entertainment attacks are the clearest evidence for this analyst's judgment that BlackCat's core danger was never purely technical: Scattered Spider's ten-minute vishing call succeeded against defenses that would likely have stopped a scripted, low-skill intrusion attempt. Any organization assessing BlackCat-lineage risk should weight identity-verification and help-desk social-engineering resilience at least as heavily as technical patching and EDR deployment — this group's most damaging incidents were won on the phone, not in the code.</p>
+      <p>The March 2024 collapse leaves a genuinely open analytical question this assessment does not resolve: whether BlackCat's operators executed a purely opportunistic exit scam against one affiliate (Change Healthcare's $22M payment), or whether the entire episode — Change Healthcare, the theft from "Notchy," and the fabricated seizure notice — was a calculated exfiltration of the group's own remaining value ahead of an anticipated second, more damaging law-enforcement action following the December 2023 disruption. The DigitalMint/Sygnia insider-affiliate indictments (incident-response professionals who became ransomware operators against the very type of company they were paid to defend) further complicate the picture of who, precisely, "BlackCat" was by the time of its collapse — the RaaS model's separation of core developers from affiliates means the individuals actually facing prosecution are not necessarily representative of, or even known to, the group's founding operators.</p>
+      <p>Forward risk trajectory: treat RansomHub and Embargo as the operationally relevant continuation of this threat, not as unrelated new entrants — both inherited meaningful fractions of BlackCat's affiliate base and, in Embargo's case, apparent code/infrastructure lineage. Organizations should expect BlackCat-signature tradecraft (Rust-based cross-platform payloads, BYOVD EDR killing, ScreenConnect/remote-support-software exploitation, and vishing-based help-desk social engineering) to persist under these or future successor brand names, consistent with the pattern already established twice over in this lineage's history.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Patch and monitor internet-facing backup, MFT, and remote-support software aggressively.</strong> Veritas Backup Exec, Fortra GoAnywhere, and ConnectWise ScreenConnect were all independently exploited as initial-access vectors — treat this software class as high-priority attack surface.</div>
+            <div class="cm-ttp">Counters: T1190</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Harden IT help-desk identity-verification procedures.</strong> Require out-of-band or multi-step verification for any password reset or MFA-enrollment request, especially for privileged/admin accounts — the vector that defeated MGM's and Caesars' defenses.</div>
+            <div class="cm-ttp">Counters: T1656</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Enforce MFA and conditional access on identity-provider admin roles.</strong> Okta and Azure AD/Entra ID administrative privileges should require hardware-token or equivalent phishing-resistant MFA, not just SMS/push.</div>
+            <div class="cm-ttp">Counters: T1133, T1656</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Deploy Microsoft's vulnerable-driver blocklist / WDAC.</strong> Block loading of known-vulnerable signed drivers to prevent BYOVD EDR-killer techniques (POORTRY/STONESTOP and similar) from executing.</div>
+            <div class="cm-ttp">Counters: T1562.001</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Forward Windows Event Logs to a hardened, out-of-band SIEM/log collector.</strong> Local log clearing (<code>wevtutil cl</code>) cannot erase logs already shipped off-host, preserving the forensic record even if the endpoint is compromised.</div>
+            <div class="cm-ttp">Counters: T1070.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Monitor for Impacket-family tool signatures and RemCom-style remote execution.</strong> Both are embedded directly into recent payload builds; network and endpoint detection should not rely solely on the presence of a separate, standalone tool.</div>
+            <div class="cm-ttp">Counters: T1021.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Deploy egress monitoring/DLP against known exfiltration tooling.</strong> Alert on ExMatter execution patterns and unusual bulk outbound transfer volumes ahead of any encryption event.</div>
+            <div class="cm-ttp">Counters: T1567.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Vet and background-check incident-response and security-vendor personnel with privileged access.</strong> The DigitalMint/Sygnia indictments demonstrate that trusted third-party IR personnel are a viable, if unusual, insider-affiliate vector for this ecosystem.</div>
+            <div class="cm-ttp">Counters: T1486 (via reduced insider-facilitated access)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">After the FBI seized the group's leak site in December 2023, ALPHV retained a separate copy of the more-than-900 signing key pairs the FBI had obtained and used them to "un-seize" and restore control of the same infrastructure within days — an unusually resilient, apparently pre-planned key-retention posture rather than a from-scratch infrastructure rebuild (DOJ; The Record).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">The Sphynx (v2.0) rewrite embeds legitimate/dual-use tooling (Impacket, RemCom) directly inside the ransomware build itself, blurring the traditional distinction between "custom malware" and "LOLBin abuse" — the payload effectively ships its own living-off-the-land toolkit rather than relying on affiliates to separately stage it (Microsoft).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics Routines</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Documented pre-encryption sequence: enumerate Windows Event Logs via <code>wevtutil.exe el</code>, then clear each one individually with <code>wevtutil.exe cl</code>; delete Volume Shadow Copies via <code>vssadmin</code> and <code>wmic</code>; disable Windows automatic repair — collectively removing both the forensic audit trail and the most common recovery path before the encryption payload runs (CISA AA23-353A; Stonefly).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">The February 2023 Sphynx rewrite deliberately removed the earlier variant's <code>--access-token</code> command-line parameter and introduced a more complex argument structure specifically to defeat detection rules and signatures built against the prior version — a direct, publicly documented example of iterating the payload in response to known defensive countermeasures rather than simply recompiling unchanged code.</div>
+      </div>
+      <!-- Timing & Operational Patterns omitted: no public reporting establishes a specific beaconing/jitter cadence or victim-timezone work-hour alignment for the core BlackCat toolkit as of 2026-09-12. -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">BYOVD EDR/AV Termination — POORTRY/STONESTOP</span>
+          <span class="evasion-ttp">T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">A malicious kernel-mode driver (POORTRY), loaded through abuse of a legitimately signed but exploitable driver-loading mechanism, is controlled by a userland component (STONESTOP) to forcibly terminate the processes of installed endpoint security products before ransomware execution. Documented by Microsoft and Mandiant across multiple BlackCat-affiliated intrusions, and independently associated with Scattered Spider/UNC3944 tradecraft.</div>
+        <div class="evasion-detail">Specific driver certificate/hash values and exact STONESTOP command syntax not independently reproduced here (values rotate per campaign and are already stale for detection purposes); consult CISA AA23-353A and Microsoft's published POORTRY/STONESTOP analysis for current indicators.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Commercial EDR/AV Killer — "Terminator" (SpyBoy)</span>
+          <span class="evasion-ttp">T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">A separately sourced, commercially available security-software-termination tool purchased from the SpyBoy cybercrime marketplace, documented as used by BlackCat-affiliated operators as an alternative or supplement to POORTRY/STONESTOP.</div>
+        <div class="evasion-detail">Specific version/build details and exact invocation syntax not publicly documented in detail as of 2026-09-12.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Windows Event Log Enumeration &amp; Clearing</span>
+          <span class="evasion-ttp">T1070.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">A two-step sequence removes the forensic audit trail immediately prior to encryption: first enumerate all available Windows Event Logs, then clear each one individually.</div>
+        <div class="evasion-detail">wevtutil.exe el
+wevtutil.exe cl [each log name returned by the prior command]</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Command-Line Signature Reworking (Sphynx Rewrite)</span>
+          <span class="evasion-ttp">T1027</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">The February 2023 Sphynx (v2.0) update removed the previously required <code>--access-token</code> command-line parameter used to invoke earlier BlackCat variants and replaced it with a more complex argument set — specifically defeating detection rules and Sigma/EDR signatures written against the older, publicly documented command-line invocation pattern.</div>
+        <div class="evasion-detail">Exact post-Sphynx argument syntax not publicly documented in full detail as of 2026-09-12; the pre-Sphynx <code>--access-token &lt;value&gt;</code> pattern is the documented baseline the rewrite was designed to break.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Cross-Platform Rust Compilation for Static-Signature Evasion</span>
+          <span class="evasion-ttp">T1027.002</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">Rust compilation historically produces binaries with lower coverage under legacy static-signature AV engines than equivalent C/C++ code, and enables the group to compile a single ransomware codebase across Windows, Linux, and VMware ESXi targets from one source tree — widening the range of environments a single payload family can strike.</div>
+        <div class="evasion-detail">No further compiler-flag-level specifics are publicly documented as of 2026-09-12.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block">
+      <div class="ctid-header">
+        <span class="ctid-tag">MITRE ATT&amp;CK EVALUATIONS — ADVERSARY EMULATION SCENARIO</span>
+        <span class="ctid-title">ALPHV BlackCat (Managed Services Evaluations 2024)</span>
+      </div>
+      <div class="ctid-body">A precision note on sourcing: MITRE's Center for Threat-Informed Defense (CTID) Adversary Emulation Library (ctid.mitre.org) was searched directly and does not carry a dedicated DarkSide-lineage or BlackCat plan. However, MITRE's related but organizationally distinct <strong>ATT&amp;CK Evaluations</strong> program (attackevals.mitre-engenuity.org) built and published a full ALPHV BlackCat scenario for its 2024 Managed Services evaluation round, based on real affiliate operations in the wild. The scenario emulates: an Initial Access Broker providing RDP access to a contractor organization; network discovery and password-store credential harvesting on the initial workstation; pivoting to a compromised backup server using harvested administrator credentials; and multi-host data exfiltration via ExMatter. Signature behaviors evaluated include defense evasion, data exfiltration, data encryption, data destruction, and system-recovery-obstruction techniques.</div>
+      <div class="ctid-links">
+        <a class="ctid-link" href="https://attackevals.github.io/ael/managedservices/alphv_blackcat/" target="_blank">EMULATION SCENARIO →</a>
+        <a class="ctid-link" href="https://ctid.mitre.org/resources/adversary-emulation-library/" target="_blank">CTID LIBRARY (NO BLACKCAT ENTRY) →</a>
+      </div>
+      <div class="ctid-phases">
+        <span class="ctid-phase-chip">Initial Access (IAB/RDP)</span>
+        <span class="ctid-phase-chip">Discovery</span>
+        <span class="ctid-phase-chip">Credential Access</span>
+        <span class="ctid-phase-chip">Lateral Movement</span>
+        <span class="ctid-phase-chip">Exfiltration (ExMatter)</span>
+        <span class="ctid-phase-chip">Data Encryption</span>
+        <span class="ctid-phase-chip">Data Destruction</span>
+        <span class="ctid-phase-chip">Recovery Obstruction</span>
+      </div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / HHS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-353a" target="_blank">#StopRansomware: ALPHV Blackcat (AA23-353A)</a></div>
+          <div class="ref-date">IOC/TTP advisory + STIX package · Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">AttackIQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.attackiq.com/2024/03/07/emulating-alphv-blackcat/" target="_blank">Response to the Revised CISA Advisory (AA23-353A): Emulating ALPHV BlackCat</a></div>
+          <div class="ref-date">Purple-team emulation content · Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Atomic Red Team / SigmaHQ</div>
+        <div>
+          <div class="ref-detail">No BlackCat/ALPHV-named test or rule identified in the open redcanaryco/atomic-red-team or SigmaHQ/sigma GitHub repositories as of 2026-09-12. Commercial/community content platforms (e.g., SOC Prime) separately publish dedicated ALPHV/BlackCat and "ALPHA SPIDER" detection rule packs compatible with common SIEM/EDR formats.</div>
+          <div class="ref-date">Gap noted (open-source repos) · Checked: 2026-09-12</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / HHS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-353a" target="_blank">#StopRansomware: ALPHV Blackcat</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/software/S1068/" target="_blank">BlackCat, Software S1068</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK Evaluations</div>
+        <div>
+          <div class="ref-detail"><a href="https://attackevals.github.io/ael/managedservices/alphv_blackcat/" target="_blank">ALPHV BlackCat Emulation Scenario</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/alphv-black-cat-ransomware-takedown-fbi" target="_blank">FBI posts takedown notice on AlphV ransomware group's website</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Flashpoint</div>
+        <div>
+          <div class="ref-detail"><a href="https://flashpoint.io/blog/alphvs-downfall-crackdown-blackcat-ransomware/" target="_blank">ALPHV's Downfall? The 2023 Crackdown on BlackCat Ransomware</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Krebs on Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://krebsonsecurity.com/2023/12/blackcat-ransomware-raises-ante-after-fbi-disruption/" target="_blank">BlackCat Ransomware Raises Ante After FBI Disruption</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Krebs on Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://krebsonsecurity.com/2024/03/blackcat-ransomware-group-implodes-after-apparent-22m-ransom-payment-by-change-healthcare/" target="_blank">BlackCat Ransomware Group Implodes After Apparent $22M Ransom Payment by Change Healthcare</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">HIPAA Journal</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.hipaajournal.com/blackcat-ransomware-affiliate-change-healthcare-scammed/" target="_blank">Blackcat Affiliate Behind Change Healthcare Ransomware Claims Group Stole $22 Million Ransom</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Unit 42 (Palo Alto)</div>
+        <div>
+          <div class="ref-detail"><a href="https://unit42.paloaltonetworks.com/connectwise-threat-brief-cve-2024-1708-cve-2024-1709/" target="_blank">Threat Brief: ConnectWise ScreenConnect Vulnerabilities (CVE-2024-1708 and CVE-2024-1709)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/alphv-ransomware-exploits-veritas-backup-exec-bugs-for-initial-access/" target="_blank">ALPHV ransomware exploits Veritas Backup Exec bugs for initial access</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">At-Bay</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.at-bay.com/articles/blackcat-ransomware-group-exploits-goanywhere-vulnerability/" target="_blank">BlackCat Ransomware Group Exploits GoAnywhere Vulnerability</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CrowdStrike</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.crowdstrike.com/en-us/adversaries/alpha-spider/" target="_blank">Alpha Spider Adversary Profile</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Dark Reading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/threat-intelligence/fin8-modifies-sardonic-backdoor-blackcat-ransomware" target="_blank">FIN8 Modifies 'Sardonic' Backdoor to Deliver BlackCat Ransomware</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/microsoft/microsoft-blackcats-sphynx-ransomware-embeds-impacket-remcom/" target="_blank">Microsoft: BlackCat's Sphynx ransomware embeds Impacket, RemCom</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Stonefly</div>
+        <div>
+          <div class="ref-detail"><a href="https://stonefly.com/blog/blackcat-alphv-ransomware-analysis-and-mitigation/" target="_blank">BlackCat/ALPHV Ransomware: In-Depth Analysis And Mitigation</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Dept. of State</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.state.gov/reward-for-information-alphv-blackcat-ransomware-as-a-service" target="_blank">Reward for Information: ALPHV/Blackcat Ransomware as a Service</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/opa/pr/two-americans-who-attacked-multiple-us-victims-using-alphv-blackcat-ransomware-sentenced" target="_blank">Two Americans Who Attacked Multiple U.S. Victims Using ALPHV BlackCat Ransomware Sentenced to Prison</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SocRadar</div>
+        <div>
+          <div class="ref-detail"><a href="https://socradar.io/blog/mgm-resorts-hacked-by-blackcat-affiliate-scattered-spider/" target="_blank">MGM Resorts Hacked by BlackCat Affiliate, 'Scattered Spider'</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Morphisec</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.morphisec.com/blog/mgm-resorts-alphv-spider-ransomware-attack/" target="_blank">Threat Analysis: MGM Resorts International ALPHV/Blackcat/Scattered Spider Ransomware Attack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Scattered_Spider" target="_blank">Scattered Spider</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/BlackCat_(cyber_gang)" target="_blank">BlackCat (cyber gang)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CloudSEK</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cloudsek.com/knowledge-base/blackcat-ransomware" target="_blank">BlackCat (ALPHV) Ransomware: Attacks, Timeline &amp; Status</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Ransomware Wire</div>
+        <div>
+          <div class="ref-detail"><a href="https://ransomwarewire.com/articles/alphv-blackcat-ransomware-group-profile-exit-scam-2026/" target="_blank">ALPHV/BlackCat: From Rust-Powered Innovation to the Ransomware Exit Scam of the Decade</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-12 · 24 sources, all open-source/public reporting</div>
+  <div>Companion cards on file: output/actors/2026-09-12_DARKSIDE.html (originating lineage) · output/actors/2026-08-30_SCATTERED-SPIDER.html (top-tier affiliate) — no CVE-based vuln card auto-dispatched (multi-vector root cause across this group's history, not a single clean exploit)</div>
+</div>
+
+</body>
+</html>
