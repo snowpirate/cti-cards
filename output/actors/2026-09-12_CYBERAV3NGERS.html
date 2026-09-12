@@ -427,7 +427,7 @@
   <div class="header-meta">// Threat Actor Profile — State-Directed ICS/OT Sabotage Operation Presented Publicly as Hacktivism</div>
   <h1><span class="accent2">CYBER</span>AV3NGERS</h1>
   <div class="header-sub">
-    PROFILE COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    PROFILE COMPILED: 2026-09-12 &nbsp;|&nbsp; PREVIOUSLY COMPILED: 2026-09-02 &nbsp;|&nbsp;
     SOURCES: MITRE ATT&amp;CK (G1027), CISA/FBI/NSA/EPA Joint Advisories AA23-335A &amp; AA26-097A, U.S. Treasury/OFAC, Claroty Team82, Mandiant, Microsoft, Dragos, Tenable, WaterISAC, 15+ additional vendor/press sources
   </div>
   <div class="classification-bar">
@@ -443,7 +443,7 @@
 <div class="alert-banner">
   <div class="alert-label">⚡ THREAT UPDATE — JUL 2026</div>
   <div class="alert-headline">Coordinated strike on 30+ Minnesota water utilities exposes national exposure of unpatched Rockwell PLCs</div>
-  <div class="alert-body">On 2026-07-26/27, a coordinated cyberattack disrupted more than 30 municipal water systems across Minnesota — including Plymouth, South St. Paul, Maple Plain, and Braham — by remotely accessing internet-exposed Rockwell Automation/Allen-Bradley MicroLogix 1100/1400 PLCs and changing device IP addresses and passwords to lock legitimate operators out. One treatment plant went fully offline, at least two cities reverted to manual operation, and one mayor declared a local state of emergency; Minnesota's Department of Health confirmed no water-quality impact and no boil-water advisories resulted (Tenable, 2026; The Register, 2026). By 2026-07-30 the FBI and EPA confirmed water/wastewater intrusions in at least seven U.S. states. Tenable assesses the operational pattern — Rockwell PLC targeting, IP/credential lockout technique — as consistent with CyberAv3ngers' established modus operandi, though neither state nor federal officials had issued formal attribution as of this compile. The incident follows directly from the six-agency joint advisory AA26-097A (2026-04-07), which confirmed CyberAv3ngers/IRGC-CEC exploitation of the still-unpatched CVE-2021-22681 Rockwell Logix authentication bypass, with expansion to Schneider Electric and Siemens devices via malicious project files designed to override safety-critical logic.</div>
+  <div class="alert-body">On 2026-07-26/27, a coordinated cyberattack disrupted more than 30 municipal water systems across Minnesota — including Plymouth, South St. Paul, Maple Plain, and Braham — by remotely accessing internet-exposed Rockwell Automation/Allen-Bradley MicroLogix 1100/1400 PLCs and changing device IP addresses and passwords to lock legitimate operators out. One treatment plant went fully offline, at least two cities reverted to manual operation, and one mayor declared a local state of emergency; Minnesota's Department of Health confirmed no water-quality impact and no boil-water advisories resulted (Tenable, 2026; The Register, 2026). By 2026-07-30 the FBI and EPA confirmed water/wastewater intrusions in at least seven U.S. states. Tenable assesses the operational pattern — Rockwell PLC targeting, IP/credential lockout technique — as consistent with CyberAv3ngers' established modus operandi, though neither state nor federal officials had issued formal attribution as of this compile. The incident follows directly from the seven-agency joint advisory AA26-097A (2026-04-07), which confirmed CyberAv3ngers/IRGC-CEC exploitation of the still-unpatched CVE-2021-22681 Rockwell Logix authentication bypass, with expansion to Schneider Electric and Siemens devices via malicious project files designed to override safety-critical logic.</div>
 </div>
 
 <!-- ═══════════════════════════════════ STAT GRID ══ -->
@@ -602,7 +602,7 @@
         <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
         <div class="timeline-content">
           <div class="timeline-phase">Escalation to Rockwell/Schneider/Siemens — AA26-097A</div>
-          <div class="timeline-desc">Campaign expands to exploit unpatched CVE-2021-22681 in Rockwell Automation Logix controllers, then to Schneider Electric and Siemens devices via malicious project files designed to override safety-critical logic. A six-agency advisory (AA26-097A, Apr 7) — FBI, CISA, NSA, EPA, DOE, and U.S. Cyber Command's CNMF — confirms operational disruption and financial loss at multiple U.S. organizations.</div>
+          <div class="timeline-desc">Campaign expands to exploit unpatched CVE-2021-22681 in Rockwell Automation Logix controllers, then to Schneider Electric and Siemens devices via malicious project files designed to override safety-critical logic. A seven-agency advisory (AA26-097A, Apr 7) — FBI, CISA, NSA, EPA, DOE, U.S. Cyber Command's CNMF, and the Department of the Treasury — confirms operational disruption and financial loss at multiple U.S. organizations.</div>
         </div>
       </div>
       <div class="timeline-item">
@@ -610,7 +610,7 @@
         <div class="timeline-track"><div class="timeline-dot red"></div></div>
         <div class="timeline-content">
           <div class="timeline-phase">Coordinated Minnesota Water-Utility Attack</div>
-          <div class="timeline-desc">30+ Minnesota water systems are hit Jul 26–27 via compromised Rockwell/Allen-Bradley MicroLogix 1100/1400 PLCs, with attackers changing device IP addresses and passwords to lock out operators. One plant goes offline; a local state of emergency is declared. FBI/EPA confirm intrusions across at least seven U.S. states by Jul 30. Tenable assesses the pattern as consistent with CyberAv3ngers, though official government attribution remains pending as of this compile.</div>
+          <div class="timeline-desc">On Jul 22 the authoring agencies update AA26-097A — expanding confirmed vendor scope beyond Rockwell to Schneider Electric, Siemens and potentially other manufacturers, and adding detection guidance for malicious modification of Add-On Instructions (AOIs) inside Rockwell PLC programs. Four days later, 30+ Minnesota water systems are hit Jul 26–27 via compromised Rockwell/Allen-Bradley MicroLogix 1100/1400 PLCs, with attackers changing device IP addresses and passwords to lock out operators. MNIT puts the confirmed total at ~36 systems. One plant (Braham) goes offline for over an hour; Plymouth and South St. Paul revert to manual operation; Maple Plain declares a local emergency. In Clayton County, Georgia, a pump station failure on Jul 27 triggers a precautionary boil-water advisory. FBI/EPA confirm intrusions across at least seven U.S. states by Jul 30; later reporting extends this to at least twelve states, with U.S. investigators assessing 100+ facilities targeted (NYT, Jul 30 2026). A group posting as "APT Iran" claims direct responsibility on Telegram alongside CyberAv3ngers, describing the operation as a warning (Check Point Research). Formal event-level government attribution remained pending as of this compile. <em>(see incident card: 2026-07-26_US-WATER-SECTOR-PLC-CAMPAIGN)</em></div>
         </div>
       </div>
     </div>
@@ -730,6 +730,40 @@
         <div class="mitre-name">Denial of Control</div>
         <div class="mitre-note">[HIGH] Triggered an alarm-driven booster-station shutdown at Aliquippa (2023) and broader loss of remote operator control across Minnesota utilities (2026).</div>
       </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence / C2</div>
+        <div class="mitre-id">T1219</div>
+        <div class="mitre-name">Remote Access Tools</div>
+        <div class="mitre-note">[HIGH] Deployed Dropbear SSH on victim cellular modems to establish remote access via port 22 (AA26-097A). Legitimate embedded software, so no malware signature exists to detect — and modems typically fall outside utility asset inventory and logging.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T0845</div>
+        <div class="mitre-name">Program Upload</div>
+        <div class="mitre-note">[HIGH] Exfiltrated device project files (.ACD on Rockwell) from victim controllers using the vendors' own configuration software — Studio 5000 Logix Designer, EcoStruxure Control Expert, TIA Portal — run on leased third-party infrastructure (AA26-097A).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impact / Inhibit Response Function</div>
+        <div class="mitre-id">T0889</div>
+        <div class="mitre-name">Modify Program</div>
+        <div class="mitre-note">[HIGH] "Modification and deletion of project file logic, to include Add-On Instructions (AOIs)" (AA26-097A). AOIs are reusable trusted code modules engineers rarely diff — the Jul 22 2026 advisory update added detection guidance specifically for anomalous AOI modification.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impact / Inhibit Response Function</div>
+        <div class="mitre-id">T0878</div>
+        <div class="mitre-name">Alarm Suppression</div>
+        <div class="mitre-note">[HIGH] Modified project logic "disabled critical shutdown and alarm logic, allowing systems to enter unsafe conditions without notifying operators" (AA26-097A). The defining 2026 escalation over the group's 2023 defacement-grade activity.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0892</div>
+        <div class="mitre-name">Change Credential</div>
+        <div class="mitre-note">[HIGH] Remote PLC password changes locked legitimate operators out of their own controllers during the Jul 26–27 2026 disruption, directly forcing reversion to manual operation at multiple Minnesota utilities (Tenable; FBI WWS alert).</div>
+      </div>
     </div>
   </div>
 </div>
@@ -827,6 +861,20 @@
         </div>
         <div class="tool-desc">A sequence of disposable Telegram channels — CyberAv3ngers → "APT IRAN" → "Cyber4vengers" (Jan 2026) — used to claim credit, publish (sometimes fabricated or recycled) "proof" of compromise, and sustain the group's hacktivist narrative independent of and resilient to disruption of any single channel or persona.</div>
       </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Dropbear SSH</span>
+          <span class="tool-tag">Legitimate Embedded Software / Persistence</span>
+        </div>
+        <div class="tool-desc">Lightweight open-source SSH server and client built for embedded Linux. Deployed by the group on victim <strong>cellular modems</strong> to establish remote access via port 22 (AA26-097A). Its operational value is precisely that it is not malware: it is plausible, common firmware-adjacent software that generates no signature-based detection, running on network equipment most water utilities neither inventory nor forward logs from. This converted opportunistic access to an exposed PLC into durable access to the site's communication path, independent of whether the controller itself was later hardened. Detection artifact: an SSH listener on a modem that has no operational reason to run one — not a file hash.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Vendor PLC Engineering Software</span>
+          <span class="tool-tag">Dual-Use / Living-off-the-Land (OT)</span>
+        </div>
+        <div class="tool-desc">Rockwell Automation <strong>Studio 5000 Logix Designer</strong>, Schneider Electric <strong>EcoStruxure Control Expert</strong>, and Siemens <strong>Totally Integrated Automation (TIA) Portal</strong> — run by the actors on leased, third-party hosted infrastructure to connect to misconfigured victim PLCs and exfiltrate device project files (AA26-097A). This is living-off-the-land applied to OT: the traffic is the legitimate vendor engineering protocol carrying a legitimate engineering operation, indistinguishable from authorized integrator work absent a baseline recording who may upload or download a program and when. Possession of the project file — the plant's ladder logic and interlock configuration — is the prerequisite for the surgical safety-logic modification documented in the Jul 2026 advisory update <em>(see incident card: 2026-07-26_US-WATER-SECTOR-PLC-CAMPAIGN)</em>.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -835,7 +883,7 @@
 <div class="section">
   <div class="section-header">
     <div class="section-num">07</div>
-    <div class="section-title">Indicators of Compromise <small>Behavioral indicators predominate — see note below</small></div>
+    <div class="section-title">Indicators of Compromise <small>21 static IPs published in AA26-097A; behavioral indicators remain the durable surface — see note below</small></div>
   </div>
   <div class="section-body">
     <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
@@ -852,11 +900,41 @@
         <tr><td class="type-label">CVE</td><td class="val">CVE-2021-22681 — Rockwell Automation Logix controllers authentication bypass via insufficiently protected cryptographic key; no firmware patch available</td><td>Claroty / CISA AA26-097A</td><td>2026-04-07</td></tr>
         <tr><td class="type-label">CVE</td><td class="val">CVE-2023-6448 / CVE-2023-6488 — Unitronics Vision Series PLC/HMI use of hard-coded default administrative credentials ("1111")</td><td>CISA ICSA-23-348-15</td><td>2023-12</td></tr>
         <tr><td class="type-label">PORT</td><td class="val">TCP 20256 — default Unitronics Vision Series remote-access port; internet-facing exposure is the primary pre-condition for compromise</td><td>CISA AA23-335A</td><td>2023-11</td></tr>
-        <tr><td class="type-label">PORT</td><td class="val">TCP 44818 — Rockwell EtherNet/IP; scanned and targeted for direct controller access in the 2026 campaign</td><td>CISA AA26-097A</td><td>2026-04</td></tr>
+        <tr><td class="type-label">PORT</td><td class="val">TCP 44818 — Rockwell EtherNet/IP explicit messaging; scanned and targeted for direct controller access in the 2026 campaign</td><td>CISA AA26-097A</td><td>2026-04</td></tr>
+        <tr><td class="type-label">PORT</td><td class="val">TCP/UDP 2222 — EtherNet/IP implicit (I/O) messaging; named alongside 44818 as a targeted OT port</td><td>CISA AA26-097A</td><td>2026-07</td></tr>
+        <tr><td class="type-label">PORT</td><td class="val">TCP 102 — ISO-TSAP / S7 protocol; targeted on Siemens S7-1200 controllers after the Jul 2026 vendor-scope expansion</td><td>CISA AA26-097A</td><td>2026-07</td></tr>
+        <tr><td class="type-label">PORT</td><td class="val">TCP 502 — Modbus; targeted on Schneider Electric Modicon M340 / BMX P34 controllers</td><td>CISA AA26-097A</td><td>2026-07</td></tr>
+        <tr><td class="type-label">PORT</td><td class="val">TCP 22 — SSH on victim cellular modems via actor-deployed Dropbear; anomalous on a water-utility modem and a high-value detection point</td><td>CISA AA26-097A</td><td>2026-07</td></tr>
         <tr><td class="type-label">PROTOCOL</td><td class="val">MQTT over TLS, destination port 8883 — IOCONTROL C2 channel; anomalous on most OT network segments and should be treated as a strong compromise indicator</td><td>Claroty Team82</td><td>2024-12</td></tr>
         <tr><td class="type-label">PROTOCOL</td><td class="val">DNS-over-HTTPS (DoH) traffic originating from OT/IoT network segments — used by IOCONTROL for C2 domain resolution</td><td>Claroty Team82</td><td>2024-12</td></tr>
         <tr><td class="type-label">FILE</td><td class="val">/usr/bin/iocontrol — IOCONTROL binary storage path on compromised Linux-based OT/IoT devices; rc.d boot script added for persistence</td><td>Claroty Team82</td><td>2024-12</td></tr>
-        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No durable, publicly attributed static IP or C2-domain list exists for this actor as of this compile. CyberAv3ngers' primary "infrastructure" is the victim's own directly-exposed OT device rather than attacker-owned C2 hosting, and IOCONTROL's DoH/MQTT design specifically resists static domain/IP enumeration. Defenders should prioritize the behavioral and protocol indicators above and the TTPs in Section 04 over static IOC matching, and consult current CISA/Claroty advisories for any newly published indicators.</td></tr>
+                <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]175</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Sep 2025 – Feb 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">141.11.164[.]153</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Jan 2026 – Jun 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">175.110.121[.]39</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Feb 2026 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">175.110.121[.]41</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Feb 2026 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">175.110.121[.]42</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Feb 2026 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">175.110.121[.]107</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Feb 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">192.142.54[.]79</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>May 2026 – Jun 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">84.200.205[.]165</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>May 2026 – Jun 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">185.225.17[.]225</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Jun 2026 – Jul 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">79.133.46[.]209</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Jul 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">88.80.150[.]199</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Jul 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">88.80.150[.]200</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Jul 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">88.80.150[.]202</td><td>CISA AA26-097A Table 1 (22 Jul 2026)</td><td>Jul 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]162</td><td>CISA AA26-097A Table 2 (07 Apr 2026)</td><td>Jan 2025 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]164</td><td>CISA AA26-097A Table 2 (07 Apr 2026)</td><td>Jan 2025 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]165</td><td>CISA AA26-097A Table 2 (07 Apr 2026)</td><td>Jan 2025 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]167</td><td>CISA AA26-097A Table 2 (07 Apr 2026)</td><td>Jan 2025 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]168</td><td>CISA AA26-097A Table 2 (07 Apr 2026)</td><td>Jan 2025 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]170</td><td>CISA AA26-097A Table 2 (07 Apr 2026)</td><td>Jan 2025 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">185.82.73[.]171</td><td>CISA AA26-097A Table 2 (07 Apr 2026)</td><td>Jan 2025 – Mar 2026</td></tr>
+        <tr><td class="type-label">IPV4</td><td class="val">135.136.1[.]133</td><td>CISA AA26-097A Table 2 (07 Apr 2026)</td><td>Mar 2026</td></tr>
+        <tr><td class="type-label">INFRA</td><td class="val">Leased, third-party hosted infrastructure used to run vendor PLC programming software and to serve as the C2 channel for project-file transfer — not actor-owned bulletproof hosting in the classic sense</td><td>CISA AA26-097A</td><td>2025-01 – 2026-07</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">Unauthorized PLC program upload or download outside a change window — vendor engineering protocol traffic from an IP that is not a known integrator or engineering workstation</td><td>CISA AA26-097A detection guidance</td><td>2026-07</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">Divergence between running PLC logic and known-good baseline, with specific attention to modified or added Add-On Instructions (AOIs) on Rockwell controllers</td><td>CISA AA26-097A (22 Jul 2026 update)</td><td>2026-07</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">Controller mode-switch state change to PROGRAM or REMOTE outside maintenance; ICS management protocol functions that change an asset's operating mode or modify programs</td><td>CISA AA26-097A detection guidance</td><td>2026-07</td></tr>
+        <tr><td class="type-label">BEHAVIOR</td><td class="val">Unexplained PLC credential change or device IP address reassignment resulting in operator lockout or loss of monitoring</td><td>Tenable; FBI WWS alert</td><td>2026-07</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3"><strong>Superseded as of 2026-09-12.</strong> The 2026-09-02 compile of this card stated that no durable, publicly attributed static IP list existed for this actor. That is no longer correct: AA26-097A published eight addresses on 2026-04-07 (Table 2) and thirteen more in its 2026-07-22 update (Table 1), all reproduced above. The earlier reasoning still holds in part — CyberAv3ngers' operational "infrastructure" is substantially the victim's own directly-exposed OT device rather than attacker-owned C2 hosting, and IOCONTROL's DoH/MQTT design resists static domain/IP enumeration — but static network IOCs now exist and should be hunted. Note that Table 2 addresses were published in April and may since have rotated. No file hashes, malware samples, C2 domains or YARA signatures have been published for the 2026 PLC campaign, which is consistent with tradecraft built on legitimate vendor engineering software, legitimate embedded SSH, and the victims' own project files rather than distributable malware. Behavioral and protocol indicators above, plus the TTPs in Section 04, remain the more durable detection surface.</td></tr>
       </tbody>
     </table>
   </div>
@@ -978,9 +1056,9 @@
       <div class="opsec-item">
         <div class="opsec-header">
           <span class="opsec-category">Infrastructure Rotation</span>
-          <span class="opsec-confidence">[MEDIUM]</span>
+          <span class="opsec-confidence">[HIGH]</span>
         </div>
-        <div class="opsec-desc">The group treats its public-facing propaganda/claim-of-credit infrastructure as disposable and separable from technical operations: serial Telegram persona rebranding — CyberAv3ngers → "APT IRAN" → "Cyber4vengers" (Jan 2026) — has followed each platform-level takedown, with each new channel able to resume claim-of-credit activity without apparent loss of underlying technical capability. No comparable public reporting documents rotation of attacker-owned technical C2 infrastructure, largely because the group's primary "infrastructure" is the victim's own compromised OT device rather than attacker-hosted servers.</div>
+        <div class="opsec-desc">The group treats its public-facing propaganda/claim-of-credit infrastructure as disposable and separable from technical operations: serial Telegram persona rebranding — CyberAv3ngers → "APT IRAN" → "Cyber4vengers" (Jan 2026) — has followed each platform-level takedown, with each new channel able to resume claim-of-credit activity without apparent loss of underlying technical capability. On the technical side, AA26-097A's two indicator tables now make rotation directly observable and supersede this card's 2026-09-02 assessment that no such reporting existed. The advisory describes <strong>leased, third-party hosted infrastructure</strong> — rented commodity hosting rather than attacker-owned servers — and the published addresses show a clear temporal cadence: a stable 185.82.73[.]0/24 cluster of seven addresses sustained from Jan 2025 through Mar 2026, then a shift to short-lived blocks held roughly one to two months each (175.110.121[.]x in Feb–Mar 2026; 192.142.54[.]79 and 84.200.205[.]165 in May–Jun; 185.225.17[.]225 in Jun–Jul), tightening to 88.80.150[.]199–202 and 79.133.46[.]209 within Jul 2026 alone. The pattern reads as a long-lived staging cluster during quiet pre-positioning, then accelerating rotation as operational tempo rose toward the July disruption. This remains distinct from classic implant C2: the leased nodes ran vendor PLC engineering software and carried project-file transfer, functioning as an operator workstation tier rather than a beacon C2 tier — consistent with the group's continued reliance on the victim's own exposed OT device as the actual foothold.</div>
       </div>
       <div class="opsec-item">
         <div class="opsec-header">
@@ -1242,6 +1320,48 @@
           <div class="ref-date">Accessed: 2026-09-02</div>
         </div>
       </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA — 2026-09-12 REFRESH</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/news/cisa-fbi-epa-and-us-government-partners-update-warning-iran-affiliated-threat-actors-targeting" target="_blank">CISA, FBI, EPA and U.S. Government Partners Update Warning of Iran-Affiliated Threat Actors Targeting Critical Infrastructure Programmable Logic Controllers (22 Jul 2026)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / NSA / EPA / DOE / CNMF / TREASURY — 2026-09-12 REFRESH</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-097a" target="_blank">AA26-097A — Iranian-Affiliated Cyber Actors Exploit PLCs Across US Critical Infrastructure (pub. 7 Apr 2026, upd. 22 Jul 2026)</a> — Source for Table 1 / Table 2 IP indicators, Dropbear SSH, vendor engineering-software abuse, and AOI modification detection guidance.</div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI — 2026-09-12 REFRESH</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/investigate/cyber/alerts/2026/malicious-cyber-actors-targeting-water-and-wastewater-sector-internet--facing-programmable-logic-controllers-causing-operational-disruptions" target="_blank">Malicious Cyber Actors Targeting Water and Wastewater Sector Internet-Facing PLCs, Causing Operational Disruptions (30 Jul 2026)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CYBERSECURITY DIVE — 2026-09-12 REFRESH</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cybersecuritydive.com/news/what-we-know-so-far-about-the-hacking-campaign-against-us-water-systems/828374/" target="_blank">What we know so far about the hacking campaign against US water systems</a> — Source for 12-state scope and the APT Iran claim of responsibility via Check Point Research.</div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MINNESOTA IT SERVICES — 2026-09-12 REFRESH</div>
+        <div>
+          <div class="ref-detail"><a href="https://mn.gov/mnit/media/blog/?id=38-761869" target="_blank">MNIT activates statewide cybersecurity response to support affected communities and protect critical infrastructure (28 Jul 2026)</a> — Source for the ~36 confirmed Minnesota systems figure.</div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSIS — 2026-09-12 REFRESH</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csis.org/analysis/mapping-iranian-cyberattacks-us-water-systems" target="_blank">Mapping Iranian Cyberattacks on U.S. Water Systems</a> — Source for the 100+ targeted facilities figure.</div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1249,8 +1369,8 @@
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 20 sources, 15 web lookups</div>
-  <div>Attribution confidence: HIGH (state sponsorship) / MEDIUM (persona-vs-operator structure) · ATT&amp;CK: 14 techniques mapped (Enterprise + ICS) · Ecosystem: IRGC-CEC / Soldiers of Solomon</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-12 · 26 sources, 15 + 6 web lookups · UPDATED FROM: 2026-09-02 · Git history preserved</div>
+  <div>Attribution confidence: HIGH (state sponsorship) / MEDIUM (persona-vs-operator structure) · ATT&amp;CK: 19 techniques mapped (Enterprise + ICS) · Ecosystem: IRGC-CEC / Soldiers of Solomon · Companion incident card: 2026-07-26_US-WATER-SECTOR-PLC-CAMPAIGN</div>
 </div>
 
 </body>
