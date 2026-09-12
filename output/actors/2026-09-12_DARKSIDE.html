@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DarkSide — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 9px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 9px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 11px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; }
+
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 11px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 9px; color: var(--accent4); margin-top: 3px; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .sanctions-list { display: flex; flex-direction: column; gap: 5px; }
+  .sanctions-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 6px 0; border-bottom: 1px solid rgba(30,46,62,0.4); }
+  .sanctions-row:last-child { border-bottom: none; }
+  .sanctions-name { font-family: var(--body); font-size: 11.5px; color: var(--text); font-weight: 500; }
+  .sanctions-role { font-family: var(--body); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+  .sanctions-badge { font-family: var(--mono); font-size: 8.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
+
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 9px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 9px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge ecrime">⚠ ECRIME · RUSSIA / EASTERN-EUROPE-BASED RAAS OPERATION · NO CONFIRMED STATE SPONSORSHIP</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Ransomware-as-a-Service (RaaS) Operation / Double-Extortion Ransomware</div>
+  <h1><span class="accent">DARK</span>SIDE</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-12 &nbsp;|&nbsp;
+    SOURCES: CISA/FBI AA21-131A, U.S. DOJ, U.S. Treasury/OFAC, Mandiant/FireEye, CrowdStrike, Secureworks CTU, Flashpoint, Elliptic, Chainalysis, Emsisoft, Krebs on Security, Picus Security, ASEC, FortiGuard Labs, 15+ additional vendor/press sources
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">BRAND DEFUNCT (SHUT DOWN 2021-05-13) — LINEAGE PERSISTS VIA SUCCESSOR RAAS</span></div>
+    <div>Threat Level: <span class="danger">HIGH (Historical) / RESIDUAL VIA BLACKMATTER → BLACKCAT-ALPHV LINEAGE</span></div>
+    <div>Primary Motive: <span class="warn">Financial Extortion — Double-Extortion Ransomware</span></div>
+    <div>Active Since: <span>August 2020 (as branded RaaS)</span></div>
+    <div>MITRE ATT&amp;CK: <span>None assigned — no G-ID or S-ID for DarkSide as of 2026-09-12</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">$90M+</div>
+    <div class="stat-label">Ransom revenue tracked across 47 Bitcoin wallets in ~9 months (Elliptic)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">80+</div>
+    <div class="stat-label">Named victims on the "Happy Blog" leak site across 15+ countries</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">85% / 15%</div>
+    <div class="stat-label">RaaS revenue split — affiliate share vs. core-operator share</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">3-GEN</div>
+    <div class="stat-label">Rebrand lineage: DarkSide → BlackMatter → BlackCat/ALPHV (disrupted Dec 2023)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>DarkSide is a Russian-speaking ransomware-as-a-service (RaaS) operation that surfaced in August 2020 and, in nine months of activity, extracted more than $90 million in ransom payments from over 80 named victims before detonating the highest-profile ransomware incident in U.S. history — the May 2021 attack on Colonial Pipeline (Elliptic, "DarkSide Ransomware has Netted Over $90 million in Bitcoin"). DarkSide is not remembered for technical sophistication; its encryption scheme (Salsa20 + RSA-1024) and much of its intrusion toolkit were unremarkable by 2021 standards. It is remembered because it perfected the RaaS business model to the point of near-corporate professionalism — a support portal, a decryption-testing feature, revenue-based ransom calibration, and a public code of conduct excluding hospitals and schools — and then, almost by accident, hit a target whose collapse the U.S. government could not ignore.</p>
+      <p>DarkSide matters now less as an active threat (the brand shut itself down on May 13, 2021, six days after the Colonial Pipeline attack, under evident law-enforcement pressure) than as the origin point of a lineage that has proven remarkably durable. DarkSide's code and personnel are assessed to have migrated into BlackMatter (July–November 2021), and BlackMatter's operators and infrastructure are, in turn, documented to have reconstituted as BlackCat/ALPHV — the RaaS group the FBI disrupted in December 2023 after it had become one of the most prolific ransomware operations of its era. Individual affiliates who worked under the DarkSide banner, such as Mikhail Matveev ("Wazawaka"), have been separately documented cycling through Babuk, LockBit, and Hive as well — DarkSide is best understood not as a single closed organization but as one node in a fluid, overlapping Russian-speaking eCrime ecosystem whose personnel, tooling, and even source code persist across brand names and law-enforcement disruptions.</p>
+      <p>Where DarkSide sits in the current threat landscape, then, is as a case study and a cautionary template rather than a live adversary. It demonstrated — before Colonial Pipeline made it undeniable — that a purely profit-motivated criminal enterprise, entirely unconnected to state direction, can produce consequences (a declared U.S. federal emergency, a G7-level diplomatic response, mandatory new federal regulation of an entire critical-infrastructure sector) that rival those of nation-state operations. Every ransomware actor that has emerged since has operated in the regulatory and law-enforcement environment DarkSide's own collapse helped create.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">DarkSide</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">None confirmed — independent financially motivated RaaS operation</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Ransomware-as-a-Service (RaaS) — core developer group + vetted criminal affiliate network</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial — double-extortion ransomware</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">August 2020 (branded RaaS launch); constituent affiliate infrastructure (UNC2465) traced to March/October 2020</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">DarkSide brand: May 13, 2021 (self-announced shutdown). Assessed lineage (BlackMatter → BlackCat/ALPHV) active through December 2023 FBI disruption.</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">None assigned — DarkSide has no dedicated Group (G-ID) or Software (S-ID) entry in MITRE ATT&amp;CK Enterprise as of 2026-09-12</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">No core developer publicly indicted by name. DOJ seized 63.7 BTC (~$2.3M) of the Colonial ransom, Jun 2021. OFAC sanctioned SUEX OTC exchange, Sep 2021, for laundering proceeds from 8 ransomware variants incl. DarkSide. Affiliate Mikhail Matveev ("Wazawaka"/"Boriselcin") indicted by DOJ, May 2023, for ransomware activity spanning DarkSide, Babuk, LockBit, and Hive.</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">DarkSide</span>
+          <span class="alias-chip">CARBON SPIDER (CrowdStrike — asserted operator of the DarkSide RaaS)</span>
+          <span class="alias-chip">GOLD WATERFALL (Secureworks — primary DarkSide-operator tracking name)</span>
+          <span class="alias-chip">GOLD NIAGARA / FIN7 / ITG14 / Sangria Tempest (suspected but explicitly unconfirmed link per Secureworks CTU)</span>
+          <span class="alias-chip">UNC2465 (Mandiant — tracked DarkSide affiliate cluster, supply-chain intrusion vector)</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>[HIGH] that DarkSide's core operators and the great majority of its affiliates are Russian-speaking and operate from Russia or elsewhere in the former Soviet space — the ransomware payload itself refuses to execute on systems configured with Russian or other CIS-language locales, a self-protective measure consistent with operating from, and wishing to avoid prosecution within, that region (Flashpoint; CSO Online). [LOW] on any more specific organizational identity: vendors disagree. CrowdStrike attributes the DarkSide RaaS operation to CARBON SPIDER, the eCrime group more widely known as FIN7 — a financial-crime group active since at least 2013 that pivoted from point-of-sale malware to "big game hunting" ransomware. Secureworks, by contrast, tracks DarkSide's operators under a separate designation, GOLD WATERFALL, and states explicitly that it has "no direct observations that would confirm any link" to GOLD NIAGARA (its name for FIN7/Carbon Spider) — despite third-party researcher claims of overlap. Flashpoint separately assesses with moderate confidence that DarkSide's operators are former REvil affiliates. No single hypothesis is confirmed across independent vendors; this card treats DarkSide's organizational lineage as a genuinely open question rather than adopting any one vendor's attribution as fact.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Aug 2020</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">RaaS Launch</div>
+          <div class="timeline-desc">DarkSide surfaces on Russian-language cybercrime forums, marketing itself with unusual professionalism: a stated (if selectively honored) exclusion policy against hospitals, schools, non-profits, and government targets, a decryptor-testing feature for negotiating victims, and a revenue-sharing affiliate model (Emsisoft, "Ransomware Profile: DarkSide"). Mandiant separately traces DarkSide-affiliate infrastructure (later designated UNC2465) to as early as March/October 2020.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Oct 2020 – Mar 2021</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Scaling &amp; V2.0 Release</div>
+          <div class="timeline-desc">DarkSide releases a v2.0 update (March 2021) with a Linux/ESXi-capable variant alongside the existing Windows payload, targeting virtualization infrastructure directly. Elliptic's later blockchain analysis identifies ransom flows to 47 distinct DarkSide-linked BTC wallets beginning in this window, ultimately totaling over $90 million, with the group's cut (~$15.5M) and affiliate share (~$74.7M) reflecting the RaaS revenue split.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Apr–May 2021</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Brenntag &amp; Colonial Pipeline Attacks</div>
+          <div class="timeline-desc">DarkSide affiliates hit Brenntag, a large German chemical distribution company, and — via a compromised legacy VPN account exploited April 29, 2021 — Colonial Pipeline Company, the largest U.S. refined-products pipeline operator. Elliptic notes roughly 10% of the group's entire nine-month revenue came from these two attacks in a single week. The Colonial Pipeline intrusion is documented separately in this repository's companion incident card (see Section 08).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">May 13, 2021</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Brand Shutdown</div>
+          <div class="timeline-desc">Six days after the Colonial Pipeline attack became public, DarkSide's operators announce they are shutting down the RaaS program, citing unspecified law-enforcement disruption of their leak-site, payment, and CDN infrastructure. Operators claim they will issue decryptors to affected affiliates' remaining victims and settle outstanding affiliate payments by May 23, 2021 (GovInfoSecurity; Intel 471).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">May–Jun 2021</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">UNC2465 Software Supply-Chain Pivot</div>
+          <div class="timeline-desc">A DarkSide-affiliated cluster Mandiant tracks as UNC2465 compromises the website of a CCTV/surveillance vendor and trojanizes its Dahua SmartPSS Windows installer (available May 18 – June 8, 2021), delivering the custom SMOKEDHAM .NET backdoor to downstream victims who downloaded the legitimate-looking software — a rare documented instance of a ransomware-affiliated actor executing a genuine software supply-chain compromise (Mandiant/FireEye, "Smoking Out a DARKSIDE Affiliate's Supply Chain Software Compromise").</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jul 2021</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">BlackMatter Emerges</div>
+          <div class="timeline-desc">A new RaaS operation, BlackMatter, appears on cybercrime forums advertising itself explicitly as combining "the best features" of DarkSide, REvil, and LockBit. Independent code analysis of a leaked BlackMatter decryptor finds the RSA and Salsa20 cryptographic implementations are near-exact copies of DarkSide's, and CISA/NSA/FBI jointly assess BlackMatter as a likely DarkSide rebrand (CISA AA21-291A).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Oct–Nov 2021</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">BlackMatter Shutdown</div>
+          <div class="timeline-desc">Following a string of high-profile attacks on U.S. agricultural cooperatives and continued law-enforcement pressure, BlackMatter operators announce their own shutdown in November 2021, again promising decryption keys to remaining affiliate victims.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Nov 2021 – Dec 2023</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">BlackCat/ALPHV Lineage &amp; FBI Disruption</div>
+          <div class="timeline-desc">BlackCat (ALPHV) emerges in November 2021; by April 2022 the FBI publicly assesses that several BlackCat developers and money launderers have direct links to the defunct DarkSide and BlackMatter operations, and BlackCat operators themselves have acknowledged the lineage. BlackCat/ALPHV goes on to become one of the most prolific ransomware operations of 2022–2023 before an FBI-led operation disrupts its leak-site and payment infrastructure in December 2023 (partially undone by the group in a subsequent apparent exit-scam against its own affiliates).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Affiliate-driven intrusion chain under a shared RaaS toolkit</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Entry vectors.</strong> Because DarkSide operated a RaaS model, initial access varied by affiliate rather than following one fixed playbook. Documented vectors include exploitation of exposed or compromised remote-access services (VPN and RDP) — the vector confirmed in the Colonial Pipeline intrusion, where a single legacy VPN account with a reused, leaked password and no MFA provided entry — as well as credentials purchased from third-party initial access brokers, targeted phishing, and, in the UNC2465 cluster's case, a genuine software supply-chain compromise: a trojanized installer for a legitimate CCTV management application, distributed from the vendor's own compromised website, that dropped the custom SMOKEDHAM backdoor onto downstream victims (Mandiant/FireEye).</p>
+      <p><strong>Toolchain and internal operations.</strong> Once inside a network, DarkSide-affiliated intrusions consistently favor legitimate, dual-use tooling over bespoke malware — a deliberate choice to minimize antivirus and EDR detections. Advanced IP Scanner and BloodHound support internal reconnaissance and Active Directory attack-path mapping; Mimikatz harvests additional credentials; TeamViewer, downloaded from the vendor's official site, provides interactive persistence that blends with legitimate remote-access traffic. Where custom tooling appears, it tends to be narrowly purpose-built — SMOKEDHAM for initial-access credential capture and command execution, NGROK for outbound tunneling to attacker infrastructure — rather than a large bespoke framework. A documented DarkSide-specific capability distributes malicious Group Policy Objects across compromised Active Directory environments, pushing scheduled tasks to domain-joined hosts to self-propagate the ransomware payload without requiring the affiliate to manually stage each endpoint (ASEC).</p>
+      <p><strong>C2, exfiltration, and impact.</strong> Command and control for the DarkSide-branded toolkit relies substantially on tunneling utilities like NGROK rather than dedicated bespoke C2 infrastructure — a further reflection of the "borrow legitimate tools" pattern. Data exfiltration ahead of encryption uses Rclone to move data in bulk to attacker-controlled cloud storage — the mechanism behind the roughly 100GB moved off Colonial Pipeline's network in a two-hour window — establishing the leverage for the group's double-extortion model before a single file is encrypted. Immediately before deploying the ransomware payload, DarkSide's toolkit executes a well-documented anti-recovery sequence: shadow-copy deletion via <code>vssadmin</code> or an equivalent PowerShell WMI call, disabling of Windows Recovery via <code>bcdedit</code>, and suspension of Windows Event Logging — then deploys the Salsa20/RSA-1024 payload itself, which performs a locale check and refuses to execute on Russian- or CIS-configured systems before encrypting files and dropping a ransom note directing the victim to a Tor-hosted negotiation and leak-site portal ("Happy Blog").</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; confidence reflects strength and specificity of source documentation</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1588.002</div>
+        <div class="mitre-name">Obtain Capabilities: Tool</div>
+        <div class="mitre-note">[HIGH] Core RaaS operators develop and lease the ransomware payload, negotiation portal, and leak-site infrastructure to vetted affiliates for a revenue share (Emsisoft; CSO Online).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Exploitation of exposed/compromised VPN and RDP services — confirmed vector in the Colonial Pipeline intrusion (a legacy, MFA-less VPN account).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1195.002</div>
+        <div class="mitre-name">Compromise Software Supply Chain</div>
+        <div class="mitre-note">[HIGH] UNC2465 trojanized a legitimate CCTV vendor's Dahua SmartPSS installer to deliver SMOKEDHAM to downstream victims (Mandiant/FireEye) — an atypical but well-documented vector for this ecosystem.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.001</div>
+        <div class="mitre-name">PowerShell</div>
+        <div class="mitre-note">[HIGH] PowerShell drives shadow-copy deletion (WMI Win32_Shadowcopy) and supports GPO-based scheduled-task deployment for self-propagation.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1053.005</div>
+        <div class="mitre-name">Scheduled Task/Job</div>
+        <div class="mitre-note">[MEDIUM] Malicious Group Policy Objects push scheduled tasks to domain-joined hosts to execute the ransomware payload AD-wide (ASEC).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1219</div>
+        <div class="mitre-name">Remote Access Software</div>
+        <div class="mitre-note">[MEDIUM] TeamViewer, downloaded from the vendor's official site, provides low-signature interactive persistence (Picus Security).</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003</div>
+        <div class="mitre-name">OS Credential Dumping</div>
+        <div class="mitre-note">[MEDIUM] Mimikatz documented across DarkSide-affiliate campaigns generally for harvesting additional domain credentials.</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1482</div>
+        <div class="mitre-name">Domain Trust Discovery</div>
+        <div class="mitre-note">[MEDIUM] BloodHound used for AD attack-path mapping ahead of lateral movement and privilege escalation.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.001</div>
+        <div class="mitre-name">Remote Desktop Protocol</div>
+        <div class="mitre-note">[MEDIUM] RDP documented as a lateral-movement channel alongside abused legitimate remote-access tooling.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1572</div>
+        <div class="mitre-name">Protocol Tunneling</div>
+        <div class="mitre-note">[MEDIUM] NGROK tunneling used by the UNC2465 cluster for outbound C2 alongside SMOKEDHAM (Mandiant/FireEye).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1622</div>
+        <div class="mitre-name">Debugger Evasion / Process Manipulation</div>
+        <div class="mitre-note">[HIGH] Helper processes launched in CREATE_SUSPENDED state with garbage command-line arguments, with the true command line read from the process's PEB in memory after suspension — defeats command-line-based behavioral detection (FortiGuard Labs).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion / Discovery</div>
+        <div class="mitre-id">T1614.001</div>
+        <div class="mitre-name">System Location Discovery</div>
+        <div class="mitre-note">[HIGH] Payload checks system locale/keyboard layout and refuses execution on Russian or CIS-language systems (Flashpoint; CSO Online).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1490</div>
+        <div class="mitre-name">Inhibit System Recovery</div>
+        <div class="mitre-note">[HIGH] Documented commands: <code>vssadmin delete shadows /all /quiet</code>, PowerShell WMI shadow-copy deletion, and <code>bcdedit /set {default} recoveryenabled No</code>, executed immediately before encryption.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[HIGH] Hybrid Salsa20 (symmetric) + RSA-1024 (asymmetric) scheme; Windows and Linux/ESXi-capable variants existed by early-mid 2021 (Qualys; Akamai).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] Double-extortion model via the Tor-hosted "Happy Blog" leak site; over $90M tracked in ransom payments across 47 wallets (Elliptic).</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Professional / Financial Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Manufacturing / Industrial</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Energy / Critical Infrastructure</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Legal Services</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Technology</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:50%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Retail</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:25%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Majority U.S.-based victims; documented Western European victims (Brenntag, Germany); explicit avoidance of Russia and other CIS states via locale-check evasion; 15+ countries represented on leak site overall</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Mid-to-large enterprises assessed able to pay a substantial ransom; affiliates reportedly reviewed victim financials/insurance status to calibrate ransom demand size</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Internet-exposed or credential-compromised VPN/RDP; initial-access-broker-purchased footholds; opportunistic software supply-chain compromise (UNC2465)</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Publicly stated exclusion of hospitals, funeral services, schools/universities, non-profits, and government entities — explicitly to reduce law-enforcement and media attention; the policy did not prevent the Colonial Pipeline attack from triggering exactly that outcome</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item green">
+        <div class="tool-header">
+          <span class="tool-name">DarkSide Ransomware</span>
+          <span class="tool-tag">RaaS Payload · Custom</span>
+        </div>
+        <div class="tool-desc">Hybrid Salsa20 (symmetric, per-file key) + RSA-1024 (asymmetric, protects Salsa20 keys) encryption; Windows and Linux/ESXi-capable variants existed by the v2.0 release (March 2021). Performs a system-locale/keyboard-layout check at execution (T1614.001) and self-terminates on Russian/CIS-configured hosts. Preceded by a documented anti-recovery sequence (shadow-copy deletion, Windows Recovery disablement, Event Logging suspension). Helper processes are launched CREATE_SUSPENDED with garbage command-line arguments, with the real command line read post-launch from the process's PEB — a specific, documented EDR-evasion mechanism (T1622). Weaponized in the Colonial Pipeline attack (see companion incident card: <code>output/incidents/2021-05-07_COLONIAL-PIPELINE.html</code>).</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">SMOKEDHAM</span>
+          <span class="tool-tag">.NET Backdoor · Custom</span>
+        </div>
+        <div class="tool-desc">Custom .NET backdoor active since at least 2019, distributed by the UNC2465 DarkSide-affiliate cluster via a trojanized CCTV-vendor software installer in May–June 2021. Supports keylogging, screenshot capture, and arbitrary command execution on infected hosts, providing the initial foothold and credential-capture capability for follow-on ransomware deployment (Mandiant/FireEye).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Mimikatz</span>
+          <span class="tool-tag">COTS / Dual-Use</span>
+        </div>
+        <div class="tool-desc">Open-source Windows credential-dumping utility used to harvest cached credentials post-foothold to support lateral movement across compromised environments.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">BloodHound</span>
+          <span class="tool-tag">COTS / Open Source</span>
+        </div>
+        <div class="tool-desc">Active Directory attack-path mapping tool used to identify routes to domain-admin-equivalent access ahead of ransomware deployment.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Advanced IP Scanner</span>
+          <span class="tool-tag">COTS</span>
+        </div>
+        <div class="tool-desc">Legitimately signed, free network-scanning utility used for internal host/network discovery; rarely flagged by antivirus, exploited for that reason.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">TeamViewer (abused)</span>
+          <span class="tool-tag">LOLBin / Legitimate Software</span>
+        </div>
+        <div class="tool-desc">Downloaded from the vendor's own site and repurposed for interactive persistence, blending with legitimate remote-access traffic patterns.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Rclone</span>
+          <span class="tool-tag">LOLBin / Open Source</span>
+        </div>
+        <div class="tool-desc">Open-source cloud-storage sync utility used for bulk pre-encryption data exfiltration to attacker-controlled cloud storage, underpinning the double-extortion leverage.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">NGROK</span>
+          <span class="tool-tag">Infrastructure / Legitimate Service</span>
+        </div>
+        <div class="tool-desc">Legitimate tunneling service abused by the UNC2465 cluster for outbound command-and-control connectivity from compromised hosts (Mandiant/FireEye).</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">"Happy Blog" Leak Site</span>
+          <span class="tool-tag">Tor-Hosted Infrastructure</span>
+        </div>
+        <div class="tool-desc">DarkSide's Tor-based name-and-shame extortion portal and negotiation channel, hosting stolen-data pages for named non-paying victims. Seized or taken offline around May 13, 2021, alongside the group's payment site and CDN.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">NOTE</td><td class="val" colspan="3">No specific host, network, or file-hash IOC values are reproduced in this card. CISA/FBI published a dedicated Malware Analysis Report and a STIX/JSON indicator package specific to DarkSide (Joint Advisory AA21-131A, updated 2021-07-07 with the MAR); consult that primary source directly for reconstructable indicator values. This avoids transcribing indicators now more than five years past their operational relevance, which this repository's standing orders flag as of limited detection value regardless.</td></tr>
+        <tr><td class="type-label">PROTOCOL</td><td class="val">Outbound tunneling via ngrok[.]io infrastructure observed for UNC2465-cluster C2 (specific ngrok subdomains not independently reproduced here)</td><td>Mandiant/FireEye</td><td>2021-05/06</td></tr>
+        <tr><td class="type-label">LEAK SITE</td><td class="val">DarkSide "Happy Blog" — Tor (.onion) hidden service; specific onion address not independently reproduced here (rotated/seized May 2021)</td><td>GovInfoSecurity; Intel 471</td><td>2021-05</td></tr>
+        <tr><td class="type-label">SUPPLY CHAIN</td><td class="val">Trojanized Dahua SmartPSS Windows installer distributed from the legitimate vendor's compromised website (specific package hash not independently reproduced here)</td><td>Mandiant/FireEye</td><td>2021-05-18 to 2021-06-08</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">HIGH (Historical) — brand defunct, residual risk via lineage</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">[HIGH] region/language; [LOW] specific organizational identity — contested across vendors</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Brand extinct since May 2021; personnel/code lineage demonstrated persistence through two further RaaS generations (BlackMatter, BlackCat/ALPHV) despite two additional law-enforcement disruptions</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Not a technical capability — a professionalized, revenue-shared RaaS business model that scales extortion by separating tooling/negotiation infrastructure (core operators) from intrusion labor (affiliates), and that has proven durable enough to survive brand death three times over</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">No confirmed identity for DarkSide's core developer(s); the FIN7/Carbon Spider vs. REvil-descended vs. wholly independent question remains open across vendors</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">BlackMatter (direct successor rebrand, Jul–Nov 2021)</span>
+          <span class="alias-chip">BlackCat / ALPHV (further lineage, disrupted Dec 2023)</span>
+          <span class="alias-chip">REvil (Flashpoint moderate-confidence shared-personnel hypothesis)</span>
+          <span class="alias-chip">FIN7 / Carbon Spider (CrowdStrike-asserted operator link, unconfirmed by Secureworks)</span>
+          <span class="alias-chip">UNC2465 (Mandiant-tracked affiliate cluster)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>DarkSide's own technical capability was never the point; it was a merely competent implementation of hybrid symmetric/asymmetric encryption and double extortion that dozens of other 2020–2021-era ransomware families matched or exceeded. What made DarkSide analytically significant — and what this analyst assesses as its most dangerous and most durable capability — is organizational: a RaaS structure sophisticated enough to attract skilled affiliates (revenue-based ransom calibration, professional negotiation support, a public "code of conduct" designed to manage law-enforcement heat) while remaining resilient to the loss of its own brand. The DarkSide → BlackMatter → BlackCat/ALPHV lineage, corroborated by independent code analysis and an FBI advisory naming shared personnel, demonstrates that shutting down a RaaS brand does not remove its operators, its affiliates, or often its source code from the threat landscape — it typically just changes the name on the leak site for a period of months.</p>
+      <p>The central attribution question this card leaves open — whether DarkSide's core operators are the eCrime group CrowdStrike tracks as CARBON SPIDER (better known publicly as FIN7), a Flashpoint-assessed REvil offshoot, or an organizationally distinct entity — is not resolved by the available public evidence, and this analyst declines to adopt any single vendor's position as settled fact given that Secureworks, the vendor closest to the claimed FIN7 link, explicitly states it has no direct observations confirming that connection. What would change this assessment: an unsealed U.S. indictment naming a specific individual as a DarkSide core developer (as opposed to an affiliate, which the Matveev indictment already covers), or forensic malware-lineage analysis directly linking DarkSide's original codebase to a previously attributed FIN7/Carbon Spider or REvil toolset rather than to shared affiliate personnel alone.</p>
+      <p>Forward risk trajectory: DarkSide-as-brand poses no ongoing direct risk. The pattern it established — rapid shutdown under pressure followed by reconstitution under a new name with overlapping personnel — is now a well-documented feature of the broader RaaS ecosystem, observed again with BlackCat/ALPHV's own late-2023/2024 disruption and apparent affiliate exit-scam. Organizations should treat any newly emerging RaaS brand exhibiting DarkSide-lineage tradecraft signatures (Salsa20/RSA-1024-family cryptography, CIS locale-check evasion, GPO-based self-propagation, heavy reliance on TeamViewer/Rclone/BloodHound) as a plausible continuation of this lineage rather than an unrelated, unknown actor.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Enforce MFA on all remote-access services.</strong> VPN, RDP, and Citrix/remote-desktop gateways should require multi-factor authentication without exception, including legacy or infrequently used accounts.</div>
+            <div class="cm-ttp">Counters: T1133, T1078</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Enforce remote-access account lifecycle management.</strong> Automatically disable VPN/remote-access accounts on role change or departure, and periodically audit for enabled-but-unused accounts.</div>
+            <div class="cm-ttp">Counters: T1133, T1078</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Deploy dark-web credential-exposure monitoring.</strong> Screen corporate credentials against known breach/leak datasets to catch password reuse before an attacker does.</div>
+            <div class="cm-ttp">Counters: T1078</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Audit and alert on Group Policy Object changes.</strong> Monitor for unauthorized GPO modifications, particularly those creating new scheduled tasks across domain-joined hosts.</div>
+            <div class="cm-ttp">Counters: T1053.005</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Restrict legitimate remote-access tools via application allowlisting.</strong> Block or tightly control TeamViewer, AnyDesk, and similar tools where not explicitly business-required.</div>
+            <div class="cm-ttp">Counters: T1219</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Monitor for bulk cloud-sync exfiltration tooling.</strong> Alert on Rclone execution or equivalent cloud-sync utility activity, and apply egress filtering/DLP against unauthorized cloud-storage destinations.</div>
+            <div class="cm-ttp">Counters: T1567.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Protect and alert on Volume Shadow Copy Service activity.</strong> Alert on <code>vssadmin delete shadows</code>, equivalent PowerShell/WMI shadow-copy deletion, and <code>bcdedit</code> recovery-disabling commands.</div>
+            <div class="cm-ttp">Counters: T1490</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Verify software supply-chain integrity.</strong> Validate installer signatures/hashes against vendor-published values before deployment, particularly for niche vendor software (e.g., surveillance/CCTV management tools) with less mature update-integrity practices.</div>
+            <div class="cm-ttp">Counters: T1195.002</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">DarkSide's Tor-hosted leak site, payment portal, and CDN infrastructure were abandoned abruptly on May 13, 2021, days after Colonial Pipeline drew intense law-enforcement attention, rather than on any observable fixed rotation schedule — consistent with reactive, heat-driven infrastructure abandonment rather than proactive hygiene (GovInfoSecurity; Intel 471). No public reporting documents a routine pre-Colonial rotation cadence.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Documented intrusions rely heavily on legitimate, dual-use tooling — TeamViewer, Advanced IP Scanner, BloodHound, native PowerShell/WMI, and Windows Group Policy/scheduled-task mechanisms — with custom code largely confined to the ransomware payload itself and, in the UNC2465 cluster, the SMOKEDHAM backdoor. This heavy LOLBin/dual-use-tool preference is consistent with the broader affiliate-driven RaaS trend of minimizing bespoke-malware detection surface (Picus Security).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics Routines</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Immediately before encryption, the payload executes a documented anti-recovery/anti-forensics sequence: shadow-copy deletion (<code>vssadmin delete shadows /all /quiet</code> or the PowerShell WMI equivalent <code>Get-WmiObject Win32_Shadowcopy|ForEach-Object {$_.Delete();}</code>), disabling of Windows Recovery (<code>bcdedit /set {default} recoveryenabled No</code>), and suspension of Windows Event Logging to deny defenders a post-incident audit trail (community malware analysis; FortiGuard Labs).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">A specific, well-documented anti-detection technique: helper processes are spawned in a CREATE_SUSPENDED state with deliberately garbled/garbage command-line arguments visible to process-creation telemetry (Sysmon Event ID 1, EDR process logs), and the malware then reads its true command line directly from the target process's PEB (Process Environment Block) in memory post-suspension, before resuming execution — specifically engineered to defeat command-line-string-based behavioral detection rules (FortiGuard Labs).</div>
+      </div>
+      <!-- Timing & Operational Patterns omitted: no public reporting establishes a specific beaconing/jitter cadence or victim-timezone work-hour alignment for the core DarkSide toolkit; the well-documented locale/keyboard-layout check is captured under Section 04 (T1614.001) and the Attack Lifecycle narrative rather than speculatively restated here as a timing pattern. -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Suspended-Process Command-Line Spoofing + PEB Read</span>
+          <span class="evasion-ttp">T1622 / T1027</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">Helper binaries are launched with the Windows API in a <strong>CREATE_SUSPENDED</strong> state, presenting deliberately garbled/garbage arguments to any process-creation monitoring (Sysmon Event ID 1, EDR command-line telemetry) that inspects the process at launch. After suspension, the malware reads the true, intended command line directly from the target process's Process Environment Block (PEB) in memory, then resumes execution with the real arguments applied internally — meaning any detection rule keyed on the visibly logged command-line string never sees the actual invocation (FortiGuard Labs, "Stomping Shadow Copies — A Second Look Into Deletion Methods").</div>
+        <div class="evasion-detail">Specific garbage-argument patterns and exact API call sequence not publicly documented in detail as of 2026-09-12; the CREATE_SUSPENDED + PEB-read mechanism itself is independently corroborated across FortiGuard Labs and community malware-analysis reporting.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Volume Shadow Copy &amp; Recovery Disablement</span>
+          <span class="evasion-ttp">T1490</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">Immediately prior to encryption, the payload eliminates local recovery options to make the extortion demand the only realistic restoration path.</div>
+        <div class="evasion-detail">vssadmin delete shadows /all /quiet
+Get-WmiObject Win32_Shadowcopy | ForEach-Object {$_.Delete();}
+bcdedit /set {default} recoveryenabled No</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Windows Event Logging Suspension</span>
+          <span class="evasion-ttp">T1562.002</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">Documented as part of the pre-encryption anti-forensics sequence, denying defenders the audit trail needed to reconstruct the intrusion timeline after the fact.</div>
+        <div class="evasion-detail">Specific API calls, registry modifications, or service-manipulation commands used to suspend Event Logging are not publicly documented in detail as of 2026-09-12.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Locale / Geofencing Self-Termination</span>
+          <span class="evasion-ttp">T1614.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">The payload checks system locale and installed keyboard layout at execution and self-terminates without encrypting on hosts configured for Russian or other CIS languages — simultaneously an operational-security measure (avoiding prosecution risk in the operators' home region) and a practical evasion technique that reduces exposure to security-vendor sandboxes and honeypots commonly configured with those locale settings (Flashpoint; CSO Online).</div>
+        <div class="evasion-detail">Specific locale/language-ID value list checked by the binary not publicly documented in detail as of 2026-09-12.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Legitimate-Tool Blending for AV/EDR Suppression</span>
+          <span class="evasion-ttp">T1219 / T1105</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">Validly signed, legitimate software (TeamViewer downloaded from the vendor's own site, Advanced IP Scanner) is deliberately preferred over custom tooling for persistence and reconnaissance specifically because these binaries rarely trigger antivirus or EDR alerts compared to bespoke or previously catalogued malware (Picus Security).</div>
+        <div class="evasion-detail">No further command-level specifics beyond standard vendor-documented tool usage are publicly available as of 2026-09-12.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">The MITRE Center for Threat-Informed Defense's Adversary Emulation Library (ctid.mitre.org/resources/adversary-emulation-library) was searched directly for DarkSide and BlackMatter plans as of 2026-09-12. The library includes published plans for actors such as FIN6 and menuPass, but no plan exists for DarkSide, BlackMatter, or BlackCat/ALPHV. No MITRE CTID adversary emulation plan has been published for this actor or its successor lineage as of 2026-09-12.</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://cisa.gov/uscert/ncas/current-activity/2021/07/07/cisa-publishes-malware-analysis-report-and-updates-alert-darkside" target="_blank">CISA Malware Analysis Report — DarkSide Ransomware</a></div>
+          <div class="ref-date">Vendor detection resource · Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Atomic Red Team</div>
+        <div>
+          <div class="ref-detail">No DarkSide-named test identified in the redcanaryco/atomic-red-team repository as of 2026-09-12. Generic technique-level tests exist for constituent techniques used by DarkSide — T1490 (Inhibit System Recovery) and T1003 (OS Credential Dumping) — but no scenario is scoped to DarkSide specifically.</div>
+          <div class="ref-date">Gap noted · Checked: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SigmaHQ</div>
+        <div>
+          <div class="ref-detail">No DarkSide-named rule identified in the SigmaHQ/sigma repository as of 2026-09-12. Generic ransomware-behavior and shadow-copy-deletion Sigma rules in the repository (e.g., <code>rules/category/antivirus/av_ransomware.yml</code>, network-scanner PUA rules covering Advanced IP Scanner) provide partial, technique-level coverage rather than actor-specific detections.</div>
+          <div class="ref-date">Gap noted · Checked: 2026-09-12</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-131a" target="_blank">AA21-131A: DarkSide Ransomware — Best Practices for Preventing Business Disruption from Ransomware Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA / NSA / FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-291a" target="_blank">AA21-291A: BlackMatter Ransomware</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CrowdStrike</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.crowdstrike.com/en-us/blog/carbon-spider-embraces-big-game-hunting-part-1/" target="_blank">CARBON SPIDER Embraces Big Game Hunting, Part 1</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CrowdStrike</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.crowdstrike.com/en-us/blog/how-ransomware-adversaries-reacted-to-the-darkside-pipeline-attack/" target="_blank">How Ransomware Adversaries Reacted to the DarkSide Attack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Secureworks CTU</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.secureworks.com/research/threat-profiles/gold-niagara" target="_blank">GOLD NIAGARA Threat Profile</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0046/" target="_blank">FIN7, GOLD NIAGARA, ITG14, Carbon Spider, ELBRUS, Sangria Tempest (G0046)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Flashpoint</div>
+        <div>
+          <div class="ref-detail"><a href="https://flashpoint.io/blog/darkside-ransomware-links-to-revil-difficult-to-dismiss/" target="_blank">DarkSide Ransomware Links to REvil Group Difficult to Dismiss</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Mandiant / FireEye</div>
+        <div>
+          <div class="ref-detail"><a href="https://tagteam.harvard.edu/hub_feeds/4280/feed_items/3097862/content" target="_blank">Smoking Out a DARKSIDE Affiliate's Supply Chain Software Compromise</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Malpedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://malpedia.caad.fkie.fraunhofer.de/actor/unc2465" target="_blank">UNC2465 (Threat Actor)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/darkside-operator-involved-in-supply-chain-attack-via-cctv-vendors-website" target="_blank">Darkside operator involved in supply chain attack via CCTV vendor's website</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Elliptic</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.elliptic.co/blog/darkside-ransomware-has-netted-over-90-million-in-bitcoin" target="_blank">DarkSide Ransomware has Netted Over $90 million in Bitcoin</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Chainalysis</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.chainalysis.com/blog/darkside-colonial-pipeline-ransomware-seizure-case-study/" target="_blank">How FBI Investigators Traced DarkSide's Funds</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Treasury / OFAC</div>
+        <div>
+          <div class="ref-detail"><a href="https://home.treasury.gov/news/press-releases/jy0471" target="_blank">Treasury Continues to Counter Ransomware — Sanctions SUEX Virtual Currency Exchange</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Emsisoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.emsisoft.com/en/blog/38577/ransomware-profile-darkside/" target="_blank">Ransomware Profile: DarkSide</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Krebs on Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://krebsonsecurity.com/2021/05/a-closer-look-at-the-darkside-ransomware-gang/" target="_blank">A Closer Look at the DarkSide Ransomware Gang</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GovInfoSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.govinfosecurity.com/darkside-ransomware-gang-says-has-shut-down-a-16620" target="_blank">DarkSide Ransomware Gang Says It Has Shut Down</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Intel 471</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.intel471.com/blog/darkside-ransomware-shut-down-revil-avaddon-cybercrime" target="_blank">The moral underground? Ransomware operators retreat after Colonial Pipeline hack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/blackcat-alphv-ransomware-linked-to-blackmatter-darkside-gangs/" target="_blank">BlackCat (ALPHV) ransomware linked to BlackMatter, DarkSide gangs</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/BlackCat_(cyber_gang)" target="_blank">BlackCat (cyber gang)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Qualys</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.qualys.com/vulnerabilities-threat-research/2021/06/09/darkside-ransomware" target="_blank">DarkSide Ransomware — Technical Analysis</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Picus Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.picussecurity.com/resource/whitepaper/illuminating-darkside-ransomware" target="_blank">Illuminating DarkSide: TTPs, Tools, and Trend Towards Defense Evasion</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ASEC (AhnLab)</div>
+        <div>
+          <div class="ref-detail"><a href="https://asec.ahnlab.com/en/47174/" target="_blank">DarkSide Ransomware With Self-Propagating Feature in AD Environments</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FortiGuard Labs</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fortinet.com/blog/threat-research/stomping-shadow-copies-a-second-look-into-deletion-methods" target="_blank">Stomping Shadow Copies — A Second Look Into Deletion Methods</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSO Online</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csoonline.com/article/570723/darkside-ransomware-explained-how-it-works-and-who-is-behind-it.html" target="_blank">DarkSide ransomware explained: How it works and who is behind it</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE CTID</div>
+        <div>
+          <div class="ref-detail"><a href="https://ctid.mitre.org/resources/adversary-emulation-library/" target="_blank">Adversary Emulation Library</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-12 · 24 sources, all open-source/public reporting</div>
+  <div>Companion incident card on file: output/incidents/2021-05-07_COLONIAL-PIPELINE.html — no CVE-based vuln card applicable (root cause was credential/process, not a single exploited vulnerability)</div>
+</div>
+
+</body>
+</html>
