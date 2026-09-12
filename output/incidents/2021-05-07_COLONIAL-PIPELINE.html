@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Colonial Pipeline Ransomware Attack — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    CP-2021-05<br/>
+    2021-05-07
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Ransomware / Extortion — Critical Infrastructure</div>
+  <h1><span class="gold">COLONIAL</span> PIPELINE RANSOMWARE ATTACK</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-12 &nbsp;|&nbsp; INCIDENT DATE: 2021-04-29 (initial access) — 2021-05-12 (pipeline restart) &nbsp;|&nbsp;
+    SOURCES: 24
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>RANSOMWARE / EXTORTION · CRITICAL INFRASTRUCTURE</span></div>
+    <div>Attribution: <span class="green">DarkSide (RaaS) [HIGH]</span></div>
+    <div>Severity: <span class="red">CRITICAL</span></div>
+    <div>Era: <span>2021 (Post-ATT&amp;CK)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">$4.4M</div>
+    <div class="stat-label">Ransom paid in 75 BTC, within hours of the encryption event (May 7, 2021)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">6 DAYS</div>
+    <div class="stat-label">Full pipeline shutdown — ~45% of East Coast refined-fuel supply halted</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">~100 GB</div>
+    <div class="stat-label">Data exfiltrated in a ~2-hour window before ransomware deployment</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">$2.3M</div>
+    <div class="stat-label">Ransom value clawed back by DOJ/FBI in the first such seizure of its kind</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="name">DarkSide (Ransomware-as-a-Service) — <span class="none">No companion actor card on file</span></span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">Colonial Pipeline Ransomware Attack</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Initial access: 2021-04-29 · Ransomware deployed &amp; discovered: 2021-05-07 · Full restart: 2021-05-12</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Ransomware / extortion against corporate IT, with precautionary cascading impact to critical infrastructure operations</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">DarkSide (RaaS core group + unidentified affiliate operator)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[HIGH]</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Colonial Pipeline Company — largest refined-products pipeline operator in the U.S. (5,500 miles, ~2.5M barrels/day)</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">1 direct victim organization; downstream impact to ~1,800 gas stations and fuel supply across 17 states + D.C.</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">2021-05-07, ~05:30 ET</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Colonial Pipeline control-room employee (found ransom note on-screen)</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">~8 days (2021-04-29 to 2021-05-07)</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">6-day precautionary shutdown of the entire pipeline; regional fuel shortage and panic buying; $4.4M ransom paid</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None assigned — DarkSide is not tracked as a formal MITRE ATT&amp;CK Group (no G-ID) or Campaign as of 2026-09-12</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">Incident is &gt;5 years old — see Section 06 historical flagging</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On the morning of May 7, 2021, a control-room employee at Colonial Pipeline Company found a ransom note on a company computer. Within hours, the operator of the largest refined-petroleum pipeline in the United States — a 5,500-mile system moving roughly 2.5 million barrels of gasoline, diesel, and jet fuel per day and supplying an estimated 45% of the East Coast's fuel — took its entire pipeline offline as a precaution (Colonial Pipeline public statement, May 8, 2021; U.S. Department of Energy, "Colonial Pipeline Cyber Incident"). The ransomware itself never touched a single valve, pump, or programmable logic controller. It didn't need to: it encrypted the IT systems Colonial used to measure, bill, and invoice the fuel moving through the line, and the company judged it could not safely or lawfully keep pumping product it could no longer account for.</p>
+      <p>The attackers were DarkSide, a Russian-speaking ransomware-as-a-service (RaaS) operation that had been running since August 2020, renting its encryption tooling and negotiation infrastructure to vetted criminal affiliates in exchange for a cut of ransom proceeds (Trend Micro, "What We Know About Darkside Ransomware," 2021; CISA/FBI Advisory AA21-131A). An affiliate had been sitting inside Colonial's network for eight days before deploying the payload, having walked in through a single compromised password on a VPN account nobody at the company realized was still active (Bloomberg, June 4, 2021; DarkReading, "Colonial Pipeline CEO... Pilfered 'Legacy' VPN Account"). In a two-hour window before encryption, the affiliate quietly exfiltrated roughly 100 gigabytes of corporate data — the leverage for a double-extortion demand layered on top of the encryption itself.</p>
+      <p>What followed was six days of fuel panic across the Southeast and mid-Atlantic: nearly 1,800 gas stations ran dry, prices hit a six-year high, and the Department of Transportation issued regional emergency declarations to relax fuel-hauling restrictions (CBS News; Washington Post, May 12, 2021). Colonial's CEO authorized a $4.4 million ransom payment — 75 Bitcoin — within hours of the attack, a decision he would later defend to Congress as "the hardest decision I've made in my 39 years in the energy industry" (Senate Homeland Security and Governmental Affairs Committee testimony, June 8, 2021). A month later, the Department of Justice announced it had clawed back $2.3 million of that payment by seizing the private key to a DarkSide-controlled Bitcoin wallet — the first operation of its kind and a watershed moment for cryptocurrency forensics against ransomware actors (DOJ/Chainalysis, June 2021).</p>
+      <p>Colonial Pipeline still matters as a case study for a reason that has nothing to do with its ransomware family, which by relevant industry standards was neither novel nor especially sophisticated. It matters because it is the cleanest public demonstration that critical infrastructure does not need its operational technology touched to be taken offline — corporate IT dependency alone is sufficient — and because it single-handedly converted ransomware from a "business email compromise"-adjacent nuisance into a matter the U.S. government now treats with the same investigative priority as terrorism. Every subsequent U.S. pipeline cybersecurity regulation, and much of the federal government's current ransomware posture, traces a direct line back to this incident.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>By 2021, ransomware-as-a-service had matured into an industrialized criminal economy. Groups like REvil, Ryuk, and Conti had already demonstrated that outsourcing intrusion work to affiliates — while core operators focused on tooling, negotiation infrastructure, and leak-site "brand" management — scaled extortion revenue far faster than any single crew could manage alone. DarkSide entered this ecosystem in August 2020 and, notably, marketed itself with a veneer of professionalism and a stated (if selectively honored) code against targeting hospitals, schools, nonprofits, and government entities — positioning explicitly aimed at avoiding the kind of law-enforcement and media attention that follows attacks on politically sensitive targets (Emsisoft, "Ransomware Profile: DarkSide"; CSO Online). Energy-sector operators, including pipeline companies, sat outside that self-imposed exclusion list and inside a target profile the group and its affiliates found attractive: large, revenue-rich, operationally intolerant of downtime, and — critically — dependent on IT/OT interdependencies most operators had not fully mapped.</p>
+      <p>Colonial Pipeline's own security posture reflected a common pattern in mid-sized critical-infrastructure operators of the era: perimeter remote-access infrastructure had accumulated over years without a rigorous account-lifecycle process. The VPN profile ultimately used for initial access was, by the company's own later admission, a "legacy" account that was not believed to be in active use — yet remained enabled, and protected by only a single factor of authentication (password only, no MFA) (DarkReading; CPO Magazine, "Colonial Pipeline Hack Connected to Password Leak of 8.4 Billion Accounts"). The password itself was later found inside an unrelated leaked credential dump circulating on the dark web, consistent with password reuse by an employee across a personal and corporate account — a failure mode with no single technical control, only layered ones (MFA, credential-exposure monitoring, account deprovisioning) that were each individually absent.</p>
+      <p>There was no specific pre-incident indicator or threat-intelligence warning naming Colonial Pipeline as a target. CISA and the FBI had published general guidance on DarkSide's RaaS model and mitigation practices before May 2021, but nothing that flagged this specific victim or vector. The geopolitical backdrop — a U.S. administration less than four months into office, already grappling with the SolarWinds supply-chain compromise disclosed the prior December, and heading toward a planned June 2021 summit between President Biden and President Putin — meant the incident landed at a moment when ransomware originating from Russia-based criminal infrastructure was already climbing the U.S. national security agenda, even before this specific attack.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Legacy Credential Compromise — Initial Access</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">On April 29, 2021, a DarkSide affiliate authenticated to Colonial Pipeline's corporate network through a VPN account that was no longer used by any active employee but had never been formally decommissioned. The account protected remote access with a password alone — no multi-factor authentication was configured for this legacy profile (Bloomberg, June 4, 2021). The password itself was not obtained from Colonial's own systems; it surfaced in an unrelated batch of leaked credentials circulating on the dark web, consistent with an employee having reused a corporate password on a separate, previously breached account. Colonial Pipeline has publicly stated it does not know precisely how the attacker obtained the specific password (Threatpost, "DarkSide Pwned Colonial With Old VPN Password"). Because the login used a technically valid account and password, it generated no authentication anomaly for defenders to act on — there was nothing in the login event itself to distinguish it from routine remote access.</div>
+        <div class="kc-pivot">A single unmonitored, MFA-less remote-access account gave the affiliate an unremarkable, fully authenticated foothold inside the corporate network — no exploit, malware, or phishing lure required at the door.</div>
+      </div>
+
+      <div class="kc-phase unknown">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Internal Reconnaissance &amp; Lateral Movement</span>
+          <span class="vis-badge vis-unknown">UNKNOWN</span>
+        </div>
+        <div class="kc-body">Between April 29 and roughly May 6, the affiliate operated inside Colonial's IT environment for approximately a week without triggering a publicly reported alert. Neither Colonial nor CISA has published a detailed account of the internal reconnaissance and lateral-movement techniques specific to this intrusion; what is publicly documented instead is the broader DarkSide affiliate tradecraft observed across the group's campaigns generally — internal network scanning, Active Directory enumeration, and credential harvesting using widely available dual-use tools (Picus Security, "Illuminating DarkSide: TTPs, Tools, and Trend Towards Defense Evasion") — which this card maps in Section 04 as representative tradecraft, not confirmed-for-Colonial fact. Whether Colonial's own security tooling generated alerts during this window that went unreviewed, versus generating no signal at all, cannot be determined from the public record — a genuine intelligence gap rather than a confirmed "missed alert" finding.</div>
+        <div class="kc-pivot">Roughly a week of undetected internal access gave the affiliate time to map the environment and stage for exfiltration and payload deployment with no apparent rush.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Data Exfiltration</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">On or around May 6, 2021, the affiliate exfiltrated approximately 100 gigabytes of data from Colonial's network in a compressed roughly two-hour window (Security Boulevard, "The Colonial Pipeline Ransomware Attack: Everything We Know"). Consistent with DarkSide's documented double-extortion model, this data theft preceded encryption and was intended as independent leverage — publish-or-pay pressure that functions even against a victim capable of restoring from backup. No public reporting indicates this exfiltration was detected in real time; it surfaced only in the post-incident forensic reconstruction.</div>
+        <div class="kc-pivot">A completed exfiltration gave DarkSide a second, backup-proof lever of extortion before a single file was ever encrypted.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Ransomware Deployment on IT Network</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Encryption was deployed against Colonial's IT and billing systems overnight into the early hours of May 7, 2021. A control-room employee discovered a ransom note on a company computer at approximately 05:30 ET (multiple sources, corroborated across CHDS timeline and contemporaneous reporting). This was the first point at which the intrusion became unambiguously visible to Colonial's own staff — detection occurred only at the terminal stage of the attack, after reconnaissance, lateral movement, and exfiltration had already run their course undetected.</div>
+        <div class="kc-pivot">Discovery of the ransom note forced an immediate, compressed incident-response decision under extreme uncertainty about how far the compromise extended.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Precautionary Full-Pipeline Shutdown</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Colonial made the decision on May 7 to shut down the entire pipeline system — not because the ransomware had reached the operational technology controlling pump stations and valves (it had not), but because the company could not rule out lateral propagation from the compromised IT environment into OT, and because its billing system — the mechanism for metering and invoicing the fuel actually moving through the line — was itself encrypted and unusable (Cybersecurity Dive; Control Engineering, "Lessons Learned from the Colonial Pipeline Attack"). Running the pipeline without the ability to measure and bill transported product was operationally and commercially untenable, independent of any direct OT compromise. This decision, not any technical action by DarkSide against control systems, is what actually removed ~45% of East Coast fuel supply from the market.</div>
+        <div class="kc-pivot">A precautionary IT-driven shutdown — not an OT attack — produced the incident's headline real-world consequence: a six-day disruption to national fuel distribution.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Ransom Payment, Negotiation &amp; Restoration</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Colonial paid a ransom of 75 Bitcoin (approximately $4.4 million) to DarkSide within hours of the attack on May 7, obtaining a decryption tool that CEO Joseph Blount later testified was slow enough that the company relied primarily on its own backups for actual recovery (Senate testimony, June 8, 2021). President Biden declared a regional state of emergency on May 9 to ease fuel-transport restrictions, and Colonial restored full pipeline service on May 12 — a five-to-six-day operational outage from detection to restart. The Department of Justice subsequently traced and seized 63.7 of the 75 Bitcoin (roughly $2.3 million at the time of seizure, reflecting BTC price appreciation), representing the 85% affiliate share of the ransom, by obtaining the private key to the wallet holding the funds — the first law-enforcement recovery of ransomware cryptocurrency proceeds of its kind (DOJ; Chainalysis, "How FBI Investigators Traced DarkSide's Funds").</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework; confidence reflects incident-specific vs. general affiliate tradecraft</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Legacy, single-factor VPN profile — believed disused but never decommissioned — provided the intrusion's entry point (Bloomberg, DarkReading).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access / Credential Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+        <div class="mitre-note">[HIGH] Login used a technically valid, reused password sourced from an unrelated leaked-credential dataset, evading anomaly-based detection (CPO Magazine).</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1018</div>
+        <div class="mitre-name">Remote System Discovery</div>
+        <div class="mitre-note">[MEDIUM] Advanced IP Scanner is documented general DarkSide affiliate tradecraft for internal network mapping; not specifically confirmed in Colonial forensics (Picus Security).</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1482</div>
+        <div class="mitre-name">Domain Trust Discovery</div>
+        <div class="mitre-note">[MEDIUM] BloodHound use for Active Directory relationship/attack-path mapping is documented across DarkSide affiliate campaigns generally (Picus Security, Splunk).</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003</div>
+        <div class="mitre-name">OS Credential Dumping</div>
+        <div class="mitre-note">[MEDIUM] Mimikatz is a documented DarkSide affiliate tool for harvesting additional credentials post-foothold; not confirmed specific to this intrusion.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1021.001</div>
+        <div class="mitre-name">Remote Desktop Protocol</div>
+        <div class="mitre-note">[MEDIUM] RDP is a documented DarkSide-affiliate lateral movement channel alongside legitimate remote-access tooling (Picus Security).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1219</div>
+        <div class="mitre-name">Remote Access Software</div>
+        <div class="mitre-note">[MEDIUM] TeamViewer, downloaded from the vendor's official site, is documented DarkSide-affiliate tradecraft for maintaining interactive access while blending into legitimate traffic.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1567.002</div>
+        <div class="mitre-name">Exfiltration to Cloud Storage</div>
+        <div class="mitre-note">[HIGH] ~100GB exfiltrated in a ~2-hour window prior to encryption is specifically confirmed for this incident; Rclone is DarkSide's documented exfiltration utility of choice (Security Boulevard; Splunk).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion / Discovery</div>
+        <div class="mitre-id">T1614.001</div>
+        <div class="mitre-name">System Location Discovery</div>
+        <div class="mitre-note">[HIGH] The DarkSide binary performs a language/keyboard-layout check and refuses to execute on systems configured for Russian or other CIS languages — well-documented across independent malware analyses (Flashpoint; CSO Online).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[HIGH] Hybrid Salsa20 (symmetric) + RSA-1024 (asymmetric) encryption scheme; Windows and Linux/ESXi-capable variants existed by the time of this attack (Qualys; Akamai).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] Double-extortion model — encryption plus a Tor-hosted leak-site threat ("Happy Blog") over the pre-exfiltrated data — culminating in the $4.4M ransom payment (Emsisoft; CSO Online).</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>What was missed, when, and why</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item">
+        <div class="pm-phase">IDENTITY &amp; ACCESS LIFECYCLE<br/>MISSED</div>
+        <div class="pm-detail"><strong>What was missed:</strong> A VPN account believed to be out of active use remained enabled on the network, protected only by a password, with no multi-factor authentication configured. Standard account-deprovisioning practice — disabling remote-access credentials once a use case ends — was not applied to this profile. This is the single control failure without which the intrusion's documented initial-access method would not have worked.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">CREDENTIAL HYGIENE<br/>MISSED</div>
+        <div class="pm-detail"><strong>What was missed:</strong> The compromised password had previously appeared in an unrelated leaked-credential dataset, consistent with reuse across a personal and corporate account. No dark-web credential-exposure monitoring or mandatory rotation policy caught this before an attacker did. Colonial has publicly stated it still does not know precisely how the specific password was obtained.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">DWELL-PERIOD DETECTION (~8 DAYS)<br/>VISIBILITY UNCONFIRMED</div>
+        <div class="pm-detail"><strong>What is and isn't known:</strong> No confirmed detection of reconnaissance, lateral movement, or the ~100GB exfiltration event has been publicly documented for the April 29 – May 6 window. Whether monitoring tooling existed and produced unreviewed signals, or produced no signal at all, is not established in the public record — a genuine gap, not a padded claim of a "missed alert."</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">TERMINAL-STAGE-ONLY DETECTION<br/>PATTERN</div>
+        <div class="pm-detail"><strong>Pattern identified:</strong> Detection occurred only at the very end of the kill chain — a human employee reading a ransom note — rather than at any earlier phase where technical controls (EDR, network anomaly detection, DLP on the exfiltration channel) could plausibly have intervened with materially less downstream impact.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail">The TSA issued its first-ever mandatory cybersecurity Security Directives for U.S. pipeline operators within weeks: Directive Pipeline-2021-01 (May 2021) required incident reporting to CISA within 12 hours, a 24/7-available cybersecurity coordinator, and a vulnerability self-assessment; Directive -02 (July 2021) mandated specific technical controls including MFA for remote access, network segmentation between IT and OT, patching timelines, and a tested contingency/recovery plan (Nextgov/FCW; Holland &amp; Knight). This replaced a decade of voluntary TSA pipeline-security guidance with binding federal regulation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, and infrastructure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">DarkSide Ransomware</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">RaaS Payload</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Hybrid Salsa20 (symmetric, per-file key) + RSA-1024 (asymmetric, protects the Salsa20 keys) encryption scheme, marketed by its operators as among the fastest encryptors available. Windows and Linux/ESXi-capable variants existed by early-mid 2021, with a v2.0 update released March 2021. Performs a system-locale/keyboard-layout check at execution and refuses to run on hosts configured for Russian or other CIS languages (T1614.001). Deployed against Colonial's IT and billing systems only — no confirmed variant or deployment against OT/ICS components in this incident (Qualys; Akamai; CISA AA21-131A).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Mimikatz</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">COTS / Dual-Use</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Open-source Windows credential-dumping utility documented across DarkSide affiliate campaigns generally for harvesting cached credentials post-foothold to support lateral movement. Not confirmed specific to the Colonial intrusion in public forensics (Picus Security).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Advanced IP Scanner</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">COTS</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Free, legitimately signed network-scanning utility used across documented DarkSide affiliate operations for internal host/network discovery, exploiting the fact that the tool rarely triggers antivirus alerts (Picus Security; Splunk).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">BloodHound</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">COTS / Open Source</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Active Directory attack-path mapping tool used to identify privilege-escalation and lateral-movement routes to domain-admin-equivalent access; part of DarkSide affiliates' documented internal-reconnaissance toolkit generally (Picus Security).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">TeamViewer (abused)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">LOLBin / Legitimate Software</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Legitimate remote-access software downloaded from the vendor's official site and repurposed for interactive persistence — a favored technique across DarkSide affiliate intrusions because the traffic and binary both appear legitimate to most network and endpoint controls (Picus Security).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Rclone</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">LOLBin / Open Source</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Open-source command-line cloud-storage sync utility, documented as DarkSide affiliates' preferred mechanism for bulk data exfiltration to attacker-controlled cloud storage ahead of encryption (T1567.002) — consistent with the ~100GB exfiltrated from Colonial in a ~2-hour window (Splunk; Security Boulevard).</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">DarkSide "Happy Blog" Leak Site</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Tor-Hosted Infrastructure</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">DarkSide's Tor-based name-and-shame extortion portal, used to threaten publication of exfiltrated victim data and host a negotiation channel. Seized or taken offline, along with the group's ransom-collection site and CDN, around May 13, 2021, days after the Colonial attack drew intense law-enforcement and media attention (GovInfoSecurity; Intel 471).</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — This incident is more than five years old. Infrastructure has long since rotated; the entries below are of archival and research value only, not operational detection value.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">NOTE</td><td class="val historical" colspan="3">No specific host, network, or file-hash IOC values are reproduced in this card. CISA and the FBI published a STIX/JSON indicator package specific to this campaign in Joint Cybersecurity Advisory AA21-131A (initially released 2021-05-11, updated 2021-05-19 with downloadable IOCs); consult that primary source directly for reconstructable indicator values rather than a secondary transcription here — this avoids introducing transcription errors into indicators over five years past their operational relevance.</td></tr>
+          <tr><td class="type-label">LEAK SITE</td><td class="val historical">DarkSide "Happy Blog" — Tor (.onion) hidden service; specific onion address not independently reproduced here (rotated/seized May 2021)</td><td>GovInfoSecurity, Intel 471</td><td>2021-05</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">President Biden declared a regional state of emergency on May 9, 2021 to relax fuel-transport regulations across 17 states and D.C. Ransomware originating from Russia-based criminal infrastructure became an explicit agenda item ahead of the June 2021 Biden-Putin Geneva summit, where the U.S. pressed Russia on tolerating ransomware "safe havens" for financially motivated actors operating from its territory. Executive Order 14028, "Improving the Nation's Cybersecurity," was signed May 12, 2021 — the same day Colonial resumed full service — and while its drafting predated this specific incident, its release timing and subsequent political momentum are widely tied to Colonial Pipeline in contemporaneous reporting.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">The incident is the clearest public proof-of-concept that ransomware confined entirely to corporate IT can force a critical-infrastructure operator to shut down operational systems as a precaution, without any direct OT/ICS compromise — a lesson that reshaped how critical-infrastructure operators model IT/OT interdependency risk. The DOJ/FBI's recovery of $2.3M in Bitcoin from a DarkSide wallet was the first successful law-enforcement cryptocurrency ransom clawback of its kind, establishing blockchain-forensics-based recovery as a viable post-payment remedy and a template for subsequent operations against other ransomware groups.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">TSA issued its first-ever mandatory cybersecurity Security Directives for pipeline operators: Pipeline-2021-01 (May 2021, reporting and self-assessment requirements) and Pipeline-2021-02 (July 2021, technical controls including MFA, IT/OT segmentation, and contingency planning) — ending a decade of voluntary-only TSA pipeline guidance. The Treasury's OFAC sanctioned the SUEX OTC cryptocurrency exchange on September 21, 2021 for laundering ransomware proceeds from at least eight variants including DarkSide, the first sanctions action of its kind against a crypto exchange. The Department of Justice separately elevated ransomware investigations to a priority tier comparable to terrorism in internal guidance issued weeks after this incident.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: [HIGH]</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">DarkSide (RaaS core operators) + an unidentified affiliate operator</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">None confirmed — financially motivated eCrime group, not state-sponsored</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">FBI publicly confirmed DarkSide's responsibility on 2021-05-10</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">No individual indictment has been publicly unsealed specifically for the Colonial Pipeline intrusion as of this writing (2026-09-12) — a documented gap in the public record</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">None on file (see note below)</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">DarkSide-branded ransom note/payload recovered from Colonial's encrypted systems; FBI's successful seizure of a DarkSide-controlled wallet holding the affiliate's 85% share of the ransom, corroborating operational control of the proceeds; DarkSide's own public statements (May 10 &amp; 13, 2021) acknowledging the attack's fallout</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">None substantive on the DarkSide brand attribution itself; early public speculation about possible state involvement, given the critical-infrastructure target, was quickly set aside by U.S. officials and is inconsistent with DarkSide's own public disavowal of political motivation and its RaaS business model</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Public unsealing of an indictment naming the specific affiliate who conducted the Colonial intrusion, or forensic correlation of that affiliate's infrastructure/tooling to a separately tracked, named eCrime cluster</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution of this incident to the DarkSide RaaS brand is not seriously contested: the ransomware payload, ransom note, and extortion infrastructure all bore DarkSide's signature, the FBI confirmed the attribution within three days, and DarkSide itself never disputed responsibility — instead issuing a public statement distancing the group from the attack's societal consequences while implicitly acknowledging its role. What remains genuinely unresolved is finer-grained: DarkSide operated a two-tier RaaS structure in which core developers built and maintained the tooling while independent affiliates conducted the actual intrusions and kept the majority (documented as 85% in the DOJ's own seizure accounting) of any ransom. The specific individual or crew who breached Colonial's VPN, moved laterally through its network, and deployed the payload has never been publicly named or indicted — a distinct intelligence gap from the well-established brand-level attribution. No companion MITRE ATT&amp;CK Group page (G-ID) exists for DarkSide as of this writing, and this card's author found no existing actor card for DarkSide in this repository's output/actors/ directory; this incident card therefore stands without a linked companion identity profile.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Colonial Pipeline is taught not because DarkSide's tooling was innovative — by the standards of 2021 ransomware, it was competent but unremarkable — but because the incident is the cleanest available proof that ransomware confined entirely to corporate IT can force a critical-infrastructure operator to shut down its operational systems without the attacker ever touching OT. Every prior generation of "ICS incident" case study (Ukraine's grid attacks, Triton, Stuxnet) involved the attacker deliberately targeting or reaching control systems. Colonial demonstrated a subtler and, in some ways, more universally applicable failure mode: an operator can be forced offline purely because it can no longer trust or operate its own billing and metering systems, even while the physical control layer remains fully intact and uncompromised. That distinction reshaped how critical-infrastructure risk assessments treat IT/OT interdependency — the relevant question shifted from "can the attacker reach the PLCs" to "can the business keep operating the plant if the IT stack goes dark."</p>
+      <p>The incident also marks a durable inflection point in U.S. regulatory posture toward critical-infrastructure cybersecurity. A decade of TSA pipeline-security guidance built entirely on voluntary industry cooperation was replaced within weeks by binding federal Security Directives — the first mandatory cybersecurity regulation the pipeline sector had ever faced. That regulatory template (mandatory incident reporting windows, a designated 24/7 cybersecurity coordinator, required technical controls, contingency planning) has since been referenced as a model for cybersecurity rulemaking efforts in other critical-infrastructure sectors, well beyond pipelines.</p>
+      <p>Finally, the DOJ/FBI's recovery of $2.3 million in ransom cryptocurrency proved, for the first time publicly, that blockchain forensics could claw back ransom payments after the fact — undercutting the assumption, common among both victims and ransomware operators at the time, that a Bitcoin payment was functionally unrecoverable once sent. That precedent shaped how law enforcement, insurers, and victim organizations have approached ransom payment and recovery decisions ever since. DarkSide's own rapid collapse — the group announced it was shutting down on May 13, 2021, just six days after the attack, reportedly under law-enforcement pressure, before elements of its code and operators resurfaced weeks later as BlackMatter — also set an early template for the now-familiar "heat, shutdown, rebrand" survival cycle later observed across the broader RaaS ecosystem (REvil, Conti, and others).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-131a" target="_blank">AA21-131A: DarkSide Ransomware — Best Practices for Preventing Business Disruption from Ransomware Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS ADVISORY — originally released 2021-05-11, updated 2021-05-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Dept. of Energy</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.energy.gov/ceser/colonial-pipeline-cyber-incident" target="_blank">Colonial Pipeline Cyber Incident</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bloomberg</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bloomberg.com/news/articles/2021-06-04/hackers-breached-colonial-pipeline-using-compromised-password" target="_blank">Hackers Breached Colonial Pipeline Using Compromised Password</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2021-06-04</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DarkReading</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/cyberattacks-data-breaches/colonial-pipeline-ceo-ransomware-attack-started-via-pilfered-legacy-vpn-account" target="_blank">Colonial Pipeline CEO: Ransomware Attack Started via Pilfered 'Legacy' VPN Account</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CPO Magazine</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cpomagazine.com/cyber-security/colonial-pipeline-hack-connected-to-password-leak-of-8-4-billion-accounts-attackers-got-in-via-an-old-vpn-account/" target="_blank">Colonial Pipeline Hack Connected to Password Leak of 8.4 Billion Accounts; Attackers Got in via an Old VPN Account</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Threatpost</div>
+        <div>
+          <div class="ref-detail"><a href="https://threatpost.com/darkside-pwned-colonial-with-old-vpn-password/166743/" target="_blank">DarkSide Pwned Colonial With Old VPN Password</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2021-06</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Security Boulevard</div>
+        <div>
+          <div class="ref-detail"><a href="https://securityboulevard.com/2021/05/the-colonial-pipeline-ransomware-attack-everything-we-know/" target="_blank">The Colonial Pipeline Ransomware Attack: Everything We Know</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2021-05</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CHDS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.chds.us/c/timeline/2021-colonial-pipeline-ransomware-attack/" target="_blank">2021 Colonial Pipeline Ransomware Attack Timeline</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Senate HSGAC</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.hsgac.senate.gov/wp-content/uploads/imo/media/doc/Testimony-Blount-2021-06-08.pdf" target="_blank">Testimony of Joseph Blount, President and CEO, Colonial Pipeline Company</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS TESTIMONY — 2021-06-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CBS News</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cbsnews.com/news/colonial-pipeline-ceo-ransomware-hackers-senate-hearing/" target="_blank">Colonial Pipeline CEO defends handling of ransomware attack in Senate testimony</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2021-06-08</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Washington Post</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.washingtonpost.com/business/2021/05/12/gas-shortage-colonial-pipeline-live-updates/" target="_blank">Colonial Pipeline systems resumes operations but Southeast still reeling from panic buying</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2021-05-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CBS News</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cbsnews.com/news/gas-prices-shortages-worsen-colonial-pipeline-ransomware-attack/" target="_blank">Gas shortages worsen as fuel prices spike after Colonial Pipeline ransomware attack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cybersecurity Dive</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cybersecuritydive.com/news/colonial-pipeline-operational-tech-security/600197/" target="_blank">The fallout when OT companies lack confidence in IT security barriers</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Control Engineering</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.controleng.com/lessons-learned-from-the-colonial-pipeline-attack/" target="_blank">Lessons learned from the Colonial Pipeline attack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Cybereason</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cybereason.com/blog/doj-recovers-2.3m-in-bitcoin-ransom-paid-by-colonial-pipeline" target="_blank">DOJ Recovers $2.3M in Bitcoin Ransom Paid by Colonial Pipeline</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2021-06</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Chainalysis</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.chainalysis.com/blog/darkside-colonial-pipeline-ransomware-seizure-case-study/" target="_blank">How FBI Investigators Traced DarkSide's Funds</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GovInfoSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.govinfosecurity.com/darkside-ransomware-gang-says-has-shut-down-a-16620" target="_blank">DarkSide Ransomware Gang Says It Has Shut Down</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2021-05-13</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Intel 471</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.intel471.com/blog/darkside-ransomware-shut-down-revil-avaddon-cybercrime" target="_blank">The moral underground? Ransomware operators retreat after Colonial Pipeline hack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Trend Micro</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.trendmicro.com/en_us/research/21/e/what-we-know-about-darkside-ransomware-and-the-us-pipeline-attac.html" target="_blank">What We Know About Darkside Ransomware and the US Pipeline Attack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Qualys</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.qualys.com/vulnerabilities-threat-research/2021/06/09/darkside-ransomware" target="_blank">DarkSide Ransomware — Technical Analysis</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Picus Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.picussecurity.com/resource/whitepaper/illuminating-darkside-ransomware" target="_blank">Illuminating DarkSide: TTPs, Tools, and Trend Towards Defense Evasion</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Flashpoint</div>
+        <div>
+          <div class="ref-detail"><a href="https://flashpoint.io/blog/darkside-ransomware-links-to-revil-difficult-to-dismiss/" target="_blank">DarkSide Ransomware Links to REvil Group Difficult to Dismiss</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">U.S. Treasury</div>
+        <div>
+          <div class="ref-detail"><a href="https://home.treasury.gov/news/press-releases/jy0471" target="_blank">Treasury Continues to Counter Ransomware as Part of Whole-of-Government Effort; Sanctions Ransomware Operators and Virtual Currency Exchange</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS PRESS RELEASE — 2021-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Nextgov/FCW</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nextgov.com/cybersecurity/2021/05/after-colonial-attack-tsa-issues-new-cyber-regs-for-pipelines/258851/" target="_blank">After Colonial attack, TSA issues new cyber regs for pipelines</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS REPORTING — 2021-05</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Holland &amp; Knight</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.hklaw.com/en/insights/publications/2021/08/tsas-pipeline-of-cybersecurity-requirements" target="_blank">TSA's Pipeline of Cybersecurity Requirements</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/Colonial_Pipeline_ransomware_attack" target="_blank">Colonial Pipeline ransomware attack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Emsisoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.emsisoft.com/en/blog/38577/ransomware-profile-darkside/" target="_blank">Ransomware Profile: DarkSide</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-12 · 24 sources, all open-source/public reporting</div>
+  <div>Compiled by CTI Incident Card Generator agent · No companion actor card exists for DarkSide in this repository as of compile date</div>
+</div>
+
+</body>
+</html>
