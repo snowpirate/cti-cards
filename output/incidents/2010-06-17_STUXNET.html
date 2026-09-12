@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stuxnet — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  /* Stamp watermark */
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  /* Defender visibility badge */
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 9px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 10.5px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 10px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 7.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 7.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 11px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 8px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.45; }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 9px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 8.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 11px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 11px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 8px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-2010-0617-STUXNET<br/>
+    2006 – 2010
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Nation-State Destructive · Worm / Self-Propagating</div>
+  <h1><span class="gold">STUX</span>NET</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-12 &nbsp;|&nbsp; INCIDENT DATE: DEV FROM 2006 · DAMAGE NOV 2009 – JAN 2010 · DISCOVERED 17 JUN 2010 &nbsp;|&nbsp;
+    SOURCES: Symantec W32.Stuxnet Dossier · Langner Group · Institute for Science and International Security · Kaspersky · VirusBlokAda · IAEA reporting · NYT/Sanger · CRS R41524 · CCDCOE · Wired/Zetter
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>NATION-STATE DESTRUCTIVE / WORM</span></div>
+    <div>Attribution: <span class="gold">US + ISRAEL — OPERATION OLYMPIC GAMES [HIGH]</span></div>
+    <div>Target: <span class="gold">NATANZ FUEL ENRICHMENT PLANT, IRAN</span></div>
+    <div>Severity: <span class="red">STRATEGIC</span></div>
+    <div>Era: <span>Pre-ATT&amp;CK (2010)</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">ENTERPRISE + ICS — RETROSPECTIVE</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">~1,000</div>
+    <div class="stat-label">IR-1 centrifuges decommissioned and replaced at Natanz, late 2009 – early 2010 (ISIS)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">4</div>
+    <div class="stat-label">Windows zero-days burned in a single operation — unprecedented then and since</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">100,000+</div>
+    <div class="stat-label">Hosts infected worldwide; over 60,000 of them in Iran</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">2</div>
+    <div class="stat-label">Stolen code-signing certificates — Realtek and JMicron, both Taiwanese</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="none">No companion actor card on file — Operation Olympic Games is a joint US/Israeli state programme, not a tracked threat-actor cluster</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">Stuxnet (Operation Olympic Games)</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">Programme from 2006; variants Jun 2009 – May 2010; damage Nov 2009 – Jan 2010</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Nation-state destructive · worm · cyber-physical sabotage</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">United States (NSA / USCYBERCOM, CIA operational lead) with Israel (Unit 8200)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[HIGH] — multiple independent official-source accounts; never formally acknowledged</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Siemens S7-315 and S7-417 PLCs, Natanz Fuel Enrichment Plant</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val">5 Iranian contractor organisations seeded; 100,000+ collateral infections worldwide</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">2010-06-17</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Sergey Ulasen, VirusBlokAda (Minsk, Belarus) — from a customer reboot loop in Iran</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val red">~12 months from first deployed variant to discovery; ~4 years from programme start</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Physical destruction of gas centrifuges; assessed programme delay</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise + ICS — all mappings [RETROSPECTIVE]</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None; Stuxnet malware referenced as S0603</span></div>
+        <div class="kv-row"><span class="kv-key">Historical IOCs</span><span class="kv-val dim">16 years old — C2 domains sinkholed since 2010; archival value only</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On 17 June 2010 an engineer in Minsk opened a support ticket. A customer machine in Iran was stuck in a reboot loop, restarting endlessly while its operators failed to regain control. Sergey Ulasen of VirusBlokAda extracted the responsible code and found something that did not belong in a routine antivirus caseload: a worm carrying a Windows zero-day and a valid digital signature from a Taiwanese hardware manufacturer. Over the following months the security industry took the sample apart and arrived at a conclusion that permanently changed the field's sense of what software could do. This was not malware that stole, encrypted or deleted. It was malware built to break machines — specifically, the gas centrifuges enriching uranium at Iran's Natanz Fuel Enrichment Plant.</p>
+      <p>The scale of the engineering was without precedent and remains so. Stuxnet burned <strong>four Windows zero-days simultaneously</strong> — CVE-2010-2568 in the Windows Shell, which executed code merely from viewing a LNK file on a removable drive; CVE-2010-2729 in the print spooler for network propagation; and CVE-2010-2743 and CVE-2010-3888 for privilege escalation. No prior malware had weaponised more than one or two at once, and burning four in a single operation meant accepting that all four would be patched the moment the operation was discovered. It carried user-mode and kernel-mode rootkits (<code>mrxcls.sys</code> and <code>mrxnet.sys</code>), and it was signed with code-signing certificates stolen from <strong>Realtek and JMicron</strong> — two companies whose offices sit near each other in the Hsinchu science park in Taiwan. The thieves were never identified.</p>
+      <p>None of that was the payload. The payload was a man-in-the-middle attack on a programmable logic controller. Stuxnet replaced <code>s7otbxdx.dll</code>, the library through which Siemens Step7 engineering software talks to a PLC, with its own version that sat between the engineer and the controller, recording and altering the blocks written to and read from it. On reaching a PLC matching a very specific configuration — the right controller model, the right count of frequency converters, from two specific vendors, driving motors in the right frequency band — it modified the control logic and then lied about it. Symantec's analysis documented the rotor-speed attack: normal operation between 807 and 1210 Hz, with Stuxnet periodically forcing the drives to <strong>1410 Hz</strong>, then down to <strong>2 Hz</strong>, then back to <strong>1064 Hz</strong>, in bursts of roughly 15 to 50 minutes about once a month. At 1410 Hz an IR-1 rotor approaches the tangential velocity at which aluminium rotors fly apart. Everywhere else in the world, Stuxnet did nothing at all.</p>
+      <p>It worked. The Institute for Science and International Security, reading quarterly IAEA inspection data, documented that Iran decommissioned and replaced roughly <strong>1,000 IR-1 centrifuges</strong> at Natanz between November 2009 and early 2010 — around a tenth of the operating stock — after a period in which installed centrifuge counts had been climbing steadily to a peak of 8,692. Ralph Langner's later analysis established that this rotor-speed attack was in fact the <em>second</em> and cruder of two distinct Stuxnet operations; an earlier, far more sophisticated attack had targeted S7-417 controllers governing the Cascade Protection System's valves and pressure sensors, aiming to destroy centrifuges through overpressure rather than overspeed.</p>
+      <p>The operation's undoing was its own success at spreading. To cross an air gap into a facility with no internet connection, the worm had to propagate aggressively through contractor networks and removable media — and the later variant propagated more aggressively than the earlier one. It escaped. By late September 2010 more than 100,000 machines worldwide were infected, over 60,000 in Iran, all of them harmlessly, because none of them were running the specific centrifuge configuration Stuxnet was looking for. That collateral spread put the sample in front of an antivirus researcher in Belarus, and the most closely held covert operation of its era became the most thoroughly reverse-engineered malware in history.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>The strategic problem.</strong> According to David Sanger's reporting in the New York Times and his 2012 book <em>Confront and Conceal</em>, drawing on interviews with current and former American officials, the programme began under President Bush around 2006 after negotiations with Iran failed and Tehran restarted enrichment, and was expanded under President Obama. The logic was explicitly one of substitution rather than escalation: Washington assessed that an Iranian weapons capability would trigger Israeli airstrikes and a regional war, and sought a third option between accepting the programme and bombing it. Sabotage that looked like equipment failure offered exactly that — a way to impose delay without a casus belli, and without either side being forced into a public position. This is the same strategic gap that, on the evidence of <em>fast16</em> (see companion incident card), was already being addressed by other means as early as 2005.</p>
+      <p><strong>The target.</strong> Natanz enriched uranium using IR-1 gas centrifuges — an Iranian derivative of the Pakistani P-1, itself derived from a 1970s URENCO design — arranged in cascades of 164 machines. The IR-1 was already an unreliable machine with a well-documented history of breakage from manufacturing and materials problems, which matters enormously to this case: <strong>Iran's centrifuges were expected to fail</strong>. An attack that produced somewhat more failure than usual was hiding inside an existing noise floor. The controllers driving the cascades were Siemens S7 PLCs programmed from Windows workstations running Step7 and WinCC, with frequency converters from two specific vendors — one Iranian, one Finnish — whose presence Stuxnet checked for before doing anything.</p>
+      <p><strong>The technology landscape of 2010.</strong> Air-gapping was widely regarded not as one control among many but as <em>the</em> control — an isolated network was considered categorically safe, and the security investment therefore went elsewhere. ICS and OT security barely existed as a professional discipline: there was no ATT&amp;CK for ICS, no OT-aware detection tooling, no meaningful PLC logic integrity verification, and Siemens' own products shipped with a hardcoded WinCC database password (later CVE-2010-2772) that was publicly documented in support forums. Windows XP dominated engineering workstations. Code-signing was trusted implicitly — a signed driver was a legitimate driver — which is precisely the assumption the stolen Realtek and JMicron certificates were purchased, or stolen, to exploit.</p>
+      <p><strong>Pre-incident indicators.</strong> There were, in the conventional sense, none. No advisory existed because nothing like this had been publicly seen. The indicator that <em>was</em> available to the victim was physical and behavioural: centrifuges were failing at an elevated rate, and Langner's reconstruction indicates Iranian engineers noticed and investigated. They attributed the failures to the IR-1's known fragility and to their own manufacturing and materials difficulties. Given the machine's history and the complete absence of any prior example of software destroying industrial equipment, that was the rational conclusion available at the time. It was also exactly the conclusion the attack was designed to produce.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Phase-by-phase account of the attack as it progressed</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 1 — Programme Authorisation &amp; Target Modelling</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Operation Olympic Games was authorised under the Bush administration around 2006 and expanded under Obama, as a joint US–Israeli effort with NSA and Unit 8200 providing technical capability and the CIA holding overall operational responsibility (Sanger, NYT/<em>Confront and Conceal</em>, 2012). The engineering demanded more than code: it required a working model of the Natanz cascade — controller models, converter vendors, motor frequency ranges, cascade topology and the physical tolerances of the IR-1 rotor. Reporting has long held that test cascades using comparable centrifuges were operated to validate the payload before deployment, which is what the specificity of the targeting conditions implies. <strong>Defender visibility: none</strong> — this phase occurred entirely on the attacker side, and its product was knowledge rather than an artifact.</div>
+        <div class="kc-pivot">A validated physical model meant the payload could be written to fire only at Natanz — and to stay inert everywhere else it inevitably reached.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 2 — Supply-Chain Seeding via Iranian Contractors</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Natanz could not be reached directly, so the operators attacked the organisations that reached it. Joint Kaspersky and Symantec research identified <strong>five Iranian contractor organisations</strong> as the seeded entry points, targeted between June 2009 and March 2010, accounting for roughly 12,000 infections traced across 3,280 distinct samples. These were engineering and industrial automation firms whose staff carried laptops and removable media between their own premises and the enrichment facility. The choice is the operation's central insight: an air gap is a property of a network, not of an organisation, and every isolated facility is connected to the outside world by the people who work in it. <strong>Defender visibility was nil</strong> — the contractors had no reason to suspect they were being used as a delivery mechanism, and no capability that would have shown them.</div>
+        <div class="kc-pivot">Compromising the contractors converted the air gap from a barrier into a delay.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 3 — Air-Gap Traversal via Removable Media</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">The crossing itself used <strong>CVE-2010-2568</strong>, a flaw in the Windows Shell by which a specially crafted LNK file executed code the moment its containing folder was <em>displayed</em> in Explorer. No double-click, no autorun, no user decision — viewing the drive was sufficient. An infected USB device carried into the facility by a contractor or engineer and opened once on an engineering workstation was the whole mechanism. This is the single most consequential technique in the case file and the reason the phrase "air gap" acquired scare quotes after 2010. <strong>Defender visibility was nil:</strong> the exploit left no user-visible trace, removable media was uncontrolled, and the workstations had no endpoint telemetry that would have recorded the execution.</div>
+        <div class="kc-pivot">Once one workstation inside the perimeter was infected, the worm was on the same network as the PLC programming environment.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 4 — Internal Propagation, Escalation &amp; Signed Rootkit Installation</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Inside, Stuxnet spread through Windows network shares and <strong>CVE-2010-2729</strong> in the print spooler, escalated privilege with <strong>CVE-2010-2743</strong> (Win32k keyboard layout) and <strong>CVE-2010-3888</strong> (Task Scheduler), and where it found Siemens WinCC installations, authenticated to their databases using the vendor's <strong>hardcoded password</strong> (CVE-2010-2772). It installed kernel drivers <code>mrxcls.sys</code> and <code>mrxnet.sys</code> to hide its files and load its payload — and both were <strong>digitally signed with certificates stolen from Realtek and JMicron</strong>. That detail did more long-term damage to a security assumption than any of the zero-days: a validly signed kernel driver was, in 2010, treated as trustworthy by construction. <strong>Defender visibility was nil,</strong> and would have been nil even with good tooling, because every signature checked out.</div>
+        <div class="kc-pivot">With SYSTEM privilege and a hidden, trusted foothold, the worm could reach the software that programmed the controllers.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 5 — Step7 Hijack &amp; PLC Man-in-the-Middle</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Stuxnet replaced <code>s7otbxdx.dll</code> — the Siemens library through which Step7 communicates with a PLC — with its own version, loaded into the <code>s7tgtopx.exe</code> Step7 process. Every block written to or read from the controller now passed through attacker code. This is the architectural heart of the operation and the reason it stayed hidden: the malware did not merely alter the PLC's logic, it <strong>controlled what the engineering workstation was able to see about the PLC's logic</strong>. An engineer who suspected the controller and read its program back was served the original, clean blocks. The verification tool and the thing being verified were the same compromised channel. <strong>Defender visibility was nil by construction</strong> — the only instrument capable of detecting the tampering was the instrument that had been subverted.</div>
+        <div class="kc-pivot">Owning the engineer's view of the controller meant the payload could run in the open and still be invisible.</div>
+      </div>
+
+      <div class="kc-phase blind">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 6 — Payload A: Cascade Protection System Overpressure (S7-417)</span>
+          <span class="vis-badge vis-blind">BLIND</span>
+        </div>
+        <div class="kc-body">Ralph Langner's <em>To Kill a Centrifuge</em> established that Stuxnet comprised two distinct attacks, and that the earlier one was by far the more sophisticated. It targeted <strong>Siemens S7-417 controllers governing the valves and pressure sensors of the Cascade Protection System</strong>, seeking to destroy centrifuges by driving process pressure beyond tolerance rather than by overspeeding rotors — an attack on the safety and protection layer itself, masking its effects from the operators monitoring the cascade. Langner's assessment is that this earlier attack was more complex, more stealthy and more dangerous than the rotor-speed variant that became famous, and that the operators subsequently abandoned it for a markedly simpler approach. <em>Note on sourcing: Langner's paper was retrieved during this compile but could not be machine-read in this environment (no PDF text extraction available). The characterisation above is drawn from secondary summaries of his work and should be verified against the primary document before use in any downstream product.</em> <strong>Defender visibility was nil.</strong></div>
+        <div class="kc-pivot">The change of tactics from the 417 overpressure attack to the 315 rotor-speed attack is the hinge of the entire case — and it is what eventually exposed the operation.</div>
+      </div>
+
+      <div class="kc-phase visible">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 7 — Payload B: Rotor Overspeed &amp; Physical Destruction (S7-315)</span>
+          <span class="vis-badge vis-misattr">VISIBLE — MISATTRIBUTED</span>
+        </div>
+        <div class="kc-body">The later and better-documented attack targeted <strong>S7-315</strong> controllers driving the centrifuge motors, and fired only after confirming a precise configuration: the right controller, the right number of frequency converters from two specific vendors, operating in the right band. Symantec documented the logic — normal drive operation between <strong>807 Hz and 1210 Hz</strong>, with Stuxnet forcing excursions to <strong>1410 Hz</strong>, then <strong>2 Hz</strong>, then back to <strong>1064 Hz</strong>, each burst lasting roughly 15 to 50 minutes and recurring about every 27–30 days. At 1410 Hz the rotor approaches the tangential velocity at which an IR-1's aluminium tube fails. Between bursts the cascade ran normally for weeks. ISIS, reading quarterly IAEA inspection data, documented that installed centrifuge counts climbed steadily to 8,692 by 16 November 2009 and that by 18 February 2010 Iran had decommissioned and replaced roughly <strong>1,000 IR-1 machines</strong>. <strong>This is the one phase with genuine defender visibility, and it was misread.</strong> The failures were seen. They were attributed to the IR-1's well-known fragility and to Iran's own manufacturing and materials problems — the correct inference from the evidence available, and precisely the inference the month-long quiet intervals were designed to produce.</div>
+        <div class="kc-pivot">Physical damage was achieved — but the cruder variant's aggressive propagation was already carrying the worm out of the facility.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 8 — Loss of Containment &amp; Discovery</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Reaching an air-gapped facility requires spreading widely enough to be carried in — and Stuxnet spread further than intended. By late September 2010 more than <strong>100,000 hosts worldwide</strong> were infected, over 60,000 of them in Iran, and all of them inertly: absent the exact Natanz configuration, the payload never armed. Symantec collected 3,280 unique samples across three variants spanning June 2009 to May 2010, and identified two command-and-control domains, hosted in Malaysia and Denmark, to which infected machines reported basic host details and from which they could receive file read/write/delete commands. On <strong>17 June 2010</strong> Sergey Ulasen of VirusBlokAda in Minsk investigated a customer machine in Iran caught in a reboot loop, extracted the sample, and found the LNK zero-day. VirusBlokAda published on 10 July 2010 and notified Microsoft; the name derives from strings in the malware's own components. <strong>Detection was real but entirely incidental</strong> — the product of an attacker containment failure and one engineer's curiosity, not of any defensive capability at the target.</div>
+        <div class="kc-pivot">Public samples put the most sensitive covert operation of its era into the hands of every malware analyst on earth.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Phase 9 — Reverse Engineering, Attribution &amp; Proliferation</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Symantec's <em>W32.Stuxnet Dossier</em> (Falliere, O Murchu, Chien) reconstructed the architecture, propagation and PLC payload across successive revisions through February 2011; Langner independently established the Natanz targeting and the two-attack structure. ISIS supplied the damage assessment from IAEA data. In June 2012 David Sanger's New York Times reporting and <em>Confront and Conceal</em> named Operation Olympic Games and its US–Israeli authorship on the basis of official-source interviews — an attribution no government has ever formally confirmed and none has meaningfully disputed. The code's descendants followed: <strong>Duqu</strong> (2011), built on shared code and oriented to reconnaissance against industrial targets; <strong>Flame</strong> (2012); and <strong>Gauss</strong>. The operation's most durable consequence was not the centrifuges but the education: every subsequent ICS attacker inherited a detailed public blueprint of how to reach a PLC and lie to the engineer watching it.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>ATT&amp;CK was published in 2013; this incident is from 2009–2010 — every cell is a retrospective mapping</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1587.001 — [HIGH]</div>
+        <div class="mitre-name">Develop Capabilities: Malware</div>
+        <div class="mitre-note">Purpose-built multi-stage worm integrating four zero-days, dual rootkits, a Step7 MITM library and two distinct PLC payloads — an engineering effort requiring a validated physical model of the target cascade.</div>
+      </div>
+
+      <div class="mitre-cell green">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1588.003 — [HIGH]</div>
+        <div class="mitre-name">Obtain Capabilities: Code Signing Certificates</div>
+        <div class="mitre-note">Certificates stolen from Realtek Semiconductor and JMicron Technology, both headquartered in the Hsinchu science park, Taiwan. The theft was never attributed and no perpetrator was identified.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1195 — [HIGH]</div>
+        <div class="mitre-name">Supply Chain Compromise</div>
+        <div class="mitre-note">Five Iranian contractor organisations were seeded between June 2009 and March 2010 as the delivery path into an air-gapped facility — ~12,000 infections across 3,280 samples (Kaspersky / Symantec).</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Initial Access / Lateral Movement</div>
+        <div class="mitre-id">T1091 — [HIGH]</div>
+        <div class="mitre-name">Replication Through Removable Media</div>
+        <div class="mitre-note">CVE-2010-2568: a crafted LNK file executed code when its folder was merely displayed in Windows Explorer — no click, no autorun. The air-gap crossing mechanism, and the technique that made "air gap" a qualified term after 2010.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Lateral Movement</div>
+        <div class="mitre-id">T1210 — [HIGH]</div>
+        <div class="mitre-name">Exploitation of Remote Services</div>
+        <div class="mitre-note">CVE-2010-2729, Windows print spooler remote code execution, used for internal propagation alongside ordinary Windows network shares.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Privilege Escalation</div>
+        <div class="mitre-id">T1068 — [HIGH]</div>
+        <div class="mitre-name">Exploitation for Privilege Escalation</div>
+        <div class="mitre-note">Two further zero-days: CVE-2010-2743 (Win32k keyboard layout) and CVE-2010-3888 (Task Scheduler), escalating local administrator to SYSTEM. Four zero-days in one operation was unprecedented and has not been repeated.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1078 — [HIGH]</div>
+        <div class="mitre-name">Valid Accounts (Vendor Hardcoded Credential)</div>
+        <div class="mitre-note">Authenticated to Siemens WinCC databases using the vendor's hardcoded password — later CVE-2010-2772 — which had been publicly documented in support forums before the attack.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1553.002 — [HIGH]</div>
+        <div class="mitre-name">Subvert Trust Controls: Code Signing</div>
+        <div class="mitre-note">Kernel drivers signed with the stolen Realtek and JMicron certificates loaded without objection. This did more lasting damage to a security assumption than any of the zero-days — a valid signature was treated as proof of legitimacy.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion / Persistence</div>
+        <div class="mitre-id">T1014 — [HIGH]</div>
+        <div class="mitre-name">Rootkit</div>
+        <div class="mitre-note">Kernel drivers <code>mrxcls.sys</code> (payload loader) and <code>mrxnet.sys</code> (file hiding) installed to <code>system32\drivers</code>, concealing the worm's files on infected hosts and on removable media.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1480 — [HIGH]</div>
+        <div class="mitre-name">Execution Guardrails</div>
+        <div class="mitre-note">The payload armed only on a precise match: correct PLC model, correct count of frequency converters from two named vendors, motors in the correct frequency band. Over 100,000 infected hosts worldwide were never harmed because none matched.</div>
+      </div>
+
+      <div class="mitre-cell">
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1071.001 — [HIGH]</div>
+        <div class="mitre-name">Application Layer Protocol: Web Protocols</div>
+        <div class="mitre-note">Two C2 domains hosted in Malaysia and Denmark received host characteristics (Windows version, IP) and could issue file read, write and delete commands. Both sinkholed in 2010.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Lateral Movement / Persistence</div>
+        <div class="mitre-id">T0873 — [HIGH]</div>
+        <div class="mitre-name">Project File Infection</div>
+        <div class="mitre-note">Siemens Step7 project files were infected, carrying the worm between engineering workstations and into environments reached by shared project data.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Execution / Impair Process Control</div>
+        <div class="mitre-id">T0843 / T0889 — [HIGH]</div>
+        <div class="mitre-name">Program Download / Modify Program</div>
+        <div class="mitre-note">Malicious control logic was written to matching S7-315 and S7-417 controllers via the hijacked <code>s7otbxdx.dll</code>, replacing the legitimate Step7 communications library.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Evasion</div>
+        <div class="mitre-id">T0851 — [HIGH]</div>
+        <div class="mitre-name">Rootkit (PLC)</div>
+        <div class="mitre-note">The first documented PLC rootkit. Sitting between Step7 and the controller, it returned the original clean logic blocks to any engineer who read the program back — the verification tool and the subverted channel were the same thing.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impair Process Control</div>
+        <div class="mitre-id">T0836 — [HIGH]</div>
+        <div class="mitre-name">Modify Parameter</div>
+        <div class="mitre-note">Frequency converter setpoints driven outside the normal 807–1210 Hz band to 1410 Hz, 2 Hz and 1064 Hz in bursts of 15–50 minutes at roughly monthly intervals — mechanical stress delivered in doses small enough to read as ordinary unreliability.</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Inhibit Response Function</div>
+        <div class="mitre-id">T0837 — [MEDIUM]</div>
+        <div class="mitre-name">Loss of Protection</div>
+        <div class="mitre-note">The earlier S7-417 attack targeted the Cascade Protection System's valves and pressure sensors — the protective layer itself. Rated MEDIUM because the primary Langner analysis could not be machine-read in this compile (see Section 03 sourcing note).</div>
+      </div>
+
+      <div class="mitre-cell amber">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Evasion</div>
+        <div class="mitre-id">T0832 — [HIGH]</div>
+        <div class="mitre-name">Manipulation of View</div>
+        <div class="mitre-note">Operators and engineers were shown normal process and program state while the cascade was being damaged — the deception layer that allowed the attack to run for months inside an existing noise floor of IR-1 failures.</div>
+      </div>
+
+      <div class="mitre-cell red">
+        <div class="mitre-framework">ATT&amp;CK FOR ICS</div>
+        <div class="mitre-retro">[RETROSPECTIVE]</div>
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T0879 — [HIGH]</div>
+        <div class="mitre-name">Damage to Property</div>
+        <div class="mitre-note">The defining outcome: roughly 1,000 IR-1 centrifuges decommissioned and replaced at Natanz between November 2009 and early 2010 (ISIS, from IAEA inspection data) — the first documented case of code destroying physical industrial equipment.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>Assessed against 2009–2010 tooling, knowledge and norms</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 2–3<br/>MISSED</div>
+        <div class="pm-detail"><strong>The air gap was treated as a control rather than as one layer, and the contractors were outside the threat model entirely.</strong> Natanz's isolation was real; the assumption that isolation implied safety was not. Five contractor organisations with routine physical access were seeded, and removable media moved freely across the boundary with no whitelisting, no media sanitisation station and no inspection. The generalisable finding is that an air gap is a property of a network, not of an organisation — it is bridged by every person, laptop and USB stick that crosses it, and defending it means defending the supply chain around it.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 3–4<br/>MISSED</div>
+        <div class="pm-detail"><strong>Four simultaneous zero-days meant no patch state would have helped, and the stolen certificates defeated the one trust check that existed.</strong> Judged by 2010 norms this is not a patching failure — CVE-2010-2568, CVE-2010-2729, CVE-2010-2743 and CVE-2010-3888 were all unknown to the vendor. The harder criticism lands on Siemens rather than the victim: the WinCC hardcoded password later designated CVE-2010-2772 was publicly documented in support forums before the attack, a self-inflicted and entirely avoidable weakness in the vendor's own product.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">PHASE 5<br/>MISSED BY CONSTRUCTION</div>
+        <div class="pm-detail"><strong>The only tool capable of detecting the tampering was the tool that had been subverted.</strong> By replacing <code>s7otbxdx.dll</code>, Stuxnet controlled the channel through which Step7 read the PLC back. An engineer who suspected the controller, read the program and compared it to the known-good version would see a match — because the malware served the original blocks. No procedural diligence available in 2010 defeats this. It is the strongest argument in the historical record for out-of-band verification: validating a controller's logic through an independent path that the suspected host does not mediate.</div>
+      </div>
+
+      <div class="pm-item partial">
+        <div class="pm-phase">PHASE 7<br/>VISIBLE — MISATTRIBUTED</div>
+        <div class="pm-detail"><strong>The damage was seen for months and reasonably explained away.</strong> Centrifuges were failing, engineers noticed, and they attributed it to the IR-1's documented fragility and Iran's own manufacturing and materials problems. Given a machine with a genuine reliability history, month-long quiet intervals between attack bursts, an operator view that read normal, and zero prior examples anywhere in the world of software destroying industrial equipment, that was the correct inference from the available evidence. <strong>This is the case's central lesson and it is uncomfortable:</strong> a sabotage campaign calibrated to hide inside an existing failure rate is not defeated by attentiveness. It is defeated only by instrumentation that can distinguish a sabotaged failure from a natural one — which did not exist then and is still rare now.</div>
+      </div>
+
+      <div class="pm-item partial">
+        <div class="pm-phase">PHASE 8<br/>DETECTED — BY ACCIDENT, ELSEWHERE</div>
+        <div class="pm-detail"><strong>Discovery was an attacker failure, not a defender success.</strong> The worm was found by an antivirus engineer in Belarus investigating a reboot loop, 3,000km from the target, because the later variant propagated aggressively enough to escape into 100,000+ machines. No detection capability at Natanz, and none in the wider ICS community, played any part. The operational lesson for offence is equally sharp and was widely absorbed: the propagation required to cross an air gap is in direct tension with the containment required to stay covert, and Stuxnet's operators lost that trade.</div>
+      </div>
+
+      <div class="pm-item">
+        <div class="pm-phase">VENDOR &amp; ECOSYSTEM LAYER<br/>MISSED</div>
+        <div class="pm-detail"><strong>No part of the ICS ecosystem was positioned to catch this.</strong> There was no OT-aware detection tooling, no PLC logic integrity verification, no ICS threat intelligence function, no ATT&amp;CK for ICS, and no expectation that controllers were targets at all. Siemens shipped a hardcoded database credential; code-signing infrastructure had no practical revocation velocity; and no framework existed for reasoning about an adversary who wanted to change a physical process rather than steal data. The failure was distributed across an entire industry's threat model, which is why the correction, when it came, was also industry-wide.</div>
+      </div>
+
+      <div class="pm-item learned">
+        <div class="pm-phase">POST-INCIDENT<br/>LESSON ADOPTED</div>
+        <div class="pm-detail"><strong>Stuxnet created ICS security as a discipline.</strong> The direct descendants are visible today: ICS-CERT's expansion and the maturing of OT-specific advisory channels; the emergence of dedicated OT security vendors and research groups; IEC 62443 adoption; the normalisation of OT asset inventory, network segmentation and removable-media control as baseline expectations; and eventually ATT&amp;CK for ICS, which gave the field a shared vocabulary for exactly the techniques this case introduced. Kernel driver signing enforcement, certificate revocation practice and USB device control all hardened materially in the following years. The one lesson still unevenly absorbed is out-of-band verification of controller logic — the Section 05 finding above — which remains the gap Stuxnet exploited most elegantly and which most OT environments still cannot close.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, tools, CVEs, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">s7otbxdx.dll — Step7 Man-in-the-Middle Library</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">PLC ROOTKIT</span>
+            <span class="artifact-tag">DLL HIJACK</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">The operation's architectural core and the first documented PLC rootkit. Stuxnet replaced Siemens' legitimate <code>s7otbxdx.dll</code> — the library through which Step7 communicates with a controller — with its own version, loaded into the <code>s7tgtopx.exe</code> Step7 process from an unexpected path. Every block written to or read from the PLC passed through attacker code, which recorded them and could substitute what the engineer saw. Reading the program back for verification returned the <em>original clean blocks</em>. Detection artifact: the DLL loading from a non-standard path inside the Step7 process — a signal only meaningful to someone already looking for it.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">mrxcls.sys / mrxnet.sys — Kernel Rootkit Drivers</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">KERNEL ROOTKIT</span>
+            <span class="artifact-tag">SIGNED — STOLEN CERTS</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Two kernel drivers installed to <code>system32\drivers</code>. <code>mrxcls.sys</code> served as the payload loader, injecting Stuxnet code into target processes at boot; <code>mrxnet.sys</code> hid the worm's files on disk and on removable media. Both were <strong>validly signed with code-signing certificates stolen from Realtek Semiconductor and JMicron Technology</strong>, so they loaded without objection on a platform where a valid signature was taken as proof of legitimacy. The malware's name derives from strings in these components. Neither theft was ever attributed.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Exploited Vulnerabilities — Four Zero-Days Plus a Vendor Credential</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">5 CVEs</span>
+            <span class="artifact-tag">4 ZERO-DAY AT TIME OF USE</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc"><strong>CVE-2010-2568</strong> — Windows Shell LNK parsing; code execution merely from displaying a folder in Explorer. The air-gap crossing mechanism, and years later still among the most widely exploited vulnerabilities in the world, long after Stuxnet was irrelevant. <strong>CVE-2010-2729</strong> — Windows print spooler remote code execution, used for internal propagation. <strong>CVE-2010-2743</strong> — Win32k keyboard layout privilege escalation. <strong>CVE-2010-3888</strong> — Task Scheduler privilege escalation, local administrator to SYSTEM. <strong>CVE-2010-2772</strong> — Siemens WinCC hardcoded database password; not a zero-day in any meaningful sense, since it had been publicly documented in vendor support forums before the attack. Four unknown-to-vendor flaws burned in one operation remains without parallel.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">PLC Payloads — S7-315 Rotor Speed / S7-417 Cascade Protection</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">ICS PAYLOAD</span>
+            <span class="artifact-tag">TWO DISTINCT ATTACKS</span>
+            <span class="artifact-tag historical">[HISTORICAL — Limited detection utility]</span>
+          </div>
+        </div>
+        <div class="artifact-desc"><strong>S7-315 (rotor overspeed, later and better documented):</strong> armed only on matching controller model, frequency-converter count and two specific converter vendors. Normal drive operation 807–1210 Hz; Stuxnet forced excursions to <strong>1410 Hz</strong>, then <strong>2 Hz</strong>, then back to <strong>1064 Hz</strong>, in bursts of roughly 15–50 minutes recurring about every 27–30 days. At 1410 Hz an IR-1 rotor approaches the tangential velocity at which it fails. <strong>S7-417 (Cascade Protection System overpressure, earlier):</strong> per Langner, targeted the valves and pressure sensors of the CPS to destroy centrifuges through process overpressure rather than overspeed, and was assessed by him as substantially more complex and stealthy than the variant that became famous. <em>The S7-417 detail is drawn from secondary summaries — Langner's primary paper was retrieved during this compile but was not machine-readable in this environment.</em></div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Root Cause — No Single CVE</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">MULTI-VECTOR</span>
+            <span class="artifact-tag">NO VULN CARD DISPATCHED</span>
+          </div>
+        </div>
+        <div class="artifact-desc">No companion vulnerability card is dispatched for this incident. The root cause does not reduce to a single clearly identifiable CVE: it is a cluster of four independent zero-days across three Windows subsystems, plus a vendor hardcoded credential, plus two stolen code-signing certificates, plus a supply-chain delivery path, plus an architectural PLC man-in-the-middle that exploited no vulnerability at all. Recording the absence explicitly per standing orders rather than manufacturing a card around a fuzzy cause. <strong>CVE-2010-2568 would nonetheless stand on its own merits as a future vuln card</strong> — it outlived this operation by many years as a mass-exploited flaw.</div>
+      </div>
+
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">Descendants — Duqu, Flame, Gauss</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">CODE LINEAGE</span>
+            <span class="artifact-tag">CONTEXTUAL</span>
+          </div>
+        </div>
+        <div class="artifact-desc"><strong>Duqu</strong> (2011) was built on shared Stuxnet code and oriented to reconnaissance — keystroke logging and data collection from industrial targets, assessed as preparation for a later operation rather than sabotage in itself. <strong>Flame</strong> (2012) was large-scale modular espionage that also travelled by USB, notable for recording audio, keystrokes and screenshots, and for its own cryptographic novelty. <strong>Gauss</strong> shares code with Flame while targeting online banking credentials. Included as lineage context; their technical treatment belongs in their own case files rather than here.</div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+      <div class="ioc-historical-note">⚠ HISTORICAL IOCs — These artifacts are 16 years old. Both C2 domains were sinkholed in 2010, all five CVEs were patched in 2010, both stolen certificates were revoked, and the payload targets hardware and Windows versions long out of service. Value is forensic and educational only.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">DOMAIN</td><td class="val historical">www.mypremierfutbol[.]com — C2; sinkholed 2010</td><td>Symantec W32.Stuxnet Dossier</td><td>2010</td></tr>
+          <tr><td class="type-label">DOMAIN</td><td class="val historical">www.todaysfutbol[.]com — C2; sinkholed 2010</td><td>Symantec W32.Stuxnet Dossier</td><td>2010</td></tr>
+          <tr><td class="type-label">INFRA</td><td class="val historical">C2 servers hosted in Malaysia and Denmark; infected hosts reported Windows version and IP address and could receive file read/write/delete commands</td><td>Symantec</td><td>2010</td></tr>
+          <tr><td class="type-label">FILE</td><td class="val historical">%System32%\drivers\mrxcls.sys — kernel payload loader, signed with stolen certificate</td><td>Symantec / Microsoft</td><td>2010</td></tr>
+          <tr><td class="type-label">FILE</td><td class="val historical">%System32%\drivers\mrxnet.sys — kernel file-hiding rootkit, signed with stolen certificate</td><td>Symantec / VirusBlokAda</td><td>2010</td></tr>
+          <tr><td class="type-label">FILE</td><td class="val historical">s7otbxdx.dll loaded into s7tgtopx.exe (Siemens Step7) from a non-standard path — the PLC man-in-the-middle library</td><td>Symantec</td><td>2010</td></tr>
+          <tr><td class="type-label">CERT</td><td class="val historical">Code-signing certificates stolen from Realtek Semiconductor and JMicron Technology (both Hsinchu, Taiwan); revoked 2010; theft never attributed</td><td>Symantec / VeriSign</td><td>2010</td></tr>
+          <tr><td class="type-label">CVE</td><td class="val historical">CVE-2010-2568 — Windows Shell LNK; code execution on folder display. Air-gap crossing vector; remained heavily exploited for years afterwards</td><td>Microsoft MS10-046</td><td>2010</td></tr>
+          <tr><td class="type-label">CVE</td><td class="val historical">CVE-2010-2729 — Windows print spooler RCE; internal propagation</td><td>Microsoft MS10-061</td><td>2010</td></tr>
+          <tr><td class="type-label">CVE</td><td class="val historical">CVE-2010-2743 — Win32k keyboard layout privilege escalation</td><td>Microsoft MS10-073</td><td>2010</td></tr>
+          <tr><td class="type-label">CVE</td><td class="val historical">CVE-2010-3888 — Task Scheduler privilege escalation, local admin to SYSTEM</td><td>Microsoft MS10-092</td><td>2010</td></tr>
+          <tr><td class="type-label">CVE</td><td class="val historical">CVE-2010-2772 — Siemens WinCC hardcoded database password; publicly documented in vendor support forums prior to the attack</td><td>Siemens / ICS-CERT</td><td>2010</td></tr>
+          <tr><td class="type-label">PROCESS</td><td class="val historical">Frequency converter setpoints driven outside 807–1210 Hz to 1410 Hz / 2 Hz / 1064 Hz in 15–50 minute bursts at ~27–30 day intervals</td><td>Symantec</td><td>2010</td></tr>
+          <tr><td class="type-label">SCALE</td><td class="val historical">3,280 unique samples across three variants, Jun 2009 – May 2010; ~12,000 infections traced to five seeded Iranian contractor organisations; 100,000+ hosts infected worldwide, 60,000+ in Iran</td><td>Symantec / Kaspersky</td><td>2010</td></tr>
+          <tr><td class="type-label">BEHAVIOR</td><td class="val">Engineering software reading back PLC logic through a library it does not verify independently — the enduring detection gap. Out-of-band validation of controller logic, through a path the suspected host does not mediate, is the only reliable counter and remains rare in OT environments</td><td>Analyst assessment</td><td>2026-09-12</td></tr>
+          <tr><td class="type-label">NOTE</td><td class="val" colspan="3">These indicators have no current operational detection value. Every network artifact is dead, every CVE is patched, and the payload targets Windows XP-era hosts and specific hardware no longer in the configuration attacked. They are retained because this case is taught, not because it is hunted. The durable transferable artifact is the behavioural pattern in the row above.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Geopolitical</div>
+        <div class="consequence-body">The operation achieved its narrow objective and lost its broader one. Roughly <strong>1,000 IR-1 centrifuges</strong> were decommissioned and replaced at Natanz (ISIS, from IAEA data), imposing real delay and cost — though assessments of how much delay vary considerably, and the Washington Post reported that Natanz recovered more quickly than initially assumed. Iran's programme was not stopped. What the operation demonstrably did accomplish was <strong>establishing that cyber operations can substitute for kinetic strikes</strong> against a proliferation target, which was the strategic proposition Olympic Games was built to test. The cost was the precedent. A state crossed the threshold into physically destructive cyber attack on another state's infrastructure in peacetime, then lost control of the weapon and let every adversary study it. Iran's subsequent development of offensive cyber capability — visible sixteen years later in the 2026 campaign against US water utilities (see companion incident card) — is widely read as at least partly a response to having been on the receiving end of this.</div>
+      </div>
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Stuxnet created an entire security discipline by proving its subject matter existed. Before 2010, "ICS security" was a niche concern of a few engineers; afterwards it became a profession with vendors, research groups, conferences, standards and eventually its own ATT&amp;CK matrix. Four specific technical contributions endure: <strong>the air-gap crossing</strong>, which retired the idea that isolation is sufficient; <strong>the PLC rootkit</strong>, which established that the engineering workstation's view of a controller cannot be trusted when the workstation is compromised; <strong>weaponised code-signing theft</strong>, which broke the assumption that a valid signature proves legitimacy and accelerated revocation and driver-signing reform; and <strong>guardrailed payloads</strong>, showing a weapon could traverse 100,000 machines and harm only the intended one. The proliferation cost was symmetric: the most detailed public blueprint ever produced for attacking industrial control systems was handed to every future adversary, and the Duqu/Flame/Gauss lineage followed within two years.</div>
+      </div>
+
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body">No prosecution, indictment or sanction has ever followed, and no government has formally acknowledged the operation — the attribution rests on official-source journalism rather than any admission. What Stuxnet did generate was a substantial body of legal and policy analysis rather than binding law. The Congressional Research Service produced <em>The Stuxnet Computer Worm: Harbinger of an Emerging Warfare Capability</em> (R41524) for Congress; the NATO CCDCOE published legal analyses examining the operation against the law of armed conflict, and it became a central worked example in the Tallinn Manual process on whether a cyber operation causing physical damage constitutes a use of force or armed attack. On the defensive side the regulatory consequences were real but indirect: expanded ICS-CERT activity, accelerated IEC 62443 adoption, and OT security expectations progressively written into critical infrastructure frameworks over the following decade. <em>Note: CRS R41524 was retrieved during this compile but was not machine-readable in this environment; it is cited as relevant primary policy material, and no specific claim in this card rests on its contents.</em></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-high">ATTRIBUTION CONFIDENCE: [HIGH]</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">United States and Israel — Operation Olympic Games</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">US: NSA / USCYBERCOM, CIA operational lead · Israel: Unit 8200</span></div>
+        <div class="kv-row"><span class="kv-key">Authorisation</span><span class="kv-val">Initiated under President Bush c.2006; expanded under President Obama</span></div>
+        <div class="kv-row"><span class="kv-key">Formal Attribution</span><span class="kv-val">NONE — never officially acknowledged by any government</span></div>
+        <div class="kv-row"><span class="kv-key">Indictments</span><span class="kv-val">None. No prosecution or sanction has ever followed</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val dim">No companion actor card on file</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Sanger's NYT reporting and <em>Confront and Conceal</em> (2012) from current and former US official interviews; target specificity requiring Natanz cascade knowledge and test centrifuges; resourcing implied by four zero-days and two stolen certificates; strategic fit with documented US–Israeli counter-proliferation policy</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">Effectively none survive scrutiny. Residual uncertainty concerns the <em>division of labour</em> between the US and Israel, not whether they were responsible</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change Assessment</span><span class="kv-val">Only official declassification would materially alter it — and would most likely confirm rather than overturn the existing account</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p><strong>This is the rare case where [HIGH] confidence is warranted despite the complete absence of formal acknowledgement</strong> — and it is worth being precise about why, because the reasoning is unusual. The attribution does not rest on technical indicators. It rests on <em>sourced journalism from participants</em>: David Sanger's June 2012 New York Times reporting and his book <em>Confront and Conceal</em>, built on interviews with current and former American officials, which named Operation Olympic Games, described its initiation under Bush around 2006 and its expansion under Obama, and identified it as a joint US–Israeli programme. Subsequent accounts have consistently placed NSA and USCYBERCOM alongside Israel's Unit 8200 on the technical side with CIA holding overall operational responsibility. In fourteen years no government has confirmed this and, more tellingly, none has meaningfully disputed it.</p>
+        <p><strong>The technical evidence corroborates the strategic account rather than establishing it independently.</strong> The payload required a validated physical model of the Natanz cascade — controller models, converter vendors, motor frequency ranges, and the failure tolerances of the IR-1 rotor — which in practice implies access to comparable centrifuges for testing. Burning four Windows zero-days simultaneously represents a resource expenditure with essentially no commercial logic, since all four would be patched on discovery; only an actor holding a deep exploit inventory and valuing this single objective above future access would make that trade. Two stolen code-signing certificates from Taiwanese manufacturers indicate a supporting collection capability. None of this fingerprints a specific state on its own. Taken with the strategic fit — the target was the subject of an explicit US and Israeli counter-proliferation objective, and the operation's design goal of imposing delay without providing a casus belli matches the documented policy problem exactly — it becomes very difficult to construct an alternative.</p>
+        <p><strong>The honest residual uncertainty is about internal division of labour, not about responsibility.</strong> Which service wrote which component, who authorised the change in tactics from the S7-417 overpressure attack to the noisier S7-315 rotor-speed attack, and whose decision produced the propagation behaviour that caused the operation's exposure — these remain genuinely unknown. Langner's finding that the operation shifted from a sophisticated, tightly scoped attack to a simpler and far more aggressive one invites speculation about differing risk appetite between partners; that speculation appears in the literature but is not evidenced, and this card does not adopt it. <strong>One methodological note worth carrying forward:</strong> compare this section to the fast16 case file, where the discovering researchers explicitly declined to attribute and the assessment is held at [MEDIUM]. The difference is not that Stuxnet left better technical evidence — in some respects fast16's Territorial Dispute artifact is a cleaner forensic link. The difference is that human sources with direct knowledge talked to a journalist. That is worth remembering when weighing how much technical attribution can actually carry on its own.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>It proved that software destroys things.</strong> Before June 2010 the proposition that code could physically wreck industrial equipment was a thought experiment, rehearsed in wargames and dismissed in budget meetings. Afterwards it was a documented fact with an equipment count attached. Everything downstream — OT security as a profession, ICS threat intelligence as a product, critical infrastructure protection as a policy priority, ATT&amp;CK for ICS as a framework — descends from the moment that proposition stopped being hypothetical. The <em>fast16</em> disclosure sixteen years later complicates the origin story usefully (see companion card: a 2005 framework attacking simulation integrity rather than machinery), but it does not displace Stuxnet's role: fast16 was invisible for two decades and changed nothing at the time, while Stuxnet was discovered, published, dissected, and reorganised an industry.</p>
+      <p><strong>It retired the air gap as a complete answer.</strong> The single most transferable lesson is that isolation is a property of a network, not of an organisation. Natanz was genuinely disconnected. It was also staffed by people who carried laptops and USB drives, and served by five contractor firms whose own networks were reachable. The attack did not defeat the air gap; it walked around it through the supply chain and across removable media, using a vulnerability that fired on merely <em>viewing</em> a folder. Every subsequent assessment of an isolated environment has had to account for this, and the phrase "air-gapped" has carried an implicit asterisk ever since.</p>
+      <p><strong>It established that a compromised engineering workstation makes controller verification meaningless.</strong> The <code>s7otbxdx.dll</code> man-in-the-middle is, technically, the most instructive part of the case and the least widely absorbed. An engineer who did everything right — suspected the PLC, read its logic back, compared it against known-good — received the original blocks, because the malware controlled the channel through which the question was asked. This is a structural problem, not a diligence problem, and its only real answer is out-of-band verification through a path the suspected host does not mediate. Sixteen years later most OT environments still cannot do this, which is why the technique reappears: the 2026 Iranian campaign against US water utilities attacked the same weakness from the other direction, modifying Add-On Instructions inside Rockwell PLC programs and forcing CISA to publish first-of-its-kind guidance on detecting exactly that.</p>
+      <p><strong>And it is the canonical case study in the cost of losing control of a weapon.</strong> The operators faced a genuine and probably unavoidable trade: reaching an air-gapped target requires propagation, and propagation risks containment failure. They lost that trade. Over 100,000 machines were infected, one of them belonged to a customer of a small Belarusian antivirus firm, and the most closely held covert operation of its era became the most thoroughly reverse-engineered malware in history — publishing, in effect, a detailed manual on cyber-physical sabotage for every state and criminal group that wanted one. Duqu, Flame and Gauss followed within two years. Whether Stuxnet was worth it is still argued: it bought delay, it did not stop the programme, and it may have accelerated the development of adversary capabilities that are still being used against American infrastructure today. That unresolved ledger is precisely why the case is still taught.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+
+      <div class="ref-item">
+        <div class="ref-source">SYMANTEC</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.security.com/threat-intelligence/stuxnet-dossier-espionage" target="_blank">W32.Stuxnet Dossier — Falliere, O Murchu &amp; Chien</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">PRIMARY TECHNICAL SOURCE — v1.4, February 2011. Architecture, propagation, C2, PLC infector, frequency values.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NATIONAL SECURITY ARCHIVE</div>
+        <div>
+          <div class="ref-detail"><a href="https://nsarchive.gwu.edu/document/21440-document-44" target="_blank">Symantec, W32.Stuxnet Dossier, Version 1.4, February 2011 — archived copy</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">LANGNER GROUP</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cs.yale.edu/homes/jf/Langner.pdf" target="_blank">To Kill a Centrifuge: A Technical Analysis of What Stuxnet's Creators Tried to Achieve — Ralph Langner</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">PRIMARY SOURCE — retrieved during this compile but NOT machine-readable in this environment (no PDF text extraction available). All Langner claims in this card are drawn from secondary summaries and are flagged as such in Sections 03, 04 and 06. Verify against this document before downstream use.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">FOREIGN POLICY</div>
+        <div>
+          <div class="ref-detail"><a href="https://foreignpolicy.com/2013/11/19/stuxnets-secret-twin/" target="_blank">Stuxnet's Secret Twin — Ralph Langner</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Prose version of the two-attack thesis. Returned HTTP 403 at compile time; listed as located but not retrieved, and no content from it is relied upon.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">ISIS</div>
+        <div>
+          <div class="ref-detail"><a href="https://isis-online.org/isis-reports/did-stuxnet-take-out-1000-centrifuges-at-the-natanz-enrichment-plant/" target="_blank">Did Stuxnet Take Out 1,000 Centrifuges at the Natanz Enrichment Plant?</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">PRIMARY DAMAGE ASSESSMENT — 22 Dec 2010, Institute for Science and International Security, from quarterly IAEA inspection data.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">ISIS</div>
+        <div>
+          <div class="ref-detail"><a href="https://isis-online.org/isis-reports/stuxnet-malware-and-natanz-update-of-isis-december-22-2010-reportsupa-href1" target="_blank">Stuxnet Malware and Natanz: Update of ISIS December 22, 2010 Report</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">KASPERSKY — EUGENE KASPERSKY BLOG</div>
+        <div>
+          <div class="ref-detail"><a href="https://eugene.kaspersky.com/2011/11/02/the-man-who-found-stuxnet-sergey-ulasen-in-the-spotlight/" target="_blank">Interview with Sergey Ulasen, The Man Who Found The Stuxnet Worm</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">First-hand account of the 17 Jun 2010 discovery at VirusBlokAda.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WIRED — KIM ZETTER</div>
+        <div>
+          <div class="ref-detail"><a href="https://pages.cs.wisc.edu/~elisa/2011-07-WIRED-Stuxnet.pdf" target="_blank">How Digital Detectives Deciphered Stuxnet, the Most Menacing Malware in History</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — July 2011. Narrative of the reverse-engineering effort.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">LAWFARE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.lawfaremedia.org/article/sanger-attributes-stuxnet-united-states-and-israel" target="_blank">Sanger Attributes Stuxnet to United States and Israel</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Analysis of the June 2012 NYT attribution and its evidentiary basis.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">SECURITYWEEK</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/obama-ordered-use-stuxnet-acceleration-cyber-attacks-against-iran/" target="_blank">Obama Ordered Use of Stuxnet, Acceleration of Cyber Attacks Against Iran</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — June 2012 coverage of Sanger's reporting.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">HARVARD — BERKMAN KLEIN</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyber.harvard.edu/cybersecurity/Olympic_Games" target="_blank">Olympic Games — Cybersecurity Wiki</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">THE REGISTER</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.theregister.com/2014/11/12/stuxnet_patient_zero/" target="_blank">Iranian contractor named as Stuxnet 'patient zero'</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Source for the five seeded contractor organisations, 12,000 infections and 3,280 samples (Kaspersky/Symantec joint research).</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NBC NEWS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nbcnews.com/news/amp/wbna41599121" target="_blank">Stuxnet Malware Hit Five Sites Before Target</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CERT-IST</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cert-ist.com/public/en/SO_detail?code=stuxnet" target="_blank">Stuxnet: A worm which targets SCADA systems</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Source corroborating C2 domains, rootkit driver names and the s7otbxdx.dll hijack.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">MICROSOFT</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/wdsi/threats/malware-encyclopedia-description?Name=Worm%3AWin32%2FStuxnet.B" target="_blank">Worm:Win32/Stuxnet.B — threat description</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CSO ONLINE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.csoonline.com/article/562691/stuxnet-explained-the-first-known-cyberweapon.html" target="_blank">Stuxnet explained: The first known cyberweapon</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NATO CCDCOE</div>
+        <div>
+          <div class="ref-detail"><a href="https://ccdcoe.org/uploads/2018/10/Falco2012_StuxnetFactsReport.pdf" target="_blank">Stuxnet Facts Report: A Technical and Strategic Analysis — Falco</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NATO CCDCOE</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberlaw.ccdcoe.org/wiki/Stuxnet_(2010)" target="_blank">Stuxnet (2010) — International cyber law: interactive toolkit</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Legal analysis under the law of armed conflict; use-of-force and armed-attack thresholds.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">CONGRESSIONAL RESEARCH SERVICE</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.congress.gov/crs_external_products/R/PDF/R41524/R41524.3.pdf" target="_blank">The Stuxnet Computer Worm: Harbinger of an Emerging Warfare Capability (R41524)</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Retrieved during this compile but NOT machine-readable in this environment. Cited as relevant primary policy material; no claim in this card rests on its contents.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">WASHINGTON POST</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.washingtonpost.com/wp-dyn/content/article/2011/02/15/AR2011021506501.html" target="_blank">Iran's Natanz nuclear facility recovered quickly from Stuxnet cyberattack</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">CONTEMPORANEOUS — Feb 2011. The counterweight to maximalist damage assessments.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">NTI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.nti.org/education-center/facilities/natanz-enrichment-complex/" target="_blank">Natanz Enrichment Complex</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Facility background, IR-1 centrifuge and cascade structure.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">DARK READING</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.darkreading.com/cyberattacks-data-breaches/stuxnet-s-earlier-version-much-more-powerful-and-dangerous-new-analysis-finds" target="_blank">Stuxnet's Earlier Version Much More Powerful And Dangerous, New Analysis Finds</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+          <div class="ref-contemporary">Coverage of Langner's two-attack finding and the S7-417 Cascade Protection System attack.</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">IEEE SPECTRUM</div>
+        <div>
+          <div class="ref-detail"><a href="https://spectrum.ieee.org/the-real-story-of-stuxnet" target="_blank">The Real Story of Stuxnet</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-source">HUNTRESS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.huntress.com/threat-library/malware/stuxnet-malware" target="_blank">Stuxnet Malware: Analysis, Detection, Removal — threat library entry</a></div>
+          <div class="ref-date">Accessed: 2026-09-12</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-12 · 24 sources, 17 web lookups</div>
+  <div>Attribution: [HIGH] · ATT&amp;CK: 18 techniques, all [RETROSPECTIVE] (Enterprise + ICS) · Companion cards: 2005-08-30_FAST16 · 2026-07-26_US-WATER-SECTOR-PLC-CAMPAIGN</div>
+</div>
+
+</body>
+</html>
