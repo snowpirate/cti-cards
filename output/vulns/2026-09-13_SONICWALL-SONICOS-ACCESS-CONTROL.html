@@ -304,7 +304,8 @@
   <div class="advisory-label">// Vulnerability Advisory — Improper Access Control (CWE-284) · SonicWall / SonicOS Gen 5/6/7 Firewalls</div>
   <h1><span class="cyan">SONICWALL</span> SONICOS<br/>ACCESS CONTROL BYPASS</h1>
   <div class="header-sub">
-    COMPILED: 2026-09-03 &nbsp;|&nbsp;
+    COMPILED: 2026-09-13 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-09-03 &nbsp;|&nbsp;
     CVE: CVE-2024-40766 &nbsp;|&nbsp;
     CWE: CWE-284 (Improper Access Control) &nbsp;|&nbsp;
     SOURCES: 18 (Government, MITRE-Adjacent Vendor Advisory, Independent Research, Press)
@@ -476,7 +477,8 @@
         <div class="et-item"><div class="et-date">Sep 2024 →</div><div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">Akira &amp; Fog Begin Sustained Exploitation</div><div class="et-desc">Arctic Wolf traces earliest Akira affiliate SSLVPN account compromises to this window; Fog ransomware exploitation documented independently from the same period.</div></div></div>
         <div class="et-item"><div class="et-date">Jul–Aug 2025</div><div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">Major Escalation &amp; "Zero-Day Scare"</div><div class="et-desc">Akira tied to ~40 ransomware incidents in July 2025 alone (3rd-most-active group that month); Kudelski Security research suspects a new zero-day given breaches of fully-patched devices with MFA bypassed.</div></div></div>
         <div class="et-item"><div class="et-date">2025-08</div><div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">SonicWall Clarifies: Not a New Zero-Day</div><div class="et-desc">Vendor confirms ongoing activity is CVE-2024-40766 exploitation compounded by unremediated Gen 6→Gen 7 migration credential and LDAP debt, not a novel flaw.</div></div></div>
-        <div class="et-item"><div class="et-date">2026-06</div><div class="et-track"><div class="et-dot red"></div></div><div class="et-content"><div class="et-event">SANS ISC Audit — Ongoing Exploitation Confirmed</div><div class="et-desc">Review of 14 patched devices finds Akira/Fog operators still resident in several, nearly two years after the original patch shipped.</div></div></div>
+        <div class="et-item"><div class="et-date">2026-06</div><div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div><div class="et-content"><div class="et-event">SANS ISC Audit — Ongoing Exploitation Confirmed</div><div class="et-desc">Review of 14 patched devices finds Akira/Fog operators still resident in several, nearly two years after the original patch shipped.</div></div></div>
+        <div class="et-item"><div class="et-date">2026-09-13</div><div class="et-track"><div class="et-dot dim"></div></div><div class="et-content"><div class="et-event">Vulnpedia.com Check — No Public PoC Catalogued</div><div class="et-desc">No ExploitDB or Nuclei entry exists for CVE-2024-40766 as of this check. Notable given two years of confirmed sustained Akira/Fog exploitation — access here has consistently come via credential/config compromise (unremediated Gen 6→Gen 7 migration debt) rather than a published exploit chain, which is why patching alone has not fully closed this exposure.</div></div></div>
       </div>
     </div>
     <div class="prose">
@@ -540,6 +542,7 @@
           <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2024-08-22</span></div>
           <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Low–Medium — standard firmware-upgrade regression risk; Gen 7 platforms may require a config re-migration pass</span></div>
           <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val red">Yes — and must include a full local-user and LDAP-binding audit, not firmware version alone</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia.com)</span><span class="kv-val dim">None catalogued as of 2026-09-13 — access is via credential/config compromise, not a published exploit chain</span></div>
         </div>
         <div class="kv">
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">SNWLID-2024-0015</span></div>
@@ -696,8 +699,8 @@ PORT     STATE SERVICE  VERSION
 <!-- ══ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-09-03 · 18 Sources (Government, Vendor, Independent Research, Press)</div>
-  <div>Companion cards: output/actors/2026-09-03_AKIRA.html (cross-linked, Section 06/10)</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-13 · 18 Sources (Government, Vendor, Independent Research, Press)</div>
+  <div>Companion cards: output/actors/2026-09-03_AKIRA.html (cross-linked, Section 06/10) · UPDATED FROM: 2026-09-03 · Git history preserved</div>
 </div>
 
 </body>

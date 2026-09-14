@@ -393,7 +393,8 @@
   <div class="advisory-label">// Vulnerability Advisory — CPU Side-Channel / Information Disclosure (Speculative Execution) · Intel · AMD · ARM · IBM</div>
   <h1><span class="cyan">SPECTRE</span> / MELTDOWN</h1>
   <div class="header-sub">
-    COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    COMPILED: 2026-09-13 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-08-30 &nbsp;|&nbsp;
     CVE: CVE-2017-5753 · CVE-2017-5715 · CVE-2017-5754 (original three; see Section 09 for the wider family) &nbsp;|&nbsp;
     CWE: CWE-1303 (modern classification) · CWE-200 / CWE-203 (original per-CVE assignment) &nbsp;|&nbsp;
     SOURCES: 17
@@ -674,10 +675,18 @@
         </div>
         <div class="et-item">
           <div class="et-date">2024 → present</div>
-          <div class="et-track"><div class="et-dot dim"></div></div>
+          <div class="et-track"><div class="et-dot dim"></div><div class="et-line"></div></div>
           <div class="et-content">
             <div class="et-event">Active Research Area, No Confirmed Breach</div>
             <div class="et-desc">GhostRace, SLAM, TikTag, Indirector, and other 2024-era findings continue the pattern: active, credible academic/red-team research with no publicly documented real-world criminal exploitation of the class to date.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-13</div>
+          <div class="et-track"><div class="et-dot dim"></div></div>
+          <div class="et-content">
+            <div class="et-event">Vulnpedia.com Check — No Public PoC Catalogued (CVE-2017-5754)</div>
+            <div class="et-desc">No ExploitDB, Nuclei, or CISA KEV entry exists for the headline Meltdown CVE as of this check, consistent with the KEV-absence finding above. Notably high EPSS (84.2%, 100th percentile) reflects broad theoretical applicability across affected CPU families rather than confirmed real-world weaponization.</div>
           </div>
         </div>
       </div>
@@ -764,6 +773,7 @@ HAVING AVG(llc_misses) > baseline_p99 AND AVG(branch_mispredicts) > baseline_p99
           <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2018-01-03 onward; microcode revisions continued through mid-2018</span></div>
           <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val red">High historically — Intel's own Jan 2018 microcode caused spontaneous reboots and was withdrawn</span></div>
           <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">For any legacy system just now being remediated: stage microcode/firmware updates before fleet-wide rollout, given the documented 2018 stability history</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia.com)</span><span class="kv-val dim">None catalogued for CVE-2017-5754, checked 2026-09-13 — academic PoCs exist but no weaponized public exploit is listed</span></div>
         </div>
         <div class="kv">
           <div class="kv-row"><span class="kv-key">Vendor Advisories</span><span class="kv-val cyan">Intel, AMD, ARM, IBM, and every major OS/hypervisor vendor issued independent advisories</span></div>
@@ -976,8 +986,8 @@ HAVING AVG(llc_misses) > baseline_p99 AND AVG(branch_mispredicts) > baseline_p99
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 20 sources, all open-source/public</div>
-  <div>CPU Speculative Execution / CWE-1303 · Original three CVEs resolved; the underlying weakness class remains open-ended — see Section 07</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-13 · 20 sources, all open-source/public</div>
+  <div>CPU Speculative Execution / CWE-1303 · Original three CVEs resolved; the underlying weakness class remains open-ended — see Section 07 · UPDATED FROM: 2026-08-30 · Git history preserved</div>
 </div>
 
 </body>

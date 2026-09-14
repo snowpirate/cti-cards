@@ -489,7 +489,8 @@
   <div class="advisory-label">// Vulnerability Advisory — Unpatchable Authentication Bypass · Rockwell Automation Logix Controllers &amp; Studio 5000 Logix Designer</div>
   <h1><span class="cyan">ROCKWELL</span> LOGIX</h1>
   <div class="header-sub">
-    COMPILED: 2026-09-02 &nbsp;|&nbsp;
+    COMPILED: 2026-09-13 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-09-02 &nbsp;|&nbsp;
     CVE: CVE-2021-22681 &nbsp;|&nbsp;
     CWE: CWE-522 (Insufficiently Protected Credentials) &nbsp;|&nbsp;
     SOURCES: 20
@@ -780,10 +781,18 @@
         </div>
         <div class="et-item">
           <div class="et-date">2026-08-03</div>
-          <div class="et-track"><div class="et-dot amber"></div></div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
           <div class="et-content">
             <div class="et-event">Exposure Research Published</div>
             <div class="et-desc">Cloud Security Alliance research documents 4,407 internet-facing Rockwell/Allen-Bradley controllers globally and notes that 19 of 22 exposed hosts in already-attacked cities also ran firmware vulnerable to a separate, older, patched flaw (CVE-2017-16740) — evidence of compounding OT patch-discipline failure beyond this single CVE.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-13</div>
+          <div class="et-track"><div class="et-dot dim"></div></div>
+          <div class="et-content">
+            <div class="et-event">Vulnpedia.com Check — No Public PoC Catalogued</div>
+            <div class="et-desc">No ExploitDB or Nuclei entry exists for CVE-2021-22681 as of this check; vulnpedia notes tooling "may still exist" outside indexed sources. This does not soften the risk picture — CyberAv3ngers/IRGC-CEC exploitation is already confirmed above via a different route (nation-state operator tradecraft, not published exploit code), and the flaw's architectural unfixability means absence of a public PoC is not a meaningful mitigating factor for this campaign.</div>
           </div>
         </div>
       </div>
@@ -868,6 +877,7 @@
           <div class="kv-row"><span class="kv-key">Vendor Guidance</span><span class="kv-val amber">Architectural/compensating controls only, unchanged in substance since 2021</span></div>
           <div class="kv-row"><span class="kv-key">Actual Remediation Path</span><span class="kv-val">Migrate to CIP Security (certificate/PSK-based authentication) where hardware/firmware supports it</span></div>
           <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Moderate — CIP Security deployment can affect latency-sensitive control traffic; requires compatibility testing on legacy segments</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia.com)</span><span class="kv-val dim">None catalogued as of 2026-09-13 — exploitation is confirmed nation-state tradecraft, not published exploit code (see Section 06)</span></div>
         </div>
         <div class="kv">
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">CISA ICSA-21-056-03 (Update A); Rockwell Automation Knowledgebase Answer ID 1130301</span></div>
@@ -1224,8 +1234,8 @@ revision: 3.7</div>
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 20 sources, all open-source/public</div>
-  <div>Rockwell Automation Studio 5000 Logix Designer / RSLogix 5000 / Logix Controllers · CVE-2021-22681</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-13 · 20 sources, all open-source/public</div>
+  <div>Rockwell Automation Studio 5000 Logix Designer / RSLogix 5000 / Logix Controllers · CVE-2021-22681 · UPDATED FROM: 2026-09-02 · Git history preserved</div>
 </div>
 
 </body>

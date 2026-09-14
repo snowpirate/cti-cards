@@ -489,7 +489,8 @@
   <div class="advisory-label">// Vulnerability Advisory — Path Traversal / Unauthenticated Arbitrary File Read · GitLab / CE &amp; EE (Self-Managed)</div>
   <h1><span class="cyan">GITLAB</span> COMMITS API TRAVERSAL</h1>
   <div class="header-sub">
-    COMPILED: 2026-09-12 &nbsp;|&nbsp;
+    COMPILED: 2026-09-13 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-09-12 &nbsp;|&nbsp;
     CVE: CVE-2026-85706 &nbsp;|&nbsp;
     CWE: CWE-22 · CWE-306 &nbsp;|&nbsp;
     SOURCES: GitLab Critical Patch Release · CISA KEV &amp; BOD 26-04 · watchTowr · Horizon3 · Field Effect · BleepingComputer · The Hacker News · SC Media · CyCognito
@@ -766,10 +767,18 @@
         </div>
         <div class="et-item">
           <div class="et-date">2026-09-12</div>
-          <div class="et-track"><div class="et-dot amber"></div></div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
           <div class="et-content">
             <div class="et-event">Compile date — exposure still substantial</div>
             <div class="et-desc">CyCognito telemetry via Shodan and Censys places self-managed GitLab instances on standard web ports at more than 20,000, with a meaningful share still inside the vulnerable range. No public PoC released. No named threat actor or campaign attributed.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-13</div>
+          <div class="et-track"><div class="et-dot cyan"></div></div>
+          <div class="et-content">
+            <div class="et-event">Vulnpedia.com Now Flags Public PoC — Read With Caution</div>
+            <div class="et-desc">One day after this card's original compile, vulnpedia.com began flagging CVE-2026-85706 as "public exploit/PoC available." On inspection, the cited references are the original HackerOne disclosure report and an unconfirmed GitHub search query — not a standalone ExploitDB or Nuclei entry the way Heartbleed or PrintNightmare have. This is corroborating evidence that the patch-diff reverse-engineering already described above is trivial, not evidence that a new independent weaponized tool has been published. Treated as unconfirmed pending a dedicated PoC repository or framework module surfacing.</div>
           </div>
         </div>
       </div>
@@ -881,6 +890,7 @@ cat http.log | zeek-cut -d ts id.orig_h id.resp_h method uri status_code resp_bo
           <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2026-09-10</span></div>
           <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Moderate — 19.3.2 includes post-deploy DB migrations</span></div>
           <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Minimal justified — exploitation is active; patch first, test after</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia.com)</span><span class="kv-val amber">Flagged as available (checked 2026-09-13), but the cited reference is the HackerOne disclosure report + an unconfirmed GitHub search — not a standalone tool; see Section 06</span></div>
         </div>
         <div class="kv">
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">GitLab Critical Patch Release 19.3.2 / 19.2.6 / 19.1.8</span></div>
@@ -1262,8 +1272,8 @@ cat http.log | zeek-cut -d ts id.orig_h id.resp_h method uri status_code resp_bo
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-09-12 · 18 sources, 11 web lookups</div>
-  <div>CVE-2026-85706 · CVSS 10.0 · CWE-22 + CWE-306 · KEV listed 2026-09-11 · LIVE THREAT — exploitation ongoing at compile time</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-13 · 18 sources, 11 web lookups</div>
+  <div>CVE-2026-85706 · CVSS 10.0 · CWE-22 + CWE-306 · KEV listed 2026-09-11 · LIVE THREAT — exploitation ongoing at compile time · UPDATED FROM: 2026-09-12 · Git history preserved</div>
 </div>
 
 </body>

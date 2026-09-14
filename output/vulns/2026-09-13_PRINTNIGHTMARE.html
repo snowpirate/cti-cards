@@ -489,8 +489,8 @@
   <div class="advisory-label">// Vulnerability Advisory — Privilege Escalation / Remote Code Execution · Microsoft / Windows Print Spooler</div>
   <h1><span class="cyan">PRINT</span>NIGHTMARE</h1>
   <div class="header-sub">
-    COMPILED: 2026-09-02 &nbsp;|&nbsp;
-    PREVIOUSLY COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    COMPILED: 2026-09-13 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-09-02 &nbsp;|&nbsp;
     CVE: CVE-2021-1675 · CVE-2021-34527 · CVE-2021-34481 · CVE-2022-21999 · CVE-2024-38198 &nbsp;|&nbsp;
     CWE: CWE-269 (Improper Privilege Management) · CWE-59 / CWE-345 (variant race-condition bypasses) &nbsp;|&nbsp;
     SOURCES: 24
@@ -771,10 +771,18 @@
         </div>
         <div class="et-item">
           <div class="et-date">2022 → 2024</div>
-          <div class="et-track"><div class="et-dot purple"></div></div>
+          <div class="et-track"><div class="et-dot purple"></div><div class="et-line"></div></div>
           <div class="et-content">
             <div class="et-event">Continued Opportunistic Use</div>
             <div class="et-desc">SpoolFool (CVE-2022-21999) and later variant CVEs continued to see inclusion in commodity privilege-escalation toolkits and post-exploitation frameworks through 2024, reflecting the durability of the underlying primitive as a reliable LPE path once initial access is achieved.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-13</div>
+          <div class="et-track"><div class="et-dot cyan"></div></div>
+          <div class="et-content">
+            <div class="et-event">Public PoC/Exploit Re-Check (vulnpedia.com)</div>
+            <div class="et-desc">CVE-2021-34527 remains listed with multiple public PoC resources: a Vicarius detection/mitigation script pair, a Packet Storm "Print Spooler Remote DLL Injection" module, and multiple searchable GitHub repositories — this is a stable, long-standing tooling ecosystem, not a fresh development.</div>
           </div>
         </div>
       </div>
@@ -859,6 +867,7 @@ EventCode IN (316, 808)
           <div class="kv-row"><span class="kv-key">Release Date (latest)</span><span class="kv-val">2024-08-13 (CVE-2024-38198)</span></div>
           <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Moderate-High — historically broke non-admin printer driver installs and some third-party print workflows fleet-wide</span></div>
           <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Validate print-server driver deployment workflows in a staging OU before broad rollout; confirm helpdesk print-driver install procedures still function under RestrictDriverInstallationToAdministrators=1</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia.com)</span><span class="kv-val red">Confirmed — Vicarius scripts + Packet Storm DLL-injection module, checked 2026-09-13</span></div>
         </div>
         <div class="kv">
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">MSRC Security Update Guide (per-CVE)</span></div>
@@ -1308,8 +1317,8 @@ Result: acceptance</div>
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 24 sources, all open-source/public</div>
-  <div>Windows Print Spooler · CVE-2021-1675 / CVE-2021-34527 / CVE-2021-34481 / CVE-2022-21999 / CVE-2024-38198 · UPDATED FROM: 2026-08-30 · Git history preserved</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-13 · 24 sources, all open-source/public</div>
+  <div>Windows Print Spooler · CVE-2021-1675 / CVE-2021-34527 / CVE-2021-34481 / CVE-2022-21999 / CVE-2024-38198 · UPDATED FROM: 2026-09-02 · Git history preserved</div>
 </div>
 
 </body>

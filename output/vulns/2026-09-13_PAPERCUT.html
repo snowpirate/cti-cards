@@ -489,8 +489,8 @@
   <div class="advisory-label">// Vulnerability Advisory — Pre-Auth RCE Chain, Two Generations · PaperCut MF / NG Print Management Software</div>
   <h1><span class="cyan">PAPER</span>CUT</h1>
   <div class="header-sub">
-    COMPILED: 2026-09-02 &nbsp;|&nbsp;
-    PREVIOUSLY COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    COMPILED: 2026-09-13 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-09-02 &nbsp;|&nbsp;
     CVE: CVE-2023-27350 · CVE-2023-27351 · CVE-2026-81578 · CVE-2026-82078 &nbsp;|&nbsp;
     CWE: CWE-284 (2023 auth bypass) · CWE-287/303 (2023 info disclosure, tentative) · CWE-306 (2026 access control) · CWE-470 (2026 unsafe reflection) &nbsp;|&nbsp;
     SOURCES: 33
@@ -818,10 +818,18 @@
         </div>
         <div class="et-item">
           <div class="et-date">2026-09-01</div>
-          <div class="et-track"><div class="et-dot green"></div></div>
+          <div class="et-track"><div class="et-dot green"></div><div class="et-line"></div></div>
           <div class="et-content">
             <div class="et-event">Emergency Patch Release 3</div>
             <div class="et-desc">PaperCut ships a third emergency patch, fixing two known regressions in Release 2 and adding further hardening — the current mandatory baseline.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-13</div>
+          <div class="et-track"><div class="et-dot cyan"></div></div>
+          <div class="et-content">
+            <div class="et-event">Public PoC/Exploit Re-Check (vulnpedia.com)</div>
+            <div class="et-desc">CVE-2023-27350: two ExploitDB entries (51391, 51452) and a Nuclei detection template remain listed. CVE-2026-81578: a Metasploit module pull request (rapid7/metasploit-framework#21842) is in progress, in addition to the honeypot-confirmed exploitation already documented above — both chains now have public tooling beyond opportunistic scanning.</div>
           </div>
         </div>
       </div>
@@ -926,6 +934,7 @@ OR (EventCode=1 (Image="*\\AnyDesk.exe" OR TargetFilename="*\\JWrapper-Remote Ac
           <div class="kv-row"><span class="kv-key">2026 Chain Patch</span><span class="kv-val amber">Emergency Patch Release 3 (2026-09-01) mandatory — Releases 1 and 2 both had reported gaps</span></div>
           <div class="kv-row"><span class="kv-key">Current Baseline</span><span class="kv-val">Emergency Patch Release 3 (2026-09-01) for versions 24, 25, 26 — fixes two known regressions from Release 2 in addition to further hardening</span></div>
           <div class="kv-row"><span class="kv-key">Unpatchable Population</span><span class="kv-val red">v23 and earlier — no fix exists; upgrade to a supported branch is the only remediation</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia.com)</span><span class="kv-val red">Confirmed both chains — ExploitDB + Nuclei (2023-27350); in-progress Metasploit module (2026-81578), checked 2026-09-13</span></div>
         </div>
         <div class="kv">
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">papercut.com/kb — PO-1216/PO-1219 (2023); Security Bulletin 27-Aug-2026 (2026, updated through Release 3)</span></div>
@@ -1368,8 +1377,8 @@ PORT     STATE SERVICE
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-09-02 · 33 sources, all open-source/public</div>
-  <div>PaperCut MF/NG · CVE-2023-27350 / CVE-2023-27351 / CVE-2026-81578 / CVE-2026-82078 · UPDATED FROM: 2026-08-30 · Git history preserved</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-13 · 33 sources, all open-source/public</div>
+  <div>PaperCut MF/NG · CVE-2023-27350 / CVE-2023-27351 / CVE-2026-81578 / CVE-2026-82078 · UPDATED FROM: 2026-09-02 · Git history preserved</div>
 </div>
 
 </body>

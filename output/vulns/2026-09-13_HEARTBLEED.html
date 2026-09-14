@@ -394,7 +394,8 @@
   <div class="advisory-label">// Vulnerability Advisory — Information Disclosure (Memory Over-Read) · OpenSSL / TLS Heartbeat Extension</div>
   <h1><span class="cyan">HEART</span>BLEED</h1>
   <div class="header-sub">
-    COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    COMPILED: 2026-09-13 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-08-30 &nbsp;|&nbsp;
     CVE: CVE-2014-0160 &nbsp;|&nbsp;
     CWE: CWE-125 (Out-of-bounds Read) &nbsp;|&nbsp;
     SOURCES: 14
@@ -672,10 +673,18 @@
         </div>
         <div class="et-item">
           <div class="et-date">2024–2026</div>
-          <div class="et-track"><div class="et-dot dim"></div></div>
+          <div class="et-track"><div class="et-dot dim"></div><div class="et-line"></div></div>
           <div class="et-content">
             <div class="et-event">Long-Tail Legacy Exposure Persists</div>
             <div class="et-desc">Internet-wide scans continue to find on the order of 100,000–300,000 devices running outdated or vulnerable OpenSSL version banners, concentrated in legacy embedded systems and unmaintained appliances (Network World; TechTarget).</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-13</div>
+          <div class="et-track"><div class="et-dot cyan"></div></div>
+          <div class="et-content">
+            <div class="et-event">Public PoC/Exploit Availability Re-Confirmed (vulnpedia.com)</div>
+            <div class="et-desc">Cross-referenced per this project's standing vulnpedia.com exploit-availability check: four ExploitDB entries (32764, 32791, 32998, 32745) and a Nuclei detection template remain publicly listed and current — this is not a purely historical finding; functional, ready-to-use PoC tooling has been continuously accessible since 2014.</div>
           </div>
         </div>
       </div>
@@ -755,6 +764,7 @@
           <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2014-04-07</span></div>
           <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val green">Low — the fix is a narrow bounds-check addition with no known functional regressions</span></div>
           <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Minimal for the patch itself; the real work is certificate/credential rotation, which requires a coordinated maintenance window</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia.com)</span><span class="kv-val red">Confirmed — 4 ExploitDB entries + Nuclei template, checked 2026-09-13</span></div>
         </div>
         <div class="kv">
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">OpenSSL Security Advisory, 2014-04-07</span></div>
@@ -945,8 +955,8 @@
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 22 sources, all open-source/public</div>
-  <div>OpenSSL Heartbeat Extension · CVE-2014-0160 · NSA-foreknowledge claim presented as disputed, not established</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-13 · 22 sources, all open-source/public</div>
+  <div>OpenSSL Heartbeat Extension · CVE-2014-0160 · NSA-foreknowledge claim presented as disputed, not established · UPDATED FROM: 2026-08-30 · Git history preserved</div>
 </div>
 
 </body>

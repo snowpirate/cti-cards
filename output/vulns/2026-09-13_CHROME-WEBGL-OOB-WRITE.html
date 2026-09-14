@@ -373,7 +373,8 @@
   <div class="advisory-label">// Vulnerability Advisory — Memory Corruption / Sandbox Escape · Google / Chrome (Android)</div>
   <h1><span class="cyan">CHROME</span> WEBGL<br/><span class="dim">OOB WRITE</span></h1>
   <div class="header-sub">
-    COMPILED: 2026-09-04 &nbsp;|&nbsp;
+    COMPILED: 2026-09-13 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-09-04 &nbsp;|&nbsp;
     CVE: CVE-2026-85050 &nbsp;|&nbsp;
     CWE: CWE-787 &nbsp;|&nbsp;
     SOURCES: CVE.org, NVD, ThreatINT, OffSeq, Help Net Security, The Hacker News, Security Affairs, Cyber Insider, VulDB (9)
@@ -616,10 +617,18 @@
         </div>
         <div class="et-item">
           <div class="et-date">2026-09-04</div>
-          <div class="et-track"><div class="et-dot green"></div></div>
+          <div class="et-track"><div class="et-dot green"></div><div class="et-line"></div></div>
           <div class="et-content">
             <div class="et-event">Compile-Date Status Check</div>
             <div class="et-desc">No public reporting, vendor statement, or KEV catalog entry confirms in-the-wild exploitation of this specific CVE as of this date. Monitor for updates given both the severity and the active-exploitation precedent set by the companion V8 bug (CVE-2026-85046) in the same release.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-13</div>
+          <div class="et-track"><div class="et-dot dim"></div></div>
+          <div class="et-content">
+            <div class="et-event">Vulnpedia.com Check — No Public PoC Catalogued</div>
+            <div class="et-desc">No ExploitDB or Nuclei entry exists for CVE-2026-85050 as of this check (EPSS 0.3%), consistent with Section 06's assessment that no threat-actor attribution or public exploitation exists yet.</div>
           </div>
         </div>
       </div>
@@ -694,6 +703,7 @@ Action: Flag / quarantine devices below threshold for compliance review</div>
           <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2026-09-03</span></div>
           <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val amber">Not flagged as elevated in sources reviewed</span></div>
           <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val">Standard enterprise browser regression testing per org policy</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia.com)</span><span class="kv-val dim">None catalogued as of 2026-09-13 (EPSS 0.3%)</span></div>
         </div>
         <div class="kv">
           <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">Chrome Releases blog — Stable Channel Update (Android), 2026-09-03</span></div>
@@ -874,8 +884,8 @@ Action: Flag / quarantine devices below threshold for compliance review</div>
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-09-04 · 10 Sources (Registry, Vendor, Press)</div>
-  <div>No companion actor/incident cards linked as of compile date — 1-day-old CVE, several technical details withheld by vendor disclosure timing (see Section 04).</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-13 · 10 Sources (Registry, Vendor, Press)</div>
+  <div>No companion actor/incident cards linked as of compile date — several technical details withheld by vendor disclosure timing (see Section 04) · UPDATED FROM: 2026-09-04 · Git history preserved</div>
 </div>
 
 </body>
