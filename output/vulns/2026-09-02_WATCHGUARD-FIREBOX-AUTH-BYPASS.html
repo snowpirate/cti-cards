@@ -36,7 +36,7 @@
     background: var(--bg);
     color: var(--text);
     font-family: var(--body);
-    font-size: 13px;
+    font-size: 16.5px;
     line-height: 1.55;
     padding: 24px;
     min-height: 100vh;
@@ -73,13 +73,13 @@
   .header-top-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
   .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
 
-  .tlp-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
   .tlp-clear { background: #d0dde8; color: #060a0f; }
   .tlp-green { background: #2d7a2d; color: #fff; }
   .tlp-amber { background: var(--amber); color: #060a0f; }
   .tlp-red   { background: var(--red); color: #fff; }
 
-  .patch-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
   .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
   .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
   .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
@@ -87,9 +87,9 @@
   .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
   .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
 
-  .kev-badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+  .kev-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
 
-  .advisory-label { font-family: var(--mono); font-size: 10px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .advisory-label { font-family: var(--mono); font-size: 14.5px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
 
   .header h1 {
     font-family: var(--sans);
@@ -106,7 +106,7 @@
   .header h1 .dim   { color: var(--text-dim); }
   .header h1 .red   { color: var(--red); }
 
-  .header-sub { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+  .header-sub { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
 
   .advisory-bar {
     display: flex;
@@ -116,7 +116,7 @@
     padding-top: 12px;
     border-top: 1px solid var(--border2);
     font-family: var(--mono);
-    font-size: 9.5px;
+    font-size: 14px;
     color: var(--text-dim);
   }
   .advisory-bar span       { color: var(--cyan); font-weight: 700; }
@@ -140,9 +140,9 @@
   .cvss-score.high   { color: var(--red); }
   .cvss-score.medium { color: var(--amber); }
   .cvss-score.low    { color: var(--green); }
-  .cvss-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
-  .cvss-vector { font-family: var(--mono); font-size: 9.5px; color: var(--text-mid); letter-spacing: 0.03em; }
-  .cvss-cve { font-family: var(--mono); font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cvss-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 14px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 15px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
 
   .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
   .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
@@ -150,21 +150,21 @@
   .stat-val.red   { color: var(--red); }
   .stat-val.amber { color: var(--amber); }
   .stat-val.dim   { color: var(--text-mid); }
-  .stat-label { font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+  .stat-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
 
   .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
-  .section-header { display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
-  .section-num   { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; min-width: 22px; }
-  .section-title { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
-  .section-title small { font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-header { display: flex; align-items: center; gap: 16px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 23px; font-weight: 700; color: var(--cyan); letter-spacing: 0.02em; min-width: 36px; line-height: 1; padding-right: 16px; border-right: 1px solid var(--border2); }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 16px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
   .section-body  { padding: 22px; }
 
-  .prose { font-family: var(--body); font-size: 12.5px; color: var(--text-mid); line-height: 1.7; }
+  .prose { font-family: var(--body); font-size: 16px; color: var(--text-mid); line-height: 1.7; }
   .prose p { margin-bottom: 14px; }
   .prose p:last-child { margin-bottom: 0; }
   .prose strong { color: var(--text); font-weight: 500; }
   .prose em { color: var(--cyan); font-style: normal; }
-  .prose code { font-family: var(--mono); font-size: 10.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+  .prose code { font-family: var(--mono); font-size: 15px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
 
   .cwe-block {
     background: var(--bg3);
@@ -174,9 +174,9 @@
     margin-bottom: 14px;
   }
   .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
-  .cwe-id     { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-id     { font-family: var(--mono); font-size: 16.5px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
   .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
-  .cwe-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.6; }
+  .cwe-body   { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.6; }
 
   .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
   .lc-phase  { position: relative; text-align: center; }
@@ -185,7 +185,7 @@
     position: absolute;
     right: -8px; top: 14px;
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 16px;
     color: var(--border2);
     z-index: 1;
   }
@@ -197,44 +197,44 @@
     background: var(--bg3);
     margin: 0 auto 6px;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono); font-size: 9px; color: var(--cyan-dim);
+    font-family: var(--mono); font-size: 13.5px; color: var(--cyan-dim);
     font-weight: 700;
   }
   .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
   .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
   .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
-  .lc-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+  .lc-label { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
 
   .kv { display: flex; flex-direction: column; }
   .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
   .kv-row:last-child { border-bottom: none; }
-  .kv-key { font-family: var(--mono); font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
-  .kv-val { font-family: var(--body); font-size: 11.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-key { font-family: var(--mono); font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 15.5px; color: var(--text); text-align: right; line-height: 1.4; }
   .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
   .kv-val.red   { color: var(--red); font-weight: 600; }
   .kv-val.amber { color: var(--amber); font-weight: 600; }
   .kv-val.green { color: var(--green); font-weight: 600; }
-  .kv-val.mono  { font-family: var(--mono); font-size: 10px; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 14.5px; }
   .kv-val.dim   { color: var(--text-dim); }
 
   .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
   .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
-  .cvss-comp-label { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-  .cvss-comp-val   { font-family: var(--mono); font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 16px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
   .cvss-comp-val.red   { color: var(--red); }
   .cvss-comp-val.amber { color: var(--amber); }
-  .cvss-comp-meaning   { font-family: var(--body); font-size: 10px; color: var(--text-mid); line-height: 1.3; }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 14.5px; color: var(--text-mid); line-height: 1.3; }
 
   .versions-table { width: 100%; border-collapse: collapse; }
-  .versions-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
-  .versions-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table th { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
   .versions-table td.vuln  { color: var(--red); }
   .versions-table td.fixed { color: var(--green); }
   .versions-table td.partial { color: var(--amber); }
 
   .exploit-timeline { display: flex; flex-direction: column; }
   .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
-  .et-date  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-date  { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
   .et-track { display: flex; flex-direction: column; align-items: center; }
   .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
   .et-dot.red   { background: var(--red); }
@@ -245,8 +245,8 @@
   .et-item:last-child .et-line { display: none; }
   .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
   .et-item:last-child .et-content { border-bottom: none; }
-  .et-event { font-family: var(--sans); font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
-  .et-desc  { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+  .et-event { font-family: var(--sans); font-size: 16.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
 
   .kev-block {
     background: var(--bg3);
@@ -257,12 +257,12 @@
   }
   .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
   .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-  .kev-tag    { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag    { font-family: var(--mono); font-size: 14.5px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
   .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
-  .kev-body   { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+  .kev-body   { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; }
 
   .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
-  .pt-tab { font-family: var(--mono); font-size: 9.5px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab { font-family: var(--mono); font-size: 14px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
   .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
   .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
   .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
@@ -270,21 +270,21 @@
 
   .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
   .pt-section:last-child { border-bottom: none; }
-  .pt-section-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
   .pt-section-label.cyan   { color: var(--cyan); }
   .pt-section-label.purple { color: var(--purple); }
   .pt-section-label.green  { color: var(--green); }
   .pt-section-label.amber  { color: var(--amber); }
 
   .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
-  .query-label { font-family: var(--mono); font-size: 8.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
-  .query-code  { font-family: var(--mono); font-size: 10px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+  .query-label { font-family: var(--mono); font-size: 13.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 14.5px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
 
   .cm-list { display: flex; flex-direction: column; }
   .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
   .cm-item:last-child { border-bottom: none; }
-  .cm-num  { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
-  .cm-text { font-family: var(--body); font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-num  { font-family: var(--mono); font-size: 14.5px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
   .cm-text strong { color: var(--text); font-weight: 500; }
 
   .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -299,24 +299,24 @@
   .xref-item:hover { border-color: var(--cyan); }
   .xref-item.actor    { border-left: 2px solid #00c8a0; }
   .xref-item.incident { border-left: 2px solid #f5c542; }
-  .xref-type { font-family: var(--mono); font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
   .xref-type.actor    { color: #00c8a0; }
   .xref-type.incident { color: #f5c542; }
   .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
-  .xref-rel  { font-family: var(--body); font-size: 10.5px; color: var(--text-mid); line-height: 1.4; }
-  .xref-none { font-family: var(--mono); font-size: 10px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+  .xref-rel  { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 14.5px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
 
   .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
-  .cve-meta-id   { font-family: var(--mono); font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 16.5px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
   .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
 
   .nmap-window { background: #020608; border: 1px solid var(--border2); border-top: 2px solid var(--cyan); margin-bottom: 12px; }
-  .nmap-titlebar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--bg3); border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.06em; }
+  .nmap-titlebar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--bg3); border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; }
   .nmap-titlebar .cmd { color: var(--cyan); }
   .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
   .nmap-titlebar .dot.green { background: var(--green); }
-  .nmap-output { font-family: var(--mono); font-size: 10.5px; line-height: 1.7; padding: 14px 16px; color: #8ab4c8; white-space: pre; overflow-x: auto; }
+  .nmap-output { font-family: var(--mono); font-size: 15px; line-height: 1.7; padding: 14px 16px; color: #8ab4c8; white-space: pre; overflow-x: auto; }
   .nmap-output .port-open   { color: var(--green); }
   .nmap-output .port-closed { color: var(--red); }
   .nmap-output .port-filter { color: var(--amber); }
@@ -327,40 +327,40 @@
 
   .nse-block { background: #020608; border: 1px solid var(--border2); border-left: 2px solid var(--purple); padding: 12px 16px; margin-bottom: 10px; }
   .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
-  .nse-name   { font-family: var(--mono); font-size: 10.5px; color: var(--purple); font-weight: 700; }
+  .nse-name   { font-family: var(--mono); font-size: 15px; color: var(--purple); font-weight: 700; }
   .nse-tags   { display: flex; gap: 5px; }
-  .nse-tag    { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag    { font-family: var(--mono); font-size: 13px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
   .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
   .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
-  .nse-cmd  { font-family: var(--mono); font-size: 10px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
-  .nse-output { font-family: var(--mono); font-size: 10px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+  .nse-cmd  { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 14.5px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
 
   .shodan-block { background: var(--bg3); border: 1px solid var(--border2); border-left: 2px solid var(--amber); padding: 12px 16px; margin-bottom: 10px; }
   .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .shodan-label  { font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
-  .shodan-dork   { font-family: var(--mono); font-size: 11px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
-  .shodan-note   { font-family: var(--body); font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+  .shodan-label  { font-family: var(--mono); font-size: 13.5px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 15px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
 
   .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
-  .port-table th { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
-  .port-table td { font-family: var(--mono); font-size: 10px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table th { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
   .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
   .port-table td.svc-name  { color: #fff; }
   .port-table td.version-vuln { color: var(--red); }
 
   .ref-list { display: flex; flex-direction: column; gap: 6px; }
-  .ref-item { display: grid; grid-template-columns: 130px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 11px; }
+  .ref-item { display: grid; grid-template-columns: 130px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 15px; }
   .ref-item:last-child { border-bottom: none; }
-  .ref-source { font-family: var(--mono); font-size: 9px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-source { font-family: var(--mono); font-size: 13.5px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
   .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
   .ref-detail a { color: var(--cyan); text-decoration: none; }
   .ref-detail a:hover { text-decoration: underline; }
-  .ref-date { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .ref-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); margin-top: 2px; }
 
   .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
   .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
 
-  .footer { margin-top: 14px; padding: 10px 18px; border: 1px solid var(--border); background: var(--bg2); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 8.5px; color: var(--text-dim); }
+  .footer { margin-top: 14px; padding: 10px 18px; border: 1px solid var(--border); background: var(--bg2); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); }
   .footer .draft-warn { color: var(--cyan); font-weight: 700; }
 
   @media (max-width: 960px) {
@@ -413,7 +413,7 @@
   </div>
   <div>
     <div class="cvss-cve">CVE-2022-23176</div>
-    <div style="margin-top:4px; font-family:var(--mono); font-size:9px; color:var(--text-dim);">No variant/related CVEs identified for this specific flaw</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:13.5px; color:var(--text-dim);">No variant/related CVEs identified for this specific flaw</div>
   </div>
   <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</div>
 </div>
@@ -559,7 +559,7 @@
       <p>Second, once in possession of a privileged session, Sandworm used that access to push a malicious firmware "update" — this is where the separate hard-coded HMAC key weakness (Section 02) comes in: the device's own firmware-integrity check accepted the attacker's modified image as legitimate because the attacker could compute a valid HMAC using the same static key every device shipped with. Cyclops Blink then persisted across reboots as if it were a normal, vendor-signed firmware component (NCSC Malware Analysis Report, Feb 23 2022).</p>
     </div>
     <div style="margin-bottom:18px;">
-      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</div>
+      <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H</div>
       <div class="cvss-breakdown">
         <div class="cvss-component">
           <div class="cvss-comp-label">Attack Vector</div>
@@ -604,7 +604,7 @@
       </div>
     </div>
     <div>
-      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
+      <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
       <table class="versions-table">
         <thead><tr><th>Vendor</th><th>Product</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
         <tbody>
@@ -627,12 +627,12 @@
     <div class="kev-block">
       <div class="kev-header">
         <span class="kev-tag">CISA KEV LISTED</span>
-        <span style="font-family:var(--mono); font-size:9px; color:var(--text-dim);">Added: 2022-04-11 · Federal remediation: standard BOD 22-01 window (14 days for post-directive KEV entries) — exact per-CVE due date not independently confirmed in this research pass, stated as a gap rather than assumed</span>
+        <span style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim);">Added: 2022-04-11 · Federal remediation: standard BOD 22-01 window (14 days for post-directive KEV entries) — exact per-CVE due date not independently confirmed in this research pass, stated as a gap rather than assumed</span>
       </div>
       <div class="kev-body">Listed on CISA's Known Exploited Vulnerabilities catalog following the February 2022 joint advisory confirming Sandworm Team's active exploitation. By the KEV listing date, the exploitation was already historical (the DOJ's remediation operation had run a month earlier) — the listing formalized what was already publicly known rather than surfacing new information.</div>
     </div>
     <div style="margin-bottom:18px;">
-      <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
       <div class="exploit-timeline">
         <div class="et-item">
           <div class="et-date">~Jun 2019</div>
@@ -819,7 +819,7 @@
     <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
   </div>
   <div class="section-body">
-    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
     <div class="xref-grid" style="margin-bottom:18px;">
       <a class="xref-item actor" href="../actors/2026-09-02_SANDWORM.html">
         <div class="xref-type actor">Threat Actor Card</div>
@@ -828,7 +828,7 @@
       </a>
     </div>
 
-    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
     <div class="xref-grid">
       <a class="xref-item incident" href="../incidents/2022-02-23_CYCLOPS-BLINK.html">
         <div class="xref-type incident">Incident Case File</div>
@@ -847,7 +847,7 @@
   </div>
   <div class="section-body">
 
-    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
     <table class="port-table" style="margin-bottom:20px;">
       <thead>
         <tr><th>Port</th><th>Proto</th><th>Service</th><th>Vulnerable Condition</th><th>Notes</th></tr>
@@ -859,7 +859,7 @@
       </tbody>
     </table>
 
-    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Default Service Scan Output (Vulnerable Host)</div>
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Nmap — Default Service Scan Output (Vulnerable Host)</div>
     <div class="nmap-window">
       <div class="nmap-titlebar">
         <div class="dot"></div>
@@ -875,7 +875,7 @@ PORT     STATE SERVICE VERSION
 <span class="port-open">4117/tcp open  unknown</span> <span class="comment">WatchGuard System Manager</span></div>
     </div>
 
-    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; margin-top:16px;">Nmap — Version-Discriminating Scan (Vulnerable vs. Patched)</div>
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; margin-top:16px;">Nmap — Version-Discriminating Scan (Vulnerable vs. Patched)</div>
     <div class="nmap-window">
       <div class="nmap-titlebar">
         <div class="dot"></div>
@@ -889,7 +889,7 @@ PORT     STATE SERVICE VERSION
 # network probe. Stated as a genuine capability gap rather than invented output.</span></div>
     </div>
 
-    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Version Identification</div>
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Service Banners — Version Identification</div>
     <div class="banner-block">
       <div class="banner-header">
         <span class="banner-label">Fireware Web UI · Port 8080</span>
@@ -898,7 +898,7 @@ PORT     STATE SERVICE VERSION
       <div class="banner-text">No public raw banner capture for a confirmed-vulnerable Fireware build was located in this research pass. Version discrimination requires authenticated access to the device's System Status / About page rather than an unauthenticated banner grab — noted as a genuine research gap, not fabricated.</div>
     </div>
 
-    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Nmap Scripting Engine (NSE) — Vulnerability Detection</div>
     <div class="nse-block">
       <div class="nse-header">
         <span class="nse-name">No dedicated NSE script identified</span>
@@ -909,7 +909,7 @@ PORT     STATE SERVICE VERSION
       <div class="nse-output">No NSE script specific to CVE-2022-23176 was found on nmap.org/nsedoc/ or in vendor/researcher writeups reviewed for this card. Detection realistically requires WatchGuard's own vendor-provided detection/remediation tooling (referenced in Section 08-C) rather than a generic network scanner script, since exploitation requires an already-authenticated session rather than an unauthenticated network-observable condition.</div>
     </div>
 
-    <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; margin-top:20px;">Shodan / Censys — Exposure Discovery</div>
     <div class="shodan-block">
       <div class="shodan-header">
         <span class="shodan-label">Shodan</span>
