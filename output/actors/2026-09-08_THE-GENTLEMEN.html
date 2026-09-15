@@ -394,9 +394,85 @@
     .mitre-grid { grid-template-columns: 1fr 1fr; }
     .sector-row { grid-template-columns: 1fr; }
   }
+
+  /* ── PRINT BUTTON (screen only; hidden via .no-print below) ── */
+  .print-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 999;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .print-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+
+    @page { margin: 12mm; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e6e6e6;
+      --border: #cfcfcf;
+      --border2: #b0b0b0;
+      --accent3: #8a6205;
+      --text: #111111;
+      --text-dim: #555555;
+      --text-mid: #2b2b2b;
+    }
+
+    body {
+      background: #fff !important;
+      background-image: none !important;
+      padding: 0 !important;
+    }
+
+    .header { background: #fff !important; }
+    .header::before { display: none !important; }
+    .header h1,
+    .section-title,
+    .timeline-phase,
+    .alert-headline,
+    .ctid-title {
+      color: #111 !important;
+    }
+
+    .tlp-badge, .nation-badge, .badge, .threat-crit, .threat-high {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .header, .stat-grid,
+    .stat-cell, .mitre-cell, .kv-row, .timeline-item, .sector-row,
+    .tool-item, .cm-item, .ref-item, .sanctions-row, .opsec-item,
+    .evasion-item, .prose p, tr {
+      break-inside: avoid;
+    }
+    .section-header { break-after: avoid; }
+    .section { orphans: 3; widows: 3; }
+    thead { display: table-header-group; }
+
+    a { color: #111 !important; text-decoration: underline; }
+  }
 </style>
 </head>
 <body>
+
+<button class="print-btn no-print" onclick="window.print()" title="Print or Save as PDF">⎘ Print / Save PDF</button>
 
 <div class="header">
   <div class="header-top-row">
