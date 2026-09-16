@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cisco ESA SQLi — Vulnerability Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #060a0f;
+    --bg2:       #090e14;
+    --bg3:       #0d1318;
+    --bg4:       #111820;
+    --border:    #152030;
+    --border2:   #1a2a3a;
+    --cyan:      #00d4ff;
+    --cyan2:     #00aacc;
+    --cyan-dim:  #005577;
+    --cyan-glow: rgba(0,212,255,0.08);
+    --red:       #ff4d4d;
+    --amber:     #f5c542;
+    --green:     #4a9e6a;
+    --purple:    #9b6dff;
+    --text:      #c8dde8;
+    --text-dim:  #3a5566;
+    --text-mid:  #7a9aaa;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow Condensed', sans-serif;
+    --body:      'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 5% 0%, rgba(0,212,255,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 30% at 95% 100%, rgba(0,212,255,0.03) 0%, transparent 55%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,255,0.018) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #060d15 0%, #091018 60%, #050b12 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,212,255,0.018) 10px, rgba(0,212,255,0.018) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2) 50%, transparent 100%);
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #d0dde8; color: #060a0f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #060a0f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  /* Patch status badge */
+  .patch-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-workaround { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-disputed { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.5); color: var(--red); }
+  .patch-resolved { background: rgba(58,85,102,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  /* KEV badge */
+  .kev-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.35); color: var(--cyan); }
+
+  .advisory-label { font-family: var(--mono); font-size: 14.5px; color: var(--cyan-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .cyan  { color: var(--cyan); }
+  .header h1 .cyan2 { color: var(--cyan2); }
+  .header h1 .dim   { color: var(--text-dim); }
+  .header h1 .red   { color: var(--red); }
+
+  .header-sub { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .advisory-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+  .advisory-bar span       { color: var(--cyan); font-weight: 700; }
+  .advisory-bar span.red   { color: var(--red); }
+  .advisory-bar span.amber { color: var(--amber); }
+  .advisory-bar span.green { color: var(--green); }
+  .advisory-bar span.dim   { color: var(--text-dim); }
+
+  /* ── CVSS SCORE CALLOUT ── */
+  .cvss-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--red);
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cvss-score { font-family: var(--sans); font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; }
+  .cvss-score.high   { color: var(--red); }
+  .cvss-score.medium { color: var(--amber); }
+  .cvss-score.low    { color: var(--green); }
+  .cvss-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .cvss-vector { font-family: var(--mono); font-size: 14px; color: var(--text-mid); letter-spacing: 0.03em; }
+  .cvss-cve { font-family: var(--mono); font-size: 15px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--cyan); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 16px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 23px; font-weight: 700; color: var(--cyan); letter-spacing: 0.02em; min-width: 36px; line-height: 1; padding-right: 16px; border-right: 1px solid var(--border2); }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 16px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 16px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--cyan); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 15px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--cyan2); }
+
+  /* ── CWE BLOCK ── */
+  .cwe-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .cwe-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cwe-id     { font-family: var(--mono); font-size: 16.5px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; }
+  .cwe-name   { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .cwe-body   { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── LIFECYCLE TRACK ── */
+  .lifecycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 20px; }
+  .lc-phase  { position: relative; text-align: center; }
+  .lc-phase::after {
+    content: '→';
+    position: absolute;
+    right: -8px; top: 14px;
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--border2);
+    z-index: 1;
+  }
+  .lc-phase:last-child::after { display: none; }
+  .lc-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-dim);
+    background: var(--bg3);
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 13.5px; color: var(--cyan-dim);
+    font-weight: 700;
+  }
+  .lc-node.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+  .lc-node.red    { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.08); }
+  .lc-node.amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,197,66,0.08); }
+  .lc-label { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 15.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.cyan  { color: var(--cyan); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.amber { color: var(--amber); font-weight: 600; }
+  .kv-val.green { color: var(--green); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 14.5px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── CVSS VECTOR BREAKDOWN ── */
+  .cvss-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
+  .cvss-component { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; text-align: center; }
+  .cvss-comp-label { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .cvss-comp-val   { font-family: var(--mono); font-size: 16px; color: var(--cyan); font-weight: 700; margin-bottom: 3px; }
+  .cvss-comp-val.red   { color: var(--red); }
+  .cvss-comp-val.amber { color: var(--amber); }
+  .cvss-comp-meaning   { font-family: var(--body); font-size: 14.5px; color: var(--text-mid); line-height: 1.3; }
+
+  /* ── AFFECTED VERSIONS TABLE ── */
+  .versions-table { width: 100%; border-collapse: collapse; }
+  .versions-table th { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .versions-table td { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.6); vertical-align: top; }
+  .versions-table td.vuln  { color: var(--red); }
+  .versions-table td.fixed { color: var(--green); }
+  .versions-table td.partial { color: var(--amber); }
+
+  /* ── EXPLOITATION TIMELINE ── */
+  .exploit-timeline { display: flex; flex-direction: column; }
+  .et-item { display: grid; grid-template-columns: 90px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 44px; }
+  .et-date  { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .et-track { display: flex; flex-direction: column; align-items: center; }
+  .et-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .et-dot.red   { background: var(--red); }
+  .et-dot.amber { background: var(--amber); }
+  .et-dot.green { background: var(--green); }
+  .et-dot.purple { background: var(--purple); }
+  .et-line  { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .et-item:last-child .et-line { display: none; }
+  .et-content { padding: 3px 0 14px; border-bottom: 1px dotted rgba(21,32,48,0.6); }
+  .et-item:last-child .et-content { border-bottom: none; }
+  .et-event { font-family: var(--sans); font-size: 16.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; margin-bottom: 3px; }
+  .et-desc  { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── KEV BLOCK ── */
+  .kev-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .kev-block.not-listed { border-left-color: var(--text-dim); border-color: var(--border); }
+  .kev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kev-tag    { font-family: var(--mono); font-size: 14.5px; font-weight: 700; padding: 2px 8px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); letter-spacing: 0.06em; }
+  .kev-tag.not-listed { background: rgba(58,85,102,0.15); border-color: var(--border2); color: var(--text-dim); }
+  .kev-body   { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ── PURPLE TEAM TABS ── */
+  .purple-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border2); }
+  .pt-tab { font-family: var(--mono); font-size: 14px; padding: 8px 16px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 2px solid transparent; cursor: default; }
+  .pt-tab.detect  { border-bottom-color: var(--cyan); color: var(--cyan); }
+  .pt-tab.hunt    { border-bottom-color: var(--purple); color: var(--purple); }
+  .pt-tab.patch   { border-bottom-color: var(--green); color: var(--green); }
+  .pt-tab.control { border-bottom-color: var(--amber); color: var(--amber); }
+
+  .pt-section { padding: 16px 0; border-bottom: 1px solid rgba(21,32,48,0.6); }
+  .pt-section:last-child { border-bottom: none; }
+  .pt-section-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pt-section-label.cyan   { color: var(--cyan); }
+  .pt-section-label.purple { color: var(--purple); }
+  .pt-section-label.green  { color: var(--green); }
+  .pt-section-label.amber  { color: var(--amber); }
+
+  /* Query blocks */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--cyan); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 13.5px; color: var(--cyan-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 14.5px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(21,32,48,0.5); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 14.5px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+
+  /* ── CROSS-REFERENCE LINKS ── */
+  .xref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .xref-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .xref-item:hover { border-color: var(--cyan); }
+  .xref-item.actor    { border-left: 2px solid #00c8a0; }
+  .xref-item.incident { border-left: 2px solid #f5c542; }
+  .xref-type { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .xref-type.actor    { color: #00c8a0; }
+  .xref-type.incident { color: #f5c542; }
+  .xref-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 3px; }
+  .xref-rel  { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.4; }
+  .xref-none { font-family: var(--mono); font-size: 14.5px; color: var(--text-dim); font-style: italic; padding: 10px 0; }
+
+  /* ── CVE METADATA BLOCK ── */
+  .cve-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cve-meta-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 14px; }
+  .cve-meta-id   { font-family: var(--mono); font-size: 16.5px; color: var(--cyan); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .cve-meta-item .kv-row { border-bottom-color: rgba(21,32,48,0.5); }
+
+  /* ── NETWORK EXPOSURE ── */
+  .nmap-window {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-top: 2px solid var(--cyan);
+    margin-bottom: 12px;
+  }
+  .nmap-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+  .nmap-titlebar .cmd { color: var(--cyan); }
+  .nmap-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+  .nmap-titlebar .dot.green { background: var(--green); }
+  .nmap-output {
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    color: #8ab4c8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .nmap-output .port-open   { color: var(--green); }
+  .nmap-output .port-closed { color: var(--red); }
+  .nmap-output .port-filter { color: var(--amber); }
+  .nmap-output .service     { color: var(--cyan); }
+  .nmap-output .version     { color: #fff; }
+  .nmap-output .vuln-flag   { color: var(--red); font-weight: 700; }
+  .nmap-output .comment     { color: var(--text-dim); }
+  .nmap-output .highlight   { background: rgba(0,212,255,0.08); display: inline; }
+
+  .nse-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--purple);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .nse-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .nse-name   { font-family: var(--mono); font-size: 15px; color: var(--purple); font-weight: 700; }
+  .nse-tags   { display: flex; gap: 5px; }
+  .nse-tag    { font-family: var(--mono); font-size: 13px; padding: 1px 6px; border: 1px solid var(--border2); color: var(--text-dim); }
+  .nse-tag.vuln   { border-color: rgba(255,77,77,0.3); color: var(--red); }
+  .nse-tag.detect { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+  .nse-cmd  { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); padding: 5px 10px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-all; }
+  .nse-output { font-family: var(--mono); font-size: 14.5px; color: #8ab4c8; padding: 8px 10px; background: #020608; white-space: pre-wrap; line-height: 1.6; }
+  .nse-output .vuln-flag { color: var(--red); font-weight: 700; }
+  .nse-output .safe-flag { color: var(--green); font-weight: 700; }
+
+  .shodan-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--amber);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .shodan-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .shodan-label  { font-family: var(--mono); font-size: 13.5px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .shodan-dork   { font-family: var(--mono); font-size: 15px; color: #fff; background: var(--bg2); border: 1px solid var(--border); padding: 6px 10px; margin-bottom: 6px; word-break: break-all; }
+  .shodan-note   { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+
+  .banner-block {
+    background: #020608;
+    border: 1px solid var(--border2);
+    border-left: 2px solid var(--cyan2);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .banner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .banner-label  { font-family: var(--mono); font-size: 13.5px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.07em; }
+  .banner-status { font-family: var(--mono); font-size: 13.5px; padding: 1px 7px; }
+  .banner-status.vulnerable { border: 1px solid rgba(255,77,77,0.4); color: var(--red); }
+  .banner-status.patched    { border: 1px solid rgba(74,158,106,0.4); color: var(--green); }
+  .banner-text   { font-family: var(--mono); font-size: 14.5px; color: #8ab4c8; line-height: 1.6; white-space: pre-wrap; }
+  .banner-text .vuln-string { color: var(--red); }
+  .banner-text .safe-string { color: var(--green); }
+
+  .port-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .port-table th { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .port-table td { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(21,32,48,0.5); vertical-align: top; }
+  .port-table td.port-num  { color: var(--cyan); font-weight: 700; }
+  .port-table td.port-open { color: var(--green); }
+  .port-table td.svc-name  { color: #fff; }
+  .port-table td.version-vuln { color: var(--red); }
+  .port-table td.version-safe { color: var(--green); }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(21,32,48,0.5); font-size: 15px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 13.5px; color: var(--cyan2); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--cyan); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO / THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .lifecycle { grid-template-columns: repeat(3, 1fr); }
+    .cvss-breakdown { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col, .xref-grid, .cve-meta-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .lifecycle { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ── PRINT BUTTON (screen only; hidden via .no-print below) ── */
+  .print-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 999;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .print-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+
+    @page { margin: 12mm; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e6e6e6;
+      --border: #cfcfcf;
+      --border2: #b0b0b0;
+      --cyan: #0088a8;
+      --cyan2: #006c86;
+      --amber: #8a6205;
+      --purple: #6a42c9;
+      --text: #111111;
+      --text-dim: #555555;
+      --text-mid: #2b2b2b;
+    }
+
+    body {
+      background: #fff !important;
+      background-image: none !important;
+      padding: 0 !important;
+    }
+
+    .header { background: #fff !important; }
+    .header::before { display: none !important; }
+    .header h1,
+    .section-title,
+    .cwe-name,
+    .et-event,
+    .xref-name {
+      color: #111 !important;
+    }
+    .port-table td.svc-name { color: #111 !important; }
+
+    .tlp-badge, .kev-tag, .badge, .kev-badge-sm {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .nmap-output, .nse-output, .nse-cmd, .shodan-dork {
+      background: #0a0e12 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .header, .stat-grid,
+    .stat-cell, .kv-row, .et-item, .kev-block, .cm-item, .xref-item,
+    .ref-item, .pt-section, .prose p, tr {
+      break-inside: avoid;
+    }
+    .section-header { break-after: avoid; }
+    .section { orphans: 3; widows: 3; }
+    thead { display: table-header-group; }
+
+    a { color: #111 !important; text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()" title="Print or Save as PDF">⎘ Print / Save PDF</button>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="patch-badge patch-now">PATCH NOW</div>
+      <div class="kev-badge">KEV LISTED</div>
+    </div>
+  </div>
+  <div class="advisory-label">// Vulnerability Advisory — SQL Injection → Root RCE · Cisco / Secure Email Gateway</div>
+  <h1><span class="cyan">CISCO</span> ESA SQLi</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-16 &nbsp;|&nbsp;
+    CVE: CVE-2026-76461 &nbsp;|&nbsp;
+    CWE: CWE-89 (SQL Injection) &nbsp;|&nbsp;
+    SOURCES: Cisco PSIRT, CISA KEV, NVD, Rapid7, The Hacker News, Triskele Labs, Help Net Security, CyCognito, GBHackers (9)
+  </div>
+  <div class="advisory-bar">
+    <div>CVSS: <span class="red">9.8 (CRITICAL)</span></div>
+    <div>Affected: <span>Cisco Secure Email Gateway, AsyncOS 15.5 and earlier / 16.0 / 16.5 (physical &amp; virtual)</span></div>
+    <div>Disclosed: <span>2026-09-14</span></div>
+    <div>Patch Date: <span>2026-09-14 (same day)</span></div>
+    <div>KEV Added: <span class="cyan">2026-09-14</span></div>
+    <div>EPSS: <span>2.2% (30-day)</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ CVSS CALLOUT + STAT GRID ══ -->
+<div class="cvss-callout">
+  <div>
+    <div class="cvss-score high">9.8</div>
+    <div class="cvss-label">CVSS v3.1 Base Score</div>
+  </div>
+  <div>
+    <div class="cvss-cve">CVE-2026-76461</div>
+    <div style="margin-top:4px; font-family:var(--mono); font-size:13.5px; color:var(--text-dim);">Single CVE — no companion variants identified in this release</div>
+  </div>
+  <div class="cvss-vector">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">9.8</div>
+    <div class="stat-label">CVSS v3.1 — Critical</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">0 DAYS</div>
+    <div class="stat-label">Disclosure-to-KEV gap — added same day</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">3 DAYS</div>
+    <div class="stat-label">BOD 26-04 federal remediation deadline</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">2.2%</div>
+    <div class="stat-label">EPSS 30-day — low despite confirmed active exploitation</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>CVE-2026-76461 is a critical, actively exploited vulnerability in Cisco Secure Email Gateway (the product formerly branded IronPort ESA, and still internally referred to by that codename — Cisco's own advisory slug is "cisco-sa-<strong>esa</strong>-inj"). A SQL injection flaw in the appliance's email-parsing logic lets an unauthenticated, remote attacker send a single crafted email through the gateway and end up executing arbitrary operating-system commands as <strong>root</strong> on the device — no login, no user interaction, no prerequisite condition beyond the target accepting mail, which is the one thing an email gateway exists to do (Cisco PSIRT, 2026-09-14).</p>
+      <p>This matters immediately, not theoretically: Cisco disclosed the flaw and shipped a fix on the same day CISA added it to the Known Exploited Vulnerabilities catalog — a same-day KEV listing that signals Cisco already had evidence of in-the-wild abuse before going public, i.e. this was exploited as a zero-day (Rapid7; The Hacker News, 2026-09-15). CISA's compressed BOD 26-04 risk tier — three calendar days rather than a fixed multi-week deadline — applies here specifically because the flaw is publicly exposed by design, KEV-listed, exploitation is automatable, and successful exploitation yields total device control.</p>
+      <p>The exposure profile is what makes this unusually dangerous relative to a typical appliance CVE: an email security gateway's entire job is to accept untrusted SMTP traffic from the open internet and parse it. There is no "behind the firewall" version of this attack surface to retreat to, and Cisco has confirmed no workaround exists — patching is the only remediation (Cisco Security Advisory, 2026-09-14).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Root Cause Analysis <small>CWE Classification + Architectural Failure</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cwe-block">
+      <div class="cwe-header">
+        <span class="cwe-id">CWE-89</span>
+        <span class="cwe-name">Improper Neutralization of Special Elements used in an SQL Command</span>
+      </div>
+      <div class="cwe-body">Untrusted input — in this case, attacker-controlled content inside an inbound email — is incorporated into a SQL statement executed by the appliance's backend database without adequate validation or parameterization, allowing the attacker to inject and execute arbitrary SQL of their own choosing.</div>
+    </div>
+    <div class="prose">
+      <p>Cisco's advisory attributes the flaw to "insufficient validation in the email parsing logic," without publishing exact code paths — standard practice for an active zero-day. What is publicly documented, and analytically significant, is Rapid7's detection guidance: hunt <code>mail_logs</code> for the string pattern <code>COPY.*TO PROGRAM</code>. That is not a generic SQL-injection signature — it is the fingerprint of a specific, well-known PostgreSQL primitive. PostgreSQL's <code>COPY table TO PROGRAM 'shell-command'</code> clause lets a sufficiently privileged database role pipe query output directly into an OS shell command, which is the standard technique for turning "I can run arbitrary SQL" into "I can run arbitrary shell commands." Cisco's ESA/Secure Email Gateway platform has used a local PostgreSQL-family database for message tracking, quarantine, and reporting data since the original IronPort architecture, which is consistent with this exploitation path.</p>
+      <p>That mechanism explains the "root" severity, not just "database compromise": if the SQL injection point runs with a database role that holds (or can escalate to) superuser-equivalent privilege — plausible on an appliance where the mail-processing service and its local database are tightly coupled and not separately hardened — <code>COPY TO PROGRAM</code> converts a query-language bug directly into OS command execution at whatever privilege the database process runs under. No separate memory-corruption exploit chain, no additional privilege-escalation bug, is needed once that step succeeds.</p>
+      <p>Architecturally, this is the same recurring failure as any other injection bug — untrusted input reaching an interpreter without a strict allow-list or parameterized-query boundary — made unusually severe by two compounding design choices specific to this product class: the input source is the appliance's core, unauthenticated, internet-facing function (accepting email), and the vulnerable component sits directly beside a database engine with a documented command-execution primitive built into its own SQL dialect. See Section 07 for the broader lesson.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Vulnerability Lifecycle</div>
+  </div>
+  <div class="section-body">
+    <div class="lifecycle">
+      <div class="lc-phase">
+        <div class="lc-node active">01</div>
+        <div class="lc-label">Discovery<br/>Not disclosed</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node active">02</div>
+        <div class="lc-label">Disclosure<br/>2026-09-14</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node amber">03</div>
+        <div class="lc-label">Patch<br/>2026-09-14</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node red">04</div>
+        <div class="lc-label">Exploitation<br/>Pre-disclosure (Sep 2026)</div>
+      </div>
+      <div class="lc-phase">
+        <div class="lc-node dim">05</div>
+        <div class="lc-label">Resolution<br/>Ongoing — patch adoption</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>This lifecycle is compressed and inverted relative to the typical CVE arc. There is no visible public research-disclosure-then-patch sequence: Cisco's PSIRT became aware of active exploitation in September 2026 and published the advisory with fixed software already available on the same day — 2026-09-14. CISA's KEV addition landed on that identical date, which only happens when the vendor's own disclosure is itself triggered by confirmed attacker activity rather than a researcher's coordinated-disclosure clock running out.</p>
+      <p>Practically, that means every organization running an affected build was vulnerable to a live, working exploitation technique for an unknown period <em>before</em> a patch existed — the "discovery" and "exploitation" phases both sit chronologically ahead of "disclosure" and "patch," rather than following them. No public source reviewed for this card specifies exactly when the underlying flaw was first exploited, only that it predates the September 14 announcement; that gap is a genuine intelligence gap, not an oversight in this research.</p>
+      <p>As of compile date, no public proof-of-concept exploit exists (see Section 04), so the "resolution" phase is currently a patch-adoption race rather than a contained incident — the compressed three-day BOD 26-04 deadline reflects CISA's judgment that this window matters.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Disclosure Analysis</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom:18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Disclosure Type</span><span class="kv-val cyan">Vendor-initiated, exploitation-driven (not researcher-coordinated)</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val">Cisco PSIRT — via confirmed customer-impacting activity</span></div>
+        <div class="kv-row"><span class="kv-key">Reported To Vendor</span><span class="kv-val dim">Not publicly documented — likely internal telemetry/customer report</span></div>
+        <div class="kv-row"><span class="kv-key">PoC Released</span><span class="kv-val green">None as of compile date (2026-09-16)</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">PoC vs Patch</span><span class="kv-val dim">N/A — no public PoC exists; exploitation preceded the patch as a zero-day</span></div>
+        <div class="kv-row"><span class="kv-key">Vendor Response</span><span class="kv-val green">Fast — same-day advisory, patch, and Cloud fleet upgrade</span></div>
+        <div class="kv-row"><span class="kv-key">Community Reaction</span><span class="kv-val">Immediate, wide press pickup (The Hacker News, GBHackers, Help Net Security et al.) within 24–48 hours</span></div>
+        <div class="kv-row"><span class="kv-key">CVD Policy Followed</span><span class="kv-val dim">Not applicable in the traditional sense — no external researcher credited</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>This is not a coordinated-vulnerability-disclosure story in the usual sense: no independent researcher or bug-bounty submission is credited in any source reviewed. The pattern instead matches "vendor discovers active exploitation against its own customers, ships a fix under emergency timelines, and discloses concurrently" — Cisco stated it had already directly contacted affected Secure Email Cloud customers where malicious activity occurred, and had upgraded its entire Cloud fleet to the fixed build ahead of the public advisory (Cisco Security Advisory; Help Net Security, 2026-09-15).</p>
+      <p>The absence of a public PoC as of this compile is itself worth stating plainly: a GitHub-hosted "CVE-2026-76461 Detection Kit" surfaced within a day of disclosure but its own README explicitly disclaims containing exploit code, limiting itself to Sigma/YARA detection rules and remediation guidance. Multiple aggregator sources (including a vulnpedia.com-style EPSS/PoC tracker referenced during this research) independently reported "no public functional PoC exists" at time of writing, with EPSS accordingly still low (2.2%) — a useful reminder that EPSS's crowd/model-derived score can substantially lag a vendor's own confirmed-exploitation signal for a fresh zero-day.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Technical Deep Dive <small>Exploitation Mechanics · CVSS Breakdown · Affected Versions</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:18px;">
+      <p>The documented attack chain has three steps, per Cisco's own advisory and corroborating press analysis: (1) an attacker constructs an email message containing a malicious SQL payload embedded in a field the gateway's parsing logic processes; (2) the appliance's email-parsing code passes that field into a SQL statement without adequate sanitization, allowing the attacker's injected SQL to execute against the local database; (3) the injected SQL uses a database-level command-execution primitive — consistent with PostgreSQL's <code>COPY ... TO PROGRAM</code> construct, per Rapid7's IOC guidance — to run an arbitrary OS command with the privileges of the database process, which on this appliance architecture is root.</p>
+      <p>No public source has reproduced or published the exact malformed field or SQL payload, which is why no independent PoC yet exists (Section 04). This is a case where the vendor advisory, KEV entry, and press coverage are unusually aligned on impact and mechanism while deliberately withholding the reproduction detail that would turn analysis into a working exploit.</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">CVSS v3.1 Vector Breakdown — CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+      <div class="cvss-breakdown">
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Vector</div>
+          <div class="cvss-comp-val red">NETWORK</div>
+          <div class="cvss-comp-meaning">Delivered over standard inbound SMTP — no local or adjacent-network access needed.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Attack Complexity</div>
+          <div class="cvss-comp-val red">LOW</div>
+          <div class="cvss-comp-meaning">A single crafted email; no race condition, timing dependency, or special target configuration required.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Privileges Required</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">The attacker need not authenticate to the appliance in any way.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">User Interaction</div>
+          <div class="cvss-comp-val red">NONE</div>
+          <div class="cvss-comp-meaning">No recipient needs to open, click, or otherwise act on the email — the gateway's automatic parsing is the trigger.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Scope</div>
+          <div class="cvss-comp-val cyan">UNCHANGED</div>
+          <div class="cvss-comp-meaning">Impact is scored as confined to the vulnerable component itself, despite root OS access — CVSS scope tracks the authorization boundary crossed, not blast radius.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Confidentiality</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Root access exposes all mail content, quarantine data, and stored credentials on the device.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Integrity</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">An attacker with root can modify mail flow, filtering rules, and system configuration at will.</div>
+        </div>
+        <div class="cvss-component">
+          <div class="cvss-comp-label">Availability</div>
+          <div class="cvss-comp-val red">HIGH</div>
+          <div class="cvss-comp-meaning">Root access permits arbitrary service disruption, including disabling mail delivery entirely.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Versions</div>
+      <table class="versions-table">
+        <thead><tr><th>Vendor</th><th>Product</th><th>Affected Versions</th><th>Fixed Version</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Cisco</td><td>Secure Email Gateway (AsyncOS) — 15.5 branch</td><td class="vuln">15.5 and earlier</td><td class="fixed">15.5.5-014</td><td>Patch available</td></tr>
+          <tr><td>Cisco</td><td>Secure Email Gateway (AsyncOS) — 16.0 branch</td><td class="vuln">16.0.x (pre-fix)</td><td class="fixed">16.0.4-302</td><td>Patch available</td></tr>
+          <tr><td>Cisco</td><td>Secure Email Gateway (AsyncOS) — 16.5 branch</td><td class="vuln">16.5.x (pre-fix)</td><td class="fixed">16.5.0-780</td><td>Patch available — Cisco's recommended target</td></tr>
+          <tr><td>Cisco</td><td>Secure Email Cloud</td><td class="fixed">N/A — cloud-managed</td><td class="fixed">Already upgraded fleet-wide by Cisco</td><td>Resolved by vendor</td></tr>
+          <tr><td>Cisco</td><td>Secure Email and Web Manager</td><td>Not affected</td><td>—</td><td>Confirmed not vulnerable</td></tr>
+          <tr><td>Cisco</td><td>Secure Web Appliance</td><td>Not affected</td><td>—</td><td>Confirmed not vulnerable</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Exploitation in the Wild <small>Threat Actors · Campaigns · KEV Status</small></div>
+  </div>
+  <div class="section-body">
+    <div class="kev-block">
+      <div class="kev-header">
+        <span class="kev-tag">CISA KEV LISTED</span>
+        <span style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim);">Added: 2026-09-14 · Required Remediation: 2026-09-17 · BOD 26-04 three-day tier</span>
+      </div>
+      <div class="kev-body">CISA added CVE-2026-76461 to KEV the same day Cisco disclosed it, citing evidence of active exploitation, and applied BOD 26-04's fastest three-day remediation tier — reserved for vulnerabilities that are publicly exposed, KEV-listed, exploitation-automatable, and capable of granting total asset control, all four of which apply here. CISA's required action also invokes its "Forensics Triage Requirements": federal agencies must assess whether a device was already compromised during the exposure window <em>before</em> simply applying the patch, since patching alone does not evict an attacker who already has root and could have planted persistence.</div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Exploitation Timeline</div>
+      <div class="exploit-timeline">
+        <div class="et-item">
+          <div class="et-date">Sep 2026<br/>(exact date undisclosed)</div>
+          <div class="et-track"><div class="et-dot red"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Active Exploitation Detected by Cisco PSIRT</div>
+            <div class="et-desc">Cisco became aware of exploitation against Secure Email Cloud customers before any public advisory existed — a zero-day by definition. No exact date, victim count, or entry-point detail has been published.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-14</div>
+          <div class="et-track"><div class="et-dot cyan"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Coordinated Disclosure, Patch, and KEV Listing</div>
+            <div class="et-desc">Cisco publishes the advisory and fixed builds; CISA adds the CVE to KEV the same day with a compressed three-day deadline.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-15</div>
+          <div class="et-track"><div class="et-dot amber"></div><div class="et-line"></div></div>
+          <div class="et-content">
+            <div class="et-event">Wide Security-Press Coverage &amp; Detection Tooling</div>
+            <div class="et-desc">Rapid7, The Hacker News, Help Net Security, GBHackers, and others publish analysis; a defensive-only Sigma/YARA detection kit surfaces on GitHub within 24 hours of disclosure. Rapid7 targets vulnerability-check coverage in InsightVM/Nexpose/Exposure Command by its Sep 16 content release.</div>
+          </div>
+        </div>
+        <div class="et-item">
+          <div class="et-date">2026-09-16</div>
+          <div class="et-track"><div class="et-dot dim"></div></div>
+          <div class="et-content">
+            <div class="et-event">Compile Date — No Public PoC, No Named Actor</div>
+            <div class="et-desc">No functional exploit PoC has been published and no threat actor or campaign has been publicly attributed. CyCognito exposure telemetry shows affected software concentrated in IT (28.7%), Financials (23.2%), and Industrials (17.1%) sectors — infrastructure observed running the software, not confirmed-vulnerable or confirmed-compromised counts.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p><strong>No threat actor or campaign has been publicly attributed to this exploitation as of compile date, and none should be inferred.</strong> Cisco has not named an actor, and no independent research reviewed for this card claims attribution. Cisco disclosed only that it directly contacted affected Secure Email Cloud customers "where malicious activity occurred" — language that implies a limited, targeted-or-opportunistic early exploitation set rather than mass scanning, but stops well short of naming scale or victims. This project's actor and incident card libraries were checked directly: no companion card exists for this CVE (see Section 10).</p>
+      <p>One piece of historical context is worth carrying without over-weighting it: press coverage of this advisory repeatedly cites a prior Cisco Secure Email zero-day, <strong>CVE-2025-20393</strong>, in which attackers deployed log-purging tooling post-compromise, attributed in earlier reporting to a China-nexus actor. That is a different CVE and a different (unconfirmed-here) actor — it is cited only as precedent that intrusions into this product line have previously involved sophisticated anti-forensic tradecraft, which is the direct rationale behind CISA's forensic-triage-before-patching requirement for this vulnerability.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Architectural Lessons <small>Why this class of vulnerability keeps recurring</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Security appliances that terminate untrusted protocols — mail gateways, web proxies, VPN concentrators — occupy a structurally dangerous architectural position: they are, by design, the one thing on the network explicitly built to accept and parse hostile input from strangers on the internet, yet they are frequently built and operated with the implicit trust model of internal infrastructure. A SQL injection in "email parsing logic" is not really a story about SQL hygiene in isolation; it is a story about what happens when a component whose entire purpose is adversarial-input handling shares a database and a privilege level with the rest of the appliance's control plane, so that a bug in the input parser becomes a bug in root access.</p>
+      <p>The specific mechanism here — an injectable SQL sink adjacent to a database engine that itself offers a built-in "run this as a shell command" primitive (PostgreSQL's <code>COPY TO PROGRAM</code> and equivalents in other engines) — is a recurring amplifier across the industry, not a Cisco-specific quirk. Any application embedding a general-purpose SQL engine inherits that engine's full feature surface, including features designed for legitimate DBA convenience that become a privilege-escalation shortcut the moment injection is possible. The durable lesson is that "we use a real database, not raw file I/O" does not by itself reduce the blast radius of an injection bug — it can increase it, because the database brings its own capability surface that a hand-rolled parser would not have had.</p>
+      <p>The second, more product-specific lesson is about appliance trust boundaries: Cisco's advisory explicitly separates Secure Email Gateway (vulnerable) from Secure Email and Web Manager and Secure Web Appliance (not vulnerable), implying the flaw lives in a component genuinely specific to inbound-mail parsing rather than a shared library across the whole product family. That is a point in favor of the architecture, not against it — the blast radius was contained to the product actually processing the untrusted input, rather than propagating across Cisco's whole secure-appliance line. The unresolved industry-wide question this vulnerability restates once again is why the mail-parsing process on an internet-facing appliance runs with a database role, and ultimately an OS privilege level, broad enough for a parsing bug to become root — least-privilege separation between "parses untrusted mail" and "administers the box" remains the architectural fix this bug class keeps calling for.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Purple Team <small>Detection · Hunting · Patch Guidance · Compensating Controls</small></div>
+  </div>
+  <div class="section-body">
+    <div class="purple-tabs">
+      <div class="pt-tab detect">A · Detection</div>
+      <div class="pt-tab hunt">B · Threat Hunting</div>
+      <div class="pt-tab patch">C · Patch Guidance</div>
+      <div class="pt-tab control">D · Compensating Controls</div>
+    </div>
+
+    <!-- A: DETECTION -->
+    <div class="pt-section">
+      <div class="pt-section-label cyan">A · Detection — SIEM Queries &amp; Behavioral Indicators</div>
+      <div class="query-block">
+        <div class="query-label">Rapid7-published IOC · ESA mail_logs</div>
+        <div class="query-code">grep -i "COPY.*TO PROGRAM" mail_logs</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Illustrative SIEM correlation (based on the same indicator, adapted for centralized log shipping) · Splunk-style pseudo-query</div>
+        <div class="query-code">index=cisco_esa sourcetype=mail_logs
+| regex _raw="(?i)COPY.*TO\s+PROGRAM"
+| table _time, host, sender, recipient, _raw</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>Beyond the log-string signature, review external network and firewall telemetry for the appliance — Rapid7 explicitly recommends this because a root-level attacker can purge local <code>mail_logs</code> to remove the very evidence the grep above looks for. Unexpected outbound connections, DNS lookups to unfamiliar destinations, or new listening processes originating from the mail gateway's host are the fallback signal once local logs can no longer be trusted. Any positive hit on the log signature, or any of these external indicators, should be treated per Section 06's KEV note: assume prior compromise and triage forensically before simply patching.</p>
+      </div>
+    </div>
+
+    <!-- B: HUNTING -->
+    <div class="pt-section">
+      <div class="pt-section-label purple">B · Threat Hunting — Hypothesis-Driven Procedures</div>
+      <div class="prose">
+        <p><strong>Hypothesis 1 — Root access was already used to establish persistence before you patch.</strong> Because CISA's forensic-triage requirement exists precisely for this scenario, hunt for new or modified cron jobs, systemd/init entries, SSH authorized_keys, or local admin accounts on the appliance dated anywhere in the weeks prior to patching — not just around the September 14 disclosure date, since the exploitation window predates public disclosure by an unknown margin.</p>
+        <p><strong>Hypothesis 2 — The appliance was used as a pivot into internal infrastructure.</strong> A rooted mail gateway is a natural staging point for lateral movement, since it is already trusted to reach internal mail infrastructure and often holds credentials or relay permissions. Review authentication logs on directly-adjacent internal systems (internal SMTP relays, directory services the gateway queries) for anomalous access originating from the gateway's IP in the exploitation window.</p>
+        <p><strong>Hypothesis 3 — Mail content itself was harvested.</strong> Root access to the appliance's database exposes message tracking and quarantine data. For high-value environments, treat any quarantined or logged sensitive email content processed during the exposure window as potentially disclosed, and assess downstream impact accordingly rather than assuming confidentiality loss requires exfiltration evidence to be credible.</p>
+      </div>
+    </div>
+
+    <!-- C: PATCH GUIDANCE -->
+    <div class="pt-section">
+      <div class="pt-section-label green">C · Patch Guidance</div>
+      <div class="two-col" style="margin-bottom:12px;">
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Patch</span><span class="kv-val green">15.5.5-014 / 16.0.4-302 / 16.5.0-780 (by branch)</span></div>
+          <div class="kv-row"><span class="kv-key">Release Date</span><span class="kv-val">2026-09-14</span></div>
+          <div class="kv-row"><span class="kv-key">Regression Risk</span><span class="kv-val">Not flagged as elevated in sources reviewed — treat as a standard AsyncOS maintenance upgrade</span></div>
+          <div class="kv-row"><span class="kv-key">Testing Required</span><span class="kv-val red">Minimal justified — exploitation is active pre-patch; patch first, triage forensically, test after</span></div>
+          <div class="kv-row"><span class="kv-key">Public PoC (vulnpedia-style check)</span><span class="kv-val dim">None catalogued as of 2026-09-16 — only a defensive-only detection kit (Sigma/YARA, no exploit code) has surfaced</span></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan">cisco-sa-esa-inj-2bLVGmhX, 2026-09-14</span></div>
+          <div class="kv-row"><span class="kv-key">Out-of-Band Patch</span><span class="kv-val">Yes — emergency release outside normal AsyncOS cycle</span></div>
+          <div class="kv-row"><span class="kv-key">Superseded By</span><span class="kv-val">Not superseded — 16.5.0-780 is Cisco's recommended current target</span></div>
+        </div>
+      </div>
+      <div class="prose">
+        <p>Cisco recommends migrating to 16.5.0-780 specifically, not just the minimum fixed build for your current branch, and has already moved its entire Secure Email Cloud fleet there. There is no workaround: Cisco's advisory states plainly that upgrading is the only remediation, so any interim mitigation (Section D) is a stop-gap for the hours needed to schedule the upgrade, not a substitute for it. Given the confirmed pre-disclosure exploitation window, treat every unpatched, internet-facing instance as potentially already compromised and follow CISA's forensic-triage guidance (Section 06) before considering the incident closed by patching alone.</p>
+      </div>
+    </div>
+
+    <!-- D: COMPENSATING CONTROLS -->
+    <div class="pt-section">
+      <div class="pt-section-label amber">D · Compensating Controls — For Environments That Cannot Patch</div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div class="cm-text"><strong>There is no vendor-sanctioned workaround — treat any compensating control below as a short bridge to patching, not a substitute for it.</strong> Cisco is explicit that upgrading is the only remediation.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div class="cm-text"><strong>Route inbound mail through a secondary filtering layer or MX-level scrubbing service ahead of the appliance</strong> during the patch window, to reduce the population of raw, unfiltered SMTP traffic reaching the vulnerable parser directly.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div class="cm-text"><strong>Increase mail-flow and system-level logging verbosity and ship logs off-device in real time</strong> before patching, specifically because a root-level compromise can include log tampering — off-device copies are the only logs you can still trust after the fact.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div class="cm-text"><strong>Restrict and monitor outbound connectivity from the appliance</strong> to only what mail delivery and vendor update functions require, since anomalous outbound traffic is the most reliable post-compromise indicator once local logs are in question.</div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div class="cm-text"><strong>Prioritize internet-facing, unauthenticated-inbound instances for immediate patching over internally-facing relays</strong> if a phased rollout is unavoidable — the entire attack surface here is unauthenticated SMTP, so exposure to the open internet is the single biggest risk multiplier across a fleet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">CVE / CVSS / KEV Reference <small>Full metadata block</small></div>
+  </div>
+  <div class="section-body">
+    <div class="cve-meta-grid">
+      <div class="cve-meta-item">
+        <div class="cve-meta-id">CVE-2026-76461</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">CVSS v3.1 Score</span><span class="kv-val red">9.8 (CRITICAL)</span></div>
+          <div class="kv-row"><span class="kv-key">Vector String</span><span class="kv-val mono">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span></div>
+          <div class="kv-row"><span class="kv-key">CWE</span><span class="kv-val cyan">CWE-89 (SQL Injection)</span></div>
+          <div class="kv-row"><span class="kv-key">EPSS Score</span><span class="kv-val">2.2% (30-day exploitation probability)</span></div>
+          <div class="kv-row"><span class="kv-key">NVD Link</span><span class="kv-val cyan"><a href="https://nvd.nist.gov/vuln/detail/CVE-2026-76461" target="_blank" style="color:var(--cyan)">nvd.nist.gov</a></span></div>
+          <div class="kv-row"><span class="kv-key">Vendor Advisory</span><span class="kv-val cyan"><a href="https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-esa-inj-2bLVGmhX" target="_blank" style="color:var(--cyan)">cisco-sa-esa-inj-2bLVGmhX</a></span></div>
+          <div class="kv-row"><span class="kv-key">KEV Status</span><span class="kv-val cyan">Listed — active exploitation confirmed</span></div>
+          <div class="kv-row"><span class="kv-key">KEV Date Added</span><span class="kv-val">2026-09-14</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Cross-References <small>Linked actor and incident cards</small></div>
+  </div>
+  <div class="section-body">
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Threat Actors Who Weaponized This Vulnerability</div>
+    <div class="xref-grid" style="margin-bottom:18px;">
+      <div class="xref-none">No companion actor cards on file for this vulnerability — no threat actor has been publicly attributed as of compile date (see Section 06).</div>
+    </div>
+
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Incidents Where This Was the Initial Vector</div>
+    <div class="xref-grid">
+      <div class="xref-none">No companion incident cards on file for this vulnerability — no specific breach has been publicly documented in enough detail to warrant a case file as of compile date.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Network Exposure <small>Ports · Protocols · Banners · Nmap · Shodan</small></div>
+  </div>
+  <div class="section-body">
+
+    <div style="font-family:var(--mono); font-size:13.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Affected Ports &amp; Protocols</div>
+    <table class="port-table" style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>Port</th>
+          <th>Proto</th>
+          <th>Service</th>
+          <th>Vulnerable Condition</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="port-num">25</td>
+          <td>TCP</td>
+          <td class="svc-name">SMTP (inbound mail)</td>
+          <td class="version-vuln">Any unpatched AsyncOS build processing inbound mail</td>
+          <td>Primary and by-design attack surface — the appliance must accept SMTP to function</td>
+        </tr>
+        <tr>
+          <td class="port-num">443 / 8443</td>
+          <td>TCP</td>
+          <td class="svc-name">HTTPS management interface</td>
+          <td>Not the reported vector</td>
+          <td>No source reviewed attributes exploitation to the admin interface — restrict exposure regardless as standard hardening</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="prose">
+      <p><strong>No public Nmap/NSE fingerprinting method, service-banner discriminator, or Shodan/Censys dork specific to this vulnerability has been published as of compile date</strong> — stated here explicitly as a gap rather than fabricated. This is consistent with the absence of a public PoC (Section 04): version discrimination for AsyncOS builds is not reliably exposed via the SMTP banner in any source reviewed, and no researcher has published a working detection script. The practical exposure-discovery method available today is inventory-based (asset management / CMDB confirmation of AsyncOS version) rather than remote fingerprinting.</p>
+      <p>The closest available exposure signal is sectoral, not device-level: CyCognito's platform telemetry found affected software concentrated in Information Technology (28.7%), Financials (23.2%), and Industrials (17.1%) organizations, explicitly caveated as "infrastructure observed running the affected software and potentially exposed, not confirmed vulnerable instances" — useful for prioritization, not for identifying specific hosts.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Cisco PSIRT</div>
+        <div>
+          <div class="ref-detail"><a href="https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-esa-inj-2bLVGmhX" target="_blank">Cisco Security Advisory: Cisco Secure Email Gateway SQL Injection Vulnerability (cisco-sa-esa-inj-2bLVGmhX)</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">NVD / NIST</div>
+        <div>
+          <div class="ref-detail"><a href="https://nvd.nist.gov/vuln/detail/CVE-2026-76461" target="_blank">CVE-2026-76461 Detail</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/alerts/2026/09/14/cisa-adds-one-known-exploited-vulnerability-catalog" target="_blank">CISA Adds One Known Exploited Vulnerability to Catalog</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Rapid7</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.rapid7.com/blog/post/etr-cve-2026-76461-critical-cisco-secure-email-gateway-vulnerability-exploited-in-the-wild/" target="_blank">CVE-2026-76461: Critical Cisco Secure Email Gateway Vulnerability Exploited in the Wild</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/09/cisco-secure-email-gateway-flaw.html" target="_blank">Cisco Secure Email Gateway Flaw Exploited in the Wild, Enables Root Command Execution</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Triskele Labs</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.triskelelabs.com/resources/unauthenticated-remote-code-execution-in-cisco-secure-email-gateway-cve-2026-76461" target="_blank">Unauthenticated Remote Code Execution in Cisco Secure Email Gateway (CVE-2026-76461)</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Help Net Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.helpnetsecurity.com/2026/09/15/cve-2026-76461-cisco-email-gateway-zero-day-exploited/" target="_blank">Cisco Patches Actively Exploited Email Gateway Zero-Day (CVE-2026-76461)</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyCognito</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cycognito.com/blog/emerging-threat-cve-2026-76461-cisco-secure-email-gateway-root-rce-via-email-parsing/" target="_blank">Emerging Threat: CVE-2026-76461 Cisco Secure Email Gateway Root RCE via Email Parsing</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GBHackers</div>
+        <div>
+          <div class="ref-detail"><a href="https://gbhackers.com/hackers-exploit-critical-cisco-secure-email-gateway-flaw/" target="_blank">Hackers Exploit Critical Cisco Secure Email Gateway Flaw to Execute Commands as Root</a></div>
+          <div class="ref-date">Accessed: 2026-09-16</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// VULNERABILITY ADVISORY · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-16 · 9 sources, all open-source/public</div>
+  <div>Cisco Secure Email Gateway (AsyncOS) · CVE-2026-76461 · KEV listed same-day as disclosure — treat as prior zero-day exploitation, not a routine patch cycle</div>
+</div>
+
+</body>
+</html>
