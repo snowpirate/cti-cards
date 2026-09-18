@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WaterPlum — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    border-left: 3px solid var(--accent2);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+  }
+  .alert-label    { font-family: var(--mono); font-size: 13.5px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red  { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 16px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 23px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; min-width: 36px; line-height: 1; padding-right: 16px; border-right: 1px solid var(--border2); }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 16px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 16px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  /* ── TWO/THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 15.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 14px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .alias-chip { font-family: var(--mono); font-size: 13.5px; padding: 3px 10px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 100px 12px 1fr; gap: 0 12px; align-items: stretch; min-height: 50px; }
+  .timeline-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent4); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.green { background: var(--accent); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.6); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 16.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red   { border-left-color: var(--accent2); }
+  .mitre-cell.amber { border-left-color: var(--accent3); }
+  .mitre-cell.green { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 14.5px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 15px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 14.5px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 10px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 70px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 15px; color: var(--text); }
+  .sector-bar-wrap { height: 8px; background: var(--bg3); border: 1px solid var(--border); }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); }
+  .sector-pct  { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL LIST ── */
+  .tool-list { display: flex; flex-direction: column; gap: 10px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 12px 16px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; flex-wrap: wrap; gap: 5px; }
+  .tool-name { font-family: var(--mono); font-size: 15px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue .tool-name  { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .tool-desc { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+
+  /* IOC table */
+  .ioc-defang-note { font-family: var(--mono); font-size: 13.5px; color: var(--accent3); margin-bottom: 12px; padding: 6px 10px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); padding: 6px 10px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 13.5px; white-space: nowrap; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 14.5px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-ttp  { font-family: var(--mono); font-size: 13px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── OPSEC / EVASION ── */
+  .opsec-list, .evasion-list { display: flex; flex-direction: column; gap: 10px; }
+  .opsec-item, .evasion-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 16px; }
+  .opsec-header, .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 13.5px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .opsec-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+
+  .evasion-technique { font-family: var(--mono); font-size: 14.5px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 13.5px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .evasion-tag.edr { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem { border-color: rgba(245,197,66,0.3); color: var(--accent3); }
+  .evasion-tag.network { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-detail { font-family: var(--mono); font-size: 14px; color: var(--text); background: var(--bg4); border: 1px solid var(--border); padding: 8px 10px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+  /* ── CTID BLOCK ── */
+  .ctid-block { background: var(--bg3); border: 1px solid var(--border); border-left: 3px solid var(--text-dim); padding: 16px 20px; }
+  .ctid-block:not(.not-available) { border-left-color: var(--accent); }
+  .ctid-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 2px 8px; letter-spacing: 0.06em; }
+  .ctid-tag.not-available { color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 14px; margin-bottom: 10px; }
+  .ctid-link { font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-decoration: none; }
+  .ctid-link:hover { text-decoration: underline; }
+  .ctid-phases { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ctid-phase-chip { font-family: var(--mono); font-size: 13px; color: var(--text-mid); border: 1px solid var(--border2); padding: 2px 8px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 7px; }
+  .ref-item { display: grid; grid-template-columns: 130px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 15px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+
+  /* ── PRINT BUTTON (screen only; hidden via .no-print below) ── */
+  .print-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 999;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .print-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+
+    @page { margin: 12mm; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e6e6e6;
+      --border: #cfcfcf;
+      --border2: #b0b0b0;
+      --accent3: #8a6205;
+      --text: #111111;
+      --text-dim: #555555;
+      --text-mid: #2b2b2b;
+    }
+
+    body {
+      background: #fff !important;
+      background-image: none !important;
+      padding: 0 !important;
+    }
+
+    .header { background: #fff !important; }
+    .header::before { display: none !important; }
+    .header h1,
+    .section-title,
+    .timeline-phase,
+    .alert-headline,
+    .ctid-title {
+      color: #111 !important;
+    }
+
+    .tlp-badge, .nation-badge, .badge, .threat-crit, .threat-high {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .header, .stat-grid,
+    .stat-cell, .mitre-cell, .kv-row, .timeline-item, .sector-row,
+    .tool-item, .cm-item, .ref-item, .sanctions-row, .opsec-item,
+    .evasion-item, .prose p, tr {
+      break-inside: avoid;
+    }
+    .section-header { break-after: avoid; }
+    .section { orphans: 3; widows: 3; }
+    thead { display: table-header-group; }
+
+    a { color: #111 !important; text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()" title="Print or Save as PDF">⎘ Print / Save PDF</button>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge">⚠ NATION-STATE · 313 GENERAL BUREAU (MUNITIONS INDUSTRY DEPT.) · NORTH KOREA</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — State-Directed Financial Cybercrime &amp; Fraudulent IT-Worker Infiltration</div>
+  <h1><span class="accent">WATER</span>PLUM</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-18 &nbsp;|&nbsp;
+    SOURCES: Joint Govt. Advisory (NPA/NCO Japan, FBI, DC3, ACSC, BND, BfV), MITRE ATT&amp;CK (G1052), Microsoft, Recorded Future/Insikt, OFAC, DOJ, Silent Push, ANY.RUN, press (10+)
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE — ESCALATING, JUST FORMALLY ATTRIBUTED</span></div>
+    <div>Threat Level: <span class="danger">CRITICAL</span></div>
+    <div>Primary Motive: <span>State Revenue Generation (WMD/Missile Funding) via Crypto Theft &amp; Fraudulent Employment</span></div>
+    <div>Active Since: <span class="warn">~Dec 2022 (cluster) / Dec 2025–Jul 2026 (named wave)</span></div>
+    <div>MITRE ATT&amp;CK: <span class="blue">G1052</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ SEVEN-NATION JOINT GOVERNMENT ADVISORY — 2026-09-18</div>
+  <div class="alert-headline">Japan, US, Germany &amp; Australia Jointly Attribute WaterPlum to DPRK's 313 General Bureau</div>
+  <div class="alert-body">Japan's National Police Agency and National Cybersecurity Office, the FBI, the US Department of Defense Cyber Crime Center, Australia's ACSC, and Germany's BND and BfV jointly published an advisory today formally naming "WaterPlum" (widely tracked elsewhere as Contagious Interview) and assessing that WaterPlum actors and certain North Korean IT workers operate under the 313 General Bureau of the Munitions Industry Department, subordinate to the Central Committee of the Workers' Party of Korea. The advisory quantifies the campaign — 30,000+ infected devices across 100+ countries, 7,000+ compromised cryptocurrency wallets, and 1.7 billion JPY (~$10.71M USD) transferred to the DPRK between December 2025 and July 2026 — and confirms Japanese authorities dismantled the country's first identified North Korean "laptop farm" as part of the response.</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">30,000+</div>
+    <div class="stat-label">Devices infected, Dec 2025 – Jul 2026</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">$10.71M</div>
+    <div class="stat-label">Cryptocurrency stolen (¥1.7B)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">7,000+</div>
+    <div class="stat-label">Compromised crypto wallets</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">100+</div>
+    <div class="stat-label">Countries with confirmed victims</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>WaterPlum is North Korea's dual-track scheme for turning the global remote-hiring market into a state revenue stream: one arm poses as recruiters and tricks software developers and IT freelancers into running credential-and-cryptocurrency-stealing malware disguised as a job-interview coding test, while a closely related arm places actual North Korean nationals into real remote IT jobs using stolen or fabricated identities. Both tracks are assessed by a seven-nation joint government advisory published today (2026-09-18) to operate under the same chain of command — the 313 General Bureau of North Korea's Munitions Industry Department — meaning the proceeds are not ordinary cybercrime skimmed for personal gain but a funding line that the advisory and prior OFAC guidance tie directly to the regime's weapons programs.</p>
+      <p>The name "WaterPlum" is new to public reporting as of today, coined by Japanese security firm NTT, but the underlying activity is not: industry researchers have independently tracked overlapping infrastructure, malware, and social-engineering tradecraft since at least late 2022 under at least ten other names — most commonly "Contagious Interview," alongside DeceptiveDevelopment, DEV#POPPER, Famous Chollima, PurpleBravo, CL-STA-0240, Gwisin Gang, Tenacious Pungsan, TAG-121, UNC5342, and Void Dokkaebi. That volume of independent convergence across competing vendors is itself a strong corroborating signal, even before governments spoke on the record.</p>
+      <p>WaterPlum matters acutely right now for three compounding reasons. First, scale: the joint advisory's own numbers — 30,000+ infected devices, 100+ countries, over $10.71M moved to North Korea in an eight-month window — represent one of the larger publicly quantified DPRK cybercrime waves to date. Second, novelty of response: this is the first time Japan has identified, investigated, and dismantled a domestic North Korean "laptop farm," and the first joint advisory to use the "WaterPlum" designation, signaling governments are treating this as an escalating, coordinated response priority rather than routine cybercrime. Third, the dual-use structure itself is the hard problem: a single successful infection can fund weapons proliferation directly (stolen crypto) and indirectly (a fraudulently-obtained salaried job funneled to the regime), and the two tracks reportedly share infrastructure — the same IP addresses were observed operating laptop farms, cloud-sourcing services, and job applications to at least one Japanese cryptocurrency exchange.</p>
+      <p>Geopolitically, WaterPlum sits inside a well-established DPRK sanctions-evasion pattern — the same 313 General Bureau lineage and the same "remote IT worker" mechanism that OFAC has been issuing guidance on since May 2022 and that the US Department of Justice has been indicting facilitators for since at least January 2025 — but it is the first activity cluster to receive a coordinated multi-government public attribution naming a single unifying designation across the malware-deployment and fraudulent-employment sides of the operation simultaneously.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">WaterPlum</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">313 General Bureau, Munitions Industry Dept., Workers' Party of Korea Central Committee</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">State-Directed Financial Cybercrime + Fraudulent IT-Worker Infiltration (hybrid)</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Revenue generation for the DPRK regime — assessed by OFAC/DOJ as funding weapons and ballistic-missile programs</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">Underlying cluster: ~Dec 2022 (per multiple vendor first-sightings); "WaterPlum" wave: Dec 2025 – Jul 2026</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Jul 2026 (campaign scope cutoff); joint advisory and laptop-farm takedown published 2026-09-18</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G1052 (tracked as "Contagious Interview")</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">No sanction/indictment names "WaterPlum" specifically as of compile; broader DPRK IT-worker scheme under the same 313 GB lineage: OFAC sanctioned 6 individuals + 2 entities (Mar 2026); DOJ indicted 3 DPRK nationals + 3 facilitators (Jan 2025)</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">WaterPlum</span>
+          <span class="alias-chip">Contagious Interview</span>
+          <span class="alias-chip">DeceptiveDevelopment</span>
+          <span class="alias-chip">DEV#POPPER</span>
+          <span class="alias-chip">Famous Chollima</span>
+          <span class="alias-chip">PurpleBravo</span>
+          <span class="alias-chip">CL-STA-0240</span>
+          <span class="alias-chip">Gwisin Gang</span>
+          <span class="alias-chip">Tenacious Pungsan</span>
+          <span class="alias-chip">TAG-121</span>
+          <span class="alias-chip">UNC5342</span>
+          <span class="alias-chip">Void Dokkaebi</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>Nation-state sponsorship: <strong>[HIGH]</strong>. This is corroborated by seven independent government agencies across three allied nations (Japan's NPA/NCO, the US FBI/DC3, Australia's ACSC, Germany's BND/BfV) via a formal joint advisory issued 2026-09-18, plus prior independent OFAC and DOJ enforcement actions against the same 313 General Bureau lineage stretching back to 2022, plus at least ten independent private-sector vendors converging on overlapping infrastructure and malware under different tracking names since 2022–2023 — an unusually deep, multi-source corroboration for a fresh public designation.</p>
+            <p>The specific claim of a <em>single, unified</em> "WaterPlum" operator set spanning both the malware-deployment track and the fraudulent-employment track is <strong>[MEDIUM]</strong>: the joint advisory itself states the two "operate under" the same 313 General Bureau chain of command and shared observed IP infrastructure — not that every individual operator works both tracks. Treat WaterPlum as a state-directed program with at least two coordinated operational tracks rather than a single flat cell.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">~Dec 2022</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Cluster Activity Begins</div>
+          <div class="timeline-desc">MITRE ATT&amp;CK dates the underlying "Contagious Interview" cluster's activity to this period, predating public documentation by roughly a year — the earliest fake-job-lure npm-malware sightings that would later be tracked under a dozen different vendor names.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2023 – 2024</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">BeaverTail / InvisibleFerret Documented</div>
+          <div class="timeline-desc">Multiple vendors independently publish on the core npm-package-based JavaScript stealer (BeaverTail) and its Python follow-on backdoor (InvisibleFerret), establishing the toolset that remains the campaign's backbone.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Sep 2024</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">OtterCookie Emerges</div>
+          <div class="timeline-desc">A JavaScript RAT/infostealer first observed, later evolving (through v4 by mid-2025) to add VM detection and Chrome/MetaMask-specific credential theft.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Aug 2024 – Sep 2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">PurpleBravo Wave — Software Supply Chain</div>
+          <div class="timeline-desc">Recorded Future's Insikt Group tracks 3,136 individually targeted IP addresses, concentrated in South Asia and North America, under its own "PurpleBravo" designation for the same overlapping cluster's supply-chain-focused activity.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jan 2025</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">DOJ Indicts DPRK IT-Worker Network</div>
+          <div class="timeline-desc">The US Department of Justice indicts three North Korean nationals and three US/foreign facilitators for a multiyear scheme placing DPRK operatives as remote IT workers — the broader ecosystem this profile's second track belongs to.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">May 2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Rejected Application — Japanese Crypto Exchange</div>
+          <div class="timeline-desc">A Japanese cryptocurrency exchange (bitFlyer, credited in the joint advisory's acknowledgements) receives and rejects a forged-resume engineering application after interviewer suspicion — video artifacts, an implausible skills/language mismatch, and VPN-sourced access — a documented case study of the fraudulent-employment track in action.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Toolset Expands: OtterCandy, StoatWaffle</div>
+          <div class="timeline-desc">OtterCandy (blending OtterCookie with a "RATatouille" component) and StoatWaffle (a modular Node.js loader abusing VS Code's auto-run task trust prompt) join the toolset, broadening delivery beyond plain npm packages to blockchain-themed VS Code project repositories.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Mar 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">OFAC Sanctions DPRK IT-Worker Network</div>
+          <div class="timeline-desc">Treasury's OFAC sanctions six individuals and two entities for facilitating the DPRK IT-worker scheme, explicitly citing WMD-program funding — again the same 313 General Bureau lineage, not yet under the "WaterPlum" name.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Dec 2025 – Jul 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Primary Quantified Wave</div>
+          <div class="timeline-desc">The window the joint advisory's headline statistics cover: 30,000+ devices infected across 100+ countries, 7,000+ cryptocurrency wallets compromised, ¥1.7B (~$10.71M) transferred to the DPRK.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026-09-18</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Joint Government Attribution &amp; Laptop-Farm Takedown</div>
+          <div class="timeline-desc">Japan's NPA/NCO, the FBI, DC3, ACSC, and Germany's BND/BfV publish the joint advisory formally naming "WaterPlum" and its 313 General Bureau sponsorship; Japan announces the first successful identification, investigation, and dismantlement of a domestic North Korean laptop farm.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Two coordinated tracks sharing infrastructure and objectives</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Track 1 — Malware-via-fake-interview.</strong> WaterPlum actors build recruiter personas — sometimes using AI face-swapping software during live video calls — impersonating AI, cryptocurrency, or NFT companies on social media, job boards, gig platforms, and freelance marketplaces. Targets are drawn into a technical interview or coding assignment and instructed to clone and run a project from GitHub, GitLab, or Bitbucket, or to open a VS Code workspace, to "verify technical abilities" or "fix a bug." The project embeds a malicious npm package (BeaverTail, StoatWaffle) or a VS Code <code>.vscode/tasks.json</code> auto-run configuration (StoatWaffle) that executes the moment the folder is opened and trusted. The initial JavaScript loader downloads a portable Python environment and drops InvisibleFerret for deeper reconnaissance and remote command execution, while OtterCookie/OtterCandy provide RAT functionality, VM-awareness checks, clipboard monitoring, keylogging, and browser/wallet credential harvesting. Stolen data — wallet seed phrases and private keys, browser-stored credentials, clipboard contents, screenshots, and any files matching credential or ID-document patterns — is exfiltrated over HTTP(S) to attacker-controlled C2 infrastructure, sometimes staged via legitimate services like Vercel-hosted pages or URL shorteners to blend with normal developer traffic.</p>
+      <p><strong>Track 2 — Fraudulent employment infiltration.</strong> In parallel, actual North Korean IT workers — based in North Korea, China, or Russia, with smaller numbers in Africa and Southeast Asia — apply for real remote developer/engineer roles using forged identities and resumes, often padded with implausibly broad skill claims. "Enablers" (witting or coerced third-country nationals, including inside Japan and the US) host "laptop farms": residences where employer-issued or personally-purchased laptops sit physically, remotely operated over VPN by the DPRK worker, so the employer's device-location telemetry shows a domestic address. Enablers also stand up and manage VPS infrastructure and receive salary payments into local bank accounts before laundering funds abroad. Successful hires give North Korea a steady, sanctions-evading salary stream and — per the advisory — footholds inside employer networks that can be leveraged for espionage, IP theft, extortion (one documented case: an IT worker extorted a company and leaked its proprietary source code after being paid), or outright sabotage (one case: a hired "maintenance" worker defaced and took down the client's website).</p>
+      <p>The two tracks are not hermetically separate: the joint advisory confirms WaterPlum actors and North Korean IT workers were observed using the <em>same IP addresses</em> across laptop-farm access, cloud-sourcing platform use, and a job application to a Japanese cryptocurrency exchange — meaning a victim who was merely infected by malware and a company that unknowingly hired a DPRK operative may be facing the same underlying infrastructure and, ultimately, the same chain of command.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework — MITRE Group G1052</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1589 / T1593</div>
+        <div class="mitre-name">Gather Victim Identity Info / Search Open Websites</div>
+        <div class="mitre-note">[HIGH] Builds target lists from job platforms, gig marketplaces, and developer social media to identify crypto/blockchain-skilled individuals.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.002</div>
+        <div class="mitre-name">Phishing: Spearphishing Link</div>
+        <div class="mitre-note">[HIGH] Fake recruiter DMs and job postings link to a malicious repository framed as an interview coding assignment.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1199</div>
+        <div class="mitre-name">Trusted Relationship</div>
+        <div class="mitre-note">[MEDIUM] Track 2's fraudulently-hired IT workers gain legitimate, trusted employer network access as their initial foothold.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1204.002</div>
+        <div class="mitre-name">User Execution: Malicious File</div>
+        <div class="mitre-note">[HIGH] Victim manually clones/runs the npm package or opens the VS Code project themselves, believing it to be a legitimate assignment.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.007</div>
+        <div class="mitre-name">Command and Scripting Interpreter: JavaScript</div>
+        <div class="mitre-note">[HIGH] BeaverTail, OtterCookie, OtterCandy, and StoatWaffle are all JavaScript/Node.js-based.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1547.001</div>
+        <div class="mitre-name">Registry Run Keys / Startup Folder</div>
+        <div class="mitre-note">[MEDIUM] FlexibleFerret variants establish persistence via Windows RUN registry key modification.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1036.005 / T1656</div>
+        <div class="mitre-name">Masquerading / Impersonation</div>
+        <div class="mitre-note">[HIGH] Fake recruiter personas, spoofed AI/crypto/NFT companies, and live-call AI face-swapping software to sustain the impersonation under video scrutiny.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1497</div>
+        <div class="mitre-name">Virtualization/Sandbox Evasion</div>
+        <div class="mitre-note">[HIGH] OtterCookie v4+ explicitly checks for qemu/virtualbox/vmware artifacts before executing its data-theft payload.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1555.003</div>
+        <div class="mitre-name">Credentials from Web Browsers</div>
+        <div class="mitre-note">[HIGH] OtterCookie explicitly targets Chrome and MetaMask-stored credentials/seed data.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1115 / T1056.001 / T1113</div>
+        <div class="mitre-name">Clipboard Data / Keylogging / Screen Capture</div>
+        <div class="mitre-note">[HIGH] Confirmed by the joint advisory's own list of targeted data types: clipboard info, key-logs, and screenshots.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1102 / T1071.001</div>
+        <div class="mitre-name">Web Service C2 / Web Protocols</div>
+        <div class="mitre-note">[MEDIUM] Microsoft documents payload staging via Vercel-hosted pages and URL-shortener redirection to blend C2 with legitimate developer traffic.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] The core objective of both tracks — direct cryptocurrency theft and salary-fraud revenue, confirmed at $10.71M for this campaign wave alone.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Software Development / IT Freelance</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Cryptocurrency / Blockchain / Web3</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:85%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Gig / Crowdsourcing Platforms (broad)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:55%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">AI / NFT Startups (as spoofed personas &amp; secondary targets)</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:35%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Japan, United States, Germany, and broadly Europe explicitly named; confirmed victims in 100+ countries overall</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Individual web designers, engineers, and blockchain/crypto specialists (Track 1); the hiring companies themselves (Track 2, secondary victim)</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Fake recruiter contact via social media / job boards / gig platforms → malicious coding-interview repository or VS Code project</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Hybrid: mass opportunistic outreach to job-seekers generally, layered with deliberate targeting of individuals holding crypto/blockchain skills valuable to both credential theft and legitimate-hire infiltration</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">BeaverTail</span>
+          <span class="tool-tag">Stealer / Loader · MITRE S1246</span>
+        </div>
+        <div class="tool-desc">Obfuscated JavaScript malware distributed as a malicious NPM package hosted on GitHub or Bitbucket. Functions as both an initial credential/browser-data stealer and a loader — downloads a customized portable Python environment and deploys InvisibleFerret as the second stage. The original and still most-cited component of this cluster's toolset.</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">InvisibleFerret</span>
+          <span class="tool-tag">Backdoor · MITRE S1245</span>
+        </div>
+        <div class="tool-desc">Python-based backdoor deployed by BeaverTail as a follow-on payload. Provides remote command execution and extended system reconnaissance, and maintains persistent access after the initial JavaScript-stage foothold. A "FlexibleFerret" Go/Python variant adds encrypted HTTP(S)/TCP C2 with dynamic plugin loading and Windows RUN-key persistence.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">OtterCookie</span>
+          <span class="tool-tag">RAT / Infostealer</span>
+        </div>
+        <div class="tool-desc">JavaScript-based RAT and infostealer, observed since September 2024, evolved through at least a v4 revision. Adds VM-environment detection (qemu/virtualbox/vmware checks) and targeted Chrome/MetaMask credential theft; uses npm packages (node-global-key-listener, screenshot-desktop) for clipboard monitoring, keylogging, and screenshot capture, with heavy obfuscation via encoded index lookups in recent variants.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">OtterCandy</span>
+          <span class="tool-tag">RAT / Infostealer, Hybrid</span>
+        </div>
+        <div class="tool-desc">Combines OtterCookie's data-theft functionality with a component tracked as "RATatouille," broadening the malware family's post-compromise capability set. Documented in the September 2026 joint government advisory as part of the current active toolset.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">StoatWaffle</span>
+          <span class="tool-tag">Modular Loader + RAT · npm / VS Code</span>
+        </div>
+        <div class="tool-desc">Modular Node.js malware family combining a loader, credential-harvesting components, and a RAT for persistence and lateral pivoting. Distributed via blockchain-themed VS Code project repositories embedding a malicious <code>.vscode/tasks.json</code> configuration that auto-executes the moment a victim opens and "trusts" the folder — abusing a legitimate developer-tooling trust prompt rather than a software vulnerability.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">HexEval Loader / XORIndex Loader</span>
+          <span class="tool-tag">npm Package Loaders · MITRE S1249 / S1248</span>
+        </div>
+        <div class="tool-desc">Obfuscated JavaScript-based npm package loaders documented in MITRE's official G1052 group profile — HexEval uses hexadecimal encoding and XORIndex uses XOR-based obfuscation to evade static analysis of malicious npm packages before handing off to the primary payload chain.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">"Laptop Farms" &amp; Enabler-Managed VPS</span>
+          <span class="tool-tag">Physical + Cloud Infrastructure</span>
+        </div>
+        <div class="tool-desc">Residential locations — typically an enabler's home — housing employer-issued or purchased laptops physically present in-country while a North Korean operator controls them remotely over VPN, defeating device-location checks. Enablers separately stand up and manage VPS infrastructure on the operators' behalf, obscuring true physical location during contracted IT work. Japan dismantled its first identified domestic instance in the lead-up to this advisory.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">AI Face-Swapping Software</span>
+          <span class="tool-tag">Social-Engineering Tooling</span>
+        </div>
+        <div class="tool-desc">Used during live video job interviews to sustain a fabricated identity under visual scrutiny; the joint advisory notes operators would disable video a few minutes into a call, citing "network issues," consistent with the deepfake tooling's real-time limitations under sustained use.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ No specific IPs, domains, or file hashes were published in the joint government advisory or vendor reporting reviewed for this compile. The Sep 18, 2026 advisory is deliberately a behavioral/TTP bulletin, closing with an explicit note that "the techniques described in this advisory are only examples." Rows below reflect documented behavioral and infrastructure-pattern indicators rather than static IOCs.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">INFRA</td><td>Payload staging via Vercel-hosted (vercel.app) pages and URL-shortener redirects (e.g., short.gy) — pattern, not a specific defanged domain</td><td>Microsoft</td><td>2026-03-11</td></tr>
+        <tr><td class="type-label">FILE</td><td>Malicious <code>.vscode/tasks.json</code> auto-run configuration embedded in blockchain-themed VS Code project repositories</td><td>Joint Advisory (NPA/FBI/ACSC/BND)</td><td>2026-09-18</td></tr>
+        <tr><td class="type-label">BEHAVIORAL</td><td>Suspicious command strings in execution logs: "curl," "base64," "-enc," "mshta," "Invoke-WebRequest -uri," "iwr -uri," or "hidden" flags in scripted downloads</td><td>Joint Advisory (NPA/FBI/ACSC/BND)</td><td>2026-09-18</td></tr>
+        <tr><td class="type-label">BEHAVIORAL</td><td>npm packages bundling node-global-key-listener / screenshot-desktop for keylogging and screenshot capture</td><td>Microsoft</td><td>2026-03-11</td></tr>
+        <tr><td class="type-label">MALWARE</td><td>BeaverTail (JS/npm stealer-loader) — MITRE S1246</td><td>MITRE ATT&amp;CK G1052</td><td>2026-09-18</td></tr>
+        <tr><td class="type-label">MALWARE</td><td>InvisibleFerret (Python backdoor) — MITRE S1245</td><td>MITRE ATT&amp;CK G1052</td><td>2026-09-18</td></tr>
+        <tr><td class="type-label">MALWARE</td><td>HexEval Loader — MITRE S1249; XORIndex Loader — MITRE S1248</td><td>MITRE ATT&amp;CK G1052</td><td>2026-09-18</td></tr>
+        <tr><td class="type-label">NOTE</td><td>No hash values, IP addresses, or domains were published in any source reviewed as of 2026-09-18 — flagged as a genuine intelligence gap, not an omission</td><td>—</td><td>2026-09-18</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (sponsorship) / MEDIUM (unified operator-set claim)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Escalating — scale figures and a first-of-its-kind government takedown suggest active disruption pressure, not decline</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">The trust exploit itself — abusing legitimate developer tooling (npm, VS Code trust prompts) rather than a patchable vulnerability, and the dual employment/malware infiltration model, not any single malware family</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">No public IOCs (hashes/IPs/domains); exact individual-level overlap between the two operational tracks unconfirmed</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Lazarus Group (RGB)</span>
+          <span class="alias-chip">APT38 / BlueNoroff</span>
+          <span class="alias-chip">WageMole</span>
+          <span class="alias-chip">DPRK IT Worker Network (OFAC-designated)</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>WaterPlum's most dangerous property is architectural rather than technical: neither track requires defeating a security control. Track 1 asks a victim to run code they were specifically told to run, inside tooling (npm, VS Code) whose entire design point is running other people's code; Track 2 asks a hiring manager to trust a resume and a video call. No patch fixes either problem — only process controls (sandboxing untrusted code, identity-verification rigor in hiring) do, which is precisely why this campaign has scaled to 30,000+ devices despite years of public reporting on the underlying cluster.</p>
+      <p><strong>Competing hypothesis worth flagging explicitly:</strong> public reporting on North Korean cyber activity frequently and loosely groups "Lazarus Group" with Contagious Interview/WaterPlum-type IT-worker-fraud clusters, but the chain-of-command claims differ — Lazarus Group is most consistently attributed to the Reconnaissance General Bureau (RGB), while today's joint advisory specifically names the 313 General Bureau of the <em>Munitions Industry Department</em> for WaterPlum. These may be sibling programs under North Korea's broader cyber apparatus rather than the same organization, and this profile treats them as ecosystem-adjacent, not identical, pending a source that reconciles the two chains of command directly.</p>
+      <p>Forward risk trajectory is upward in the near term: the joint advisory itself frames this as an early, evolving response ("actors continuously evolve and refine their methods"), Japan's laptop-farm takedown is described as a first, not a pattern, and the underlying economic incentive (regime revenue, including WMD funding per OFAC) gives North Korea no reason to abandon a scheme this profitable absent sustained multilateral disruption. What would most increase attribution confidence on the "unified operator set" question specifically: a leaked or seized WaterPlum operational document showing tasking that crosses both tracks, comparable to what previous Lazarus-adjacent leaks have occasionally provided for other DPRK clusters.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Never execute unvetted code from a job interview, coding assignment, or "verify your skills" request outside an isolated sandbox or disposable VM.</strong> Treat this as a standing policy for any recruitment process, not just ones that already feel suspicious.</div>
+            <div class="cm-ttp">Counters: T1566.002, T1204.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Open unfamiliar VS Code projects only in Restricted Mode</strong> (answer "No" to the trust prompt), which prevents <code>.vscode/tasks.json</code> auto-execution on folder open — the specific mechanism StoatWaffle abuses.</div>
+            <div class="cm-ttp">Counters: T1204.002, T1547.001</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Alert on scripted-download strings</strong> — <code>curl</code>, <code>base64</code>, <code>-enc</code>, <code>mshta</code>, <code>Invoke-WebRequest -uri</code>, <code>iwr -uri</code>, or hidden-window flags — appearing in developer-tool child processes.</div>
+            <div class="cm-ttp">Counters: T1059.007, execution-stage detection generally</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Keep cryptocurrency wallet keys and seed phrases off any machine used for freelance/interview code execution</strong>, and treat any device that ran an untrusted assignment as compromised — create a fresh wallet on a separate device and move funds rather than trusting in-place remediation.</div>
+            <div class="cm-ttp">Counters: T1555.003, T1657</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Harden remote-hiring verification</strong>: cross-check claimed employment history and certifications independently, ask unscripted personal-context questions (hometown, local weather, hobbies) during interviews, and treat frequent camera drops, background voices, or a skills/language mismatch as escalation triggers, not technical hiccups.</div>
+            <div class="cm-ttp">Counters: T1199, T1036.005, T1656</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Never host a remote-work laptop for a third party at your residence without independently verifying the employer and role</strong> — this is precisely the "laptop farm" recruitment vector used against unwitting or complicit domestic enablers.</div>
+            <div class="cm-ttp">Counters: Enabler/infrastructure-provisioning stage generally</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Enforce least-privilege access for any newly onboarded remote contractor or subcontractor</strong>, and be prepared to revoke access immediately and audit for source-code exfiltration or web-facing changes if DPRK-worker indicators surface post-hire.</div>
+            <div class="cm-ttp">Counters: T1199, post-compromise extortion/sabotage cases documented in Section 03</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Deploy EDR with behavioral (not just signature) detection on any endpoint used for evaluating external code submissions</strong>, since this cluster's initial-stage tooling is JavaScript/Node.js-based and evolves faster than static hash-based detection can track.</div>
+            <div class="cm-ttp">Counters: T1497, general evasion of static detection</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Enablers independently stand up and manage VPS infrastructure on operators' behalf specifically to obscure the operators' true physical location during contracted work — a persistent outsourced-infrastructure model rather than operators directly rotating their own hosting.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Persona Management</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Uses AI face-swapping software during live video interviews to sustain a fabricated identity, but limits exposure by disabling video a few minutes into calls citing "network issues" — an observed, specific pattern the joint advisory calls out directly, consistent with real-time deepfake tooling degrading under sustained scrutiny. Forged resumes deliberately overstate breadth of skill (10+ programming languages, blockchain, and cloud platforms each) to pass initial screening.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Timing &amp; Operational Patterns</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Operators observed pausing malicious activity on North Korean national holidays to play games and watch soccer instead — a direct behavioral tell that the operators' actual work calendar follows the DPRK domestic calendar rather than the victim's time zone or the cover story's claimed location.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Consistent use of free machine-translation and AI-assistance service plans, and practiced Japanese pronunciation via text-to-speech software, to compensate for language gaps between the operators' native language and the persona's claimed nationality/location during interviews.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics / Detection Avoidance</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">OtterCookie v4+ performs virtualization/sandbox detection (qemu, virtualbox, vmware artifact checks) before executing its data-theft payload, specifically to avoid detonating inside malware-analysis environments. Heavy JavaScript obfuscation via encoded index lookups in recent variants is intended to defeat static/signature detection rather than dynamic analysis.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Legitimate Developer-Tool Trust Abuse</span>
+          <span class="evasion-ttp">T1204.002 / T1547.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">VS Code .vscode/tasks.json</span>
+        </div>
+        <div class="evasion-desc">StoatWaffle's malicious VS Code configuration auto-executes the instant a victim opens and "trusts" a project folder — no exploit, no macro warning, no AV-flagged binary, because the execution path is a feature of the IDE itself.</div>
+        <div class="evasion-detail">Specific payload arguments and the exact tasks.json structure are not publicly documented as of 2026-09-18 — the joint advisory and vendor reporting describe the mechanism generically without reproducing the malicious configuration verbatim.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Scripted Download / LOLBin Chaining</span>
+          <span class="evasion-ttp">T1059 / T1218</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+          <span class="evasion-tag network">NETWORK</span>
+        </div>
+        <div class="evasion-desc">The joint advisory explicitly warns defenders to watch for specific strings appearing in execution chains, implying these are the actor's actual observed patterns rather than generic guidance.</div>
+        <div class="evasion-detail">Flagged strings (per joint advisory, 2026-09-18): "curl", "base64", "-enc", "mshta", "Invoke-WebRequest -uri", "iwr -uri", "hidden"
+Execution chain pattern (per Microsoft, 2026-03-11): code editor → cmd/PowerShell → curl/wget → script execution, with downloads sourced from vercel.app or URL-shortener redirects.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Sandbox / Analysis-Environment Detection</span>
+          <span class="evasion-ttp">T1497.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+        </div>
+        <div class="evasion-desc">OtterCookie v4+ checks the host environment before triggering its full data-theft payload, per ANY.RUN and The Hacker News technical analysis.</div>
+        <div class="evasion-detail">Documented checks: presence of qemu, virtualbox, or vmware artifacts. Exact check implementation (registry keys vs. process enumeration vs. hardware IDs) not publicly documented as of 2026-09-18.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Live Anti-Forensics — Video Call Termination</span>
+          <span class="evasion-ttp">T1656 (Impersonation)</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag">Social Engineering</span>
+        </div>
+        <div class="evasion-desc">A human-operational evasion technique rather than a technical one: operators disable video a few minutes into an interview call, attributing it to "network issues," to limit the window during which AI face-swapping artifacts or background inconsistencies could be noticed.</div>
+        <div class="evasion-detail">Per the joint advisory (2026-09-18): "Conducted online interviews using AI face-swapping software. After a few minutes the actors disabled their video and advised the target to disable their video due to network issues."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense adversary emulation plan has been published for WaterPlum, Contagious Interview, or any of its tracked aliases as of 2026-09-18. The CTID's public adversary_emulation_library repository does not include a dedicated plan for this cluster; the only located reference was a passing mention of Contagious Interview npm attacks in adjacent November 2025 research, not a structured emulation plan.</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G1052/" target="_blank">Group G1052 — Contagious Interview: full technique and software mapping</a></div>
+          <div class="ref-date">Reference profile · Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ANY.RUN</div>
+        <div>
+          <div class="ref-detail"><a href="https://any.run/cybersecurity-blog/invisibleferret-malware-analysis/" target="_blank">InvisibleFerret Malware: Technical Analysis</a></div>
+          <div class="ref-date">Sandbox-based malware analysis · Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Silent Push</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.silentpush.com/blog/contagious-interview-front-companies/" target="_blank">Contagious Interview front-company infrastructure analysis</a></div>
+          <div class="ref-date">Infrastructure/OSINT research · Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">—</div>
+        <div>
+          <div class="ref-detail">No Atomic Red Team tests, Sigma rules, or vendor-published purple-team/SCYTHE/AttackIQ plans specific to this cluster were identified as of compile date.</div>
+          <div class="ref-date">Gap noted, not fabricated · 2026-09-18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">NPA / NCO / FBI / DC3 / ACSC / BND / BfV</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ic3.gov/CSA/2026/260918.pdf" target="_blank">Joint Advisory: North Korean "WaterPlum," commonly referred to as "Contagious Interview," Cyber Actor Group Targeting IT Professionals; Activities of North Korean IT Workers</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G1052/" target="_blank">Group G1052 — Contagious Interview</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CyberScoop</div>
+        <div>
+          <div class="ref-detail"><a href="https://cyberscoop.com/north-korea-waterplum-job-seeker-crypto-attacks/" target="_blank">International security agencies warn about North Korean hackers exploiting job seekers to steal crypto, data</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/north-korean-hackers-infect-thousands-of-devices-waterplum-scheme" target="_blank">North Korean hackers infect thousands of devices across 100 countries as part of 'WaterPlum' campaign</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft Security Blog</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2026/03/11/contagious-interview-malware-delivered-through-fake-developer-job-interviews/" target="_blank">Contagious Interview: Malware delivered through fake developer job interviews</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Recorded Future / Insikt Group</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.recordedfuture.com/research/purplebravos-targeting-it-software-supply-chain" target="_blank">PurpleBravo's Targeting of the IT Software Supply Chain</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/01/north-korean-purplebravo-campaign.html" target="_blank">North Korean PurpleBravo Campaign Targeted 3,136 IP Addresses via Fake Job Interviews</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/03/ofac-sanctions-dprk-it-worker-network.html" target="_blank">OFAC Sanctions DPRK IT Worker Network Funding WMD Programs Through Fake Remote Jobs</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">ANY.RUN</div>
+        <div>
+          <div class="ref-detail"><a href="https://any.run/cybersecurity-blog/invisibleferret-malware-analysis/" target="_blank">InvisibleFerret Malware: Technical Analysis</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Silent Push</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.silentpush.com/blog/contagious-interview-front-companies/" target="_blank">Contagious Interview (DPRK) Launches a New Campaign Creating Three Front Companies</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2025/05/ottercookie-v4-adds-vm-detection-and.html" target="_blank">OtterCookie v4 Adds VM Detection and Chrome, MetaMask Credential Theft Capabilities</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-18 · 11 sources, all open-source/public/government</div>
+  <div>WaterPlum (aka Contagious Interview) · MITRE G1052 · DPRK 313 General Bureau · Formally attributed same day as compile — treat as a live, evolving assessment</div>
+</div>
+
+</body>
+</html>
