@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hive — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red  { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 16px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 23px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; min-width: 36px; line-height: 1; padding-right: 16px; border-right: 1px solid var(--border2); }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 16px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 16px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 15px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--accent); }
+
+  /* ── TWO/THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 15.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 14px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ALIAS CHIPS ── */
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .alias-chip { font-family: var(--mono); font-size: 13.5px; padding: 3px 10px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 100px 12px 1fr; gap: 0 12px; align-items: stretch; min-height: 50px; }
+  .timeline-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent4); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.green { background: var(--accent); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.6); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 16.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red   { border-left-color: var(--accent2); }
+  .mitre-cell.amber { border-left-color: var(--accent3); }
+  .mitre-cell.green { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 14.5px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 15px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 14.5px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+
+  /* ── SECTOR TARGETING ── */
+  .sector-list { display: flex; flex-direction: column; gap: 10px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 70px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 15px; color: var(--text); }
+  .sector-bar-wrap { height: 8px; background: var(--bg3); border: 1px solid var(--border); }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); }
+  .sector-pct  { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-align: right; }
+
+  /* ── TOOL LIST ── */
+  .tool-list { display: flex; flex-direction: column; gap: 10px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 12px 16px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; flex-wrap: wrap; gap: 5px; }
+  .tool-name { font-family: var(--mono); font-size: 15px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue .tool-name  { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .tool-desc { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+
+  /* IOC table */
+  .ioc-defang-note { font-family: var(--mono); font-size: 13.5px; color: var(--accent3); margin-bottom: 12px; padding: 6px 10px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); padding: 6px 10px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 13.5px; white-space: nowrap; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+
+  /* Countermeasure list */
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 14.5px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-ttp  { font-family: var(--mono); font-size: 13px; color: var(--accent4); margin-top: 3px; }
+
+  /* ── OPSEC / EVASION ── */
+  .opsec-list, .evasion-list { display: flex; flex-direction: column; gap: 10px; }
+  .opsec-item, .evasion-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 16px; }
+  .opsec-header, .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 13.5px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .opsec-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+
+  .evasion-technique { font-family: var(--mono); font-size: 14.5px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 13.5px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .evasion-tag.edr { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem { border-color: rgba(245,197,66,0.3); color: var(--accent3); }
+  .evasion-tag.network { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-detail { font-family: var(--mono); font-size: 14px; color: var(--text); background: var(--bg4); border: 1px solid var(--border); padding: 8px 10px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+  /* ── CTID BLOCK ── */
+  .ctid-block { background: var(--bg3); border: 1px solid var(--border); border-left: 3px solid var(--text-dim); padding: 16px 20px; }
+  .ctid-block:not(.not-available) { border-left-color: var(--accent); }
+  .ctid-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 2px 8px; letter-spacing: 0.06em; }
+  .ctid-tag.not-available { color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 14px; margin-bottom: 10px; }
+  .ctid-link { font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-decoration: none; }
+  .ctid-link:hover { text-decoration: underline; }
+  .ctid-phases { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ctid-phase-chip { font-family: var(--mono); font-size: 13px; color: var(--text-mid); border: 1px solid var(--border2); padding: 2px 8px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 7px; }
+  .ref-item { display: grid; grid-template-columns: 130px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 15px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+
+  /* ── PRINT BUTTON (screen only; hidden via .no-print below) ── */
+  .print-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 999;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .print-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+
+    @page { margin: 12mm; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e6e6e6;
+      --border: #cfcfcf;
+      --border2: #b0b0b0;
+      --accent3: #8a6205;
+      --text: #111111;
+      --text-dim: #555555;
+      --text-mid: #2b2b2b;
+    }
+
+    body {
+      background: #fff !important;
+      background-image: none !important;
+      padding: 0 !important;
+    }
+
+    .header { background: #fff !important; }
+    .header::before { display: none !important; }
+    .header h1,
+    .section-title,
+    .timeline-phase,
+    .alert-headline,
+    .ctid-title {
+      color: #111 !important;
+    }
+
+    .tlp-badge, .nation-badge, .badge, .threat-crit, .threat-high {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .header, .stat-grid,
+    .stat-cell, .mitre-cell, .kv-row, .timeline-item, .sector-row,
+    .tool-item, .cm-item, .ref-item, .sanctions-row, .opsec-item,
+    .evasion-item, .prose p, tr {
+      break-inside: avoid;
+    }
+    .section-header { break-after: avoid; }
+    .section { orphans: 3; widows: 3; }
+    thead { display: table-header-group; }
+
+    a { color: #111 !important; text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()" title="Print or Save as PDF">⎘ Print / Save PDF</button>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge ecrime">◆ ECRIME · RANSOMWARE-AS-A-SERVICE · RUSSIAN-SPEAKING NEXUS</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — Double-Extortion RaaS · Disrupted Jan 2023 · Lineage Continues Under Successor Brands</div>
+  <h1><span class="accent3">HIVE</span><span class="dim"> Ransomware</span></h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-18 &nbsp;|&nbsp;
+    SOURCES: CISA/FBI/HHS AA22-321A, DOJ/FBI takedown reporting, FBI FLASH-20260521-001, Microsoft, Bitdefender, Group-IB, Kookmin University, State Dept RFJ, press (11)
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">DEFUNCT — INFRASTRUCTURE SEIZED JAN 2023</span></div>
+    <div>Threat Level: <span class="warn">HISTORICAL (lineage active via successors)</span></div>
+    <div>Primary Motive: <span>Financial — double extortion</span></div>
+    <div>Active: <span>Jun 2021 – Jan 2023</span></div>
+    <div>MITRE ATT&amp;CK: <span class="blue">No G-ID assigned — see AA22-321A</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">1,500+</div>
+    <div class="stat-label">Victims worldwide before takedown</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">$100M+</div>
+    <div class="stat-label">Ransoms extorted (Jun 2021 – Nov 2022)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">1,300+</div>
+    <div class="stat-label">Decryption keys given to victims by FBI</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">7 MONTHS</div>
+    <div class="stat-label">FBI dwell time inside Hive's own network</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Hive was a ransomware-as-a-service operation that ran from June 2021 until its infrastructure was seized in January 2023, extorting more than $100 million from over 1,500 victims across healthcare, government, manufacturing, IT, and communications. Its defining characteristic was not technical sophistication — its early encryptor contained a cryptographic flaw that academic researchers publicly broke — but operational aggression against victims for whom downtime is measured in human consequences: it took an Illinois health system offline, forced Costa Rica's national health service to shut down its Single Digital Health Record system, and encrypted India's largest integrated power company.</p>
+      <p>Hive matters far more as a <em>law-enforcement case study</em> than as a live threat. In late July 2022 the FBI covertly penetrated Hive's own network and stayed inside for roughly seven months, quietly generating decryption keys and handing them to victims — over 300 to organizations mid-attack across 48 states, plus more than 1,000 to earlier victims — preventing an estimated $130 million in ransom payments before the coordinated seizure on 26 January 2023. It is one of the clearest public examples of a deliberate strategic shift: the Bureau chose sustained disruption and victim recovery over waiting to build arrest cases, and announced no arrests on takedown day.</p>
+      <p>That choice has a visible downside in the record. Because the operators themselves were never in custody, the capability did not die with the infrastructure: in October 2023 a new RaaS brand, <strong>Hunters International</strong>, appeared using an encryptor with roughly 60% code overlap with Hive's. Hunters denied being Hive, claiming it had simply bought the source code. It ran until announcing its own shutdown on 4 July 2025, whereupon the operation rebranded again as <strong>World Leaks</strong> — dropping encryption entirely in favour of data-theft extortion, and still claiming victims into 2026. The Hive lineage has therefore outlived the Hive brand by more than three years.</p>
+      <p><strong>Why this card exists, and an important attribution correction:</strong> this profile was opened from an incident report in which an intrusion's initial-access IP — <code>66.70.179[.]236</code> — was matched against a public threat feed whose filename attributed it to Hive. That match does not hold up. The FBI's FLASH-20260521-001 (21 May 2026) lists that exact address as an exit node of the "First VPN Service," a criminal VPN active since roughly 2014 with 32 nodes in 27 countries that was rented by <em>at least 25 different ransomware groups</em>. The address is shared anonymization infrastructure, not Hive-owned infrastructure — and the intrusion in question post-dated Hive's seizure by two years. See Section 08 for the full reasoning; it is a useful worked example of how a feed filename becomes a false attribution.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">Hive</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val amber">None — independent criminal enterprise, Russian-speaking cybercriminal ecosystem</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">eCrime — Ransomware-as-a-Service (developer/affiliate split)</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial — double extortion (encryption + HiveLeaks data publication)</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">June 2021 (first observed)</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val red">26 January 2023 — infrastructure seized; brand never resumed</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono dim">None assigned (verified against MITRE's full group and software indices, 2026-09-18)</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">US State Dept RFJ bounty: up to $10M for leadership, up to $15M for owners/operators/affiliates. No arrests at takedown. Mikhail Matveev (linked to Hive, LockBit, Babuk) arrested by Russian authorities Dec 2024, tried in Kaliningrad</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases &amp; Lineage</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">Hive</span>
+          <span class="alias-chip">HiveLeaks (leak site)</span>
+          <span class="alias-chip">Hunters International (successor)</span>
+          <span class="alias-chip">World Leaks (current successor)</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>Hive as a discrete RaaS operation: <strong>[HIGH]</strong>. Corroborated by a joint CISA/FBI/HHS advisory (AA22-321A), a DOJ/FBI/Secret Service takedown with German and Dutch partners, and extensive independent vendor analysis of the encryptor.</p>
+            <p>Hive → Hunters International continuity: <strong>[MEDIUM-HIGH]</strong>. Bitdefender documented roughly 60% encryptor code overlap; Group-IB reported that other ransomware operators referred to the new RaaS as "Hive" and that some individuals were contacted by Hunters administrators <em>from the same accounts</em> previously used by Hive. Hunters denies the link, claiming it purchased Hive's source code — a claim that would explain code overlap but not account reuse.</p>
+            <p>Russian-speaking ecosystem placement: <strong>[MEDIUM]</strong>. Inferred from the criminal-forum ecosystem Hive operated within and the Matveev linkage, rather than from direct language or geolocation evidence published about Hive's own operators. No government attribution names a host state.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Jun 2021</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Hive Appears</div>
+          <div class="timeline-desc">Hive launches as a RaaS with a developer/affiliate split, a TOR negotiation portal with live chat, and the "HiveLeaks" data-publication site for victims who refuse to pay.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Aug 2021</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Memorial Health System — First Major Healthcare Victim</div>
+          <div class="timeline-desc">The Illinois health system diverts emergency patients and cancels urgent surgeries and radiology exams; roughly 216,000 patients' health information is ultimately exposed. Establishes Hive's willingness to hit clinical care directly.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Oct 2021</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">ESXi Encryptor &amp; Rapid Scaling</div>
+          <div class="timeline-desc">A Golang VMware ESXi variant is observed, extending impact from individual hosts to whole virtualised estates. By 16 October 2021 Hive had struck 355 companies — a 72% month-over-month increase.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Feb 2022</div>
+        <div class="timeline-track"><div class="timeline-dot green"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Kookmin University Breaks Hive's Encryption</div>
+          <div class="timeline-desc">South Korean researchers publish "A Method for Decrypting Data Infected with Hive Ransomware," demonstrating recovery without paying. Within days Hive overhauls its cryptography — a rare, publicly datable instance of academic research forcing a ransomware crew to re-engineer its core product.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Mar 2022</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Golang → Rust Port</div>
+          <div class="timeline-desc">Hive follows BlackCat/ALPHV in rewriting its encryptor in Rust, gaining safer concurrency for faster encryption plus string encryption in the <code>.rdata</code> section decrypted at runtime via XOR — materially raising the reverse-engineering cost.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">May–Jun 2022</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Costa Rica — CCSS National Health Service</div>
+          <div class="timeline-desc">Hive forces the Costa Rican Social Security Fund to shut down critical national systems including EDUS (Single Digital Health Record) and SICERE (Centralized Collection), reportedly demanding $5M in bitcoin — landing weeks after Conti's separate assault on the same government.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jul 2022</div>
+        <div class="timeline-track"><div class="timeline-dot green"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">FBI Penetrates Hive's Network</div>
+          <div class="timeline-desc">The Bureau gains covert access to Hive's infrastructure and begins generating decryption keys immediately, uncertain how long access will hold. The operation runs undetected for roughly seven months.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Oct 2022</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Tata Power</div>
+          <div class="timeline-desc">Hive encrypts India's largest integrated power company on 3 October and later leaks stolen data — a critical-infrastructure victim in a market Hive had not previously prioritised.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">17 Nov 2022</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Joint Advisory AA22-321A</div>
+          <div class="timeline-desc">FBI, CISA and HHS publish Hive's IOCs and TTPs while the covert FBI access is still live — public defensive guidance issued without tipping the ongoing operation.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">26 Jan 2023</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Takedown — Infrastructure Seized, No Arrests</div>
+          <div class="timeline-desc">DOJ, FBI and Secret Service, with German and Dutch police, seize Hive's servers and dark-web portals. Over 300 keys had gone to victims mid-attack across 48 states and 1,000+ to prior victims, preventing ~$130M in payments. Officials confirm no arrests, stating they were still mapping administrators and affiliates.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Oct–Nov 2023</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Hunters International Emerges</div>
+          <div class="timeline-desc">A new RaaS surfaces running an encryptor with ~60% code overlap with Hive's. Operators deny continuity, claiming they bought the source code, website and legacy Golang/C versions.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Feb 2024</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">US Bounty Raised</div>
+          <div class="timeline-desc">The State Department's Rewards for Justice programme offers up to $10M for information identifying Hive leadership, and up to $15M covering owners, operators and affiliates.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jul 2025 → 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Hunters Shuts Down → World Leaks Continues</div>
+          <div class="timeline-desc">Hunters International announces closure on 4 July 2025 (55 confirmed attacks, 199 unconfirmed) and offers free decryptors, having already launched World Leaks on 1 January 2025 — an extortion-only operation with no encryptor. Group-IB counts at least 33 World Leaks attacks; the operation is tied to a June 2025 extortion campaign against a UBS third-party supplier that exposed data on roughly 130,000 UBS employees, and remains active through the first half of 2026.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Per CISA/FBI/HHS AA22-321A and FBI investigation data</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Initial access</strong> came predominantly through exposed remote services protected by a single factor. Affiliates logged into RDP, VPN and similar remote-access protocols using valid credentials with no MFA, and where MFA did exist on FortiOS VPN gateways they exploited <strong>CVE-2020-12812</strong> — a flaw so trivial it barely deserves the word "exploit": simply changing the case of the username caused the gateway to skip the second factor. Where remote services were not available, they exploited Microsoft Exchange through the ProxyShell chain (CVE-2021-34473, CVE-2021-34523, CVE-2021-31207) and CVE-2021-42321, or sent phishing mail with malicious attachments.</p>
+      <p><strong>Consolidation and pre-encryption preparation</strong> followed a consistent, noisy pattern. Affiliates killed processes belonging to backup software, antivirus and file-copying tools; disabled AV and antispyware through registry modification; and cleared Windows event logs via <code>wevtutil.exe cl system</code> / <code>security</code> / <code>application</code>. Recovery was systematically dismantled before the encryptor ran: <code>vssadmin.exe delete shadows /all /quiet</code> to destroy shadow copies, and <code>bcdedit.exe /set {default} bootstatuspolicy ignoreallfailures</code> to suppress Windows recovery. Helper scripts <code>hive.bat</code> and <code>shadow.bat</code> automated portions of this and then deleted themselves.</p>
+      <p><strong>Exfiltration</strong> preceded encryption, supporting the double-extortion model. Hive affiliates used <strong>Rclone</strong> synchronising to <strong>Mega.nz</strong>, with anonymous file-sharing services — AnonFiles, Send.exploit.in, UFile, SendSpace, PrivatLab — as alternates. Stolen data fed HiveLeaks, the TOR publication site used to pressure non-paying victims.</p>
+      <p><strong>Encryption and extortion</strong> then ran across Windows, Linux and ESXi targets using dedicated builds (<code>Windows_x64_encrypt.exe</code>/<code>.dll</code>, <code>Linux_encrypt</code>, <code>Esxi_encrypt</code>). Hive's distinguishing implementation detail was that it wrote a <code>*.key</code> file to the volume root (<code>C:\</code> or <code>/root/</code>) and dropped <code>HOW_TO_DECRYPT.txt</code> instructing the victim not to modify or delete it, because that key file was required for decryption — a design that made the key file itself a high-value forensic artifact, and one of the hooks the Kookmin University researchers pulled on when they demonstrated recovery without paying.</p>
+      <p>Victims were funnelled to a TOR sales portal with live chat for negotiation. Notably, the FBI later assessed that only <strong>20–25% of Hive victims reported</strong> their victimisation to law enforcement at all — which is why the Bureau had to push decryption keys out through field offices and 72 legal attachés rather than simply notifying a known victim list.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise — mapping per CISA/FBI/HHS AA22-321A (no MITRE G-ID assigned)</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1133</div>
+        <div class="mitre-name">External Remote Services</div>
+        <div class="mitre-note">[HIGH] Single-factor RDP/VPN logins were the dominant entry route — the single most consequential control gap across Hive's victim set.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1190</div>
+        <div class="mitre-name">Exploit Public-Facing Application</div>
+        <div class="mitre-note">[HIGH] ProxyShell (CVE-2021-34473 / -34523 / -31207) and CVE-2021-42321 against Exchange; CVE-2020-12812 against FortiOS VPN.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.001</div>
+        <div class="mitre-name">Phishing: Spearphishing Attachment</div>
+        <div class="mitre-note">[MEDIUM] Malicious attachments used where no exposed remote service or unpatched Exchange server was available.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059</div>
+        <div class="mitre-name">Command and Scripting Interpreter</div>
+        <div class="mitre-note">[HIGH] PowerShell and native utilities driving shadow-copy destruction and defence tampering, wrapped in hive.bat / shadow.bat.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1562.001</div>
+        <div class="mitre-name">Impair Defenses: Disable or Modify Tools</div>
+        <div class="mitre-note">[HIGH] Terminated backup, antivirus and file-copy processes — including stopping the Security Accounts Manager to suppress SIEM alerting.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1070</div>
+        <div class="mitre-name">Indicator Removal: Clear Windows Event Logs</div>
+        <div class="mitre-note">[HIGH] wevtutil.exe cl against system, security and application logs, plus self-deleting helper scripts.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1112</div>
+        <div class="mitre-name">Modify Registry</div>
+        <div class="mitre-note">[MEDIUM] Registry edits to disable antivirus and antispyware ahead of encryptor execution.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1518.001</div>
+        <div class="mitre-name">Software Discovery: Security Software Discovery</div>
+        <div class="mitre-note">[MEDIUM] Enumeration of installed security and backup products preceded the targeted process-termination sweep.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003</div>
+        <div class="mitre-name">OS Credential Dumping</div>
+        <div class="mitre-note">[MEDIUM] Credential harvesting supported lateral movement to domain assets and backup servers before deployment.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1537</div>
+        <div class="mitre-name">Transfer Data to Cloud Account</div>
+        <div class="mitre-note">[HIGH] Rclone synchronising victim data to Mega.nz; AnonFiles, SendSpace, UFile, PrivatLab and Send.exploit.in as alternates.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1486</div>
+        <div class="mitre-name">Data Encrypted for Impact</div>
+        <div class="mitre-note">[HIGH] Cross-platform encryptors for Windows, Linux and ESXi; a *.key file written to volume root is required for decryption.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1490</div>
+        <div class="mitre-name">Inhibit System Recovery</div>
+        <div class="mitre-note">[HIGH] vssadmin shadow deletion plus bcdedit bootstatuspolicy ignoreallfailures to defeat Windows recovery.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] Double extortion — encryption plus threatened HiveLeaks publication; $100M+ realised across 1,500+ victims.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Healthcare &amp; Public Health</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Government Facilities</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:75%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Critical Manufacturing</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:70%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Information Technology</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:55%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Communications / Energy</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:45%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Global; heaviest concentration in the United States (victims across 48 states received FBI keys), with significant activity in Latin America, Europe and India</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Mid-to-large enterprises and public institutions where downtime carries acute operational or human cost — hospitals, national health services, utilities, school districts</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Internet-exposed RDP/VPN without MFA; unpatched Exchange (ProxyShell); FortiOS gateways vulnerable to the CVE-2020-12812 MFA bypass</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Affiliate-driven and opportunistic rather than centrally directed — targets were selected by whichever affiliate found an exploitable edge, which is why victimology is broad rather than sector-coherent</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">Hive Encryptor (Golang, Jun 2021 – Feb 2022)</span>
+          <span class="tool-tag">Ransomware · Custom</span>
+        </div>
+        <div class="tool-desc">The original cross-platform encryptor. Wrote a <code>*.key</code> file to the volume root required for decryption and dropped <code>HOW_TO_DECRYPT.txt</code>. Its key-management scheme contained a cryptographic weakness that Kookmin University researchers published a practical recovery method against in February 2022 — the flaw that ultimately forced a full crypto redesign.</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">Hive Encryptor (Rust, Mar 2022 – Jan 2023)</span>
+          <span class="tool-tag">Ransomware · Custom</span>
+        </div>
+        <div class="tool-desc">Rewritten in Rust following BlackCat/ALPHV's lead. Rust's concurrency primitives enabled faster parallel encryption, while string encryption — strings held in the <code>.rdata</code> section and XOR-decrypted with constants at runtime — significantly raised analysis cost. Shipped with a rebuilt cryptographic scheme specifically to close the academic decryption method.</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-header">
+          <span class="tool-name">Esxi_encrypt / Linux_encrypt</span>
+          <span class="tool-tag">Ransomware · Hypervisor-targeting</span>
+        </div>
+        <div class="tool-desc">Dedicated builds for VMware ESXi and Linux, the ESXi variant first observed in Golang around October 2021 and later ported to Rust. Encrypting the hypervisor rather than individual guests collapses an entire virtualised estate in one action and sidesteps in-guest EDR entirely.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">hive.bat / shadow.bat</span>
+          <span class="tool-tag">Script · Custom</span>
+        </div>
+        <div class="tool-desc">Helper batch scripts automating cleanup and recovery destruction, notable for deleting themselves after execution — a deliberate, low-effort anti-forensic step that removes the clearest narrative artifact of the pre-encryption sequence.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Rclone + Mega.nz</span>
+          <span class="tool-tag">Exfiltration · Legitimate/Dual-Use</span>
+        </div>
+        <div class="tool-desc">The exfiltration backbone. Rclone is a legitimate, widely deployed cloud-sync utility, so its presence is not inherently suspicious — detection depends on context (unexpected host, unusual destination, volume) rather than on the binary itself. Alternates included AnonFiles, Send.exploit.in, UFile, SendSpace and PrivatLab.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Native Windows Binaries (LOLBins)</span>
+          <span class="tool-tag">LOLBin · Built-in</span>
+        </div>
+        <div class="tool-desc"><code>vssadmin.exe</code> and <code>wmic</code> for shadow-copy destruction, <code>bcdedit.exe</code> to suppress recovery, <code>wevtutil.exe</code> to clear event logs. Entirely signed, entirely native — the destructive phase generated almost no novel binary artifacts for signature-based tooling to catch.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">HiveLeaks &amp; TOR Negotiation Portal</span>
+          <span class="tool-tag">Infrastructure · Extortion</span>
+        </div>
+        <div class="tool-desc">A <code>.onion</code> sales and negotiation portal with live chat, paired with the HiveLeaks publication site used to pressure non-payers. Both were seized in the January 2023 operation and replaced with a law-enforcement seizure notice.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">Rented Anonymization Infrastructure</span>
+          <span class="tool-tag">Infrastructure · Third-Party</span>
+        </div>
+        <div class="tool-desc">Like most RaaS operations, Hive affiliates fronted their activity through commercial criminal VPN and bulletproof-hosting services rather than dedicated infrastructure. This is precisely what makes single-IP attribution to Hive unreliable — see Sections 07 and 08 on the First VPN Service exit node that triggered this profile.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains below are defanged; reconstruct before use in tooling. Reference URLs in Section 13 are NOT defanged. <strong>Age warning:</strong> Hive's infrastructure was seized in January 2023. Network indicators below are archival and have near-zero current detection utility — they are retained for retrospective hunting only. Host-based artifacts and command patterns remain useful, including against successor tooling.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">FILE</td><td>HOW_TO_DECRYPT.txt — ransom note dropped in encrypted directories</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">FILE</td><td>*.key — key file written to volume root (C:\ or /root/); victim instructed not to delete or modify</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">FILE</td><td>hive.bat, shadow.bat — self-deleting helper scripts</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">FILE</td><td>Windows_x64_encrypt.exe / .dll, Linux_encrypt, Esxi_encrypt — platform-specific encryptor builds</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">PROCESS</td><td>wevtutil.exe cl system / security / application — event log clearing</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">PROCESS</td><td>vssadmin.exe delete shadows /all /quiet — shadow copy destruction</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">PROCESS</td><td>bcdedit.exe /set {default} bootstatuspolicy ignoreallfailures — recovery suppression</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="historical">asq.r77vh0[.]pw · asq.d6shiiwz[.]pw · asq.swhw71un[.]pw · asd.s7610rir[.]pw</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">IP</td><td class="historical">84.32.188[.]57 · 185.8.105[.]67 · 46.166.161[.]123 (representative sample; AA22-321A lists 23 total)</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">INFRA</td><td>Rclone traffic to Mega.nz from servers with no business need for cloud sync; uploads to AnonFiles / SendSpace / UFile / PrivatLab / Send.exploit[.]in</td><td>CISA AA22-321A</td><td>2022-11</td></tr>
+        <tr><td class="type-label">IP</td><td class="historical">66.70.179[.]236 — <strong>NOT Hive-owned.</strong> First VPN Service exit node per FBI FLASH-20260521-001; rented by 25+ ransomware groups. Listed here only because a public feed filed it under a Hive-named feed file. Do not treat a hit on this address as Hive attribution</td><td>FBI FLASH-20260521-001</td><td>2026-05-21</td></tr>
+        <tr><td class="type-label">NOTE</td><td>Hive's TOR negotiation portal and HiveLeaks site were seized 2023-01-26 and are permanently offline</td><td>DOJ / FBI</td><td>2023-01-26</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val amber">HISTORICAL — brand defunct; capability persists in successor lineage</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (operation) / MEDIUM-HIGH (successor continuity) / MEDIUM (host-state)</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Brand extinct since Jan 2023; lineage evolved away from encryption entirely toward extortion-only (World Leaks)</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Hypervisor-level encryption (Esxi_encrypt) — collapsed whole virtual estates and bypassed in-guest EDR</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Operator identities never publicly established; no arrests at takedown, and only 20–25% of victims ever reported</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
+        <div class="alias-grid">
+          <span class="alias-chip">Hunters International (successor)</span>
+          <span class="alias-chip">World Leaks (current)</span>
+          <span class="alias-chip">BlackCat / ALPHV (Rust precedent)</span>
+          <span class="alias-chip">Conti (parallel Costa Rica ops)</span>
+          <span class="alias-chip">LockBit / Babuk (Matveev overlap)</span>
+        </div>
+        <div style="margin-top: 12px; font-family: var(--mono); font-size: 13px; color: var(--text-dim); line-height: 1.5;">Companion cards on file: BLACKCAT-ALPHV, REVIL, DARKSIDE, AKIRA</div>
+      </div>
+    </div>
+    <div class="prose">
+      <p><strong>The IP that prompted this profile does not attribute to Hive, and the reasoning matters more than the conclusion.</strong> The chain ran: an intrusion's initial-access address was checked against a public threat feed; the feed file was named <code>hive_ransomware.txt</code>; the address was therefore reported as tied to a ransomware actor. But FBI FLASH-20260521-001 lists <code>66.70.179[.]236</code> as an exit node of the First VPN Service — commercial criminal anonymization infrastructure operating since roughly 2014 across 32 nodes in 27 countries, marketed on Exploit[.]in and XSS[.]is, and used by at least 25 distinct ransomware groups before a French- and Dutch-led takedown. Three independent problems compound: the address is <em>shared</em>, so a hit identifies the rented VPN and not the tenant; the intrusion in question is dated January 2025, two years after Hive's infrastructure was seized and the brand ceased; and the FBI's own advisory cautions that such addresses are historically observed assignments that may later be reallocated to benign services. A feed filename is a categorisation convenience, not an attribution claim — and where shared infrastructure is involved, it cannot be one.</p>
+      <p><strong>Competing hypothesis on successor continuity.</strong> Hunters International's denial — that it bought Hive's source code, website and legacy builds rather than being Hive — is not implausible on its face; source-code sales are a real feature of the RaaS economy, and code overlap alone would be consistent with either story. What tips the assessment toward genuine continuity is Group-IB's reporting that some individuals were approached by Hunters administrators from the <em>same accounts</em> previously used by Hive, plus other operators in the ecosystem continuing to refer to the new RaaS as Hive. Purchased code does not come with the seller's account credentials and social graph. This remains [MEDIUM-HIGH] rather than [HIGH] because the account-reuse evidence rests on a single vendor's reporting; independent corroboration from a second source with visibility into those forums would close the gap.</p>
+      <p><strong>The strategic lesson is about what a takedown does and does not buy.</strong> The FBI's operation was a genuine success on its own terms — roughly $130M in payments prevented, 1,300+ victims given keys, and a demonstrated model for prioritising victim recovery over arrest-building. But no operator was in custody on takedown day, and the capability reconstituted within nine months under a new brand, then rebranded again, and is still extorting organisations in 2026 under a third name with the encryption component discarded entirely. Infrastructure seizure degrades a criminal enterprise; only arrests and asset seizure appear to end one. That evolution — Hive's double extortion → Hunters' double extortion → World Leaks' extortion-only — also tracks a broader ecosystem shift in which encryption is increasingly treated as optional overhead while data theft does the coercive work. For defenders, that means controls tuned to detect encryption events are aimed at the part of the kill chain the lineage has abandoned; exfiltration detection is now where the leverage sits.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Enforce phishing-resistant MFA on every remote-access path — VPN, RDP, webmail, and any admin portal.</strong> Single-factor remote services were Hive's dominant entry route, and are the control failure most directly implicated in the incident that opened this profile.</div>
+            <div class="cm-ttp">Counters: T1133</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Verify that MFA on VPN gateways actually cannot be bypassed, rather than assuming its presence is sufficient.</strong> CVE-2020-12812 let Hive skip FortiOS MFA by changing the case of a username — test authentication edge cases against your own gateways, including case variance and alternate username formats.</div>
+            <div class="cm-ttp">Counters: T1190, T1133</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Alert on recovery-destruction commands as a high-severity, near-certain-malice signal.</strong> <code>vssadmin delete shadows</code>, <code>bcdedit /set bootstatuspolicy ignoreallfailures</code> and <code>wevtutil cl</code> have almost no legitimate use on production endpoints and sit immediately before encryption — this is the highest-value detection window in the entire chain.</div>
+            <div class="cm-ttp">Counters: T1490, T1070</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Maintain offline, encrypted, immutable backups covering the full infrastructure — and test restoration.</strong> Hive systematically killed backup processes and destroyed shadow copies before encrypting; only backups outside the blast radius survive that sequence.</div>
+            <div class="cm-ttp">Counters: T1490, T1486, T1562.001</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Treat the ESXi management plane as tier-0 and monitor it accordingly.</strong> Hypervisor encryptors bypass in-guest EDR entirely; restrict hypervisor management access, enforce MFA on it, and ship ESXi logs off-host where guest-level tooling cannot see the attack at all.</div>
+            <div class="cm-ttp">Counters: T1486 (Esxi_encrypt)</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Baseline and alert on Rclone and cloud-sync traffic by context, not by binary reputation.</strong> Rclone is legitimate software; what is anomalous is a server with no business need synchronising bulk data to Mega.nz or an anonymous file-sharing host. This control has grown <em>more</em> important as the lineage moved to extortion-only.</div>
+            <div class="cm-ttp">Counters: T1537</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Do not treat a threat-feed hit on a shared VPN or hosting IP as actor attribution.</strong> Corroborate any single-IP match against the feed's own provenance and at least one independent source before naming a group in an incident report — the scenario that produced this card is the cautionary example.</div>
+            <div class="cm-ttp">Counters: Analytic error, not a technique — see Section 08</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Report ransomware incidents to law enforcement even when you do not intend to pay.</strong> Only 20–25% of Hive victims reported, which is the direct reason the FBI could not simply notify known victims while holding decryption keys for them. Reporting is what makes key-recovery operations reach you.</div>
+            <div class="cm-ttp">Counters: Intelligence gap — see Section 08</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">Windows event logs were cleared via <code>wevtutil.exe cl</code> against the system, security and application channels, and the <code>hive.bat</code> / <code>shadow.bat</code> helper scripts deleted themselves after execution. The intent is narrative destruction rather than evasion — by the time logs are cleared the encryption is imminent, so the value is in denying responders the reconstruction, not in avoiding detection.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">The destructive phase leaned almost entirely on signed native binaries — <code>vssadmin</code>, <code>wmic</code>, <code>bcdedit</code>, <code>wevtutil</code> — with custom code reserved for the encryptor itself and exfiltration handled by legitimate third-party software (Rclone). Hive's custom-tooling footprint was therefore concentrated in a single, late-stage artifact, leaving most of the intrusion visible only as behaviour.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">The March 2022 Rust rewrite is the clearest deliberate hygiene investment: string encryption with strings held in the <code>.rdata</code> section and XOR-decrypted at runtime, combined with Rust's optimised output, materially raised reverse-engineering cost. The concurrent cryptographic redesign was a direct, datable response to Kookmin University's published decryption method — Hive treated a public academic paper as an operational incident and re-engineered within days.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Affiliates fronted operations through rented criminal VPN services and anonymous file-sharing platforms rather than dedicated, attributable infrastructure — the structural reason single-IP attribution to Hive is unreliable (Section 08). Note the limit of this assessment: Hive's own rotation discipline was evidently insufficient against a determined adversary, since the FBI held covert access to its core network for seven months without detection.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Persona &amp; Brand Management</span>
+          <span class="opsec-confidence">[MEDIUM-HIGH]</span>
+        </div>
+        <div class="opsec-desc">The post-takedown rebrand sequence is itself an OPSEC pattern: relaunch under a new name with a modified encryptor (Hunters International), then retire that brand publicly — complete with free decryptors, which buys goodwill and muddies continuity claims — while the replacement (World Leaks) has already been running for six months. Group-IB's observation that Hunters administrators contacted people from Hive-era accounts shows the brand hygiene was considerably better than the account hygiene.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Security Tooling Termination &amp; SAM Suppression</span>
+          <span class="evasion-ttp">T1562.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">Before deploying the encryptor, affiliates enumerated and terminated processes belonging to antivirus, backup and file-copying software, and disabled AV/antispyware through registry modification. Picus's analysis of AA22-321A specifically documents stopping the Security Accounts Manager to prevent SIEM alerting.</div>
+        <div class="evasion-detail">Documented behaviour: termination of backup, AV and file-copy processes; registry edits disabling antivirus and antispyware; Security Accounts Manager stopped to suppress SIEM alerts.
+Exact process-name kill lists and registry value paths are not enumerated in AA22-321A and are not publicly documented as of 2026-09-18.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Log Destruction via Native Binary</span>
+          <span class="evasion-ttp">T1070.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+          <span class="evasion-tag">wevtutil.exe</span>
+        </div>
+        <div class="evasion-desc">Event logs were cleared using the signed, built-in Windows event utility rather than any custom tool — nothing novel lands on disk, and the action is indistinguishable at the binary level from legitimate administration.</div>
+        <div class="evasion-detail">wevtutil.exe cl system
+wevtutil.exe cl security
+wevtutil.exe cl application
+(per CISA/FBI/HHS AA22-321A)</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Recovery Suppression Chain</span>
+          <span class="evasion-ttp">T1490</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">vssadmin / bcdedit / wmic</span>
+        </div>
+        <div class="evasion-desc">Shadow copies were destroyed and Windows recovery suppressed immediately before encryption, using only native utilities. This sequence is the most reliable high-fidelity detection opportunity Hive offered — it is loud, but it happens minutes before impact.</div>
+        <div class="evasion-detail">vssadmin.exe delete shadows /all /quiet
+bcdedit.exe /set {default} bootstatuspolicy ignoreallfailures
+(per CISA/FBI/HHS AA22-321A; wmic also observed in the same role)</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Binary Analysis Resistance — Rust String Encryption</span>
+          <span class="evasion-ttp">T1027</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">Rust encryptor</span>
+        </div>
+        <div class="evasion-desc">The March 2022 Rust encryptor held its strings encrypted in the <code>.rdata</code> section, decrypting them at runtime by XORing with constants — defeating static string-based signatures and slowing manual reverse engineering, per Microsoft's analysis of the Rust variant.</div>
+        <div class="evasion-detail">Documented mechanism: strings resident in .rdata, decrypted at runtime via XOR with constants (Microsoft Security Blog, 2022-07-05).
+Specific XOR constants and per-sample key material vary by build and are not published as a stable indicator.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Hypervisor-Layer Execution</span>
+          <span class="evasion-ttp">T1486</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">Esxi_encrypt</span>
+        </div>
+        <div class="evasion-desc">Encrypting at the ESXi layer sidesteps guest-resident EDR entirely — there is no agent on the hypervisor to alert, and every guest is impacted without any of them being touched individually. Strictly speaking this is an architectural bypass rather than an evasion technique, which is what makes it hard to instrument against.</div>
+        <div class="evasion-detail">Esxi_encrypt build observed from ~October 2021 (Golang), later ported to Rust.
+No published per-command execution sequence for the ESXi variant as of 2026-09-18.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense adversary emulation plan has been published for Hive as of 2026-09-18. CTID's public adversary_emulation_library covers named state-nexus actors (APT29, Sandworm, FIN6, menuPass and others) but contains no Hive plan, consistent with CTID's limited coverage of RaaS brands generally. Relatedly, MITRE ATT&CK has assigned Hive neither a group G-ID nor a software entry — verified directly against both indices on this compile date — so CISA/FBI/HHS AA22-321A serves as the authoritative technique mapping in its place.</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-321a" target="_blank">AA22-321A machine-readable IOC package (AA22-321A.stix)</a></div>
+          <div class="ref-date">STIX IOC bundle for detection tooling ingest · Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Picus Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.picussecurity.com/resource/blog/cisa-alert-aa22-321a-hive-ransomware-analysis-simulation-ttps-iocs" target="_blank">CISA Alert AA22-321A: Hive Ransomware Analysis, Simulation, TTPs &amp; IOCs</a></div>
+          <div class="ref-date">Vendor attack-simulation content mapped to AA22-321A · Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Kookmin University</div>
+        <div>
+          <div class="ref-detail">"A Method for Decrypting Data Infected with Hive Ransomware" — academic cryptanalysis of the pre-Rust key scheme</div>
+          <div class="ref-date">Research reference (applies only to Golang-era samples) · Feb 2022</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">—</div>
+        <div>
+          <div class="ref-detail">No Hive-specific Atomic Red Team test set or dedicated SigmaHQ ruleset was identified in this research pass. Generic coverage does exist for the underlying techniques — shadow-copy deletion, event-log clearing and Rclone exfiltration all have mature public detection content that applies directly to Hive's chain.</div>
+          <div class="ref-date">Gap noted, not fabricated · 2026-09-18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">CISA / FBI / HHS</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-321a" target="_blank">#StopRansomware: Hive Ransomware (AA22-321A)</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ic3.gov/CSA/2022/221117.pdf" target="_blank">Joint Cybersecurity Advisory — Hive Ransomware (PDF)</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ic3.gov/CSA/2026/260521.pdf" target="_blank">FLASH-20260521-001: "First VPN Service" Used by Ransomware Actors to Compromise Systems</a></div>
+          <div class="ref-date">Source for the 66.70.179[.]236 attribution correction · Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DOJ / FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/news/press-releases/us-department-of-justice-disrupts-hive-ransomware-variant" target="_blank">U.S. Department of Justice Disrupts Hive Ransomware Variant</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.fbi.gov/news/speeches-and-testimony/director-christopher-wrays-remarks-at-press-conference-announcing-the-disruption-of-the-hive-ransomware-group" target="_blank">Director Christopher Wray's Remarks Announcing the Disruption of the Hive Ransomware Group</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Record</div>
+        <div>
+          <div class="ref-detail"><a href="https://therecord.media/hive-ransomware-decryptors-fbi-bryan-smith-interview-click-here" target="_blank">Knocking down Hive: How the FBI ran its own ransomware decryption operation</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2022/07/05/hive-ransomware-gets-upgrades-in-rust/" target="_blank">Hive ransomware gets upgrades in Rust</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bitdefender</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bitdefender.com/en-us/blog/businessinsights/hive-ransomwares-offspring-hunters-international-takes-the-stage" target="_blank">Hive Ransomware's Offspring: Hunters International Takes the Stage</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Group-IB</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.group-ib.com/blog/hunters-international-ransomware-group/" target="_blank">The beginning of the end: the story of Hunters International</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/hive-ransomware-ports-its-linux-vmware-esxi-encryptor-to-rust/" target="_blank">Hive ransomware ports its Linux VMware ESXi encryptor to Rust</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">US State Dept</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.state.gov/owners-operators-affiliates-of-the-hive-ransomware-as-a-service" target="_blank">Rewards for Justice — Owners/Operators/Affiliates of the Hive Ransomware as a Service</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SecurityWeek</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.securityweek.com/hunters-international-shuts-down-offers-free-decryptors-as-it-morphs-into-world-leaks/" target="_blank">Hunters International Shuts Down, Offers Free Decryptors as It Morphs Into World Leaks</a></div>
+          <div class="ref-date">Accessed: 2026-09-18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-18 · 11 sources, all open-source/public/government</div>
+  <div>Hive RaaS · Seized Jan 2023 · No MITRE G-ID · Network IOCs are archival — see Section 08 for the 66.70.179[.]236 attribution correction</div>
+</div>
+
+</body>
+</html>
