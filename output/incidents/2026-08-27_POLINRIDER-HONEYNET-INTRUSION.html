@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PolinRider Honeynet Intrusion — Cyber Incident Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0c0a06;
+    --bg2:         #111009;
+    --bg3:         #16140b;
+    --bg4:         #1c1a10;
+    --border:      #2e2a18;
+    --border2:     #3d3820;
+    --gold:        #c8960a;
+    --gold2:       #f5c542;
+    --gold-dim:    #7a5c08;
+    --red:         #cc4444;
+    --blue:        #5b9bd5;
+    --green:       #4a9e6a;
+    --text:        #e8dfc0;
+    --text-dim:    #6b5e3a;
+    --text-mid:    #a8956a;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 15% 0%, rgba(200,150,10,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 85% 100%, rgba(200,150,10,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,150,10,0.018) 40px);
+  }
+
+  /* ── CASE FILE HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #100e07 0%, #161309 60%, #0e0c05 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(200,150,10,0.015) 10px, rgba(200,150,10,0.015) 11px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2) 50%, transparent 100%);
+  }
+
+  .header-stamp {
+    position: absolute;
+    top: 18px; right: 28px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+    border: 1px solid var(--gold-dim);
+    padding: 6px 12px;
+    opacity: 0.7;
+  }
+
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear { background: #d0dde8; color: #080c10; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--gold2); color: #080c10; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .casefile-label {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 62px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .gold   { color: var(--gold2); }
+  .header h1 .gold2  { color: var(--gold); }
+  .header h1 .dim    { color: var(--text-dim); }
+  .header h1 .red    { color: var(--red); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
+  .case-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+  .case-bar span        { color: var(--gold2); font-weight: 700; }
+  .case-bar span.red    { color: var(--red); }
+  .case-bar span.dim    { color: var(--text-dim); }
+  .case-bar span.blue   { color: var(--blue); }
+  .case-bar span.green  { color: var(--green); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--gold2); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 16px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 23px; font-weight: 700; color: var(--gold2); letter-spacing: 0.02em; min-width: 36px; line-height: 1; padding-right: 16px; border-right: 1px solid var(--border2); }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 16px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 16px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--gold2); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 15px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--gold2); }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.6); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key  { font-family: var(--mono); font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val  { font-family: var(--body); font-size: 15.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.gold  { color: var(--gold2); font-weight: 600; }
+  .kv-val.red   { color: var(--red); font-weight: 600; }
+  .kv-val.blue  { color: var(--blue); font-weight: 600; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 14.5px; }
+  .kv-val.dim   { color: var(--text-dim); }
+
+  /* ── ACTOR REFERENCE BADGE ── */
+  .actor-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 14.5px;
+    color: var(--text-dim);
+  }
+  .actor-ref .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .actor-ref .name  { color: var(--gold2); font-weight: 700; }
+  .actor-ref .none  { color: var(--text-dim); font-style: italic; }
+
+  /* ── KILL CHAIN ── */
+  .killchain { display: flex; flex-direction: column; gap: 0; }
+  .kc-phase {
+    border-left: 3px solid var(--border2);
+    padding: 0 0 24px 20px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .kc-phase:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .kc-phase::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--bg2);
+  }
+  .kc-phase.blind::before    { background: var(--red); }
+  .kc-phase.visible::before  { background: var(--gold2); }
+  .kc-phase.detected::before { background: var(--green); }
+  .kc-phase.unknown::before  { background: var(--text-dim); }
+
+  .kc-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .kc-phase-name {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vis-badge {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .vis-blind       { background: rgba(204,68,68,0.15); border: 1px solid rgba(204,68,68,0.4); color: var(--red); }
+  .vis-unreviewed  { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .vis-misattr     { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .vis-detected    { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .vis-unknown     { background: rgba(107,94,58,0.15); border: 1px solid rgba(107,94,58,0.4); color: var(--text-dim); }
+
+  .kc-body {
+    font-family: var(--body);
+    font-size: 16px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .kc-body strong { color: var(--text); font-weight: 500; }
+  .kc-body code { font-family: var(--mono); font-size: 15px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--gold2); }
+  .kc-pivot {
+    font-family: var(--body);
+    font-size: 15.5px;
+    color: var(--gold-dim);
+    font-style: italic;
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── MITRE GRID ── */
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--blue); }
+  .mitre-cell.red    { border-left-color: var(--red); }
+  .mitre-cell.amber  { border-left-color: var(--gold2); }
+  .mitre-cell.green  { border-left-color: var(--green); }
+  .mitre-tactic    { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id        { font-family: var(--mono); font-size: 13.5px; color: var(--blue); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--red); }
+  .mitre-cell.amber .mitre-id { color: var(--gold2); }
+  .mitre-cell.green .mitre-id { color: var(--green); }
+  .mitre-name      { font-family: var(--body); font-size: 15px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note      { font-family: var(--body); font-size: 14.5px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-retro     { font-family: var(--mono); font-size: 12.5px; color: var(--gold-dim); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .mitre-framework { font-family: var(--mono); font-size: 12.5px; color: var(--gold2); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  /* ── DEFENDER POST-MORTEM ── */
+  .postmortem-grid { display: flex; flex-direction: column; gap: 10px; }
+  .pm-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+  }
+  .pm-item.partial { border-left-color: var(--gold2); }
+  .pm-item.learned { border-left-color: var(--green); }
+  .pm-phase  { font-family: var(--mono); font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; line-height: 1.4; }
+  .pm-detail { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; }
+  .pm-detail strong { color: var(--text); font-weight: 500; }
+
+  /* ── TECHNICAL ARTIFACTS ── */
+  .artifact-list { display: flex; flex-direction: column; gap: 8px; }
+  .artifact-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 10px 14px;
+  }
+  .artifact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .artifact-name { font-family: var(--mono); font-size: 15px; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
+  .artifact-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .artifact-tag  { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .artifact-tag.historical { border-color: rgba(200,150,10,0.3); color: var(--gold-dim); }
+  .artifact-desc { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.45; }
+  .artifact-desc code { font-family: var(--mono); font-size: 14.5px; color: var(--gold2); }
+
+  /* IOC table */
+  .ioc-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .ioc-table th { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(46,42,24,0.5); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--gold2); font-size: 13.5px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-table td.historical { color: var(--text-dim); font-style: italic; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 13.5px; color: var(--gold2); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold2); background: rgba(200,150,10,0.05); }
+  .ioc-historical-note { font-family: var(--mono); font-size: 13.5px; color: var(--gold-dim); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--gold-dim); background: rgba(200,150,10,0.04); }
+
+  /* ── CONSEQUENCES ── */
+  .consequence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .consequence-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .consequence-label {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .consequence-body {
+    font-family: var(--body);
+    font-size: 15.5px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .consequence-body strong { color: var(--text); font-weight: 500; }
+  .consequence-na { color: var(--text-dim); font-style: italic; font-size: 15px; }
+
+  /* ── ATTRIBUTION ── */
+  .attr-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 14.5px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .attr-high         { background: rgba(74,158,106,0.12); border: 1px solid rgba(74,158,106,0.35); color: var(--green); }
+  .attr-medium       { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.35); color: var(--gold2); }
+  .attr-low          { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.35); color: var(--blue); }
+  .attr-unattributed { background: rgba(107,94,58,0.12); border: 1px solid rgba(107,94,58,0.35); color: var(--text-dim); }
+
+  /* ── TWO-COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(46,42,24,0.5); font-size: 15px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 13.5px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); margin-top: 2px; }
+  .ref-contemporary { font-family: var(--mono); font-size: 13px; color: var(--gold-dim); margin-top: 2px; letter-spacing: 0.04em; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--gold2); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .consequence-grid { grid-template-columns: 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .pm-item { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── PRINT BUTTON (screen only; hidden via .no-print below) ── */
+  .print-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 999;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .print-btn:hover { border-color: var(--gold2); color: var(--gold2); }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+
+    @page { margin: 12mm; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e6e6e6;
+      --border: #cfcfcf;
+      --border2: #b0b0b0;
+      --gold2: #8a6205;
+      --text: #111111;
+      --text-dim: #555555;
+      --text-mid: #2b2b2b;
+    }
+
+    body {
+      background: #fff !important;
+      background-image: none !important;
+      padding: 0 !important;
+    }
+
+    .header { background: #fff !important; }
+    .header::before { display: none !important; }
+    .header h1,
+    .section-title,
+    .kc-phase-name {
+      color: #111 !important;
+    }
+
+    .tlp-badge, .vis-badge, .mitre-retro, .mitre-framework {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .header, .stat-grid,
+    .stat-cell, .mitre-cell, .kv-row, .kc-phase, .pm-item, .artifact-item,
+    .consequence-panel, .ref-item, .prose p, tr {
+      break-inside: avoid;
+    }
+    .section-header { break-after: avoid; }
+    .section { orphans: 3; widows: 3; }
+    thead { display: table-header-group; }
+
+    a { color: #111 !important; text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()" title="Print or Save as PDF">⎘ Print / Save PDF</button>
+
+<!-- ═══════════════════════════════ CASE FILE HEADER ══ -->
+<div class="header">
+  <div class="header-stamp">
+    CASE FILE<br/>
+    INC-2026-0827-PLNRDR<br/>
+    27 AUG – 3 SEP 2026
+  </div>
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+  </div>
+  <div class="casefile-label">// Cyber Incident Case File — Supply Chain Intrusion Observed in a Deception Environment</div>
+  <h1><span class="gold">POLINRIDER</span><span class="dim"> HONEYNET</span></h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-19 &nbsp;|&nbsp; INCIDENT DATE: 2026-08-27 → 2026-09-03 &nbsp;|&nbsp;
+    SOURCES: Deception.Pro op report, Socket, SOC Prime, OpenSourceMalware, MITRE ATT&amp;CK, companion WaterPlum actor card (8)
+  </div>
+  <div class="case-bar">
+    <div>Incident Type: <span>Supply Chain Intrusion — Observed Under Instrumentation</span></div>
+    <div>Attribution: <span class="green">DPRK — PolinRider / Famous Chollima</span></div>
+    <div>Severity: <span class="dim">NONE (decoy environment)</span></div>
+    <div>Intel Value: <span class="red">HIGH</span></div>
+    <div>ATT&amp;CK Framework: <span class="blue">Enterprise</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val">3 HOURS</div>
+    <div class="stat-label">Bait installed → live operator engaged</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val red">167 HOURS</div>
+    <div class="stat-label">Total operation observed end to end</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">3</div>
+    <div class="stat-label">Persistence mechanisms, all one fake .NET name</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">0</div>
+    <div class="stat-label">Real assets at risk — decoy estate throughout</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Case File Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-ref">
+      <span class="label">Attributed Actor →</span>
+      <span class="name">WaterPlum / Contagious Interview (see actor card: 2026-09-18_WATERPLUM)</span>
+    </div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Incident Name</span><span class="kv-val gold">PolinRider Honeynet Intrusion</span></div>
+        <div class="kv-row"><span class="kv-key">Date Range</span><span class="kv-val">2026-08-27 14:33 → 2026-09-03 (~167 hours)</span></div>
+        <div class="kv-row"><span class="kv-key">Incident Type</span><span class="kv-val">Supply-chain intrusion, deliberately induced and fully instrumented</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Actor</span><span class="kv-val red">DPRK-linked PolinRider operator (single individual assessed)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val">[MEDIUM] — per originating researcher's own stated confidence</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Target</span><span class="kv-val">Decoy corporate workstation — persona: Product Manager, fictional global travel company</span></div>
+        <div class="kv-row"><span class="kv-key">Victim Count</span><span class="kv-val dim">None — no real organisation, users, or data involved</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Initial Discovery</span><span class="kv-val">2026-08-27 14:33 — at first execution, by design</span></div>
+        <div class="kv-row"><span class="kv-key">Discovered By</span><span class="kv-val gold">Deception.Pro honeynet instrumentation (LimaCharlie EDR, Zeek, Suricata/ETPRO, full PCAP, TLS-decrypted C2)</span></div>
+        <div class="kv-row"><span class="kv-key">Dwell Time</span><span class="kv-val green">Zero — adversary was under observation from the first process execution</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Impact</span><span class="kv-val">Intelligence production — full hands-on-keyboard tradecraft capture</span></div>
+        <div class="kv-row"><span class="kv-key">ATT&amp;CK Framework</span><span class="kv-val blue">Enterprise</span></div>
+        <div class="kv-row"><span class="kv-key">MITRE Campaign ID</span><span class="kv-val mono">None — actor tracked as G1052 (Contagious Interview)</span></div>
+        <div class="kv-row"><span class="kv-key">IOC Currency</span><span class="kv-val">Fresh as of Sep 2026 — infrastructure may rotate; re-validate before blocking</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Situation Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>On 27 August 2026 a Fortune 500 enterprise CTI team, working inside a Deception.Pro instrumented honeynet, installed a trojanized Python package (<code>pybitjs</code>) on a decoy corporate workstation and waited. <strong>Within roughly three hours a live DPRK-linked operator found the callback, engaged it, and began working the host by hand.</strong> Over the following week — about 167 hours in total — that operator ran a complete supply-chain intrusion end to end while every process, packet and decrypted C2 exchange was recorded.</p>
+      <p>What makes this case file worth keeping is not the malware, which is consistent with tooling already documented across the PolinRider campaign. It is the <em>observation conditions</em>. Most intrusion reporting is reconstructed after the fact from surviving artifacts, with the gaps filled by inference. Here the defenders held full telemetry before the adversary arrived, so the record includes things post-hoc forensics normally destroys or never captures: the exact interval between bait and engagement, a three-day dormancy followed by a precise return, and the specific moments where a human being was demonstrably typing rather than a script running.</p>
+      <p>Three actions in particular mark live hands-on-keyboard work rather than automation: an interactive reboot command (<code>shutdown /r /t 0</code>) issued minutes after first execution, a machine-wide Python 3.14 installation driven through PowerShell on the operator's return, and a deployment script invoked with an argument (<code>SvcHostUpdate.py --deploy</code>) rather than a fixed command line. Each of these is a decision, not a payload step.</p>
+      <p>The operator's persistence tradecraft is the other durable lesson. All three mechanisms planted — a scheduled task, a registry Run key, and a Startup-folder launcher — were given the same name, <strong>MicrosoftCLROptimization</strong>, impersonating a genuine Microsoft .NET runtime optimisation component. In this environment that choice was irrelevant because the instrumentation flagged the writes regardless. In a normal enterprise, reviewed by a human scanning a task list, it is exactly the sort of name that survives.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Background &amp; Context</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>The campaign.</strong> PolinRider is a DPRK-linked software supply-chain campaign that surfaced in early 2026 and has expanded aggressively across open-source ecosystems. Socket's reporting (July 2026) counted 162 malicious artifacts across 108 packages — roughly 80 Go modules, 10 Packagist packages, npm packages, and a Chrome extension — while OpenSourceMalware tracked confirmed repository compromise reaching 1,951 repositories across 1,047 distinct owners by May 2026 and a confirmed footprint growing roughly 6.5× since March. The campaign's centre of gravity is GitHub account takeover rather than registry compromise: npm and PyPI were comparatively spared precisely because they require separate publishing credentials the operators frequently did not hold.</p>
+      <p><strong>The delivery tradecraft.</strong> PolinRider plants obfuscated JavaScript loaders into legitimate repositories, hidden in configuration files or, in more recent variants, inside fake <code>.woff2</code> font files triggered through VS Code <code>tasks.json</code> task configurations. Concealment is unusually deliberate for a supply-chain operation: Git history rewriting with force pushes, anti-dated commits so malicious changes appear older than they are, and whitespace padding that pushes code beyond typical screen width in a diff view. Payloads are retrieved from public blockchain RPC infrastructure — TRON, Aptos and BNB Smart Chain services — decrypted with embedded XOR keys and executed via <code>eval()</code>, which puts C2 retrieval on infrastructure most enterprises will not block.</p>
+      <p><strong>The parent actor.</strong> PolinRider is attributed to Famous Chollima, the DPRK cluster this project profiles under the designation <strong>WaterPlum</strong> (MITRE G1052, "Contagious Interview") — the same operation formally attributed by a seven-nation joint government advisory on 18 September 2026 to the 313 General Bureau of North Korea's Munitions Industry Department. Some reporting additionally claims overlap with APT37 (Reaper / ScarCruft); that overlap is <em>not</em> currently reflected in the companion actor card and is flagged in Section 08 as an open item.</p>
+      <p><strong>The collection environment.</strong> Deception.Pro operates instrumented Active Directory honeynets built to be indistinguishable from real corporate estates — in this case roughly 2,500 endpoints and 2,000 users, with AI-generated and randomised personas, organisations and documents supplying the supporting fiction. The decoy in this engagement was a Product Manager at a fictional global travel company. Sensor coverage combined LimaCharlie EDR, Zeek, and Suricata with ETPRO signatures, plus full packet capture and TLS-decrypted command and control. That last capability is what separates this record from network-flow-based reporting: the C2 exchanges were read, not merely counted.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Kill Chain Narrative <small>Visibility was total by design — see Section 05 for why that inverts the usual reading</small></div>
+  </div>
+  <div class="section-body">
+    <div class="killchain">
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">Bait Placement &amp; Operator Discovery</span>
+          <span class="vis-badge vis-detected">DETECTED — BY DESIGN</span>
+        </div>
+        <div class="kc-body">The CTI team installed the trojanized <code>pybitjs-0.1.0</code> package on the decoy workstation and allowed the resulting callback to reach live attacker infrastructure. <strong>Roughly three hours later an operator engaged the host.</strong> That interval is the single most operationally interesting number in this case file: it implies the actor is actively monitoring callbacks from installed packages and triaging them by hand on a short cycle, rather than harvesting output from an automated collection queue at leisure.</div>
+        <div class="kc-pivot">Analytic note: three hours is an engagement time, not a detection time. It measures the adversary's attentiveness, which is rarely measurable at all outside a deception environment.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">27 Aug 14:33 — Loader Execution &amp; Multi-Channel Staging</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">A Node.js loader executed from the malicious package and beaconed to C2 at <code>23.27.13[.]135</code>. Within the same minute, <code>cmd.exe</code> and <code>curl</code> retrieved the follow-on payloads <code>SvcHostUpdate.py</code> and <code>SvcHostUpdate.js</code> from <code>files.catbox[.]moe</code>, while the loader also chained through a raw README on <code>gitlab[.]com</code> as a secondary delivery channel.</div>
+        <div class="kc-pivot">Using a public paste/file host and a raw file in a code-hosting repository as delivery channels places both retrievals inside traffic categories most enterprises permit by default.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">27 Aug 14:33 — Interactive Reboot (First HOK Marker)</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">The operator issued <code>shutdown /r /t 0</code>, forcing an immediate restart. A reboot is a high-risk action for an intruder — it surrenders volatile state and any non-persistent foothold — so issuing one minutes into an intrusion reads as a deliberate human decision, most plausibly to force pending installation or persistence state to take effect.</div>
+        <div class="kc-pivot">This is the earliest unambiguous evidence in the record that a person, not a script, was driving the session.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">27 Aug 15:02 — Credential Access &amp; Stealer Deployment</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">LSASS access was observed, and the XFiles / OmniStealer information stealer was detected on the host. Roughly half an hour separates first execution from credential-theft activity — a compressed, businesslike tempo consistent with an operator working a known playbook rather than exploring an unfamiliar environment.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">27 Aug 17:21 — Collection Staged for Exfiltration</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">A password-protected archive was staged in the Downloads folder. Archiving before exfiltration is routine tradecraft; the password protection additionally defeats content inspection on the way out and complicates DLP matching on the archive body.</div>
+      </div>
+
+      <div class="kc-phase unknown">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">28–29 Aug — Dormancy</span>
+          <span class="vis-badge vis-unknown">NO ACTIVITY OBSERVED</span>
+        </div>
+        <div class="kc-body">No operator activity was recorded for approximately three days. Because the sensors were live and comprehensive throughout, this is a genuine absence rather than a visibility gap — an important distinction that ordinary incident reconstruction almost never gets to make. The reason for the pause is not recoverable from telemetry: a shift rotation, a tasking queue, a deliberate dwell, and simple operator absence are all consistent with the evidence.</div>
+        <div class="kc-pivot">Recorded as UNKNOWN rather than DETECTED because what is known is the absence of activity, not the cause of it.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">30 Aug 14:05 – 14:11 — Return as SYSTEM &amp; Toolchain Build-Out</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">The operator returned and resumed hands-on-keyboard activity <strong>as SYSTEM</strong>. At 14:09 PowerShell downloaded and installed <strong>Python 3.14 machine-wide</strong>; at 14:11 <code>SvcHostUpdate.py --deploy</code> was executed and <code>pip</code> installed <code>requests</code>, <code>pyperclip</code>, <code>mss</code> and <code>Pillow</code>. Those four packages map cleanly onto the stealer's functions: HTTP exfiltration, clipboard theft, screen capture and image handling.</div>
+        <div class="kc-pivot">Installing a language runtime machine-wide is loud, slow and permanent — an operator trading stealth for capability, and a strong indicator of confidence that nobody was watching.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">30 Aug 14:12 — Triple Persistence Under a Microsoft Alias</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">Three persistence mechanisms were planted within the same minute — a scheduled task, a registry Run key, and a Startup-folder launcher — all named <strong>MicrosoftCLROptimization</strong> after a genuine Microsoft .NET runtime optimisation component, with the payload path reaching into a <code>CLR_v4.0\Optimization</code> directory structure to complete the disguise.</div>
+        <div class="kc-pivot">Three redundant mechanisms under one name is a trade-off: it survives the removal of any single mechanism, but it also means one recognised name burns all three at once.</div>
+      </div>
+
+      <div class="kc-phase detected">
+        <div class="kc-phase-header">
+          <span class="kc-phase-name">30 Aug 14:12 → 3 Sep — Exfiltration &amp; Wallet Targeting</span>
+          <span class="vis-badge vis-detected">DETECTED</span>
+        </div>
+        <div class="kc-body">The stealer began POSTing to <code>150.251.113[.]223:8443</code> using rotating browser user agents to blend exfiltration into ordinary web traffic. Separately, traffic to Ethereum RPC endpoints — <code>1rpc[.]io</code>, <code>ethereum-rpc.publicnode[.]com</code> and <code>eth.drpc[.]org</code> — confirmed cryptocurrency wallet interest alongside credential and source-code collection. The operation ran to approximately 167 hours before concluding on 3 September.</div>
+        <div class="kc-pivot">Wallet RPC lookups are the clearest signal of the DPRK revenue motive underneath the developer-targeting lure.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Analyst-derived: the originating report published no explicit ATT&amp;CK mapping</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1195.002</div>
+        <div class="mitre-name">Supply Chain Compromise: Software Supply Chain</div>
+        <div class="mitre-note">[HIGH] Trojanized pybitjs Python package served as the entry vector — deliberately installed here, but the genuine campaign mechanism.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.007</div>
+        <div class="mitre-name">Command and Scripting Interpreter: JavaScript</div>
+        <div class="mitre-note">[HIGH] Node.js loader executed from the package; SvcHostUpdate.js delivered as a follow-on component.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.001</div>
+        <div class="mitre-name">Command and Scripting Interpreter: PowerShell</div>
+        <div class="mitre-note">[HIGH] Used on 30 Aug to download and install Python 3.14 machine-wide before deploying the stealer.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.006</div>
+        <div class="mitre-name">Command and Scripting Interpreter: Python</div>
+        <div class="mitre-note">[HIGH] SvcHostUpdate.py --deploy executed with an argument; pip pulled requests, pyperclip, mss and Pillow as stealer dependencies.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1105</div>
+        <div class="mitre-name">Ingress Tool Transfer</div>
+        <div class="mitre-note">[HIGH] cmd.exe and curl retrieved payloads from files.catbox[.]moe within seconds of first execution.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1102</div>
+        <div class="mitre-name">Web Service</div>
+        <div class="mitre-note">[HIGH] A raw README on gitlab[.]com served as a secondary delivery channel — legitimate developer infrastructure as transport.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1053.005</div>
+        <div class="mitre-name">Scheduled Task/Job: Scheduled Task</div>
+        <div class="mitre-note">[HIGH] "MicrosoftCLROptimization" scheduled task, one of three same-named mechanisms planted at 14:12.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1547.001</div>
+        <div class="mitre-name">Registry Run Keys / Startup Folder</div>
+        <div class="mitre-note">[HIGH] Both a Run key and a Startup-folder VBS launcher, again under the MicrosoftCLROptimization name.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1036.004</div>
+        <div class="mitre-name">Masquerading: Masquerade Task or Service</div>
+        <div class="mitre-note">[HIGH] Impersonated a real Microsoft .NET runtime optimisation component, including a matching CLR_v4.0\Optimization path.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.001</div>
+        <div class="mitre-name">OS Credential Dumping: LSASS Memory</div>
+        <div class="mitre-note">[HIGH] LSASS access observed at 15:02, ~29 minutes after initial execution.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1115 / T1113</div>
+        <div class="mitre-name">Clipboard Data / Screen Capture</div>
+        <div class="mitre-note">[HIGH] Confirmed by both stealer behaviour and the pyperclip / mss dependency installs.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Collection</div>
+        <div class="mitre-id">T1560.001</div>
+        <div class="mitre-name">Archive Collected Data: Archive via Utility</div>
+        <div class="mitre-note">[MEDIUM] Password-protected archive staged in Downloads at 17:21, defeating content inspection on egress.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1041</div>
+        <div class="mitre-name">Exfiltration Over C2 Channel</div>
+        <div class="mitre-note">[HIGH] HTTP POST to 150.251.113[.]223:8443 with rotating browser user agents to blend with normal web traffic.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1657</div>
+        <div class="mitre-name">Financial Theft</div>
+        <div class="mitre-note">[HIGH] Ethereum RPC endpoint traffic (1rpc[.]io, publicnode, drpc) confirms cryptocurrency wallet targeting as an objective.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Defender Post-Mortem <small>Inverted: nothing was missed — so the question becomes what full visibility does and does not buy</small></div>
+  </div>
+  <div class="section-body">
+    <div class="postmortem-grid">
+      <div class="pm-item learned">
+        <div class="pm-phase">ENTIRE CHAIN<br/>OBSERVED</div>
+        <div class="pm-detail">This case file is the <strong>control condition</strong> for every other incident in this library. Defenders held complete endpoint, network and decrypted-C2 telemetry before the adversary arrived, so every phase carries a DETECTED badge. Read the other case files against this one: where they show BLIND phases, the difference is almost never adversary sophistication — it is sensor coverage and retention.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">TLS DECRYPTION<br/>DECISIVE</div>
+        <div class="pm-detail">TLS-decrypted command and control is what separates this record from flow-based reporting. Without it the team would have had connection metadata to <code>150.251.113[.]223:8443</code> and nothing about what crossed the wire. Rotating browser user agents were specifically chosen to survive metadata-level inspection — and they would have.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">PERSISTENCE<br/>WOULD LIKELY SURVIVE ELSEWHERE</div>
+        <div class="pm-detail">The MicrosoftCLROptimization naming was caught here because instrumentation flagged the writes mechanically, not because the name looked wrong. <strong>A human reviewing a scheduled-task list in a real enterprise would very plausibly skip it</strong> — it impersonates a component that genuinely exists, in a path that genuinely exists. The honest finding is that this evasion was neutralised by telemetry, not defeated on its merits.</div>
+      </div>
+      <div class="pm-item partial">
+        <div class="pm-phase">LOUD ACTIONS<br/>ONLY LOUD IF WATCHED</div>
+        <div class="pm-detail">A machine-wide Python 3.14 install, an interactive reboot, and LSASS access inside 30 minutes are all high-signal events. The operator performed them without hesitation, which implies confidence that nobody was looking — a reasonable assumption against most developer endpoints, where these actions are either unmonitored or indistinguishable from normal developer behaviour.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">LIMIT<br/>ATTRIBUTION UNRESOLVED</div>
+        <div class="pm-detail">Total host visibility did not produce operator identity, tasking, or organisational placement. Attribution still rests on tradecraft and tooling overlap with prior PolinRider reporting, at [MEDIUM] confidence. <strong>Deception buys behavioural fidelity, not identity</strong> — a limit worth stating plainly, because the richness of the telemetry invites over-reading.</div>
+      </div>
+      <div class="pm-item">
+        <div class="pm-phase">LIMIT<br/>DORMANCY UNEXPLAINED</div>
+        <div class="pm-detail">The three-day gap is confirmed as a real absence rather than a sensor gap, but its cause is not recoverable. Shift rotation, tasking queue, deliberate dwell and operator absence all fit equally. A single observation cannot establish a pattern; several engagements would be needed to test whether the return interval is structural.</div>
+      </div>
+      <div class="pm-item learned">
+        <div class="pm-phase">TRANSFERABLE<br/>DETECTION SURFACE</div>
+        <div class="pm-detail">The durable output for ordinary enterprises is behavioural, not indicator-based: developer tooling spawning <code>curl</code>/<code>cmd.exe</code>, a language runtime installed machine-wide outside change control, three same-named persistence mechanisms appearing within one minute, and outbound POSTs to a raw IP on a non-standard port. None of these depend on the specific addresses in Section 06 surviving rotation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Technical Artifacts <small>Malware, infrastructure, IOCs</small></div>
+  </div>
+  <div class="section-body">
+    <div class="artifact-list">
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">pybitjs 0.1.0</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Trojanized Package</span>
+            <span class="artifact-tag">PyPI / Supply Chain</span>
+          </div>
+        </div>
+        <div class="artifact-desc">The lure. Distributed as <code>pybitjs-0.1.0-py3-none-any.whl</code>, carrying the Node.js loader that initiated the chain. Notably, broader campaign reporting indicates PolinRider's operators frequently failed to obtain PyPI publishing credentials, making a working malicious PyPI artifact a comparatively scarce campaign asset.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">WinosStager</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Loader</span>
+            <span class="artifact-tag">Node.js</span>
+          </div>
+        </div>
+        <div class="artifact-desc">First-stage loader executing from the trojanized package, beaconing to <code>23.27.13[.]135</code> and pulling follow-on payloads from both a public file host and a raw GitLab README — two independent delivery channels established within the first minute.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">OtterCandy / RATatouille</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">C2 / RAT</span>
+            <span class="artifact-tag">JavaScript</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Command-and-control component delivered as <code>SvcHostUpdate.js</code>. OtterCandy is documented elsewhere in this library as part of the WaterPlum toolset — its appearance here is one of the stronger tooling links between this engagement and the wider Contagious Interview operation.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">XFiles / OmniStealer</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Infostealer</span>
+            <span class="artifact-tag">Python</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Delivered as <code>SvcHostUpdate.py</code> and deployed with a <code>--deploy</code> argument. Capabilities observed: clipboard theft, screen capture, HTTP exfiltration and LSASS credential access. Its Python dependencies (<code>requests</code>, <code>pyperclip</code>, <code>mss</code>, <code>Pillow</code>) map one-to-one onto those functions and are themselves a useful installation-time indicator.</div>
+      </div>
+      <div class="artifact-item">
+        <div class="artifact-header">
+          <span class="artifact-name">MicrosoftCLROptimization (persistence trio)</span>
+          <div class="artifact-tags">
+            <span class="artifact-tag">Persistence</span>
+            <span class="artifact-tag">Masquerading</span>
+          </div>
+        </div>
+        <div class="artifact-desc">Scheduled task, registry Run key, and <code>Startup\MicrosoftCLROptimization.vbs</code> launcher — three mechanisms, one impersonated Microsoft .NET name, planted inside a single minute. A second Startup artifact, <code>clr_init.vbs</code>, was also recorded.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div class="ioc-defang-note">⚠ All IPs and domains below are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+      <div class="ioc-historical-note">⚠ CURRENCY — Indicators are current as of the September 2026 report. Network infrastructure rotates quickly in this campaign; validate before deploying to blocklists, and prefer the behavioural detections in Section 05 for durable coverage.</div>
+      <table class="ioc-table">
+        <thead>
+          <tr><th>Type</th><th>Value / Description</th><th>Source</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="type-label">IP</td><td class="val">23.27.13[.]135 — loader C2 beacon destination</td><td>Deception.Pro</td><td>2026-08-27</td></tr>
+          <tr><td class="type-label">IP</td><td class="val">150.251.113[.]223:8443 — stealer exfiltration endpoint</td><td>Deception.Pro</td><td>2026-08-30</td></tr>
+          <tr><td class="type-label">DOMAIN</td><td class="val">files.catbox[.]moe — payload staging host</td><td>Deception.Pro</td><td>2026-08-27</td></tr>
+          <tr><td class="type-label">URL</td><td class="val">gitlab[.]com/test26330331/test — raw README used as secondary delivery channel</td><td>Deception.Pro</td><td>2026-08-27</td></tr>
+          <tr><td class="type-label">URL</td><td class="val">files.pythonhosted[.]org/.../pybitjs-0.1.0-py3-none-any.whl — trojanized package</td><td>Deception.Pro</td><td>2026-08-27</td></tr>
+          <tr><td class="type-label">DOMAIN</td><td class="val">1rpc[.]io · ethereum-rpc.publicnode[.]com · eth.drpc[.]org — wallet/RPC targeting</td><td>Deception.Pro</td><td>2026-08-30</td></tr>
+          <tr><td class="type-label">FILE</td><td class="val">%TEMP%\SvcHostUpdate.py · %TEMP%\SvcHostUpdate.js</td><td>Deception.Pro</td><td>2026-08-27</td></tr>
+          <tr><td class="type-label">FILE</td><td class="val">Startup\MicrosoftCLROptimization.vbs · Startup\clr_init.vbs</td><td>Deception.Pro</td><td>2026-08-30</td></tr>
+          <tr><td class="type-label">FILE</td><td class="val">systemprofile\...\CLR_v4.0\Optimization\ngen.exe — masqueraded payload path</td><td>Deception.Pro</td><td>2026-08-30</td></tr>
+          <tr><td class="type-label">REGISTRY</td><td class="val">Run key "MicrosoftCLROptimization"; Scheduled Task "MicrosoftCLROptimization"</td><td>Deception.Pro</td><td>2026-08-30</td></tr>
+          <tr><td class="type-label">HASH</td><td class="val">75ad8365fce771294258a792fcd6b92be499714626aba0960aa1c1746e8672fd (97icr5.py)</td><td>Deception.Pro</td><td>2026-09</td></tr>
+          <tr><td class="type-label">HASH</td><td class="val">7c4029b7f1383e25fb1b1ed10292e0bbe024952df2772c1d14f3bfee6ab29984 (s5w2f0.js)</td><td>Deception.Pro</td><td>2026-09</td></tr>
+          <tr><td class="type-label">HASH</td><td class="val">d4688428d0e99fd4f0320d14fdd6ed46445e775b25779cdea8790e6804426ac6 (README.md delivery stage)</td><td>Deception.Pro</td><td>2026-09</td></tr>
+          <tr><td class="type-label">HASH</td><td class="val">c197268f7e7cf2848b8c1ae59bbd0e0c14defe668a2d365302137ea929b47769 (ngen.exe)</td><td>Deception.Pro</td><td>2026-09</td></tr>
+          <tr><td class="type-label">HASH</td><td class="val">bc866cfcdda37e24dc2634dc282c7a0e6f55209da17a8fa105b07414c0e7c527 (schtasks child loader)</td><td>Deception.Pro</td><td>2026-09</td></tr>
+          <tr><td class="type-label">SIGNATURE</td><td class="val">ETPRO MALWARE Nodster CnC Activity · ET MALWARE RATatouille rand-user-agent Supply Chain Compromise · ET HUNTING Suspicious POST (Windows folder reference) · ETPRO INFO Ethereum RPC Endpoint Domain · ET INFO Windows PowerShell User-Agent Usage</td><td>Deception.Pro (Suricata/ETPRO)</td><td>2026-09</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Consequences <small>Strategic · Technical · Legal/Regulatory</small></div>
+  </div>
+  <div class="section-body">
+    <div class="consequence-grid">
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Strategic / Intelligence</div>
+        <div class="consequence-body">The consequences here run in the defenders' favour, which is the point. The engagement produced first-party behavioural intelligence on an active DPRK campaign — engagement tempo, hands-on-keyboard markers, persistence naming convention and live infrastructure — at the cost of one decoy workstation. It also produced a rare measurable data point on adversary attentiveness: <strong>three hours from install to human engagement</strong>, which is not obtainable from post-hoc forensics at all.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Technical / Capability</div>
+        <div class="consequence-body">Full tradecraft capture across the chain, including TLS-decrypted C2 content that flow-level monitoring would have missed entirely. The behavioural detection surface in Section 05 transfers directly to production environments, and the Suricata/ETPRO signatures that fired provide immediately deployable network coverage. <strong>No capability was lost</strong> — the adversary spent tooling and live infrastructure against a target that never held anything real.</div>
+      </div>
+      <div class="consequence-panel">
+        <div class="consequence-label">⬡ Legal / Regulatory</div>
+        <div class="consequence-body consequence-na">Not applicable — no real organisation, users, or regulated data were involved at any point. No breach notification obligation, no regulatory exposure, and no third-party harm arose from this engagement. The decoy persona, company and documents were synthetic by construction.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="attr-confidence attr-medium">ATTRIBUTION CONFIDENCE: MEDIUM — as stated by the originating researchers</div>
+    <div class="two-col">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Attributed To</span><span class="kv-val gold">PolinRider campaign — DPRK-linked</span></div>
+        <div class="kv-row"><span class="kv-key">Parent Cluster</span><span class="kv-val red">Famous Chollima / Contagious Interview (MITRE G1052)</span></div>
+        <div class="kv-row"><span class="kv-key">Sponsor</span><span class="kv-val red">DPRK — 313 General Bureau, Munitions Industry Dept. (per Sep 2026 joint advisory on the parent cluster)</span></div>
+        <div class="kv-row"><span class="kv-key">Claimed Overlap</span><span class="kv-val">APT37 / Reaper / ScarCruft — reported by third parties, not established here</span></div>
+        <div class="kv-row"><span class="kv-key">Companion Actor Card</span><span class="kv-val blue">output/actors/2026-09-18_WATERPLUM.html</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Primary Evidence</span><span class="kv-val">Tooling overlap (OtterCandy/RATatouille, OmniStealer), supply-chain lure model, wallet RPC targeting, infrastructure consistency with prior Socket reporting</span></div>
+        <div class="kv-row"><span class="kv-key">Operator Count</span><span class="kv-val">Single operator assessed to have driven the full chain</span></div>
+        <div class="kv-row"><span class="kv-key">Competing Hypotheses</span><span class="kv-val">Shared/sold tooling by a non-DPRK actor; an affiliate operating campaign tooling outside direct DPRK tasking</span></div>
+        <div class="kv-row"><span class="kv-key">What Would Change It</span><span class="kv-val">Operator identity or tasking evidence; infrastructure overlap with government-attributed DPRK indicators</span></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="prose">
+        <p>Attribution rests on tradecraft and tooling consistency rather than on anything the telemetry uniquely revealed about the operator. The lure model (trojanized developer package delivered through a supply-chain vector), the malware families (OtterCandy/RATatouille for C2, OmniStealer for collection), the wallet-RPC targeting, and infrastructure continuity with previously published PolinRider reporting all point the same direction. That is a reasonable [MEDIUM] — and the originating researchers' own stated confidence, which this card carries forward rather than inflating.</p>
+        <p><strong>Worth stating plainly: total host visibility did not improve attribution.</strong> The instrumentation resolved <em>what the operator did</em> to a granularity almost no incident report achieves, and resolved <em>who the operator was</em> not at all. Deception environments yield behavioural fidelity; identity still requires the things it always required — infrastructure overlap with known-attributed indicators, operational security failures, or law-enforcement access. The volume of detail in this case file should not be mistaken for attributional strength.</p>
+        <p><strong>Open item for the companion actor card.</strong> Several third-party sources covering PolinRider describe an overlap between Famous Chollima and APT37 (Reaper/ScarCruft). This project's WaterPlum card does not currently reflect that claim, and this card does not adopt it — APT37 is conventionally attributed to the Ministry of State Security lineage rather than the 313 General Bureau named in the September 2026 joint advisory, so the two claims are not trivially compatible. Reconciling them is flagged as a refresh candidate rather than resolved here.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Historical Significance</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>This case file's significance is methodological rather than consequential. Nobody was harmed, nothing was lost, and the malware was already documented. What is unusual is the <em>evidentiary basis</em>: a complete intrusion recorded by defenders who instrumented the environment before the adversary arrived, including decrypted command and control. Nearly every other case file in this library — Cyclops Blink, NotPetya, Colonial Pipeline — was reconstructed backwards from artifacts that survived, with the gaps filled by inference. This one was recorded forwards.</p>
+      <p>That inversion is worth preserving deliberately, because it supplies a baseline the other case files can be measured against. When a case file shows BLIND phases, this one demonstrates that the blindness was usually a property of the sensor coverage rather than of the adversary's skill. The PolinRider operator here was not notably stealthy — a machine-wide runtime install, an interactive reboot, LSASS access within half an hour, and three persistence mechanisms in one minute are all loud. They go unnoticed in ordinary environments because nothing is listening at that granularity, not because they are subtle.</p>
+      <p>The engagement also produces a genuinely novel class of metric. "Three hours from bait to hands-on-keyboard" measures the <strong>adversary's</strong> responsiveness, not the defender's — and it implies an operator actively working a queue of fresh installs rather than batch-processing stolen output later. Dwell time, the metric the industry actually tracks, describes how long defenders took to notice. Engagement time describes how much the adversary cares. Only deception environments can produce it, and it is the kind of number that should shape how urgently a developer who ran an untrusted package is treated: not "we have days," but "someone may already be typing."</p>
+      <p>Finally, a note on the intelligence supply chain itself. This card is a synthesis of a first-party report — our sourcing is one step removed from the sensors, and that degrades what we can claim. The originating researchers watched the operator work; we read their account of it. That distinction is invisible in most finished intelligence, which is precisely why it is worth writing down.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Deception.Pro</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.deception.pro/blog/hok-dprk-polinrider-sep-2026" target="_blank">[Op Report] Hands-on-Keyboard Activity from the DPRK "PolinRider" Supply Chain Attack</a></div>
+          <div class="ref-date">Primary source — first-party honeynet telemetry · Accessed: 2026-09-19</div>
+          <div class="ref-contemporary">ORIGINATING REPORT — all timeline entries, IOCs and hashes in this card derive from it</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Socket</div>
+        <div>
+          <div class="ref-detail"><a href="https://socket.dev/blog/polinrider-north-korea-linked-supply-chain-campaign-expands" target="_blank">PolinRider: North Korea-Linked Supply Chain Campaign Expands Across Open Source Ecosystems</a></div>
+          <div class="ref-date">Campaign scale and delivery tradecraft · Accessed: 2026-09-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SOC Prime</div>
+        <div>
+          <div class="ref-detail"><a href="https://socprime.com/active-threats/dprk-polinrider-campaign-shows-hands-on-keyboard-supply-chain-activity/" target="_blank">DPRK PolinRider Campaign Shows Hands-on-Keyboard Supply Chain Activity</a></div>
+          <div class="ref-date">Independent coverage of the same op report · Accessed: 2026-09-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">OpenSourceMalware</div>
+        <div>
+          <div class="ref-detail"><a href="https://opensourcemalware.com/blog/polinrider-blast-radius-grows" target="_blank">PolinRider Confirmed Footprint Grows 6.5x Since March</a></div>
+          <div class="ref-date">Repository-compromise scale figures · Accessed: 2026-09-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">OpenSourceMalware</div>
+        <div>
+          <div class="ref-detail"><a href="https://opensourcemalware.com/blog/polinrider-jumps-the-fence" target="_blank">PolinRider Jumps the Fence to Go, Packagist, npm, PyPI</a></div>
+          <div class="ref-date">Ecosystem expansion and PyPI credential context · Accessed: 2026-09-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G1052/" target="_blank">Group G1052 — Contagious Interview</a></div>
+          <div class="ref-date">Parent cluster technique and software mapping · Accessed: 2026-09-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">FBI / NPA et al.</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ic3.gov/CSA/2026/260918.pdf" target="_blank">Joint Advisory: North Korean "WaterPlum," commonly referred to as "Contagious Interview"</a></div>
+          <div class="ref-date">Parent-cluster state attribution (313 General Bureau) · Accessed: 2026-09-19</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">This Repository</div>
+        <div>
+          <div class="ref-detail">Companion actor card: <code>output/actors/2026-09-18_WATERPLUM.html</code> — full profile of the parent cluster, its malware families and government attribution</div>
+          <div class="ref-date">Internal cross-reference · 2026-09-18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// CYBER INCIDENT CASE FILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-19 · 8 sources, all open-source/public</div>
+  <div>Honeynet engagement — no real victim · Observed 2026-08-27 → 2026-09-03 · Parent actor: WaterPlum (G1052)</div>
+</div>
+
+</body>
+</html>
