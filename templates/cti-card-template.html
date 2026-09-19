@@ -286,6 +286,11 @@
   .cm-text strong { color: var(--text); font-weight: 500; }
   .cm-ttp  { font-family: var(--mono); font-size: 13.5px; color: var(--accent4); margin-top: 3px; }
 
+  /* Detection query blocks — Section 09 */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 14.5px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
   /* ── REFERENCES ── */
   .ref-list { display: flex; flex-direction: column; gap: 6px; }
   .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 15px; }
@@ -928,6 +933,27 @@
       </div>
     </div>
     <!-- Add additional cm-item blocks beyond 06 as needed -->
+
+    <!-- ── DETECTION CONTENT ──
+         Ship at least one runnable detection per card wherever source material supports it —
+         Suricata/Snort, Sigma, EDR or SIEM queries are all acceptable. Label every block with
+         its log source. Two hard rules:
+           1. A query you constructed yourself must be labelled "(illustrative)" — never present
+              a self-authored query as vendor-published or source-documented.
+           2. If no published detection content exists for this actor, say so explicitly in a
+              prose line instead of inventing rules to fill the space.
+         Omit this whole block if the actor has no detection content worth carrying. -->
+    <div style="margin-top: 18px;">
+      <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Detection Content</div>
+      <div class="query-block">
+        <div class="query-label">{{QUERY_1_LABEL}} · {{LOG_SOURCE_1}}</div>
+        <div class="query-code">{{QUERY_1_CONTENT}}</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">{{QUERY_2_LABEL}} · {{LOG_SOURCE_2}}</div>
+        <div class="query-code">{{QUERY_2_CONTENT}}</div>
+      </div>
+    </div>
   </div>
 </div>
 
