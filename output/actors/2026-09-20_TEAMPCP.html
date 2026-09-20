@@ -293,6 +293,37 @@
   .ref-detail a:hover { text-decoration: underline; }
   .ref-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); margin-top: 2px; }
 
+  /* Detection query blocks — Section 09 */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 14.5px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* ── OPSEC / EVASION ── */
+  .opsec-list, .evasion-list { display: flex; flex-direction: column; gap: 10px; }
+  .opsec-item, .evasion-item { background: var(--bg3); border: 1px solid var(--border); padding: 12px 16px; }
+  .opsec-header, .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 13.5px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .opsec-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+
+  .evasion-technique { font-family: var(--mono); font-size: 14.5px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 13.5px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .evasion-tag.edr { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem { border-color: rgba(245,197,66,0.3); color: var(--accent3); }
+  .evasion-tag.network { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-detail { font-family: var(--mono); font-size: 14px; color: var(--text); background: var(--bg4); border: 1px solid var(--border); padding: 8px 10px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+  /* ── CTID BLOCK ── */
+  .ctid-block { background: var(--bg3); border: 1px solid var(--border); border-left: 3px solid var(--text-dim); padding: 16px 20px; }
+  .ctid-block:not(.not-available) { border-left-color: var(--accent); }
+  .ctid-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 2px 8px; letter-spacing: 0.06em; }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+
   /* ── FOOTER ── */
   .footer {
     margin-top: 14px;
@@ -410,8 +441,9 @@
   <div class="header-meta">// Threat Actor Profile — Cloud-Native Software Supply Chain Compromise &amp; Ransomware-Enabled Extortion</div>
   <h1><span class="accent">TEAM</span>PCP</h1>
   <div class="header-sub">
-    PROFILE COMPILED: 2026-08-30 &nbsp;|&nbsp;
-    SOURCES: Unit 42, Wiz, KELA, Bitsight, Malpedia, Krebs on Security, U.S. DOJ, FBI/IC3, TechCrunch, BleepingComputer, The Record, SOCRadar, Sophos, SANS ISC + 6 more (see §10)
+    PROFILE COMPILED: 2026-09-20 &nbsp;|&nbsp;
+    PREVIOUSLY COMPILED: 2026-08-30 &nbsp;|&nbsp;
+    SOURCES: Unit 42, Wiz, KELA, Bitsight, Flare, Expel, StepSecurity, Snyk, Akamai, Microsoft, Malpedia, Krebs on Security, U.S. DOJ, FBI/IC3, TechCrunch, BleepingComputer, The Record, SOCRadar, Sophos, SANS ISC + 6 more (see §13)
   </div>
   <div class="classification-bar">
     <div>Status: <span class="danger">ACTIVE — PARTIALLY DISRUPTED</span></div>
@@ -424,9 +456,9 @@
 
 <!-- ═══════════════════════════════ ALERT BANNER ══ -->
 <div class="alert-banner">
-  <div class="alert-label">⚡ AFP / FBI JOINT ACTION — 2026-08-27</div>
-  <div class="alert-headline">Two Alleged TeamPCP Operators Arrested and Federally Indicted in Australia</div>
-  <div class="alert-body">On August 27, 2026, the Australian Federal Police and Western Australia Police Force — supported by the FBI — executed search warrants in Cottesloe, Hamilton Hill, and Mandurah, WA, and arrested Ruben Ian Thomson (21, AU/ZA national) and Louis Michael Gaebler (23) on a combined 14 cybercrime charges (TechCrunch, Aug 27 2026; Krebs on Security, Aug 2026). A parallel U.S. federal indictment out of the Northern District of California charges Thomson with conspiracy to violate the Computer Fraud and Abuse Act (DOJ USAO-NDCA, Aug 2026). Both remain in custody pending a September 18, 2026 court appearance. Analysts caution this action addresses only a subset of a larger, Telegram-coordinated crew — active CipherForce/Vect extortion operations are not confirmed halted.</div>
+  <div class="alert-label">⚡ DEANONYMIZATION METHODOLOGY PUBLISHED — SEP 2026</div>
+  <div class="alert-headline">Flare Publishes the OSINT Chain That Unmasked an Alleged TeamPCP Operator</div>
+  <div class="alert-body">Following the August 27, 2026 arrests of Ruben Ian Thomson (21, AU/ZA national) and Louis Michael Gaebler (23) by the AFP and Western Australia Police Force with FBI support — 14 combined cybercrime charges, plus a parallel CFAA conspiracy indictment against Thomson from the U.S. Northern District of California — Flare's Emerging Threats Team published the full deanonymization chain behind the identification, amplified in a widely-viewed John Hammond video ("GitHub Hacker EXPOSED BY HIS CAT"). The chain ran from a single reused handle, <em>DeadCatx3</em>, through HackerOne, Hugging Face, a leaked-password-linked Gmail, TikTok and finally a decade-old Steam profile whose distinctive cat avatar appeared on the TeamPCP Telegram channel. It is a rare public walkthrough of operator-level OPSEC failure, and it materially strengthens the persona-to-defendant mapping this card previously flagged as its own upgrade trigger (see §01, §08, §10).</div>
 </div>
 
 <!-- ═══════════════════════════════════ STAT GRID ══ -->
@@ -440,8 +472,8 @@
     <div class="stat-label">Organizations Compromised via LiteLLM Alone</div>
   </div>
   <div class="stat-cell">
-    <div class="stat-val blue">10.0</div>
-    <div class="stat-label">CVSS — CVE-2025-55182 "React2Shell" Exploited for Access</div>
+    <div class="stat-val blue">170+</div>
+    <div class="stat-label">npm/PyPI Packages Poisoned in One Day — Mini Shai-Hulud, May 2026</div>
   </div>
   <div class="stat-cell">
     <div class="stat-val">3,800+</div>
@@ -461,6 +493,8 @@
       <p>TeamPCP matters right now because its trajectory illustrates where financially motivated cybercrime is heading: from a Telegram-based stolen-data brokerage in mid-2025 into a full-spectrum initial-access-broker-plus-ransomware operation. The group's March 2026 compromise of Aqua Security's Trivy, Checkmarx's KICS, and BerriAI's LiteLLM — an AI gateway with over 95 million monthly downloads — rippled outward to breach the European Commission's AWS environment (roughly 500,000 credentials and 300+ GB exfiltrated, per CERT-EU/The Record, 2026) and to touch automotive manufacturers including BMW, Audi, Honda, Mercedes-Benz, Volvo, and Toyota through their software supply chains (TechCrunch, Aug 2026).</p>
       <p>Within the current eCrime landscape, TeamPCP sits at the convergence point of two trends analysts have flagged as accelerating through 2026: supply-chain compromise as a scalable initial-access vector, and the blurring line between access brokers and ransomware operators. Since a formal partnership announced in late March 2026, TeamPCP supplies stolen cloud and CI/CD access to the Vect ransomware operation for encryption and extortion, while simultaneously running its own CipherForce extortion brand for direct operations — a dual-track monetization model that maximizes return on every compromised credential (Sophos, 2026; Hard2Bit, 2026).</p>
       <p>The critical operational context as of this compile date is the August 27, 2026 arrest of two alleged members in Western Australia and a parallel U.S. federal indictment (DOJ, N.D. Cal.) — a meaningful law-enforcement milestone, but one researchers assess as only partial disruption. TeamPCP is widely characterized as a loose confederation drawing from multiple cybercriminal circles rather than a single hierarchical cell (BleepingComputer, Aug 2026), and its decentralized, blockchain-backed C2 infrastructure was explicitly engineered for resilience against takedown.</p>
+      <p><strong>Two developments since the previous compile materially change the picture.</strong> First, the group did not stop after March: on May 11, 2026 it launched <em>Mini Shai-Hulud</em>, a genuinely self-propagating cross-ecosystem worm that poisoned over 170 npm and PyPI packages in a single coordinated push — including the TanStack, Mistral AI and OpenSearch ecosystems — by stealing an OIDC token from a CI runner and exchanging it for publish rights to an entire namespace (Expel; StepSecurity; Phoenix Security, May 2026). That campaign escalates TeamPCP from "compromises packages" to "operates a worm," and its credential stealer reached beyond cloud keys into HashiCorp Vault tokens and Kubernetes secrets while injecting persistence hooks into developer tooling including VS Code and Claude Code.</p>
+      <p>Second, Flare's Emerging Threats Team published the OSINT chain that identified an alleged operator — a rare, fully documented walkthrough of how reused identity artifacts across a decade collapsed an operator's separation between criminal persona and real life. That material is captured in §10 (OPSEC Procedures) as observed OPSEC failure, and it raises this card's confidence on group structure from the [MEDIUM] the previous compile assigned.</p>
     </div>
   </div>
 </div>
@@ -480,9 +514,9 @@
           <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Cloud-native eCrime / Initial Access Broker + Ransomware Operator</span></div>
           <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Financial gain — credential monetization, extortion, ransomware-as-a-service partnerships</span></div>
           <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">Mid-2025 (Telegram stolen-data brokerage); operationally visible as a supply-chain actor late 2025</span></div>
-          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Aug 2026 (active dual-track CipherForce/Vect extortion at time of arrests)</span></div>
-          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">Not assigned — emerging actor, not yet catalogued in ATT&amp;CK Groups as of 2026-08-30</span></div>
-          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">INDICTED — 2 alleged members charged &amp; in custody (AU), federal CFAA conspiracy indictment (DOJ, N.D. Cal.), as of 2026-08-27; additional members assessed at large</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">Aug 2026 (active dual-track CipherForce/Vect extortion at time of arrests); last confirmed campaign May 2026 (Mini Shai-Hulud)</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">Not assigned — re-verified against ATT&amp;CK Groups index 2026-09-20; still uncatalogued</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">INDICTED — 2 alleged members charged &amp; in custody (AU), federal CFAA conspiracy indictment (DOJ, N.D. Cal.), as of 2026-08-27; additional members assessed at large. A September 18, 2026 court appearance was scheduled; its outcome was not established in this research pass</span></div>
         </div>
       </div>
       <div>
@@ -494,12 +528,16 @@
           <span class="alias-chip">PCPcat</span>
           <span class="alias-chip">ShellForce</span>
           <span class="alias-chip">DeadCatx3</span>
-          <span class="alias-chip">PersyPCP</span>
+          <span class="alias-chip">PersyPCP / Persy_PCP</span>
+          <span class="alias-chip">PCPsh / PCP.sh (Telegram)</span>
+          <span class="alias-chip">DMT / BulkDMT</span>
+          <span class="alias-chip">Mini Shai-Hulud (campaign)</span>
         </div>
         <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
           <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
           <div class="prose">
-            <p><strong>[HIGH]</strong> that the "TeamPCP" brand/cluster is responsible for the March–August 2026 supply-chain campaign: independently corroborated by Wiz, Unit 42, KELA (as UNC6780), Bitsight, and CrowdStrike (as Altered Spider) via consistent C2 infrastructure, malware, and TTPs, and reinforced by the August 2026 criminal indictment. <strong>[MEDIUM]</strong> on precise group structure and full membership — researchers describe TeamPCP as an amalgamation of individuals from multiple cybercriminal circles rather than one hierarchical group (BleepingComputer, Aug 2026); the two Telegram admin personas identified ("DMT"/BulkDMT and PersyPCP, ages ~20–21) are consistent with, but not conclusively matched to, the ages of the two individuals arrested (21 and 23). This would be upgraded to [HIGH] on structure with confirmed persona-to-defendant mapping from unsealed court filings.</p>
+            <p><strong>[HIGH]</strong> that the "TeamPCP" brand/cluster is responsible for the March–August 2026 supply-chain campaign: independently corroborated by Wiz, Unit 42, KELA (as UNC6780), Bitsight, and CrowdStrike (as Altered Spider) via consistent C2 infrastructure, malware, and TTPs, and reinforced by the August 2026 criminal indictment. <strong>[MEDIUM]</strong> on precise group structure and full membership — researchers describe TeamPCP as an amalgamation of individuals from multiple cybercriminal circles rather than one hierarchical group (BleepingComputer, Aug 2026); the two Telegram admin personas identified ("DMT"/BulkDMT and PersyPCP, ages ~20–21) are consistent with, but not conclusively matched to, the ages of the two individuals arrested (21 and 23).</p>
+            <p><strong>Updated 2026-09-20 — persona-to-individual linkage now [HIGH] for one operator.</strong> Flare's published OSINT chain connects the <em>DeadCatx3</em> handle to Ruben Thomson by name via a HackerOne profile, to the domain <code>masscan[.]cloud</code> via a Hugging Face account, and — through a leaked-password-linked Gmail and a TikTok account — to a Steam profile whose distinctive cat avatar reappears on the TeamPCP Telegram channel. That is multi-platform, independently-checkable corroboration rather than circumstantial overlap. Note the precise scope of the upgrade: it establishes <em>one persona ↔ one named individual</em>, not the group's full membership or hierarchy, which remain [MEDIUM]. Court filings are still the evidence that would settle structure.</p>
           </div>
         </div>
       </div>
@@ -564,11 +602,27 @@
         </div>
       </div>
       <div class="timeline-item">
+        <div class="timeline-date">MAY 11, 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Mini Shai-Hulud — Self-Propagating Cross-Ecosystem Worm</div>
+          <div class="timeline-desc">TeamPCP launches a coordinated worm campaign poisoning 170+ npm and PyPI packages in a single push, hitting the TanStack, Mistral AI and OpenSearch ecosystems. Entry was an orphaned commit in a TanStack CI workflow that still carried OIDC trust federation with npm: the worm extracted an OIDC token from the runner process and exchanged it for publish access across the whole namespace. Its stealer targets AWS IAM keys, GitHub PATs, HashiCorp Vault tokens and Kubernetes secrets, and injects persistence hooks into VS Code and Claude Code so it survives reboots. C2: <code>api.masscan[.]cloud</code> and <code>filev2.getsession[.]org</code>; tracked as CVE-2026-45321 (Expel; StepSecurity; Tenable; Phoenix Security, May 2026). A follow-on wave via a compromised AntV maintainer account published 300+ further malicious npm packages (Snyk).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
         <div class="timeline-date">AUG 27, 2026</div>
         <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
         <div class="timeline-content">
           <div class="timeline-phase">Arrests &amp; Federal Indictment</div>
           <div class="timeline-desc">AFP and Western Australia Police Force, supported by the FBI, arrest Ruben Ian Thomson (21) and Louis Michael Gaebler (23) in Perth on 14 combined charges; the DOJ (N.D. Cal.) unseals a federal indictment charging Thomson with CFAA conspiracy (Krebs on Security, TechCrunch, DOJ USAO-NDCA, Aug 2026).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">SEP 2026</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Deanonymization Methodology Published</div>
+          <div class="timeline-desc">Flare's Emerging Threats Team publishes the full OSINT chain behind the operator identification — DeadCatx3 → HackerOne → Hugging Face → leaked-password-linked Gmail → TikTok → Steam avatar → TeamPCP Telegram — subsequently amplified by a John Hammond video. The publication converts what had been an unexplained arrest into a reproducible attribution methodology, and supplies the OPSEC-failure detail recorded in §10 (Flare, Sep 2026).</div>
         </div>
       </div>
     </div>
@@ -759,6 +813,13 @@
         </div>
         <div class="tool-desc">Self-propagating module that spreads laterally across the npm and PyPI package ecosystems. Its distinguishing architecture element is use of a decentralized Internet Computer Protocol (ICP) blockchain "canister" (tdtqy-oyaaa-aaaae-af2dq-cai.raw.icp0[.]io) as a tamper-proof C2 dead drop, making primary infrastructure resistant to conventional domain/IP takedown.</div>
       </div>
+      <div class="tool-item red">
+        <div class="tool-header">
+          <span class="tool-name">MINI SHAI-HULUD</span>
+          <span class="tool-tag">SELF-PROPAGATING WORM · CUSTOM · Expel / StepSecurity</span>
+        </div>
+        <div class="tool-desc">Cross-ecosystem npm/PyPI worm deployed 2026-05-11, named for the sandworms of Frank Herbert's <em>Dune</em> — part of a consistent Dune-themed naming convention across the group's infrastructure. Propagates by hijacking GitHub Actions workflows to forge valid publish tokens, notably by extracting OIDC tokens from CI runner processes where trust federation with npm remains configured. Its stealer reaches beyond cloud keys into HashiCorp Vault tokens and Kubernetes secrets, and it injects persistence hooks into developer tooling — VS Code and Claude Code — so that compromise survives reboot and follows the developer rather than the machine. C2 via <code>api.masscan[.]cloud</code> and <code>filev2.getsession[.]org</code>. The May wave alone reached 170+ packages; a later AntV maintainer compromise added 300+ more.</div>
+      </div>
       <div class="tool-item amber">
         <div class="tool-header">
           <span class="tool-name">KUBE.PY</span>
@@ -798,7 +859,7 @@
     <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
   </div>
   <div class="section-body">
-    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 10 are NOT defanged.</div>
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
     <table class="ioc-table">
       <thead>
         <tr>
@@ -830,6 +891,13 @@
         <tr><td class="type-label">CVE</td><td class="val">CVE-2025-55182 ("React2Shell") — unauthenticated RCE in React Server Components, CVSS 10.0/9.3, exploited for initial access</td><td>Zscaler ThreatLabz</td><td>Disclosed 2025-12-03</td></tr>
         <tr><td class="type-label">PROTOCOL</td><td class="val">Branch name pattern dev_remote_ea5Eu/test/v1 (Nord Stream tool default) left in poisoned workflows</td><td>Wiz</td><td>2026-03</td></tr>
         <tr><td class="type-label">MESSAGE</td><td class="val">User-agent indicators: git/2.43.0 (outdated), Boto3/1.42.73 with Kali Linux default signatures</td><td>Wiz</td><td>2026-03</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">masscan[.]cloud — operator-linked domain; surfaced via a Hugging Face profile tied to the DeadCatx3 handle, later reused as Mini Shai-Hulud C2 infrastructure</td><td>Flare</td><td>2026-09</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">api.masscan[.]cloud — Mini Shai-Hulud worm C2</td><td>Expel / StepSecurity</td><td>2026-05</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">filev2.getsession[.]org — Mini Shai-Hulud exfiltration endpoint</td><td>Expel / StepSecurity</td><td>2026-05</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2026-45321 — Mini Shai-Hulud supply chain attack identifier</td><td>Tenable</td><td>2026-05</td></tr>
+        <tr><td class="type-label">CVE</td><td class="val">CVE-2026-33634 — exploited to overwrite Trivy's automated workflow versions</td><td>CSA Labs</td><td>2026-03</td></tr>
+        <tr><td class="type-label">BEHAVIORAL</td><td class="val">Unexpected npm/PyPI publish events from CI, especially where an orphaned workflow retains OIDC trust federation with a package registry</td><td>Expel / StepSecurity</td><td>2026-05</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">Persistence hooks written into VS Code and Claude Code configuration — developer-tooling persistence that follows the user, not the host</td><td>StepSecurity / Phoenix Security</td><td>2026-05</td></tr>
         <tr><td class="type-label">NOTE</td><td class="val">24 malicious file SHA256 hashes catalogued by Unit 42 (Apr 2026); values not reproduced in this table — consult source report directly for hash-based detection.</td><td>Unit 42</td><td>2026-08-30 (accessed)</td></tr>
       </tbody>
     </table>
@@ -846,10 +914,10 @@
     <div class="two-col" style="margin-bottom: 18px;">
       <div class="kv">
         <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">CRITICAL</span></div>
-        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (campaign/brand) · MEDIUM (full structure)</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">HIGH (campaign/brand) · HIGH (one persona ↔ named individual, as of Sep 2026) · MEDIUM (full structure)</span></div>
         <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Degrading but not neutralized — 2 members charged; core admin infrastructure and broader confederation likely persist</span></div>
-        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Cascading software supply-chain compromise — single dependency access → thousands of downstream victims</span></div>
-        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Full membership roster/hierarchy; disputed secondary victim claims (Databricks, AstraZeneca)</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Self-propagating cross-ecosystem worming (Mini Shai-Hulud) — escalates cascading compromise from manual poisoning to autonomous spread</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">Full membership roster/hierarchy; whether May 2026 worm activity continued post-arrest; disputed secondary victim claims (Databricks, AstraZeneca)</span></div>
       </div>
       <div>
         <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Groups</div>
@@ -866,6 +934,7 @@
       <p>TeamPCP represents the industrialization of software supply-chain compromise as a criminal business model rather than a technical leap forward. Every individual technique observed — RCE exploitation, PAT theft, typosquatting, package-lifecycle-hook abuse — is well-precedented; what sets the group apart is disciplined reuse of these techniques chained across five ecosystems (GitHub Actions, Docker Hub, PyPI, npm, OpenVSX) within a single multi-week campaign window, and a monetization structure (dual CipherForce/Vect tracks) built to extract value from every credential harvested, whether or not a given victim is worth a bespoke ransomware deployment.</p>
       <p>The group's most dangerous capability is blast radius, not sophistication. The LiteLLM compromise alone touched a package with over 95 million monthly downloads; a single stolen maintainer credential compounded into confirmed or claimed impact against 2,500+ organizations, an EU institution, and multiple automotive OEMs. This dynamic — narrow initial access, broad downstream consequence — is structurally difficult for individual victim organizations to defend against, since the compromise arrives through a trusted update channel rather than a perimeter they control.</p>
       <p>Attribution to the TeamPCP brand for the core March–August 2026 campaign is [HIGH] confidence, cross-corroborated by independent vendor telemetry (Wiz, Unit 42, KELA/UNC6780, CrowdStrike/Altered Spider) and now reinforced by criminal charges. Confidence on the group's internal structure remains [MEDIUM]: multiple outlets describe TeamPCP as a loose confederation of individuals drawn from several existing cybercriminal circles rather than a single hierarchical cell, which is consistent with an arrest netting only two individuals against a campaign of this scale. A competing hypothesis worth flagging explicitly: some claimed victims (Databricks, and possibly AstraZeneca — separately linked by some researchers to LAPSUS$) may reflect opportunistic claim-jacking on leak forums rather than confirmed TeamPCP operations, and should not be treated as confirmed without independent forensic corroboration. This assessment would move to [HIGH] on structure if unsealed court filings conclusively map the "DMT"/PersyPCP Telegram personas to the named defendants.</p>
+      <p><strong>Updated 2026-09-20 — two revisions to the assessment above.</strong> First, "blast radius, not sophistication" now understates the capability. The May 2026 Mini Shai-Hulud campaign was genuinely self-propagating: it forged its own publish tokens by extracting OIDC credentials from CI runners and spread without operator intervention, which is a materially different threat model from the March campaign's hands-on package poisoning. Injecting persistence into VS Code and Claude Code is the sharper development — it attaches compromise to the <em>developer</em> rather than the host, and survives the rebuild that would normally close out an incident. Second, the persona-to-individual gap this card previously flagged has substantially closed for one operator via Flare's published OSINT chain, though full group structure remains [MEDIUM] and the disputed Databricks/AstraZeneca claims are unchanged.</p>
       <p>Forward risk trajectory: the August 2026 arrests are unlikely to fully neutralize the group given its loose, multi-member structure and infrastructure explicitly engineered for resilience — a decentralized ICP blockchain C2 channel and GitHub-repository fallback dead drops are both designed to survive conventional takedown. Expect continued targeting of security and DevSecOps tooling as a high-leverage vector (compromising the tools defenders trust is more efficient than defeating them), and continued Vect/BreachForums-affiliate monetization even if the CipherForce-specific operators identified in this action go dark.</p>
     </div>
   </div>
@@ -940,6 +1009,49 @@
         </div>
       </div>
     </div>
+
+    <!-- ── DETECTION CONTENT ── -->
+    <div style="margin-top: 18px;">
+      <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Detection Content</div>
+      <div class="query-block">
+        <div class="query-label">Mini Shai-Hulud C2 egress from build infrastructure (illustrative) · CI/CD proxy or DNS logs</div>
+        <div class="query-code">// Built from published IOCs (Expel / StepSecurity, May 2026) — query itself is analyst-authored
+source=proxy OR source=dns
+| where dest_domain IN ("api.masscan.cloud", "masscan.cloud", "filev2.getsession.org")
+   OR parent_domain = "masscan.cloud"
+| where src_host IN (ci_runner_inventory)
+| stats count BY src_host, dest_domain, _time</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Nord Stream default branch artifact in repositories · GitHub audit log</div>
+        <div class="query-code">// Wiz documented TeamPCP leaving the tool's default branch naming unmodified in victim repos
+action = "git.create_branch" OR action = "protected_branch.policy_override"
+| where branch_name LIKE "dev_remote_ea5Eu%" OR branch_name LIKE "%/test/v1"
+| table repo, actor, branch_name, _time</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Anomalous package publish from CI, incl. OIDC-federated workflows (illustrative) · npm/PyPI + GitHub Actions audit</div>
+        <div class="query-code">// Targets the Mini Shai-Hulud entry technique: OIDC token lifted from a runner,
+// exchanged for namespace-wide publish rights. Highest-signal variant is a publish
+// originating from a workflow nobody has intentionally maintained.
+event_type = "package.publish"
+| where publish_source = "ci" AND workflow_last_human_commit_age_days > 180
+| join registry_namespace [ search event_type="oidc.token.exchange" audience="npm" ]
+| table registry_namespace, package, workflow_ref, actor, _time</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Credential-stealer read of CI runner process memory · Linux auditd / eBPF</div>
+        <div class="query-code">// kamikaze.sh reads /proc/&lt;pid&gt;/mem to defeat GitHub's secret masking —
+// legitimate build steps essentially never do this.
+syscall IN ("open","openat","process_vm_readv")
+| where path MATCHES "/proc/[0-9]+/mem"
+| where NOT process_name IN (approved_debuggers)
+| table host, process_name, ppid, path, _time</div>
+      </div>
+      <div class="prose" style="margin-top:12px;">
+        <p>Microsoft published dedicated detection, investigation and defence guidance for the Trivy supply-chain compromise (Mar 2026) — see §12 — which remains the most authoritative vendor-published detection content for the March campaign specifically. The behavioural signals above are preferred over the network IOCs in §07 for durable coverage, since this group rotates infrastructure quickly and engineered its primary C2 to survive takedown.</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -947,6 +1059,199 @@
 <div class="section">
   <div class="section-header">
     <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, persona management, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Persona Management — Catastrophic Failure</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">The defining OPSEC characteristic of this actor is not what it did well but what it did not do at all: maintain separation between criminal and personal identity. A single handle, <strong>DeadCatx3</strong>, was reused across a GitHub tooling account, a HackerOne profile carrying a real name, and a Hugging Face account whose listed domain (<code>masscan[.]cloud</code>) later served as operational C2. The chain terminated in an avatar — a distinctive cat-before-monitors image, original enough that reverse image search returned nothing — that appeared on both a decade-old Steam profile and the TeamPCP Telegram channel. Reverse image search returning <em>zero</em> results is what made it decisive: a stock image would have proved nothing (Flare, Sep 2026).</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Credential Hygiene — Self-Inflicted</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">The pivot from handle to real identity ran through the actor's own exposure in breach corpora: leaked passwords tied a school email address to a personal Gmail account, which in turn owned the TikTok profile displaying both a real name and a Steam reference. An operator who built a career on harvesting other people's credentials was located through his own appearance in a combolist — worth stating plainly, because the same corpora are available to defenders.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation — Mixed</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Operationally the group showed reasonable discipline: commercial VPN egress (Mullvad exits via Datacamp and 31173 Services AB), disposable VPS hosting (InterServer), and rapid rotation of staging domains across the March campaign. The failure was <em>linkage</em>, not rotation — <code>masscan[.]cloud</code> appeared on a personal Hugging Face profile and was later reused as Mini Shai-Hulud C2 infrastructure, connecting operational tooling directly to an identity artifact. Rotating infrastructure does not help if one asset bridges both lives.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene — Weak</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Several avoidable fingerprints survived into victim environments: the Nord Stream framework's default branch-naming pattern (<code>dev_remote_ea5Eu/test/v1</code>) left unmodified in poisoned repositories, an outdated <code>git/2.43.0</code> client string, and Boto3 requests carrying Kali Linux default signatures (Wiz, Mar 2026). Each is a free detection opportunity handed to defenders, and each suggests operators running stock tooling without sanitising defaults.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Takedown Resilience — Strong</span>
+          <span class="opsec-confidence">[HIGH]</span>
+        </div>
+        <div class="opsec-desc">In deliberate contrast to its personal OPSEC, the group's <em>infrastructure</em> design was genuinely takedown-resistant: a decentralized Internet Computer Protocol blockchain canister served as a tamper-proof C2 dead drop immune to conventional domain seizure or registrar action, with GitHub repository fallbacks behind it. This asymmetry — sophisticated operational architecture, negligent personal tradecraft — is the most instructive thing about the group, and it is the reason arrests were possible while infrastructure disruption was not.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, loader internals, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Strategic Pre-Emption — Compromise the Scanners First</span>
+          <span class="evasion-ttp">T1195.002 / T1562</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">DETECTION SUPPRESSION</span>
+          <span class="evasion-tag">Trivy · Checkmarx KICS</span>
+        </div>
+        <div class="evasion-desc">The group's highest-leverage evasion decision was target selection rather than tooling: by poisoning vulnerability scanners and security actions first, it simultaneously disabled the detection layer and inherited that layer's privileged access to downstream pipelines. Defensive tooling runs early, runs with credentials, and is trusted by definition.</div>
+        <div class="evasion-detail">Trivy workflow compromise: CVE-2026-33634 exploited to overwrite 76 of 77 versions of the automated workflow using a stolen developer credential with repository write access (CSA Labs, Mar 2026). Checkmarx KICS GitHub Action compromised 2026-03-23.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Loader Anti-Analysis — API Hashing, Direct Syscalls, ETW Blinding</span>
+          <span class="evasion-ttp">T1027 / T1562.006</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag siem">TELEMETRY LOSS</span>
+        </div>
+        <div class="evasion-desc">The Windows loader resolves APIs by DJB2 hash rather than name (defeating static import analysis), issues direct syscalls to bypass userland API hooking, and kills Event Tracing for Windows to blind the telemetry channel EDR products depend on.</div>
+        <div class="evasion-detail">Observed techniques: DJB2 hash-based API resolution; direct syscall invocation; ETW patching/termination.
+Specific syscall stubs and hash constants vary per build and are not published as stable indicators.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Automated Re-Obfuscation Against Signatures</span>
+          <span class="evasion-ttp">T1027.005</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">SIGNATURE EVASION</span>
+        </div>
+        <div class="evasion-desc">Analysed variants share identical architecture and an identical cipher seed while differing in class names and lookup tables — the signature of an automated re-obfuscation pipeline producing a fresh-looking sample per deployment. Hash- and string-based detection degrades to near-useless against this; the invariant is the architecture, not the bytes.</div>
+        <div class="evasion-detail">Invariant across variants: identical architecture, identical cipher seed.
+Variable per build: class names, lookup tables.
+Detection implication — pivot to behavioural and structural signatures (e.g. YARA on architecture/constants) over file hashes.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">PNG-Steganographic Shellcode &amp; Process Hollowing</span>
+          <span class="evasion-ttp">T1027.003 / T1055.012</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">dllhost.exe</span>
+        </div>
+        <div class="evasion-desc">The final stage injects an embedded payload into a created <code>dllhost.exe</code> via process hollowing. The shellcode is carried as an embedded PNG image: each ARGB pixel encodes a byte, with <code>0xFF</code> as separator — meaning the payload never exists as recognisable code on disk. The group used the same steganographic instinct for exfiltration, with <code>hangup.wav</code> / <code>ringtone.wav</code> as carriers (Unit 42).</div>
+        <div class="evasion-detail">Shellcode encoding: embedded PNG, each ARGB pixel = one byte, 0xFF separator.
+Injection target: newly created dllhost.exe (process hollowing).
+Final payload function: RAT backdoor.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Blockchain C2 Resolution</span>
+          <span class="evasion-ttp">T1102 / T1568</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag">ICP canister</span>
+        </div>
+        <div class="evasion-desc">CanisterWorm resolves command and control through an Internet Computer Protocol blockchain canister acting as a tamper-proof dead drop. There is no domain to seize and no registrar to serve, and the traffic resembles ordinary Web3 API access — a category most enterprise egress policies neither block nor inspect.</div>
+        <div class="evasion-detail">Canister dead-drop: tdtqy-oyaaa-aaaae-af2dq-cai.raw.icp0[.]io
+Detection approach — treat any egress to ICP canister endpoints from build or server infrastructure as anomalous by default; there is rarely a legitimate reason for CI to talk to a blockchain canister.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Secret-Masking Bypass via Runner Memory</span>
+          <span class="evasion-ttp">T1003 / T1552</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+          <span class="evasion-tag">/proc/&lt;pid&gt;/mem</span>
+        </div>
+        <div class="evasion-desc">kamikaze.sh reads CI runner process memory directly via <code>/proc/&lt;pid&gt;/mem</code>, defeating GitHub's secret-masking protection — which redacts secrets in logs but cannot protect them in the memory of the process using them. Exfiltration is AES-256-CBC/RSA-4096 encrypted before egress, so content inspection yields nothing.</div>
+        <div class="evasion-detail">Read path: /proc/&lt;pid&gt;/mem against the runner process.
+Encryption before exfil: AES-256-CBC / RSA-4096.
+Residual detection artifacts (per Wiz): outdated git/2.43.0 user agent and TruffleHog secret-validation signatures in outbound CI traffic.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense adversary emulation plan exists for TeamPCP as of 2026-09-20. CTID's public adversary_emulation_library covers established state-nexus actors (APT29, APT3, FIN6, Sandworm, menuPass and others) and has not added coverage for this actor, which is consistent with both its recency and CTID's limited coverage of eCrime brands. MITRE ATT&amp;CK has likewise assigned no group G-ID — re-verified against the Groups index on this compile date.</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation &amp; Detection Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2026/03/24/detecting-investigating-defending-against-trivy-supply-chain-compromise/" target="_blank">Guidance for detecting, investigating, and defending against the Trivy supply chain compromise</a></div>
+          <div class="ref-date">Vendor detection &amp; IR guidance — most authoritative for the March campaign · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Expel</div>
+        <div>
+          <div class="ref-detail"><a href="https://expel.com/blog/mini-shai-hulud-cross-ecosystem-supply-chain-worm-targeting-npm-pypi/" target="_blank">Mini Shai-Hulud: Cross-ecosystem supply chain worm targeting npm &amp; PyPI</a></div>
+          <div class="ref-date">Worm analysis and hunting indicators · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">StepSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.stepsecurity.io/blog/mini-shai-hulud-is-back-a-self-spreading-supply-chain-attack-hits-the-npm-ecosystem" target="_blank">Mini Shai-Hulud Is Back: A Self-Spreading Supply Chain Attack Compromises TanStack npm Packages</a></div>
+          <div class="ref-date">CI/CD-specific detection and hardening guidance · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Unit 42</div>
+        <div>
+          <div class="ref-detail">Catalogue of 24 malicious file SHA-256 hashes from the March 2026 campaign — usable directly for retrospective hunting, with the caveat in §11 that automated re-obfuscation limits hash-based coverage going forward</div>
+          <div class="ref-date">Hash IOC set · Apr 2026</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">—</div>
+        <div>
+          <div class="ref-detail">No TeamPCP-specific Atomic Red Team test set or dedicated SigmaHQ ruleset was identified in this research pass. Generic coverage exists for the underlying techniques — process hollowing, ETW tampering, and anomalous CI publish events all have mature public detection content applicable here.</div>
+          <div class="ref-date">Gap noted, not fabricated · 2026-09-20</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
     <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
   </div>
   <div class="section-body">
@@ -1119,6 +1424,69 @@
           <div class="ref-date">Accessed: 2026-08-30</div>
         </div>
       </div>
+      <div class="ref-item">
+        <div class="ref-source">Flare</div>
+        <div>
+          <div class="ref-detail"><a href="https://flare.io/learn/resources/blog/teampcp-software-supply-chain-attacks" target="_blank">Unmasking TeamPCP: Software Supply Chain Attacks</a></div>
+          <div class="ref-date">Primary source for the deanonymization chain (§10) · Added 2026-09-20 · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">John Hammond</div>
+        <div>
+          <div class="ref-detail"><a href="https://youtu.be/nj9e2Qfe3Cc" target="_blank">GitHub Hacker EXPOSED BY HIS CAT (video)</a></div>
+          <div class="ref-date">Popular walkthrough of the Flare research — video not directly reviewed for this card; findings sourced from Flare's written report · Added 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Expel</div>
+        <div>
+          <div class="ref-detail"><a href="https://expel.com/blog/mini-shai-hulud-cross-ecosystem-supply-chain-worm-targeting-npm-pypi/" target="_blank">Mini Shai-Hulud: Cross-ecosystem supply chain worm targeting npm &amp; PyPI</a></div>
+          <div class="ref-date">Added 2026-09-20 · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">StepSecurity</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.stepsecurity.io/blog/mini-shai-hulud-is-back-a-self-spreading-supply-chain-attack-hits-the-npm-ecosystem" target="_blank">Mini Shai-Hulud Is Back: A Self-Spreading Supply Chain Attack Compromises TanStack npm Packages</a></div>
+          <div class="ref-date">Added 2026-09-20 · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Phoenix Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://phoenix.security/mini-shai-hulud-teampcp-tanstack/" target="_blank">Mini Shai-Hulud: TeamPCP's Self-Propagating npm Worm Hits TanStack, OpenSearch, and Mistral AI Across 170 Packages</a></div>
+          <div class="ref-date">Added 2026-09-20 · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Snyk</div>
+        <div>
+          <div class="ref-detail"><a href="https://snyk.io/blog/mini-shai-hulud-antv-npm-supply-chain-attack/" target="_blank">Mini Shai-Hulud Hits AntV: 300+ Malicious npm Packages Published via Compromised Maintainer Account</a></div>
+          <div class="ref-date">Added 2026-09-20 · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Tenable</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.tenable.com/blog/mini-shai-hulud-frequently-asked-questions" target="_blank">Mini Shai-Hulud Supply Chain Attack CVE-2026-45321 FAQ</a></div>
+          <div class="ref-date">Added 2026-09-20 · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2026/03/24/detecting-investigating-defending-against-trivy-supply-chain-compromise/" target="_blank">Guidance for detecting, investigating, and defending against the Trivy supply chain compromise</a></div>
+          <div class="ref-date">Added 2026-09-20 · Accessed: 2026-09-20</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">CSA Labs</div>
+        <div>
+          <div class="ref-detail"><a href="https://labs.cloudsecurityalliance.org/research/csa-research-note-teampcp-supply-chain-ci-cd-20260324-csa-st/" target="_blank">CSA Research Note: TeamPCP Trivy Supply Chain Attack and Kubernetes Wiper</a></div>
+          <div class="ref-date">Source for CVE-2026-33634 · Added 2026-09-20 · Accessed: 2026-09-20</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1126,8 +1494,8 @@
 <!-- ══════════════════════════════════════ FOOTER ══ -->
 <div class="footer">
   <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
-  <div>TLP:CLEAR · COMPILED: 2026-08-30 · 24 sources reviewed, 10 web searches</div>
-  <div>Analyst Confidence: HIGH (campaign attribution) · MEDIUM (group structure)</div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-20 · 33 sources reviewed · UPDATED FROM: 2026-08-30 · Git history preserved</div>
+  <div>Analyst Confidence: HIGH (campaign attribution) · HIGH (one persona ↔ named individual) · MEDIUM (group structure)</div>
 </div>
 
 </body>
