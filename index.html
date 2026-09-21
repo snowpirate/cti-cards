@@ -20,6 +20,7 @@
     --red:      #ff4d4d;
     --blue:     #5b9bd5;
     --cyan:     #00d4ff;
+    --violet:   #a78bfa;
     --glacier:  #d4f0f5;
     --glacier2: #3ea8c9;
     --text:     #d0dde8;
@@ -179,6 +180,7 @@
   .chip:hover         { border-color: var(--text-dim); color: var(--text); }
   .chip.active        { border-color: var(--teal); color: var(--teal); background: rgba(0,200,160,0.07); }
   .chip.active.gold   { border-color: var(--gold); color: var(--gold); background: rgba(245,197,66,0.07); }
+  .chip.active.violet { border-color: var(--violet); color: var(--violet); background: rgba(167,139,250,0.07); }
   .filter-count {
     font-family: var(--mono);
     font-size: 13.5px;
@@ -253,6 +255,9 @@
   .lib-card.incident::before { background: var(--gold); }
   .lib-card.vuln::before     { background: #00d4ff; }
   .lib-card.vuln .lib-card-footer .open { color: #00d4ff; }
+  .lib-card.technique::before { background: var(--violet); }
+  .lib-card.technique .lib-card-footer .open { color: var(--violet); }
+  .badge.attck { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.4); color: var(--violet); }
   .badge.patch-now      { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.4); color: #ff4d4d; font-size: 13px; padding: 2px 6px; }
   .badge.patch-test     { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--gold); font-size: 13px; padding: 2px 6px; }
   .badge.patch-none     { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.4); color: #ff4d4d; font-size: 13px; padding: 2px 6px; }
@@ -398,6 +403,10 @@
         <div class="site-stat-val" id="vuln-count" style="color:var(--cyan)">0</div>
         <div class="site-stat-label">Vuln Advisories</div>
       </div>
+      <div class="site-stat">
+        <div class="site-stat-val" id="technique-count" style="color:#a78bfa">0</div>
+        <div class="site-stat-label">Techniques</div>
+      </div>
     </div>
   </div>
 </div>
@@ -416,6 +425,7 @@
     <div class="chip" data-filter="ecrime">eCrime</div>
     <div class="chip" data-filter="ics">ICS / OT</div>
     <div class="chip" data-filter="vuln">Vulnerabilities</div>
+    <div class="chip violet" data-filter="technique">Techniques</div>
   </div>
   <div class="filter-count" id="filter-count"></div>
 </div>
@@ -1102,6 +1112,45 @@
     <div class="empty-state" id="vuln-empty" style="display:none">// NO VULNERABILITY ADVISORIES ON FILE</div>
   </div>
 
+  <!-- ── TECHNIQUE PROFILES ── -->
+  <div class="lib-section" id="section-techniques">
+    <div class="lib-section-header">
+      <span class="lib-section-icon" style="color:#a78bfa">◈</span>
+      <span class="lib-section-title" style="color:#a78bfa">Technique Profiles</span>
+      <span class="lib-section-count" id="technique-section-count"></span>
+    </div>
+    <div class="card-grid" id="technique-grid">
+
+      <!-- ↓↓↓ AGENT-MAINTAINED TECHNIQUE CARDS BEGIN ↓↓↓ -->
+
+      <a class="lib-card technique" href="output/techniques/2026-09-21_CLICKFIX.html"
+         data-name="ClickFix"
+         data-type="technique"
+         data-tags="clickfix filefix promptfix consentfix terminalfix downloadfix clickfake t1204.004 user execution malicious copy paste runmru fake captcha social engineering paste and run lumma latrodectus netsupport amos havoc freakypoll mshta powershell run dialog applescript contagious interview kimsuky sandworm muddywater apt28 apt36">
+        <div class="lib-card-inner">
+          <div class="lib-card-top">
+            <div class="lib-card-name">ClickFix</div>
+            <div class="lib-card-badges">
+              <span class="badge tlp-clear">TLP:CLEAR</span>
+              <span class="badge attck">T1204.004</span>
+              <span class="badge threat-crit">WIDESPREAD</span>
+            </div>
+          </div>
+          <div class="lib-card-sub">TECHNIQUE · EXECUTION (TA0002) · WINDOWS / MACOS / LINUX</div>
+          <div class="lib-card-desc">A fake CAPTCHA or error prompt gets the user to paste a command into the Run dialog themselves — so nothing is downloaded, email and browser controls are never invoked, and an authorised user performs the execution. Up 517% in H1 2025 and now ~8% of blocked attacks, used by the GRU and by Telegram-bought stealers alike.</div>
+          <div class="lib-card-footer">
+            <span class="date">COMPILED: 2026-09-21</span>
+            <span class="open">OPEN PROFILE →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- ↑↑↑ AGENT-MAINTAINED TECHNIQUE CARDS END ↑↑↑ -->
+
+    </div>
+    <div class="empty-state" id="technique-empty" style="display:none">// NO TECHNIQUE PROFILES ON FILE</div>
+  </div>
+
   <!-- ── INCIDENT CASE FILES ── -->
   <div class="lib-section" id="section-incidents">
     <div class="lib-section-header">
@@ -1452,15 +1501,19 @@
     const actors    = document.querySelectorAll('#actor-grid .lib-card').length;
     const incidents = document.querySelectorAll('#incident-grid .lib-card').length;
     const vulns     = document.querySelectorAll('#vuln-grid .lib-card').length;
+    const techs     = document.querySelectorAll('#technique-grid .lib-card').length;
     document.getElementById('actor-count').textContent    = actors;
     document.getElementById('incident-count').textContent = incidents;
     document.getElementById('vuln-count').textContent     = vulns;
+    document.getElementById('technique-count').textContent = techs;
     document.getElementById('actor-section-count').textContent    = actors    + ' PROFILES';
     document.getElementById('incident-section-count').textContent = incidents + ' CASES';
     document.getElementById('vuln-section-count').textContent     = vulns     + ' ADVISORIES';
+    document.getElementById('technique-section-count').textContent = techs     + ' TECHNIQUES';
     document.getElementById('actor-empty').style.display    = actors    === 0 ? 'block' : 'none';
     document.getElementById('incident-empty').style.display = incidents === 0 ? 'block' : 'none';
     document.getElementById('vuln-empty').style.display     = vulns     === 0 ? 'block' : 'none';
+    document.getElementById('technique-empty').style.display = techs    === 0 ? 'block' : 'none';
     updateFilterCount();
   }
 
@@ -1495,7 +1548,12 @@
         if (f === 'all') {
           card.classList.remove('hidden');
         } else if (f === 'actor') {
-          card.classList.toggle('hidden', card.classList.contains('incident'));
+          card.classList.toggle('hidden',
+            card.classList.contains('incident') ||
+            card.classList.contains('vuln') ||
+            card.classList.contains('technique'));
+        } else if (f === 'technique') {
+          card.classList.toggle('hidden', !card.classList.contains('technique'));
         } else if (f === 'incident') {
           card.classList.toggle('hidden', !card.classList.contains('incident'));
         } else if (f === 'vuln') {

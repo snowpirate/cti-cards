@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ClickFix — Technique Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #0a080f;
+    --bg2:         #100d18;
+    --bg3:         #15111f;
+    --bg4:         #1c1726;
+    --border:      #2a2438;
+    --border2:     #372f47;
+    --violet:      #a78bfa;
+    --violet2:     #8b5cf6;
+    --violet-dim:  #5b21b6;
+    --red:         #ff5c5c;
+    --amber:       #f5c542;
+    --green:       #4ade80;
+    --blue:        #60a5fa;
+    --text:        #ddd6f0;
+    --text-dim:    #6b6280;
+    --text-mid:    #a89fc0;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 12% 0%, rgba(167,139,250,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 88% 100%, rgba(139,92,246,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(167,139,250,0.015) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(167,139,250,0.015) 40px);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #120e1c 0%, #16111f 60%, #0d0a14 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 9px, rgba(167,139,250,0.016) 9px, rgba(167,139,250,0.016) 10px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--violet), var(--violet2) 50%, transparent 100%);
+  }
+  .header-top-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .header-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tlp-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; }
+  .tlp-clear { background: #ddd6f0; color: #0a080f; }
+  .tlp-green { background: #2d7a2d; color: #fff; }
+  .tlp-amber { background: var(--amber); color: #0a080f; }
+  .tlp-red   { background: var(--red); color: #fff; }
+
+  .prev-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 2px; }
+  .prev-widespread { background: rgba(255,92,92,0.15); border: 1px solid rgba(255,92,92,0.5); color: var(--red); }
+  .prev-growing    { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.45); color: var(--amber); }
+  .prev-niche      { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.4); color: var(--blue); }
+  .prev-declining  { background: rgba(107,98,128,0.2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  .attck-badge { font-family: var(--mono); font-size: 14.5px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.4); color: var(--violet); }
+
+  .technique-label { font-family: var(--mono); font-size: 14.5px; color: var(--violet-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header h1 .violet  { color: var(--violet); }
+  .header h1 .violet2 { color: var(--violet2); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 12px; }
+
+  .technique-bar {
+    display: flex; flex-wrap: wrap; gap: 6px 20px;
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono); font-size: 14px; color: var(--text-dim);
+  }
+  .technique-bar span       { color: var(--violet); font-weight: 700; }
+  .technique-bar span.red   { color: var(--red); }
+  .technique-bar span.amber { color: var(--amber); }
+  .technique-bar span.green { color: var(--green); }
+  .technique-bar span.blue  { color: var(--blue); }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-cell  { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val   { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--violet); line-height: 1; }
+  .stat-val.red   { color: var(--red); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.dim   { color: var(--text-mid); }
+  .stat-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  /* ── SECTIONS ── */
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 16px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 23px; font-weight: 700; color: var(--violet); letter-spacing: 0.02em; min-width: 36px; line-height: 1; padding-right: 16px; border-right: 1px solid var(--border2); }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 16px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose { font-family: var(--body); font-size: 16px; color: var(--text-mid); line-height: 1.7; }
+  .prose p { margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--violet); font-style: normal; }
+  .prose code { font-family: var(--mono); font-size: 15px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--violet); }
+
+  /* ── KV ROWS ── */
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(42,36,56,0.8); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 15.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.violet { color: var(--violet); font-weight: 600; }
+  .kv-val.red    { color: var(--red); font-weight: 600; }
+  .kv-val.amber  { color: var(--amber); font-weight: 600; }
+  .kv-val.green  { color: var(--green); font-weight: 600; }
+  .kv-val.mono   { font-family: var(--mono); font-size: 14.5px; }
+  .kv-val.dim    { color: var(--text-dim); }
+
+  /* ── VARIANT CHIPS ── */
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tech-chip { font-family: var(--mono); font-size: 13.5px; padding: 3px 10px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .tech-chip.primary { border-color: var(--violet); color: var(--violet); font-weight: 700; }
+
+  /* ── EXECUTION CHAIN ── */
+  .chain { display: flex; flex-direction: column; gap: 8px; }
+  .chain-step { display: grid; grid-template-columns: 44px 1fr; gap: 14px; background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--violet); padding: 12px 16px; }
+  .chain-num { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--violet); line-height: 1.1; }
+  .chain-title { font-family: var(--sans); font-size: 16.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .chain-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; }
+  .chain-desc code { font-family: var(--mono); font-size: 14.5px; color: var(--violet); }
+
+  /* ── VARIANT FAMILY ── */
+  .variant-list { display: flex; flex-direction: column; gap: 10px; }
+  .variant-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--violet2); padding: 12px 16px; }
+  .variant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; flex-wrap: wrap; gap: 6px; }
+  .variant-name { font-family: var(--mono); font-size: 15px; color: var(--violet); font-weight: 700; letter-spacing: 0.04em; }
+  .variant-surface { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .variant-desc { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+  .variant-desc code { font-family: var(--mono); font-size: 14.5px; color: var(--violet); }
+
+  /* ── ADOPTION MATRIX ── */
+  .adoption-list { display: flex; flex-direction: column; }
+  .adoption-head, .adoption-row { display: grid; grid-template-columns: 150px 150px 1fr 120px; gap: 12px; padding: 8px 10px; align-items: start; }
+  .adoption-head { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; border-bottom: 1px solid var(--border2); }
+  .adoption-row { border-bottom: 1px solid rgba(42,36,56,0.7); }
+  .adoption-row:last-child { border-bottom: none; }
+  .adopt-actor { font-family: var(--mono); font-size: 14.5px; color: var(--violet); font-weight: 700; }
+  .adopt-attr { font-family: var(--mono); font-size: 13px; padding: 1px 7px; border: 1px solid var(--border2); color: var(--text-dim); display: inline-block; height: fit-content; }
+  .adopt-attr.nation { border-color: rgba(255,92,92,0.35); color: var(--red); }
+  .adopt-attr.ecrime { border-color: rgba(245,197,66,0.35); color: var(--amber); }
+  .adopt-detail { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.45; }
+  .adopt-xref { font-family: var(--mono); font-size: 13px; color: var(--blue); text-align: right; }
+  .adopt-xref.none { color: var(--text-dim); }
+
+  /* ── PAYLOAD / FACTOR ITEMS ── */
+  .item-list { display: flex; flex-direction: column; gap: 10px; }
+  .list-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--blue); padding: 12px 16px; }
+  .list-item.red   { border-left-color: var(--red); }
+  .list-item.amber { border-left-color: var(--amber); }
+  .list-item.green { border-left-color: var(--green); }
+  .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; flex-wrap: wrap; gap: 6px; }
+  .list-name { font-family: var(--mono); font-size: 15px; color: var(--blue); font-weight: 700; letter-spacing: 0.04em; }
+  .list-item.red   .list-name { color: var(--red); }
+  .list-item.amber .list-name { color: var(--amber); }
+  .list-item.green .list-name { color: var(--green); }
+  .list-tag  { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 7px; }
+  .list-desc { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+  .list-desc code { font-family: var(--mono); font-size: 14.5px; color: var(--violet); }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 110px 12px 1fr; gap: 0 12px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--violet); border: 1px solid var(--bg2); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.blue  { background: var(--blue); }
+  .timeline-dot.amber { background: var(--amber); }
+  .timeline-dot.red   { background: var(--red); }
+  .timeline-dot.green { background: var(--green); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(42,36,56,0.8); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 16.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+  .timeline-desc code { font-family: var(--mono); font-size: 14.5px; color: var(--violet); }
+
+  /* ── DETECTION QUERY BLOCKS ── */
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--violet); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 14.5px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  /* ── MITIGATIONS ── */
+  .mitigation-list { display: flex; flex-direction: column; gap: 10px; }
+  .mitigation-item { background: var(--bg3); border: 1px solid var(--border); border-left: 3px solid var(--green); padding: 12px 16px; }
+  .mitigation-item.partial { border-left-color: var(--amber); }
+  .mitigation-item.weak    { border-left-color: var(--text-dim); }
+  .mitigation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; flex-wrap: wrap; gap: 6px; }
+  .mitigation-name { font-family: var(--sans); font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; }
+  .mitigation-rating { font-family: var(--mono); font-size: 13px; padding: 1px 8px; letter-spacing: 0.06em; font-weight: 700; }
+  .rating-high    { background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.4); color: var(--green); }
+  .rating-partial { background: rgba(245,197,66,0.12); border: 1px solid rgba(245,197,66,0.4); color: var(--amber); }
+  .rating-weak    { background: rgba(107,98,128,0.15); border: 1px solid var(--border2); color: var(--text-dim); }
+  .mitigation-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .mitigation-detail { font-family: var(--mono); font-size: 14px; color: var(--text); background: var(--bg4); border: 1px solid var(--border); padding: 8px 10px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+  /* ── CTID BLOCK ── */
+  .ctid-block { background: var(--bg3); border: 1px solid var(--border); border-left: 3px solid var(--text-dim); padding: 16px 20px; }
+  .ctid-block:not(.not-available) { border-left-color: var(--violet); }
+  .ctid-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 2px 8px; letter-spacing: 0.06em; }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+
+  /* ── REFERENCES ── */
+  .ref-list { display: flex; flex-direction: column; gap: 7px; }
+  .ref-item { display: grid; grid-template-columns: 130px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(42,36,56,0.7); font-size: 15px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 13.5px; color: var(--violet); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; line-height: 1.4; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--blue); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── TWO/THREE COL ── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 14px; padding: 10px 18px;
+    border: 1px solid var(--border); background: var(--bg2);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+    font-family: var(--mono); font-size: 13.5px; color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--violet); font-weight: 700; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .adoption-head { display: none; }
+    .adoption-row { grid-template-columns: 1fr; gap: 4px; }
+    .adopt-xref { text-align: left; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 38px; }
+    .chain-step { grid-template-columns: 1fr; gap: 4px; }
+  }
+
+  /* ── PRINT BUTTON (screen only; hidden via .no-print below) ── */
+  .print-btn {
+    position: fixed; top: 14px; right: 14px; z-index: 999;
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text); background: var(--bg3);
+    border: 1px solid var(--border2); padding: 8px 16px;
+    cursor: pointer; border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .print-btn:hover { border-color: var(--violet); color: var(--violet); }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+
+    @page { margin: 12mm; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e6e6e6;
+      --border: #cfcfcf;
+      --border2: #b0b0b0;
+      --violet: #5b21b6;
+      --violet2: #6d28d9;
+      --green: #15803d;
+      --amber: #8a6205;
+      --blue: #1d4ed8;
+      --text: #111111;
+      --text-dim: #555555;
+      --text-mid: #2b2b2b;
+    }
+
+    body { background: #fff !important; background-image: none !important; padding: 0 !important; }
+
+    .header { background: #fff !important; }
+    .header::before { display: none !important; }
+    .header h1,
+    .section-title,
+    .chain-title,
+    .timeline-phase,
+    .mitigation-name,
+    .ctid-title { color: #111 !important; }
+
+    .tlp-badge, .prev-badge, .attck-badge, .mitigation-rating, .adopt-attr {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .header, .stat-grid,
+    .stat-cell, .kv-row, .chain-step, .variant-item, .adoption-row,
+    .list-item, .timeline-item, .query-block, .mitigation-item,
+    .ref-item, .prose p, tr {
+      break-inside: avoid;
+    }
+    .section-header { break-after: avoid; }
+    .section { orphans: 3; widows: 3; }
+    thead { display: table-header-group; }
+
+    a { color: #111 !important; text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()" title="Print or Save as PDF">⎘ Print / Save PDF</button>
+
+<!-- ═══════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-badges">
+      <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+      <div class="prev-badge prev-widespread">WIDESPREAD</div>
+      <div class="attck-badge">T1204.004</div>
+    </div>
+  </div>
+  <div class="technique-label">// Technique Profile — Social Engineering / User-Assisted Execution · Execution (TA0002)</div>
+  <h1><span class="violet">CLICK</span>FIX</h1>
+  <div class="header-sub">
+    COMPILED: 2026-09-21 &nbsp;|&nbsp;
+    ATT&amp;CK: T1204.004 &nbsp;|&nbsp;
+    PLATFORMS: Windows · macOS · Linux &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK, Microsoft, Recorded Future, Group-IB, Huntress, SentinelOne, Menlo, Kaspersky, SigmaHQ, Red Canary (13)
+  </div>
+  <div class="technique-bar">
+    <div>Tactic: <span>Execution (TA0002)</span></div>
+    <div>First Observed: <span>~2024</span></div>
+    <div>Prevalence: <span class="red">~8% of all blocked attacks</span></div>
+    <div>Known Adopters: <span class="amber">5 ATT&amp;CK-catalogued + broad commodity use</span></div>
+    <div>Primary Defeat: <span class="green">Disable the Run dialog (GPO)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">517%</div>
+    <div class="stat-label">Surge in observed use, H1 2025</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">~8%</div>
+    <div class="stat-label">Share of all blocked attacks</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">5+</div>
+    <div class="stat-label">Named variants in the "-Fix" family</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val dim">ZERO</div>
+    <div class="stat-label">Files downloaded — the victim types the payload</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Technique Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>ClickFix is a social-engineering technique in which a web page convinces the user to copy a command and run it themselves — typically in the Windows Run dialog (Win+R) or the macOS Terminal — under the cover of a fake error message, a bogus CAPTCHA, or a counterfeit software-update prompt. MITRE catalogues it as <strong>T1204.004, User Execution: Malicious Copy and Paste</strong>, added to ATT&amp;CK on 18 March 2025 and last revised 12 May 2026.</p>
+      <p>Its significance is structural rather than technical. Most initial-access controls in a modern enterprise are built around <em>inspecting things that arrive</em> — attachments, downloads, scripts fetched by a browser. ClickFix delivers nothing. There is no attachment to detonate, no download to reputation-check, no browser exploit to sandbox. The payload crosses the security boundary through the user's clipboard and is executed by the user's own hand, in a shell the user is trusted to use. Email filtering, browser sandboxing, download protections and mark-of-the-web all sit to one side of the transaction and never see it.</p>
+      <p>That structural advantage has produced explosive adoption. Observed use surged <strong>517% in the first half of 2025</strong>, and by 2026 the technique accounted for roughly <strong>8% of all blocked attacks</strong> and ranked among the top global malware-delivery methods between March and May. Critically, adoption crosses the usual tiering: this is simultaneously the delivery mechanism for commodity infostealers sold on Telegram <em>and</em> for state programmes in Russia, Iran, North Korea and Pakistan. Techniques rarely span that range; ClickFix does because its cost is near zero and its defeat rate against conventional controls is high.</p>
+      <p>The technique has also proven unusually generative. Rather than a single static pattern, it has spawned a family of derivatives — <strong>FileFix</strong>, <strong>PromptFix</strong>, <strong>ConsentFix</strong>, TerminalFix, DownloadFix — each relocating the paste target to a less-monitored interface as defenders instrument the previous one. Its internals have moved in parallel, from cleartext commands and disk-based <code>.bat</code> files to fileless, memory-only execution with XOR or Base64+Deflate encoding and server-side polymorphism. Defensive response has begun: Apple shipped a macOS mitigation in March 2026, and a bypass using the <code>applescript://</code> URI scheme appeared within roughly a month.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Technique Identity</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Common Name</span><span class="kv-val violet">ClickFix</span></div>
+          <div class="kv-row"><span class="kv-key">ATT&amp;CK ID</span><span class="kv-val mono">T1204.004</span></div>
+          <div class="kv-row"><span class="kv-key">ATT&amp;CK Name</span><span class="kv-val">User Execution: Malicious Copy and Paste</span></div>
+          <div class="kv-row"><span class="kv-key">Tactic</span><span class="kv-val">Execution (TA0002)</span></div>
+          <div class="kv-row"><span class="kv-key">Parent Technique</span><span class="kv-val">T1204 — User Execution</span></div>
+          <div class="kv-row"><span class="kv-key">Platforms</span><span class="kv-val">Windows, macOS, Linux</span></div>
+          <div class="kv-row"><span class="kv-key">First Observed</span><span class="kv-val dim">~2024 — precise first-use date not established in this research pass</span></div>
+          <div class="kv-row"><span class="kv-key">Added to ATT&amp;CK</span><span class="kv-val">2025-03-18 (v1.1, last modified 2026-05-12)</span></div>
+          <div class="kv-row"><span class="kv-key">ATT&amp;CK Mitigations</span><span class="kv-val mono">M1038 · M1031 · M1021</span></div>
+          <div class="kv-row"><span class="kv-key">ATT&amp;CK Analytics</span><span class="kv-val mono">AN0962 (Win) · AN0963 (Linux) · AN0964 (macOS)</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Known Names &amp; Variants</div>
+        <div class="chip-grid">
+          <span class="tech-chip primary">ClickFix</span>
+          <span class="tech-chip">FileFix</span>
+          <span class="tech-chip">PromptFix</span>
+          <span class="tech-chip">ConsentFix</span>
+          <span class="tech-chip">TerminalFix</span>
+          <span class="tech-chip">DownloadFix</span>
+          <span class="tech-chip">ClickFake (campaign-specific)</span>
+          <span class="tech-chip">Fake CAPTCHA</span>
+          <span class="tech-chip">Paste-and-run</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Classification Note</div>
+          <div class="prose">
+            <p>ClickFix is a <em>delivery and execution</em> technique, not a malware family or an actor. It is the step that gets code running; what runs afterwards is unconstrained and varies by operator (Section 06).</p>
+            <p>Distinguish it from adjacent techniques it is often conflated with: it is not phishing-with-attachment (T1204.002 — there is no file), not drive-by compromise (T1189 — there is no browser exploit), and not a browser vulnerability of any kind. The browser behaves correctly throughout. The only thing "exploited" is the user's willingness to follow instructions, which is why no patch addresses it.</p>
+            <p>"ClickFake" appears in reporting on the DPRK Contagious Interview cluster and denotes a campaign applying this technique, not a separate technique.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Execution Mechanics <small>The canonical Windows chain; variants relocate step 03</small></div>
+  </div>
+  <div class="section-body">
+    <div class="chain">
+      <div class="chain-step">
+        <div class="chain-num">01</div>
+        <div>
+          <div class="chain-title">Lure Delivery</div>
+          <div class="chain-desc">The victim reaches an attacker-controlled page — via malvertising, a compromised legitimate site, SEO poisoning, a phishing link, or in targeted operations a fake job-interview or recruitment portal. Modern lures perform browser and OS fingerprinting first, serving the correct instructions for the victim's platform and suppressing the lure entirely for analysis environments.</div>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">02</div>
+        <div>
+          <div class="chain-title">Pretext — Manufactured Failure</div>
+          <div class="chain-desc">The page presents a problem only the user can "fix": a failed CAPTCHA ("verify you are human"), a corrupted document, a browser or driver update, a Windows Update screen, or a broken video codec. The pretext is essential — it converts an unusual request (open a shell and paste this) into a plausible remediation step. Recent lures add countdown timers and video walkthroughs to compress deliberation and supply false legitimacy.</div>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">03</div>
+        <div>
+          <div class="chain-title">Clipboard Poisoning</div>
+          <div class="chain-desc">JavaScript writes the payload command to the clipboard automatically — the user is never shown the real command and typically believes they are copying a verification code or error reference. The visible instruction is only "press Win+R, press Ctrl+V, press Enter." Displayed text and clipboard contents routinely differ.</div>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">04</div>
+        <div>
+          <div class="chain-title">User-Performed Execution</div>
+          <div class="chain-desc">The victim pastes into the Run dialog (Windows), Terminal (macOS), or the Alt+F2 run prompt (Linux) and executes. This is the security boundary crossing, and it is performed by an authorised user in an interface they are permitted to use. Commands commonly invoke <code>powershell</code>, <code>mshta</code>, <code>rundll32</code>, <code>wscript</code>, <code>curl</code> or <code>wget</code>, frequently with padding whitespace so the malicious portion scrolls out of the dialog's visible field.</div>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">05</div>
+        <div>
+          <div class="chain-title">Fileless Staging</div>
+          <div class="chain-desc">Contemporary chains avoid touching disk. The pasted command retrieves a second stage — increasingly over DNS or from a legitimate hosting service — decodes it in memory via XOR or Base64+Deflate, and executes without writing an artifact for disk-scanning AV to examine. Server-side polymorphism returns a structurally different payload per request, defeating hash- and string-based signatures.</div>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">06</div>
+        <div>
+          <div class="chain-title">Payload &amp; Persistence</div>
+          <div class="chain-desc">The final payload lands (Section 06) and establishes persistence by conventional means. Note the forensic consequence of steps 03–04: the pasted string is written to the <code>RunMRU</code> registry key <em>before</em> any deobfuscation — the single highest-value artifact this technique leaves behind (Section 08).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Variant Family <small>Each derivative relocates the paste target to a less-instrumented interface</small></div>
+  </div>
+  <div class="section-body">
+    <div class="variant-list">
+      <div class="variant-item">
+        <div class="variant-header">
+          <span class="variant-name">FileFix</span>
+          <span class="variant-surface">Windows File Explorer address bar</span>
+        </div>
+        <div class="variant-desc">Moves execution out of the Run dialog and into File Explorer, instructing the victim to paste a command or path into the address bar. Significant because it defeats the single most effective ClickFix mitigation — disabling the Run dialog — and because File Explorer address-bar input is far less commonly monitored, with no direct <code>RunMRU</code> equivalent to capture the pasted string.</div>
+      </div>
+      <div class="variant-item">
+        <div class="variant-header">
+          <span class="variant-name">PromptFix</span>
+          <span class="variant-surface">AI assistants and agentic tooling</span>
+        </div>
+        <div class="variant-desc">Retargets the technique at AI tooling, embedding instructions intended to be relayed through or executed by an assistant rather than typed by a human. Notable as the first variant that does not require a human in the loop at the execution step — the trust being abused is the user's trust in their assistant's output.</div>
+      </div>
+      <div class="variant-item">
+        <div class="variant-header">
+          <span class="variant-name">ConsentFix</span>
+          <span class="variant-surface">OAuth consent flows</span>
+        </div>
+        <div class="variant-desc">Applies the same manufactured-failure pretext to OAuth authorisation, steering the victim into granting application consent rather than executing a command. The outcome is token-based account access instead of code execution — the technique's logic transplanted into identity, where no endpoint control applies at all.</div>
+      </div>
+      <div class="variant-item">
+        <div class="variant-header">
+          <span class="variant-name">TerminalFix / DownloadFix</span>
+          <span class="variant-surface">Terminal emulators · browser download flows</span>
+        </div>
+        <div class="variant-desc">Further relocations of the execution surface documented by Push Security among newer variants that combine OS detection, video walkthroughs and countdown timers. The pattern across the family is consistent: as defenders instrument one interface, the technique migrates to the next least-monitored one.</div>
+      </div>
+      <div class="variant-item">
+        <div class="variant-header">
+          <span class="variant-name">macOS applescript:// bypass</span>
+          <span class="variant-surface">URI scheme handler</span>
+        </div>
+        <div class="variant-desc">After Apple shipped a ClickFix-targeted mitigation in March 2026, a modified variant surfaced within roughly a month using the <code>applescript://</code> URI scheme to achieve execution without invoking Terminal at all — sidestepping both the new mitigation and Terminal-focused detection analytics such as AN0964.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Evolution Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">~2024</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Emergence — Fake Errors and Cleartext Commands</div>
+          <div class="timeline-desc">The technique appears in commodity campaigns using fake browser-update and error-message lures, with cleartext commands and disk-based <code>.bat</code> payloads. Early implementations are crude and leave abundant disk artifacts.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025-03-18</div>
+        <div class="timeline-track"><div class="timeline-dot green"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Formalised as ATT&amp;CK T1204.004</div>
+          <div class="timeline-desc">MITRE adds "User Execution: Malicious Copy and Paste" as a sub-technique of T1204, giving defenders a shared identifier and, importantly, a mapping target for detection engineering. Platforms listed: Windows, macOS, Linux.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">H1 2025</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">517% Surge — Mass Adoption</div>
+          <div class="timeline-desc">Observed use increases more than sixfold in six months. Adoption broadens from commodity infostealer operators into state-aligned programmes, and the technique settles at roughly 8% of all blocked attacks.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025 → 2026</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Fileless Execution &amp; Server-Side Polymorphism</div>
+          <div class="timeline-desc">Operators abandon cleartext and disk-based staging in favour of XOR or Base64+Deflate encoding decoded entirely in memory, defeating disk-scanning antivirus. Menlo documents the shift to server-side polymorphism, where each request returns a structurally different payload, collapsing signature-based coverage.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026 (early)</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Variant Family Proliferates</div>
+          <div class="timeline-desc">FileFix, PromptFix, ConsentFix, TerminalFix and DownloadFix emerge, relocating execution into File Explorer, AI tooling, OAuth consent and terminal emulators. Lures add OS detection, countdown timers and video walkthroughs.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026-03</div>
+        <div class="timeline-track"><div class="timeline-dot green"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Apple Ships a macOS Mitigation</div>
+          <div class="timeline-desc">Apple adds a platform-level mitigation specifically targeting ClickFix-style attacks — a rare instance of an OS vendor shipping a control against a social-engineering technique rather than a vulnerability.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026-04</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Mitigation Bypassed via applescript://</div>
+          <div class="timeline-desc">Within roughly a month, a modified variant uses the <code>applescript://</code> URI scheme to bypass the Terminal requirement entirely. The turnaround time is the clearest available measure of how cheap it is to relocate this technique's execution surface.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026-03 → 05</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Top Global Malware Delivery Technique</div>
+          <div class="timeline-desc">ClickFix ranks among the leading malware-delivery methods worldwide for the period, with Microsoft documenting dedicated macOS campaigns using fake utility lures to deliver infostealers.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026-05-12</div>
+        <div class="timeline-track"><div class="timeline-dot green"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">ATT&amp;CK Entry Revised to v1.1</div>
+          <div class="timeline-desc">MITRE updates T1204.004 with expanded procedure examples — including Contagious Interview (G1052), Kimsuky (G0094) and MuddyWater (G0069) — and three platform-specific detection analytics.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Adoption Matrix <small>Cross-tier adoption is what makes this technique unusual</small></div>
+  </div>
+  <div class="section-body">
+    <div class="adoption-list">
+      <div class="adoption-head">
+        <div>Actor</div>
+        <div>Attribution</div>
+        <div>Observed Use</div>
+        <div>Card</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">Contagious Interview</div>
+        <div><span class="adopt-attr nation">DPRK · G1052</span></div>
+        <div class="adopt-detail">ATT&amp;CK-catalogued procedure. Applies ClickFix within fake job-interview lures, reported as the "ClickFake Interview" campaign delivering OtterCandy and related tooling to developers.</div>
+        <div class="adopt-xref">→ WATERPLUM</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">Kimsuky</div>
+        <div><span class="adopt-attr nation">DPRK · G0094</span></div>
+        <div class="adopt-detail">ATT&amp;CK-catalogued procedure — employs ClickFix social engineering to obtain code execution against targeted victims.</div>
+        <div class="adopt-xref">→ KIMSUKY</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">Sandworm</div>
+        <div><span class="adopt-attr nation">RUSSIA · GRU</span></div>
+        <div class="adopt-detail">Reported using the technique since spring 2026, resulting in confirmed network compromise of at least one organisation infected with FreakyPoll.</div>
+        <div class="adopt-xref">→ SANDWORM</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">MuddyWater</div>
+        <div><span class="adopt-attr nation">IRAN · G0069</span></div>
+        <div class="adopt-detail">ATT&amp;CK-catalogued procedure — ClickFix lures targeting victims with malicious PowerShell.</div>
+        <div class="adopt-xref none">— no card</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">APT28</div>
+        <div><span class="adopt-attr nation">RUSSIA · GRU</span></div>
+        <div class="adopt-detail">Reported folding ClickFix into existing infection chains alongside other state programmes from Russia, Iran and North Korea.</div>
+        <div class="adopt-xref none">— no card</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">APT36</div>
+        <div><span class="adopt-attr nation">PAKISTAN-ALIGNED</span></div>
+        <div class="adopt-detail">Notable as a Linux implementation — redirected victims to fake CAPTCHA pages instructing execution via the Alt+F2 run dialog.</div>
+        <div class="adopt-xref none">— no card</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">Commodity eCrime</div>
+        <div><span class="adopt-attr ecrime">BROAD / UNATTRIBUTED</span></div>
+        <div class="adopt-detail">The bulk of observed volume. Infostealer and loader operators distributing Lumma, Latrodectus, NetSupport RAT and AMOS through malvertising, SEO poisoning and compromised sites — no single operator, and the reason the technique reaches ~8% of blocked attacks.</div>
+        <div class="adopt-xref none">— n/a</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">Havoc (S1229)</div>
+        <div><span class="adopt-attr ecrime">TOOLING · S1229</span></div>
+        <div class="adopt-detail">ATT&amp;CK-catalogued at the software level — infection chains initiated via ClickFix lures delivered in phishing emails.</div>
+        <div class="adopt-xref none">— n/a</div>
+      </div>
+      <div class="adoption-row">
+        <div class="adopt-actor">Kali365 (S9044)</div>
+        <div><span class="adopt-attr ecrime">TOOLING · S9044</span></div>
+        <div class="adopt-detail">Generates device codes with copy-paste instructions during authentication — the device-code-phishing expression of the same copy-paste primitive.</div>
+        <div class="adopt-xref none">— n/a</div>
+      </div>
+    </div>
+    <div class="prose" style="margin-top:16px;">
+      <p><strong>The analytic point of this matrix is the spread, not the entries.</strong> Four state programmes across four countries and the entire commodity infostealer ecosystem converged on the same technique inside roughly two years. That does not normally happen — capability usually flows downward from state tooling to criminal use over a longer horizon, or stays tier-locked. ClickFix travelled instantly in both directions because it requires no exploit, no tooling investment and no infrastructure beyond a web page, so there is nothing to reverse-engineer or buy. For defenders the practical consequence is that a ClickFix detection provides no attribution signal whatsoever — the same artifact is produced by a Telegram-bought stealer and by the GRU.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Payloads &amp; Outcomes <small>What lands once the paste succeeds</small></div>
+  </div>
+  <div class="section-body">
+    <div class="item-list">
+      <div class="list-item amber">
+        <div class="list-header">
+          <span class="list-name">Lumma Stealer</span>
+          <span class="list-tag">Infostealer · Commodity</span>
+        </div>
+        <div class="list-desc">Among the most frequently observed ClickFix payloads. Harvests browser credentials, session cookies, and cryptocurrency wallet material. Represents the dominant commodity outcome: rapid credential theft monetised through log marketplaces rather than hands-on intrusion.</div>
+      </div>
+      <div class="list-item amber">
+        <div class="list-header">
+          <span class="list-name">AMOS (Atomic macOS Stealer)</span>
+          <span class="list-tag">Infostealer · macOS</span>
+        </div>
+        <div class="list-desc">The primary macOS outcome, documented by CloudSEK in ClickFix campaigns and by Microsoft in fake-utility lure campaigns (May 2026). Its prominence is why ClickFix matters on macOS specifically — the technique neatly sidesteps Gatekeeper and notarisation, which govern downloaded applications rather than user-pasted shell commands.</div>
+      </div>
+      <div class="list-item blue">
+        <div class="list-header">
+          <span class="list-name">Latrodectus</span>
+          <span class="list-tag">Loader · Commodity</span>
+        </div>
+        <div class="list-desc">Loader family frequently delivered through ClickFix chains, functioning as the staging layer for follow-on tooling including ransomware precursors. Its presence marks a chain intended for hands-on-keyboard follow-up rather than one-shot credential theft.</div>
+      </div>
+      <div class="list-item blue">
+        <div class="list-header">
+          <span class="list-name">NetSupport RAT</span>
+          <span class="list-tag">RAT · Repurposed Legitimate Tool</span>
+        </div>
+        <div class="list-desc">Legitimate remote-administration software repurposed as a RAT. Pairs naturally with ClickFix because both halves of the chain rely on things that are individually legitimate — a user running a command, and a signed remote-support tool — leaving little that is inherently malicious for signature-based controls to flag.</div>
+      </div>
+      <div class="list-item red">
+        <div class="list-header">
+          <span class="list-name">FreakyPoll</span>
+          <span class="list-tag">State Tooling · Sandworm</span>
+        </div>
+        <div class="list-desc">Delivered in Sandworm's use of the technique since spring 2026, resulting in confirmed network compromise of at least one organisation. Illustrates the ceiling: the same paste that usually yields a commodity stealer can equally yield GRU access to a network.</div>
+      </div>
+      <div class="list-item red">
+        <div class="list-header">
+          <span class="list-name">Havoc C2 Framework</span>
+          <span class="list-tag">C2 Framework · S1229</span>
+        </div>
+        <div class="list-desc">Open-source post-exploitation framework whose infection chains are ATT&amp;CK-documented as initiated via ClickFix lures in phishing emails — the technique feeding directly into full command-and-control rather than a single-purpose payload.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Why It Works <small>The specific control failures this technique exploits</small></div>
+  </div>
+  <div class="section-body">
+    <div class="item-list">
+      <div class="list-item red">
+        <div class="list-header">
+          <span class="list-name">Nothing Crosses the Inspection Boundary</span>
+          <span class="list-tag">Control Architecture</span>
+        </div>
+        <div class="list-desc">Email gateways, browser sandboxes, download reputation services and mark-of-the-web all operate on <em>artifacts in transit</em>. ClickFix transmits no artifact — the payload travels as clipboard text inside the user's session and is instantiated locally. This is not a control being evaded; it is a control never being invoked, which is why adding more inspection depth produces no improvement.</div>
+      </div>
+      <div class="list-item red">
+        <div class="list-header">
+          <span class="list-name">The Executing Identity Is Legitimate</span>
+          <span class="list-tag">Authorisation Model</span>
+        </div>
+        <div class="list-desc">Execution is performed by an authenticated, authorised user in an interface they are entitled to use. There is no privilege escalation, no anomalous account, no unusual logon — the process ancestry looks like a person running a command, because it is. Behavioural detection must therefore distinguish legitimate from illegitimate use of a legitimate capability, which is a materially harder problem than spotting an unauthorised one.</div>
+      </div>
+      <div class="list-item amber">
+        <div class="list-header">
+          <span class="list-name">Displayed Text ≠ Clipboard Contents</span>
+          <span class="list-tag">Interface Trust</span>
+        </div>
+        <div class="list-desc">JavaScript populates the clipboard with content the user never sees. Security awareness training that teaches users to "read before you click" fails structurally here: there is nothing to read. The user believes they are copying a verification code. Whitespace padding compounds this by pushing the malicious portion out of the Run dialog's visible field even if they look.</div>
+      </div>
+      <div class="list-item amber">
+        <div class="list-header">
+          <span class="list-name">Verification Fatigue as an Attack Surface</span>
+          <span class="list-tag">Human Factors</span>
+        </div>
+        <div class="list-desc">Users are conditioned by years of legitimate CAPTCHAs, MFA prompts and update nags to perform small compliance rituals without scrutiny. SentinelOne frames this as weaponised verification fatigue. The pretext succeeds not because users are careless but because it is indistinguishable in form from the dozens of legitimate interruptions they are trained to clear quickly.</div>
+      </div>
+      <div class="list-item amber">
+        <div class="list-header">
+          <span class="list-name">Self-Blame Suppresses Reporting</span>
+          <span class="list-tag">Incident Response</span>
+        </div>
+        <div class="list-desc">Because the victim performed the action personally, realisation tends to arrive with embarrassment attached — a materially different psychology from "I received a phishing email," which users report readily. This suppresses and delays reporting, extending dwell time. Any defensive programme against this technique should explicitly address reporting culture, not just prevention.</div>
+      </div>
+      <div class="list-item blue">
+        <div class="list-header">
+          <span class="list-name">Near-Zero Cost to Relocate</span>
+          <span class="list-tag">Defender Economics</span>
+        </div>
+        <div class="list-desc">The technique requires no exploit, no tooling and no infrastructure beyond a web page, so moving to a new execution surface costs an afternoon. The variant family and the ~1-month turnaround on Apple's March 2026 mitigation are the evidence. Defenders instrumenting a specific interface (the Run dialog) are entering an exchange where each of their moves is expensive and each of the adversary's is cheap.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Detection <small>Artifacts, queries and hunting guidance</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose" style="margin-bottom:16px;">
+      <p><strong>The highest-fidelity artifact on Windows is the <code>RunMRU</code> registry key</strong> — <code>HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU</code> — which records every command entered into the Run dialog as single-letter values, with execution order tracked in <code>MRUList</code>. Values terminate in a literal <code>\1</code>, so entries appear as <code>notepad\1</code> or <code>mshta.exe\1</code>.</p>
+      <p>Its forensic value is specific and worth understanding: <em>RunMRU captures the pasted string before any downstream deobfuscation</em>. It is the closest thing available to a transcript of the social-engineering step itself, and it distinguishes successful execution from a lure that was merely displayed. Where a memory-only chain leaves nothing else behind, this key frequently survives.</p>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">RunMRU modification containing LOLBins · Microsoft Defender XDR (KQL, illustrative)</div>
+      <div class="query-code">// Pattern is well documented (Microsoft; Bert-JanP Hunting-Queries repo; kqlquery.com);
+// this composition is analyst-authored.
+DeviceRegistryEvents
+| where RegistryKey endswith @"\Explorer\RunMRU"
+| where RegistryValueData has_any ("powershell","mshta","rundll32","wscript",
+                                   "cscript","curl","wget","cmd /c","iwr","irm")
+   or RegistryValueData has_any ("http://","https://")
+| project Timestamp, DeviceName, InitiatingProcessAccountName,
+          RegistryValueName, RegistryValueData
+| order by Timestamp desc</div>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">Published Sigma rule · Windows registry_set</div>
+      <div class="query-code">SigmaHQ — "Potential ClickFix Execution Pattern - Registry"
+Path: rules/windows/registry/registry_set/registry_set_potential_clickfix_execution.yml
+
+Logic: detects RunMRU key modifications whose value data contains HTTP/HTTPS
+links — i.e. a pasted command referencing a remote resource.
+Use this as the baseline rule rather than authoring from scratch.</div>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">Browser-parented shell execution · EDR process telemetry (illustrative)</div>
+      <div class="query-code">// Explorer.exe spawning an interpreter shortly after browser activity is the
+// behavioural signature when RunMRU is unavailable (e.g. FileFix variants).
+process_create
+| where parent_process in ("explorer.exe")
+| where process_name in ("powershell.exe","mshta.exe","wscript.exe",
+                         "cscript.exe","rundll32.exe","curl.exe")
+| where command_line has_any ("-enc","-e ","FromBase64String","DownloadString",
+                              "IEX","Invoke-Expression","hidden","-w h")
+| join kind=inner (browser_activity | where timestamp > ago(10m)) on device_id</div>
+    </div>
+
+    <div class="query-block">
+      <div class="query-label">macOS / Linux terminal chains · ATT&amp;CK analytics AN0963 · AN0964</div>
+      <div class="query-code">MITRE publishes three platform-specific analytics for T1204.004:
+
+AN0962 (Windows) — browser/email activity → process creation with suspicious
+                   arguments → optional file drop → outbound connection
+AN0963 (Linux)   — curl/wget piping to bash, or base64 decode chains,
+                   followed by transient files and egress
+AN0964 (macOS)   — Terminal/iTerm2 spawning shells with obfuscated patterns,
+                   user-directory file writes, network connections
+
+Note the coverage gap: AN0964 keys on Terminal/iTerm2, which the April 2026
+applescript:// variant specifically avoids.</div>
+    </div>
+
+    <div class="prose" style="margin-top:12px;">
+      <p><strong>Known limitations, stated plainly.</strong> RunMRU-based detection covers the classic Run-dialog pattern and nothing else — <em>FileFix defeats it entirely</em>, since File Explorer address-bar input has no equivalent MRU capture. Legitimate administrative use of the Run dialog generates false positives in environments where engineers work that way, so the LOLBin and URL conditions are doing the real filtering. Server-side polymorphism means the second-stage payload will not match hashes or static strings, so detection must anchor on the paste event and process ancestry rather than on what lands afterwards. Finally, none of these artifacts are attributional (Section 05).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Hardening &amp; Mitigation <small>Rated by how much of the technique each control actually removes</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitigation-list">
+      <div class="mitigation-item">
+        <div class="mitigation-header">
+          <span class="mitigation-name">Disable the Run Dialog via GPO</span>
+          <span class="mitigation-rating rating-high">HIGH IMPACT</span>
+        </div>
+        <div class="mitigation-desc">The single most effective control against classic ClickFix, and the one Huntress and others rank first. It removes the execution surface the canonical chain depends on rather than trying to detect its misuse. Most users in most organisations have no business need for Win+R, so the operational cost is typically low — but scope it, since engineering and IT staff will notice immediately.</div>
+        <div class="mitigation-detail">User Configuration → Administrative Templates → Start Menu and Taskbar
+  → "Remove Run menu from Start Menu"  (also disables the Win+R shortcut)
+
+Caveat: does NOT stop FileFix, which relocates execution to the File Explorer
+address bar specifically to survive this control.</div>
+      </div>
+      <div class="mitigation-item">
+        <div class="mitigation-header">
+          <span class="mitigation-name">Constrain Interpreters with AppLocker / WDAC</span>
+          <span class="mitigation-rating rating-high">HIGH IMPACT</span>
+        </div>
+        <div class="mitigation-desc">Blocking or tightly scoping the interpreters ClickFix commands invoke attacks the chain one step later than the Run dialog, and therefore survives variant relocation — FileFix, TerminalFix and DownloadFix still have to reach an interpreter. Restricting <code>mshta.exe</code> and <code>wscript.exe</code> is comparatively low-friction in most estates; PowerShell needs more care.</div>
+        <div class="mitigation-detail">Restrict via AppLocker or Windows Defender Application Control:
+  mshta.exe, wscript.exe, cscript.exe
+Block execution of powershell.exe and mshta.exe from user-writable directories.
+
+ATT&CK mitigation: M1038 (Execution Prevention)</div>
+      </div>
+      <div class="mitigation-item partial">
+        <div class="mitigation-header">
+          <span class="mitigation-name">PowerShell Constrained Language Mode</span>
+          <span class="mitigation-rating rating-partial">PARTIAL</span>
+        </div>
+        <div class="mitigation-desc">MITRE's named mitigation for this technique. Strips the language elements most download-and-execute one-liners depend on, which meaningfully raises the cost of the PowerShell path. Rated partial rather than high because it addresses one interpreter among several — an operator who meets it simply pivots to <code>mshta</code>, <code>curl</code> or a script host.</div>
+        <div class="mitigation-detail">ATT&CK mitigation: M1038 (Execution Prevention)
+Deploy via WDAC policy or __PSLockdownPolicy where WDAC is not available.</div>
+      </div>
+      <div class="mitigation-item partial">
+        <div class="mitigation-header">
+          <span class="mitigation-name">Targeted User Education — One Specific Rule</span>
+          <span class="mitigation-rating rating-partial">PARTIAL</span>
+        </div>
+        <div class="mitigation-desc">Generic "be suspicious" training fails here because the clipboard contents are invisible (Section 07). What does transfer is a single categorical rule with no judgement required: <em>no legitimate CAPTCHA, error message or software update will ever ask you to paste a command into a terminal or Run box.</em> Pair it explicitly with blame-free reporting, since self-blame measurably suppresses disclosure after the victim has executed the command themselves.</div>
+        <div class="mitigation-detail">Teach the categorical rule, not the judgement call.
+Reinforce that reporting after execution carries no penalty — dwell time
+after a successful paste is driven largely by reporting delay.</div>
+      </div>
+      <div class="mitigation-item partial">
+        <div class="mitigation-header">
+          <span class="mitigation-name">Web Content &amp; Network Controls</span>
+          <span class="mitigation-rating rating-partial">PARTIAL</span>
+        </div>
+        <div class="mitigation-desc">MITRE lists network intrusion prevention (M1031) and restricting web-based content (M1021). These interdict lure delivery and second-stage retrieval rather than the technique itself, so their effectiveness tracks how well your blocklists keep pace with malvertising and newly registered lure domains — which is to say, partially. Egress filtering on the second-stage fetch is the more durable half.</div>
+        <div class="mitigation-detail">ATT&CK mitigations: M1031 (Network Intrusion Prevention),
+                    M1021 (Restrict Web-Based Content)</div>
+      </div>
+      <div class="mitigation-item weak">
+        <div class="mitigation-header">
+          <span class="mitigation-name">Clipboard Monitoring</span>
+          <span class="mitigation-rating rating-weak">WEAK</span>
+        </div>
+        <div class="mitigation-desc">Intuitively appealing — the clipboard is where the payload lives — but poor in practice. Clipboard telemetry is noisy, privacy-sensitive, inconsistently available across platforms, and trivially defeated by delivering the payload in fragments or via a different transfer path. Worth logging for post-incident reconstruction; not worth building prevention on.</div>
+        <div class="mitigation-detail">Consider enabling Run-dialog and clipboard logging for forensic value only.
+Do not treat as a preventive control.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID, Atomic Red Team &amp; published detection content</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No Dedicated Emulation Plan</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense adversary emulation plan or micro-emulation plan specific to ClickFix / T1204.004 was identified as of 2026-09-21. CTID's adversary_emulation_library is organised around named actors rather than individual techniques, so a technique-level plan would fall under its Micro Emulation Plans line of work, where no ClickFix entry was located. Atomic Red Team provides the practical substitute below.</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation &amp; Detection Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">Red Canary</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1204.002/T1204.002.md" target="_blank">Atomic Red Team — T1204.002 Test #12: "ClickFix Campaign - Abuse RunMRU to Launch mshta via PowerShell", and Test #13: "Click-Fix via Downloaded BAT File"</a></div>
+          <div class="ref-date">Atomic tests · Note: filed under T1204.002, not .004 — worth knowing when mapping coverage · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SigmaHQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://detection.fyi/sigmahq/sigma/windows/registry/registry_set/registry_set_potential_clickfix_execution/" target="_blank">Potential ClickFix Execution Pattern — Registry (registry_set_potential_clickfix_execution)</a></div>
+          <div class="ref-date">Published Sigma rule — recommended detection baseline · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/techniques/T1204/004/" target="_blank">T1204.004 detection analytics AN0962 / AN0963 / AN0964</a></div>
+          <div class="ref-date">Platform-specific detection logic (Windows / Linux / macOS) · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Community</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/Bert-JanP/Hunting-Queries-Detection-Rules/blob/main/DFIR/MDE%20-%20ClickFix%20Triage%20Query.md" target="_blank">MDE ClickFix Triage Query (Bert-JanP, Hunting-Queries-Detection-Rules)</a></div>
+          <div class="ref-date">Ready-to-run DFIR triage query for Microsoft Defender for Endpoint · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Note</div>
+        <div>
+          <div class="ref-detail">Atomic Red Team's ClickFix tests rely on the operator manually pressing Win+R to trigger execution and do not simulate the clipboard-poisoning step. Published community work extends them to cover clipboard manipulation — worth reviewing before treating an Atomic run as full-chain validation.</div>
+          <div class="ref-date">Coverage limitation, stated rather than assumed · 2026-09-21</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/techniques/T1204/004/" target="_blank">User Execution: Malicious Copy and Paste (T1204.004)</a></div>
+          <div class="ref-date">Primary classification source · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2025/08/21/think-before-you-clickfix-analyzing-the-clickfix-social-engineering-technique/" target="_blank">Think before you Click(Fix): Analyzing the ClickFix social engineering technique</a></div>
+          <div class="ref-date">Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Microsoft</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.microsoft.com/en-us/security/blog/2026/05/06/clickfix-campaign-uses-fake-macos-utilities-lures-deliver-infostealers/" target="_blank">ClickFix campaign uses fake macOS utilities lures to deliver infostealers</a></div>
+          <div class="ref-date">Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Recorded Future</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.recordedfuture.com/research/clickfix-campaigns-targeting-windows-and-macos" target="_blank">ClickFix Campaigns Targeting Windows and macOS</a></div>
+          <div class="ref-date">Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Menlo Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.menlosecurity.com/blog/the-evolution-of-clickfix-from-cleartext-to-server-side-polymorphism" target="_blank">The Evolution of ClickFix: From Cleartext to Server Side Polymorphism</a></div>
+          <div class="ref-date">Source for the fileless / polymorphism shift · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Group-IB</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.group-ib.com/blog/clickfix-the-social-engineering-technique-hackers-use-to-manipulate-victims/" target="_blank">ClickFix: The Social Engineering Technique Hackers Use to Manipulate Victims</a></div>
+          <div class="ref-date">Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SentinelOne</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.sentinelone.com/blog/how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/" target="_blank">Caught in the CAPTCHA: How ClickFix is Weaponizing Verification Fatigue to Deliver RATs &amp; Infostealers</a></div>
+          <div class="ref-date">Source for the human-factors analysis in §07 · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Huntress</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.huntress.com/blog/dont-sweat-clickfix-techniques" target="_blank">ClickFix Attack: Variants, Detection &amp; How It Works</a></div>
+          <div class="ref-date">Source for the Run-dialog mitigation ranking · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Kaspersky</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.kaspersky.com/blog/clickfix-attack-variations/55340/" target="_blank">Variations of the ClickFix</a></div>
+          <div class="ref-date">Variant family reference · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">SOCRadar</div>
+        <div>
+          <div class="ref-detail"><a href="https://socradar.io/blog/clickfix-filefix-copy-paste-top-social-engineering/" target="_blank">ClickFix &amp; FileFix: Copy-Paste as Top Social Engineering</a></div>
+          <div class="ref-date">Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Prophet Security</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.prophetsecurity.ai/blog/clickfix-attack" target="_blank">ClickFix Attacks: How to Detect and Investigate Fake CAPTCHA Lures</a></div>
+          <div class="ref-date">RunMRU forensic detail · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Wikipedia</div>
+        <div>
+          <div class="ref-detail"><a href="https://en.wikipedia.org/wiki/ClickFix" target="_blank">ClickFix</a></div>
+          <div class="ref-date">Source for Apple's Mar 2026 macOS mitigation and the Apr 2026 applescript:// bypass · Accessed: 2026-09-21</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">This Repository</div>
+        <div>
+          <div class="ref-detail">Companion actor cards for documented adopters: <code>output/actors/2026-09-18_WATERPLUM.html</code> (Contagious Interview / G1052), <code>output/actors/2026-09-02_KIMSUKY.html</code>, <code>output/actors/2026-09-02_SANDWORM.html</code></div>
+          <div class="ref-date">Internal cross-references · 2026-09-21</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// TECHNIQUE PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-21 · 13 sources, all open-source/public</div>
+  <div>ClickFix · T1204.004 · First technique card in this library — no IOCs by design; techniques are behavioural, not indicator-based</div>
+</div>
+
+</body>
+</html>
