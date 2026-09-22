@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mustang Panda — Threat Actor Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #080c10;
+    --bg2:         #0d1219;
+    --bg3:         #111820;
+    --bg4:         #161f29;
+    --border:      #1e2e3e;
+    --border2:     #243344;
+    --accent:      #00c8a0;
+    --accent2:     #ff4d4d;
+    --accent3:     #f5c542;
+    --accent4:     #5b9bd5;
+    --text:        #d0dde8;
+    --text-dim:    #5a7080;
+    --text-mid:    #8aa5bb;
+    --mono:        'Share Tech Mono', monospace;
+    --sans:        'Barlow Condensed', sans-serif;
+    --body:        'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.55;
+    padding: 24px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(0,200,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,155,213,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 40px);
+  }
+
+  .header {
+    position: relative;
+    border: 1px solid var(--border2);
+    background: linear-gradient(135deg, #0a1520 0%, #0e1a28 60%, #071510 100%);
+    padding: 28px 32px 22px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,200,160,0.018) 8px, rgba(0,200,160,0.018) 9px);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 50%, var(--accent4) 100%);
+  }
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tlp-badge {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .tlp-clear  { background: #d0dde8; color: #080c10; }
+  .tlp-green  { background: #2d7a2d; color: #fff; }
+  .tlp-amber  { background: var(--accent3); color: #080c10; }
+  .tlp-red    { background: var(--accent2); color: #fff; }
+
+  .nation-badge {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+  }
+  .nation-badge.ecrime { color: var(--accent3); border-color: var(--accent3); }
+  .nation-badge.unknown { color: var(--text-dim); border-color: var(--border2); }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: var(--sans);
+    font-size: 68px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header h1 .accent  { color: var(--accent); }
+  .header h1 .accent2 { color: var(--accent2); }
+  .header h1 .accent3 { color: var(--accent3); }
+  .header h1 .accent4 { color: var(--accent4); }
+  .header h1 .dim     { color: var(--text-dim); }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+  }
+  .classification-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+  .classification-bar span         { color: var(--accent); font-weight: 700; }
+  .classification-bar span.danger  { color: var(--accent2); }
+  .classification-bar span.warn    { color: var(--accent3); }
+  .classification-bar span.blue    { color: var(--accent4); }
+
+  .alert-banner {
+    border: 1px solid rgba(255,77,77,0.5);
+    background: linear-gradient(90deg, rgba(255,77,77,0.07) 0%, rgba(255,77,77,0.02) 100%);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alert-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent2);
+  }
+  .alert-label    { font-family: var(--mono); font-size: 13.5px; color: var(--accent2); letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+  .alert-headline { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+  .alert-body     { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stat-cell { background: var(--bg3); border: 1px solid var(--border); padding: 12px 10px; text-align: center; }
+  .stat-val  { font-family: var(--sans); font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-val.red   { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.blue  { color: var(--accent4); }
+  .stat-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; line-height: 1.3; }
+
+  .section { border: 1px solid var(--border2); background: var(--bg2); margin-bottom: 14px; }
+  .section-header { display: flex; align-items: center; gap: 16px; padding: 13px 22px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .section-num   { font-family: var(--mono); font-size: 23px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; min-width: 36px; line-height: 1; padding-right: 16px; border-right: 1px solid var(--border2); }
+  .section-title { font-family: var(--sans); font-weight: 700; font-size: 21px; letter-spacing: 0.01em; color: #fff; text-transform: uppercase; }
+  .section-title small { font-family: var(--body); font-weight: 400; font-size: 16px; color: var(--text-dim); text-transform: none; margin-left: 10px; }
+  .section-body  { padding: 22px; }
+
+  .prose { font-family: var(--body); font-size: 16px; color: var(--text-mid); line-height: 1.65; }
+  .prose p { margin-bottom: 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text); font-weight: 500; }
+  .prose em { color: var(--accent3); font-style: normal; }
+
+  .kv { display: flex; flex-direction: column; gap: 5px; }
+  .kv-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.5); }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-key { font-family: var(--mono); font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .kv-val { font-family: var(--body); font-size: 15.5px; color: var(--text); text-align: right; line-height: 1.4; }
+  .kv-val.mono  { font-family: var(--mono); font-size: 14.5px; }
+  .kv-val.teal  { color: var(--accent); font-weight: 600; }
+  .kv-val.red   { color: var(--accent2); font-weight: 600; }
+  .kv-val.amber { color: var(--accent3); font-weight: 600; }
+  .kv-val.blue  { color: var(--accent4); font-weight: 600; }
+
+  .alias-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .alias-chip { font-family: var(--mono); font-size: 13.5px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-mid); background: var(--bg3); letter-spacing: 0.04em; border-radius: 2px; }
+  .alias-chip.primary { border-color: rgba(0,200,160,0.4); color: var(--accent); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 80px 12px 1fr; gap: 0 10px; align-items: stretch; min-height: 48px; }
+  .timeline-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-align: right; padding-top: 3px; line-height: 1.3; }
+  .timeline-track { display: flex; flex-direction: column; align-items: center; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1px solid var(--bg); flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.red   { background: var(--accent2); }
+  .timeline-dot.amber { background: var(--accent3); }
+  .timeline-dot.blue  { background: var(--accent4); }
+  .timeline-line { flex: 1; width: 1px; background: var(--border2); margin-top: 2px; }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-content { padding: 3px 0 16px; border-bottom: 1px dotted rgba(30,46,62,0.4); }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-phase { font-family: var(--sans); font-size: 16.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 4px; }
+  .timeline-desc  { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+
+  .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .mitre-cell { background: var(--bg3); border: 1px solid var(--border); padding: 9px 11px; border-left: 2px solid var(--accent4); }
+  .mitre-cell.red    { border-left-color: var(--accent2); }
+  .mitre-cell.amber  { border-left-color: var(--accent3); }
+  .mitre-cell.green  { border-left-color: var(--accent); }
+  .mitre-tactic { font-family: var(--mono); font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .mitre-id    { font-family: var(--mono); font-size: 13.5px; color: var(--accent4); font-weight: 700; }
+  .mitre-cell.red   .mitre-id { color: var(--accent2); }
+  .mitre-cell.amber .mitre-id { color: var(--accent3); }
+  .mitre-cell.green .mitre-id { color: var(--accent); }
+  .mitre-name  { font-family: var(--body); font-size: 15px; color: var(--text); margin-top: 3px; line-height: 1.35; }
+  .mitre-note  { font-family: var(--body); font-size: 14.5px; color: var(--text-mid); margin-top: 4px; line-height: 1.35; font-style: italic; }
+  .mitre-framework { font-family: var(--mono); font-size: 12.5px; color: var(--accent3); letter-spacing: 0.08em; margin-bottom: 2px; }
+
+  .sector-list { display: flex; flex-direction: column; gap: 7px; }
+  .sector-row  { display: grid; grid-template-columns: 180px 1fr 56px; align-items: center; gap: 8px; }
+  .sector-name { font-family: var(--body); font-size: 15px; color: var(--text); }
+  .sector-bar-wrap { height: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 1px; overflow: hidden; }
+  .sector-bar  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent3)); border-radius: 1px; }
+  .sector-pct  { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-align: right; }
+
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-item { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent2); padding: 10px 14px; }
+  .tool-item.amber { border-left-color: var(--accent3); }
+  .tool-item.blue  { border-left-color: var(--accent4); }
+  .tool-item.green { border-left-color: var(--accent); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px; }
+  .tool-name { font-family: var(--mono); font-size: 15px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .tool-item.amber .tool-name { color: var(--accent3); }
+  .tool-item.blue  .tool-name { color: var(--accent4); }
+  .tool-item.green .tool-name { color: var(--accent); }
+  .tool-tag  { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .tool-desc { font-family: var(--body); font-size: 15px; color: var(--text-mid); line-height: 1.45; }
+
+  .ioc-table { width: 100%; border-collapse: collapse; }
+  .ioc-table th { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border2); }
+  .ioc-table td { font-family: var(--mono); font-size: 14.5px; color: var(--text-mid); padding: 5px 8px; border-bottom: 1px solid rgba(30,46,62,0.4); vertical-align: top; }
+  .ioc-table td.type-label { color: var(--accent3); font-size: 13.5px; white-space: nowrap; }
+  .ioc-table td.val { color: var(--text); word-break: break-all; }
+  .ioc-defang-note { font-family: var(--mono); font-size: 13.5px; color: var(--accent3); margin-bottom: 10px; padding: 5px 8px; border-left: 2px solid var(--accent3); background: rgba(245,197,66,0.05); }
+
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(30,46,62,0.35); }
+  .cm-item:last-child { border-bottom: none; }
+  .cm-num  { font-family: var(--mono); font-size: 14.5px; color: var(--accent3); font-weight: 700; flex-shrink: 0; margin-top: 1px; min-width: 22px; }
+  .cm-text { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+  .cm-text strong { color: var(--text); font-weight: 500; }
+  .cm-ttp  { font-family: var(--mono); font-size: 13.5px; color: var(--accent4); margin-top: 3px; }
+
+  .query-block { background: var(--bg3); border: 1px solid var(--border); border-left: 2px solid var(--accent); padding: 10px 14px; margin-bottom: 8px; }
+  .query-label { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .query-code  { font-family: var(--mono); font-size: 14.5px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+
+  .ref-list { display: flex; flex-direction: column; gap: 6px; }
+  .ref-item { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(30,46,62,0.35); font-size: 15px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-source { font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .ref-detail { font-family: var(--body); color: var(--text-mid); line-height: 1.4; }
+  .ref-detail a { color: var(--accent4); text-decoration: none; }
+  .ref-detail a:hover { text-decoration: underline; }
+  .ref-date { font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); margin-top: 2px; }
+
+  .sanctions-list { display: flex; flex-direction: column; gap: 5px; }
+  .sanctions-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 6px 0; border-bottom: 1px solid rgba(30,46,62,0.4); }
+  .sanctions-row:last-child { border-bottom: none; }
+  .sanctions-name { font-family: var(--body); font-size: 15.5px; color: var(--text); font-weight: 500; }
+  .sanctions-role { font-family: var(--body); font-size: 14.5px; color: var(--text-dim); margin-top: 1px; }
+  .sanctions-badge { font-family: var(--mono); font-size: 13.5px; padding: 2px 7px; background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: var(--accent2); white-space: nowrap; align-self: center; }
+
+  .opsec-list { display: flex; flex-direction: column; gap: 8px; }
+  .opsec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    padding: 10px 14px;
+  }
+  .opsec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+  .opsec-category { font-family: var(--mono); font-size: 13.5px; color: var(--accent3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .opsec-confidence { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .opsec-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; }
+  .opsec-desc strong { color: var(--text); font-weight: 500; }
+
+  .evasion-list { display: flex; flex-direction: column; gap: 8px; }
+  .evasion-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+  }
+  .evasion-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+  .evasion-technique { font-family: var(--mono); font-size: 14.5px; color: var(--accent2); font-weight: 700; letter-spacing: 0.04em; }
+  .evasion-ttp { font-family: var(--mono); font-size: 13.5px; color: var(--accent4); }
+  .evasion-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .evasion-tag { font-family: var(--mono); font-size: 13px; color: var(--text-dim); border: 1px solid var(--border2); padding: 1px 6px; }
+  .evasion-tag.edr    { border-color: rgba(255,77,77,0.3); color: var(--accent2); }
+  .evasion-tag.siem   { border-color: rgba(91,155,213,0.3); color: var(--accent4); }
+  .evasion-tag.network { border-color: rgba(0,200,160,0.3); color: var(--accent); }
+  .evasion-desc { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.5; margin-bottom: 6px; }
+  .evasion-desc strong { color: var(--text); font-weight: 500; }
+  .evasion-detail {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    color: var(--text-mid);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ctid-block {
+    background: var(--bg3);
+    border: 1px solid rgba(0,200,160,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .ctid-block.not-available {
+    border-left-color: var(--text-dim);
+    border-color: var(--border);
+  }
+  .ctid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .ctid-tag {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    background: rgba(0,200,160,0.08);
+    border: 1px solid rgba(0,200,160,0.3);
+    color: var(--accent);
+    letter-spacing: 0.07em;
+  }
+  .ctid-tag.not-available { background: rgba(58,85,102,0.12); border-color: var(--border2); color: var(--text-dim); }
+  .ctid-title { font-family: var(--sans); font-size: 15px; font-weight: 700; color: #fff; text-transform: uppercase; }
+  .ctid-body { font-family: var(--body); font-size: 15.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 10px; }
+  .ctid-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ctid-link {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--accent);
+    border: 1px solid rgba(0,200,160,0.25);
+    padding: 3px 10px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+  }
+  .ctid-link:hover { border-color: var(--accent); }
+  .ctid-phases { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .ctid-phase-chip {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .footer {
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+  .footer .draft-warn { color: var(--accent3); font-weight: 700; }
+
+  @media (max-width: 960px) {
+    .mitre-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .header h1 { font-size: 42px; }
+    .mitre-grid { grid-template-columns: 1fr 1fr; }
+    .sector-row { grid-template-columns: 1fr; }
+  }
+
+  .print-btn {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 999;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .print-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  @media print {
+    .no-print { display: none !important; }
+    @page { margin: 12mm; }
+    :root {
+      --bg: #ffffff;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e6e6e6;
+      --border: #cfcfcf;
+      --border2: #b0b0b0;
+      --accent3: #8a6205;
+      --text: #111111;
+      --text-dim: #555555;
+      --text-mid: #2b2b2b;
+    }
+    body {
+      background: #fff !important;
+      background-image: none !important;
+      padding: 0 !important;
+    }
+    .header { background: #fff !important; }
+    .header::before { display: none !important; }
+    .header h1,
+    .section-title,
+    .timeline-phase,
+    .alert-headline,
+    .ctid-title {
+      color: #111 !important;
+    }
+    .tlp-badge, .nation-badge, .badge, .threat-crit, .threat-high {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .header, .stat-grid,
+    .stat-cell, .mitre-cell, .kv-row, .timeline-item, .sector-row,
+    .tool-item, .cm-item, .ref-item, .sanctions-row, .opsec-item,
+    .evasion-item, .prose p, tr {
+      break-inside: avoid;
+    }
+    .section-header { break-after: avoid; }
+    .section { orphans: 3; widows: 3; }
+    thead { display: table-header-group; }
+    a { color: #111 !important; text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()" title="Print or Save as PDF">⎘ Print / Save PDF</button>
+
+<!-- ═══════════════════════════════════════ HEADER ══ -->
+<div class="header">
+  <div class="header-top-row">
+    <div class="tlp-badge tlp-clear">TLP:CLEAR</div>
+    <div class="nation-badge">⚠ NATION-STATE · PRC (ASSESSED MSS AFFILIATION) · CHINA</div>
+  </div>
+  <div class="header-meta">// Threat Actor Profile — State-Sponsored Cyber Espionage / Political &amp; Strategic Intelligence Collection</div>
+  <h1><span class="accent">Mustang</span> Panda</h1>
+  <div class="header-sub">
+    PROFILE COMPILED: 2026-09-22 &nbsp;|&nbsp;
+    SOURCES: MITRE ATT&amp;CK, DOJ/FBI, Recorded Future Insikt Group, IBM X-Force, Kaspersky Securelist, Acronis TRU, Check Point Research, Proofpoint, Zscaler ThreatLabz, Talos Intelligence, AttackIQ (21 sources)
+  </div>
+  <div class="classification-bar">
+    <div>Status: <span class="danger">ACTIVE</span></div>
+    <div>Threat Level: <span class="danger">HIGH</span></div>
+    <div>Primary Motive: <span>Political &amp; Strategic Espionage</span></div>
+    <div>Active Since: <span>~2012</span></div>
+    <div>MITRE ATT&amp;CK: <span>G0129</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ALERT BANNER ══ -->
+<div class="alert-banner">
+  <div class="alert-label">⚡ VENDOR ADVISORY — KASPERSKY SECURELIST / HONEYMYTE COOLCLIENT ROOTKIT — AUGUST 2026</div>
+  <div class="alert-headline">Mustang Panda (HoneyMyte Cluster) Ships Signed Kernel-Mode Rootkit in Upgraded CoolClient Backdoor</div>
+  <div class="alert-body">In August 2026, Kaspersky documented an upgraded CoolClient backdoor variant — tracked as HoneyMyte activity within the wider Mustang Panda ecosystem — that installs a signed Windows kernel-mode driver (<strong>msagent.sys</strong>) as a service to hide processes, files, registry artifacts, and C2 network traffic from endpoint defenses. Confirmed victims span government entities in Myanmar, Mongolia, Pakistan, and Russia, with CoolClient deployed as a secondary implant following an initial PlugX infection. Organizations in the group's historical target set should prioritize kernel-driver allow-listing and EDR signature updates (Securelist, Aug 2026).</div>
+</div>
+
+<!-- ═══════════════════════════════════ STAT GRID ══ -->
+<div class="stat-grid">
+  <div class="stat-cell">
+    <div class="stat-val red">4,258</div>
+    <div class="stat-label">US Systems Disinfected — DOJ/FBI PlugX Takedown, Aug 2024–Jan 2025</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val amber">21</div>
+    <div class="stat-label">Tracking Aliases Across Vendors (MITRE G0129)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val blue">14</div>
+    <div class="stat-label">Years Continuous Operation (Active Since ~2012)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">33</div>
+    <div class="stat-label">IOCTL Handlers — CoolClient Kernel Rootkit, Aug 2026</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 00 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Overview</div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p>Mustang Panda (MITRE G0129) is a China-nexus state-sponsored cyber espionage group that has run continuous operations since at least 2012, making it one of the longest-lived and most prolifically tracked PRC-aligned actors currently active. Rather than pursuing financial gain or disruption, the group conducts sustained political and strategic intelligence collection aligned with PRC foreign policy priorities: monitoring of Belt & Road partner states, Taiwan and South China Sea posture, and surveillance of diaspora and dissident communities tied to Tibet, Hong Kong, and Myanmar's civil society. Its footprint spans over a dozen tracking designations across the vendor ecosystem — TA416, RedDelta, Bronze President, Stately Taurus, Earth Preta, Camaro Dragon, HoneyMyte, HIVE0154, Twill Typhoon, ITG27, UNC6384, and Red Lich among them — reflecting both its scale and the difficulty of cleanly bounding its operational clusters.</p>
+      <p>The group matters acutely right now because it just demonstrated something most APT groups never have to: survival of a coordinated, multi-country government takedown. Between August 2024 and January 2025, the FBI and French law enforcement (working with Sekoia.io) executed a court-authorized operation that remotely deleted a PlugX variant from 4,258 U.S.-based computers as part of a broader global disinfection effort. Rather than going dark, Mustang Panda retooled within months — fielding the LOTUSLITE backdoor and SnakeDisk USB worm, then through 2026 a Zoho WorkDrive-abusing C2 implant (ZOHOMURK), a previously undocumented VNC-capable backdoor (Havencode), and a kernel-mode rootkit upgrade to the long-running CoolClient tool. That resilience — a deep bench of independently developed backdoors not solely reliant on PlugX — is the single most consequential fact about this actor's current risk profile.</p>
+      <p>Geopolitically, Mustang Panda operates squarely inside several of the PRC's highest-priority intelligence targets. 2026 activity documented by Acronis, IBM X-Force, and Aviatrix shows sustained targeting of Indian government, energy/hydropower, and banking institutions amid ongoing India-China border friction and deepening India-Taiwan cooperation, alongside renewed campaigns against U.S. policy organizations and Korean policy circles tracking U.S.-Korea alignment. European foreign ministries and defense ministries — a target set the group has returned to repeatedly since at least 2022 — were again hit by TA416-attributed campaigns in late 2025, per Proofpoint.</p>
+      <p>Operationally, the group remains non-destructive: no confirmed wiper or ransomware deployment appears in the reporting reviewed for this card. Its danger lies in persistence, technical adaptability, and breadth — a global target list spanning South and Southeast Asia, Europe, the Vatican, Russia, the Gulf, and North America, sustained by a toolchain that keeps absorbing new evasion techniques (kernel rootkits, DNS-over-HTTPS, legitimate-SaaS C2 abuse) faster than defenders can retire old ones.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 01 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Identity &amp; Attribution</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Primary Name</span><span class="kv-val teal">Mustang Panda</span></div>
+          <div class="kv-row"><span class="kv-key">Sponsor / Parent</span><span class="kv-val red">PRC — assessed Ministry of State Security (MSS) affiliation</span></div>
+          <div class="kv-row"><span class="kv-key">Actor Type</span><span class="kv-val amber">Nation-state cyber espionage APT</span></div>
+          <div class="kv-row"><span class="kv-key">Primary Motivation</span><span class="kv-val">Political &amp; strategic intelligence collection</span></div>
+          <div class="kv-row"><span class="kv-key">Active Since</span><span class="kv-val">~2012 (MITRE); some vendors cite 2014</span></div>
+          <div class="kv-row"><span class="kv-key">Last Observed</span><span class="kv-val">September 2026 (ongoing)</span></div>
+          <div class="kv-row"><span class="kv-key">MITRE G-ID</span><span class="kv-val mono">G0129</span></div>
+          <div class="kv-row"><span class="kv-key">Legal Status</span><span class="kv-val red">No individual DOJ indictment or OFAC designation identified for Mustang Panda operators as of this compile</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 10px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">Tracking Aliases</div>
+        <div class="alias-grid">
+          <span class="alias-chip primary">Mustang Panda</span>
+          <span class="alias-chip">TA416</span>
+          <span class="alias-chip">RedDelta</span>
+          <span class="alias-chip">Bronze President</span>
+          <span class="alias-chip">Stately Taurus</span>
+          <span class="alias-chip">Earth Preta</span>
+          <span class="alias-chip">Camaro Dragon</span>
+          <span class="alias-chip">HoneyMyte</span>
+          <span class="alias-chip">HIVE0154</span>
+          <span class="alias-chip">Twill Typhoon</span>
+          <span class="alias-chip">Tantalum</span>
+          <span class="alias-chip">Luminous Moth</span>
+          <span class="alias-chip">UNC6384</span>
+          <span class="alias-chip">TEMP.Hex</span>
+          <span class="alias-chip">Red Lich</span>
+          <span class="alias-chip">ClumsyToad</span>
+          <span class="alias-chip">PKPLUG</span>
+          <span class="alias-chip">ITG27</span>
+          <span class="alias-chip">FireAnt</span>
+          <span class="alias-chip">Vertigo Panda</span>
+          <span class="alias-chip">Dark Peony</span>
+        </div>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Attribution Confidence</div>
+          <div class="prose">
+            <p>[MEDIUM-HIGH]. Targeting consistently aligns with PRC political priorities (Tibet, Taiwan, South China Sea, Belt &amp; Road partner states, diaspora/dissident surveillance), and a January 2025 FBI affidavit states the PRC government paid the group to develop and deploy the specific PlugX variant remediated in the joint takedown operation. Chinese-language build artifacts and operational tempo consistent with PRC-nexus tradecraft further support the assessment. Confidence stops short of [HIGH] because, unlike the 2025 APT27/i-Soon case, no indictment or leaked tasking documentation has named individual PRC officers or units directing Mustang Panda specifically — the FBI affidavit language is the strongest public documentary evidence to date, not a criminal charge against named individuals.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 02 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Campaign &amp; Operational Timeline</div>
+  </div>
+  <div class="section-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2012–2017</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Emergence &amp; PlugX Adoption</div>
+          <div class="timeline-desc">Earliest tracked activity (as PKPLUG) against Mongolia, Vietnam, and Myanmar-focused civil society and government targets, built around the long-running PlugX (Korplug) RAT shared across multiple Chinese-nexus clusters (MITRE ATT&amp;CK G0129).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Dec 2022–2023</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">SmugX / European Commission-Themed Lures</div>
+          <div class="timeline-desc">HTML smuggling campaign (SmugX, tracked since Dec 2022) and a European Commission-themed PlugX delivery chain targeted foreign ministries and embassies across France, Germany, Italy, Greece, Cyprus, Turkey, Sweden, and the Czech Republic, collecting intelligence on EU internal discussions of China policy and export controls (Check Point Research 2023; EclecticIQ).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Aug 2024–Jan 2025</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Global PlugX Disinfection Operation</div>
+          <div class="timeline-desc">French law enforcement, working with Sekoia.io, developed a remote-deletion technique for a Mustang Panda PlugX variant; the FBI adopted it under nine court-authorized warrants (Eastern District of Pennsylvania), remotely disinfecting approximately 4,258 U.S.-based systems as part of a wider international takedown (DOJ/FBI, Jan 2025).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jan 2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Post-Takedown PlugX Adaptation</div>
+          <div class="timeline-desc">Recorded Future Insikt Group documented an adapted PlugX infection chain under the RedDelta cluster name, targeting Taiwan, Mongolia, and Southeast Asian government entities — evidence the group had already begun modifying its flagship RAT ahead of the public takedown announcement.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Sep 2025</div>
+        <div class="timeline-track"><div class="timeline-dot amber"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">SnakeDisk USB Worm &amp; LOTUSLITE Retooling</div>
+          <div class="timeline-desc">IBM X-Force (HIVE0154) documented the SnakeDisk USB worm — geofenced to propagate specifically across isolated/segmented Thai IP ranges and drop the Yokai backdoor as a secondary payload — alongside renewed use of the LOTUSLITE backdoor against U.S. policy organizations, evidencing rapid capability rebuild after the PlugX takedown.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jan 2026</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">CoolClient Backdoor Update &amp; New PlugX Sample</div>
+          <div class="timeline-desc">A refreshed CoolClient (HoneyMyte) backdoor was deployed in government-focused attacks, alongside a January 2026 PlugX sample using a multi-layer LNK→PowerShell execution chain, RC4 key "AcLgMF," mutex "WSDpqXEdu," and C2 to dalerocks[.]com over TCP/443 (The Hacker News; Bluecyber).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Mar 2026</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Southeast Asian Government Campaign (Multi-Cluster)</div>
+          <div class="timeline-desc">Reporting identified three China-linked clusters, including Mustang Panda-attributed activity, targeting a Southeast Asian government in a 2025-dated campaign disclosed in March 2026 — underscoring the difficulty of cleanly separating Mustang Panda's operations from closely adjacent PRC-nexus clusters (The Hacker News).</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Apr–May 2026</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Indian Banking &amp; Korean Policy Circles; Havencode Discovery</div>
+          <div class="timeline-desc">Spear-phishing campaigns disguised as IT help-desk communications targeted Indian banks and U.S.-Korea policy circles (Aviatrix, Apr 2026). In May 2026, IBM X-Force (ITG27) captured live activity in a simulated enterprise environment via a "China BG"-subject phishing lure and identified a previously undiscovered VNC-capable backdoor, Havencode, extending an India energy/government campaign first reported by Acronis.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Jun 2026</div>
+        <div class="timeline-track"><div class="timeline-dot blue"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">Zoho WorkDrive C2 Abuse — India Hydropower &amp; Government</div>
+          <div class="timeline-desc">Acronis TRU identified two parallel campaigns (active beaconing Jun 12–22, 2026) using SHARDLOADER, MINIRECON, and the newly identified ZOHOMURK implant — which abuses hardcoded Zoho OAuth credentials to run an attacker-controlled WorkDrive account as a C2 dead-drop — against India's hydropower sector and government bodies engaged in India-Taiwan cooperation agreements.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Aug 2026</div>
+        <div class="timeline-track"><div class="timeline-dot red"></div><div class="timeline-line"></div></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">CoolClient Kernel-Mode Rootkit</div>
+          <div class="timeline-desc">Kaspersky Securelist documented a CoolClient variant bundling a signed Windows kernel-mode driver (msagent.sys, signed via a certificate issued to Nanjing Ranyi Technology Co., Ltd.) with 33 IOCTL request handlers, hiding processes, files, registry artifacts, and C2 traffic from EDR — confirmed against government victims in Myanmar, Mongolia, Pakistan, and Russia. See Alert Banner.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 03 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Attack Lifecycle <small>Phishing-led espionage with a resilient, multi-backdoor toolchain</small></div>
+  </div>
+  <div class="section-body">
+    <div class="prose">
+      <p><strong>Entry vectors:</strong> Mustang Panda's primary route in remains spear-phishing — emails carrying malicious LNK, ZIP/RAR, or CHM attachments, or links, built around geopolitically relevant lures (EU Commission themes, India-Taiwan MOU cooperation, IT help-desk impersonation, ASEAN summit materials). Where phishing alone is insufficient — notably against air-gapped or segmented government networks in Thailand — the group deploys the SnakeDisk USB worm, which propagates via removable media and geofences its payload delivery to specific target IP ranges before dropping the Yokai backdoor. A third vector, DLL sideloading via signed legitimate software (Solid PDF Creator, Citrix Receiver), delivers loaders like SHARDLOADER once initial access lures are opened.</p>
+      <p><strong>Toolchain:</strong> The group runs a deep, largely self-developed toolchain rather than depending on a single flagship implant. PlugX (Korplug) remains the longest-serving RAT — modular, plugin-based, and shared informally across the wider Chinese-nexus ecosystem — but 2025–2026 activity shows heavy investment in independent alternatives: the TONESHELL backdoor family (with PUBLOAD/PUBSHELL as loader/downloader components), LOTUSLITE, CoolClient (the HoneyMyte-branded backdoor now carrying a kernel rootkit), ZOHOMURK, MINIRECON (a TONESHELL derivative), and the newly identified VNC-capable Havencode backdoor. This toolchain diversity is precisely what let the group absorb the 2024–2025 PlugX takedown without an operational pause.</p>
+      <p><strong>C2 methodology:</strong> Command and control runs predominantly over HTTPS, increasingly resolved via DNS-over-HTTPS (DoH) to defeat passive DNS monitoring, with Cloudflare-fronted infrastructure common for TONESHELL/LOTUSLITE variants. PlugX configuration data is protected with multi-stage obfuscation — RC4 decryption followed by additional XOR transformation — that delays static extraction of C2 parameters. ZOHOMURK represents a distinct C2 model: rather than dedicated infrastructure, it abuses a legitimate Zoho WorkDrive account as a dead-drop, reading operator commands from an "inbox" folder and writing exfiltrated output to an "outbox" folder, blending entirely into expected enterprise SaaS traffic.</p>
+      <p><strong>Lateral movement, persistence &amp; exfiltration:</strong> Once inside, the group performs credential access via LSASS memory dumping, NTDS extraction, and DCSync, alongside domain/network discovery to support further movement. Persistence is achieved through registry Run keys, scheduled tasks, WMI event subscriptions, and — with the CoolClient rootkit upgrade — a signed kernel-mode driver installed as a Windows service. Data is staged locally before exfiltration over the established C2 channel (HTTPS/DoH) or, in the ZOHOMURK model, over the abused cloud-storage channel itself; USB-based exfiltration is used in isolated network scenarios reached via SnakeDisk.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 04 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">TTPs — MITRE ATT&amp;CK Mapping <small>Enterprise framework · confidence per technique in brackets</small></div>
+  </div>
+  <div class="section-body">
+    <div class="mitre-grid">
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Reconnaissance</div>
+        <div class="mitre-id">T1593</div>
+        <div class="mitre-name">Search Open Websites/Domains</div>
+        <div class="mitre-note">[HIGH] OSINT gathering on diplomatic, NGO, and policy-org targets to construct topical spear-phishing lures (MITRE G0129).</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1587.001</div>
+        <div class="mitre-name">Develop Capabilities: Malware</div>
+        <div class="mitre-note">[HIGH] In-house development of PlugX, TONESHELL family, ZOHOMURK, MINIRECON, and Havencode rather than reliance on commodity malware.</div>
+      </div>
+      <div class="mitre-cell green">
+        <div class="mitre-tactic">Resource Development</div>
+        <div class="mitre-id">T1588.003</div>
+        <div class="mitre-name">Obtain Capabilities: Code Signing Certificates</div>
+        <div class="mitre-note">[HIGH] CoolClient's msagent.sys kernel driver signed via a certificate issued to Nanjing Ranyi Technology Co., Ltd. to satisfy Windows driver-signing enforcement (Securelist, Aug 2026).</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1566.001</div>
+        <div class="mitre-name">Phishing: Spearphishing Attachment</div>
+        <div class="mitre-note">[HIGH] LNK/ZIP/CHM/RAR lures themed on EU policy, India-Taiwan cooperation, and IT help-desk impersonation across every major 2022–2026 campaign reviewed.</div>
+      </div>
+      <div class="mitre-cell red">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1091</div>
+        <div class="mitre-name">Replication Through Removable Media</div>
+        <div class="mitre-note">[HIGH] SnakeDisk USB worm geofenced to isolated/segmented Thai networks, dropping the Yokai backdoor as a secondary payload (IBM X-Force, Sep 2025).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1204.002</div>
+        <div class="mitre-name">User Execution: Malicious File</div>
+        <div class="mitre-note">[HIGH] Victim opens the delivered LNK/attachment, triggering the loader chain.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Execution</div>
+        <div class="mitre-id">T1059.001</div>
+        <div class="mitre-name">Command and Scripting Interpreter: PowerShell</div>
+        <div class="mitre-note">[HIGH] LNK-triggered PowerShell stage drops a decoy and extracts the encrypted PlugX/loader DLL (Socprime; Bluecyber).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1547.001</div>
+        <div class="mitre-name">Registry Run Keys / Startup Folder</div>
+        <div class="mitre-note">[HIGH] Standard registry-based persistence across PlugX and TONESHELL-family implants (MITRE G0129).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1053.005</div>
+        <div class="mitre-name">Scheduled Task</div>
+        <div class="mitre-note">[MEDIUM] Scheduled-task persistence documented in AttackIQ's PlugX/TONESHELL emulation research.</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1574.001</div>
+        <div class="mitre-name">Hijack Execution Flow: DLL</div>
+        <div class="mitre-note">[HIGH] SHARDLOADER and TONESHELL loaders sideload malicious DLLs via signed binaries (Solid PDF Creator, Citrix Receiver) to inherit trust (Acronis TRU, Jun 2026).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1027.013</div>
+        <div class="mitre-name">Obfuscated Files: Encrypted/Encoded File</div>
+        <div class="mitre-note">[HIGH] Multi-stage RC4 + XOR obfuscation of PlugX configuration data delays static signature extraction (Zscaler ThreatLabz, 2026).</div>
+      </div>
+      <div class="mitre-cell amber">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1014</div>
+        <div class="mitre-name">Rootkit</div>
+        <div class="mitre-note">[MEDIUM] Signed kernel-mode driver (msagent.sys) hides processes, files, registry keys, and C2 traffic via 33 IOCTL handlers — behavior documented Aug 2026, not yet reflected on the official G0129 ATT&amp;CK page as of this compile.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1003.001</div>
+        <div class="mitre-name">OS Credential Dumping: LSASS Memory</div>
+        <div class="mitre-note">[MEDIUM] LSASS memory access attributed on the MITRE G0129 group page.</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1018</div>
+        <div class="mitre-name">Remote System Discovery</div>
+        <div class="mitre-note">[MEDIUM] Network reconnaissance supporting lateral movement planning (MITRE G0129).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1102</div>
+        <div class="mitre-name">Web Service</div>
+        <div class="mitre-note">[HIGH] ZOHOMURK abuses a legitimate Zoho WorkDrive account with hardcoded OAuth credentials as a C2 dead-drop (Acronis TRU, Jun 2026).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Command &amp; Control</div>
+        <div class="mitre-id">T1573.001</div>
+        <div class="mitre-name">Encrypted Channel: Symmetric Cryptography</div>
+        <div class="mitre-note">[HIGH] RC4-based symmetric encryption of PlugX C2 traffic and configuration, resolved increasingly via DNS-over-HTTPS (Zscaler ThreatLabz).</div>
+      </div>
+      <div class="mitre-cell">
+        <div class="mitre-tactic">Exfiltration</div>
+        <div class="mitre-id">T1567.002</div>
+        <div class="mitre-name">Exfiltration Over Web Service: Exfiltration to Cloud Storage</div>
+        <div class="mitre-note">[HIGH] ZOHOMURK writes stolen data to an attacker-controlled Zoho WorkDrive "outbox" folder (Acronis TRU, Jun 2026).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 05 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">Targeting Profile</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Sector Targeting</div>
+        <div class="sector-list">
+          <div class="sector-row">
+            <span class="sector-name">Government &amp; Diplomatic</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:95%"></div></div>
+            <span class="sector-pct">PRIMARY</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">NGOs, Think Tanks &amp; Religious Orgs</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:80%"></div></div>
+            <span class="sector-pct">HIGH</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Energy &amp; Hydropower</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:55%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Banking &amp; Financial Policy</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:45%"></div></div>
+            <span class="sector-pct">MED</span>
+          </div>
+          <div class="sector-row">
+            <span class="sector-name">Telecommunications</span>
+            <div class="sector-bar-wrap"><div class="sector-bar" style="width:30%"></div></div>
+            <span class="sector-pct">LOW</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-key">Geographies</span><span class="kv-val">Primary: SE/South Asia (Myanmar, Vietnam, Thailand, Taiwan, India, Mongolia, Pakistan). Secondary: Europe (France, Germany, Italy, Greece, Cyprus, Turkey, Sweden, Czech Republic), US policy orgs, Vatican, Russia, Gulf region</span></div>
+          <div class="kv-row"><span class="kv-key">Victim Profile</span><span class="kv-val">Foreign affairs/defense ministries, diplomatic missions, Tibetan/ethnic-minority advocacy NGOs, policy think tanks, hydropower/energy operators, banks, policy-circle individuals</span></div>
+          <div class="kv-row"><span class="kv-key">Preferred Entry</span><span class="kv-val">Geopolitically-themed spear-phishing (help-desk impersonation, MOU/summit lures); USB propagation into air-gapped/isolated networks; DLL sideloading via trusted signed software</span></div>
+          <div class="kv-row"><span class="kv-key">Target Doctrine</span><span class="kv-val">Non-destructive political/strategic intelligence collection supporting PRC foreign policy priorities — Belt &amp; Road monitoring, Taiwan/SCS posture tracking, diaspora and dissident surveillance</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 06 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">Tools, Malware &amp; Infrastructure</div>
+  </div>
+  <div class="section-body">
+    <div class="tool-list">
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">PLUGX / KORPLUG</span>
+          <span class="tool-tag">RAT · Custom, shared PRC-nexus tool</span>
+        </div>
+        <div class="tool-desc">Long-running modular RAT (in use since ~2008, shared informally across multiple Chinese-nexus clusters) with a plugin architecture covering keylogging, screen capture, file management, remote shell, and network proxying. C2 over TCP/UDP/HTTPS with growing DNS-over-HTTPS use; multi-stage RC4+XOR configuration obfuscation; API hashing and PEB walking for evasion. Subject of the Aug 2024–Jan 2025 FBI/DOJ-French disinfection operation that remediated 4,258 U.S. hosts.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">TONESHELL / PUBLOAD / PUBSHELL</span>
+          <span class="tool-tag">Backdoor + loader family · Custom</span>
+        </div>
+        <div class="tool-desc">Custom backdoor family delivered via DLL sideloading through legitimately signed binaries; PUBLOAD and PUBSHELL serve as loader/downloader stages sharing architectural similarities with TONESHELL itself. C2 infrastructure frequently masked behind Cloudflare fronting.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">COOLCLIENT (HoneyMyte)</span>
+          <span class="tool-tag">RAT + kernel rootkit · Custom</span>
+        </div>
+        <div class="tool-desc">Espionage backdoor first publicly disclosed by Sophos (2022) with keylogging, clipboard theft, credential harvesting, file management, and plugin-based extensibility. In Aug 2026 Kaspersky documented a variant adding a signed kernel-mode driver (msagent.sys, service-installed, 33 IOCTL handlers, signed via a certificate issued to Nanjing Ranyi Technology Co., Ltd.) that hides processes, files, registry objects, and C2 traffic. Consistently deployed as a secondary implant following an initial PlugX infection; confirmed victims in Myanmar, Mongolia, Pakistan, and Russia.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">LOTUSLITE</span>
+          <span class="tool-tag">Backdoor · Custom</span>
+        </div>
+        <div class="tool-desc">Backdoor whose delivery mechanism evolved from CHM files to JavaScript loaders to DLL sideloading. Deployed post-2025 PlugX takedown against U.S. policy organizations as part of the group's rapid capability rebuild.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">SNAKEDISK</span>
+          <span class="tool-tag">USB worm · Custom</span>
+        </div>
+        <div class="tool-desc">USB-propagated worm geofenced to specifically target isolated or segmented Thai IP ranges; deploys the Yokai backdoor as a secondary payload once the correct network context is confirmed, evidencing deliberate targeting discipline rather than indiscriminate spread.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">ZOHOMURK</span>
+          <span class="tool-tag">C2/exfil implant · Custom, abused SaaS</span>
+        </div>
+        <div class="tool-desc">Implant carrying hardcoded Zoho OAuth credentials that runs an attacker-controlled Zoho WorkDrive account as a C2 dead-drop — reading operator commands from an "inbox" folder and writing stolen data to an "outbox" folder. Deployed June 2026 against Indian government and hydropower targets; traffic blends into legitimate enterprise SaaS usage.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">MINIRECON</span>
+          <span class="tool-tag">Backdoor · TONESHELL derivative</span>
+        </div>
+        <div class="tool-desc">Reworked TONESHELL variant beaconing over a WebSocket connection carried on HTTPS. Deployed alongside ZOHOMURK in the June 2026 India campaign.</div>
+      </div>
+      <div class="tool-item blue">
+        <div class="tool-header">
+          <span class="tool-name">SHARDLOADER</span>
+          <span class="tool-tag">Loader · Custom, DLL sideload</span>
+        </div>
+        <div class="tool-desc">Loader that deploys via DLL sideloading through legitimately signed binaries — a Solid PDF Creator executable in one campaign, a Citrix Receiver binary in another — to deliver MINIRECON and ZOHOMURK.</div>
+      </div>
+      <div class="tool-item amber">
+        <div class="tool-header">
+          <span class="tool-name">HAVENCODE</span>
+          <span class="tool-tag">VNC-capable backdoor · Custom, newly identified</span>
+        </div>
+        <div class="tool-desc">Previously undocumented VNC-capable backdoor first captured by IBM X-Force in May 2026 via a "China BG"-subject phishing lure, extending a campaign against India's energy and government sectors first reported by Acronis. Full technical teardown not yet widely corroborated across vendors as of this compile.</div>
+      </div>
+      <div class="tool-item green">
+        <div class="tool-header">
+          <span class="tool-name">SHADOWPAD</span>
+          <span class="tool-tag">Modular backdoor · Shared Chinese-ecosystem tool</span>
+        </div>
+        <div class="tool-desc">Modular backdoor shared across multiple PRC-nexus threat clusters, observed in some Mustang Panda-adjacent activity per SocRadar reporting — illustrative of tool-sharing dynamics across the wider Chinese APT ecosystem rather than a Mustang Panda-exclusive capability.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 07 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Indicators of Compromise <small>All IPs and domains defanged</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ioc-defang-note">⚠ IOC HANDLING — All IPs and domains in this table are defanged. Reconstruct before use in detection tooling. Reference URLs in Section 13 are NOT defanged.</div>
+    <table class="ioc-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value / Description</th>
+          <th>Source</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="type-label">DOMAIN</td><td class="val">coastallasercompany[.]com</td><td>Zscaler ThreatLabz</td><td>2026</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">dalerocks[.]com — PlugX C2 over TCP/443</td><td>Bluecyber (Jan 2026 sample analysis)</td><td>2026-01</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">couldinstallup[.]com</td><td>vcs-ti indicator repository</td><td>2026</td></tr>
+        <tr><td class="type-label">DOMAIN</td><td class="val">editor.gleeze[.]com</td><td>vcs-ti indicator repository</td><td>2026</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">msagent.sys — CoolClient signed kernel rootkit driver</td><td>Kaspersky Securelist</td><td>2026-08</td></tr>
+        <tr><td class="type-label">REGISTRY</td><td class="val">Mutex: WSDpqXEdu — Jan 2026 PlugX sample</td><td>Bluecyber</td><td>2026-01</td></tr>
+        <tr><td class="type-label">MALWARE</td><td class="val">RC4 config key: AcLgMF — Jan 2026 PlugX sample (rotates per build)</td><td>Bluecyber</td><td>2026-01</td></tr>
+        <tr><td class="type-label">FILE</td><td class="val">Staging path: %public%\GData — Jan 2026 PlugX sample</td><td>Bluecyber</td><td>2026-01</td></tr>
+        <tr><td class="type-label">PORT</td><td class="val">TCP/443 (HTTPS) — primary C2 transport across PlugX/TONESHELL/CoolClient variants</td><td>Zscaler ThreatLabz; Talos Intelligence</td><td>2026</td></tr>
+        <tr><td class="type-label">PROTOCOL</td><td class="val">DNS-over-HTTPS (DoH) — used for C2 domain resolution to evade DNS-based detection</td><td>Zscaler ThreatLabz</td><td>2026</td></tr>
+        <tr><td class="type-label">NOTE</td><td class="val">Full published hash sets for SnakeDisk, ZOHOMURK, MINIRECON, Havencode, and the CoolClient rootkit were not exhaustively reproduced in the secondary reporting reviewed for this card — consult IBM X-Force, Acronis TRU, and Kaspersky Securelist primary advisories directly for complete file hashes as of 2026-09-22.</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 08 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Analyst Assessment</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col" style="margin-bottom: 18px;">
+      <div class="kv">
+        <div class="kv-row"><span class="kv-key">Overall Threat Level</span><span class="kv-val red">HIGH</span></div>
+        <div class="kv-row"><span class="kv-key">Attribution Confidence</span><span class="kv-val amber">MEDIUM-HIGH</span></div>
+        <div class="kv-row"><span class="kv-key">Trajectory</span><span class="kv-val">Escalating technical sophistication; broadening sector/geographic footprint</span></div>
+        <div class="kv-row"><span class="kv-key">Most Dangerous Capability</span><span class="kv-val red">Demonstrated toolchain resilience — full retool within months of a coordinated FBI/French global takedown</span></div>
+        <div class="kv-row"><span class="kv-key">Primary Intel Gap</span><span class="kv-val amber">No public tasking documentation naming individual PRC MSS officers/units directing this activity</span></div>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Ecosystem / Affiliated Clusters</div>
+        <div class="alias-grid">
+          <span class="alias-chip">HIVE0154 (IBM)</span>
+          <span class="alias-chip">ITG27 (IBM X-Force)</span>
+          <span class="alias-chip">RedDelta (Recorded Future)</span>
+          <span class="alias-chip">UNC6384 (Google/Mandiant)</span>
+          <span class="alias-chip">TEMP.Hex</span>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Mustang Panda earns a HIGH rather than CRITICAL threat rating: it is consistently active, well-resourced, and globally distributed, but the reporting reviewed for this card shows no confirmed destructive or ransomware deployment — its objective remains sustained intelligence collection, not disruption. What elevates concern is trajectory, not intent. The group absorbed a coordinated, multi-country law enforcement operation (arguably the most significant single disruption event of its 14-year history) and emerged within months fielding four largely new implants (LOTUSLITE, ZOHOMURK, MINIRECON, Havencode) plus a kernel-mode rootkit upgrade to an existing one (CoolClient). Few PRC-nexus actors have demonstrated this combination of independent toolchain depth and operational tempo recovery in the public record.</p>
+      <p>A live competing hypothesis worth flagging: March 2026 reporting describing "three China-linked clusters" active against a Southeast Asian government, only one attributed to Mustang Panda, illustrates a structural attribution problem across this actor's tracking history. With 21 distinct vendor aliases in circulation — some (RedDelta, HIVE0154/ITG27, UNC6384) representing genuinely independent tracking lineages that vendors have since merged into G0129 — it is plausible that some activity currently bundled under "Mustang Panda" reflects closely coordinated but operationally distinct PRC-nexus clusters rather than one unified group. This card treats the MITRE G0129 consolidation as the working baseline but flags the splitting risk explicitly.</p>
+      <p>Forward risk trajectory is elevated in three specific theaters through the remainder of 2026: continued targeting of Indian government, energy, and banking entities amid persistent India-China border friction and deepening India-Taiwan technical cooperation; renewed European foreign/defense ministry targeting tracking EU-China policy friction; and sustained interest in Korean policy circles tracking U.S.-Korea alignment. Attribution confidence would move to HIGH with either a formal indictment naming individual operators (as occurred for APT27/i-Soon in 2025) or leaked internal tasking material comparable to the i-Soon leak. Absent that, MEDIUM-HIGH — strong circumstantial and documentary alignment, no direct human-source or documentary proof of individual PRC state direction — is the defensible ceiling.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 09 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Defensive Recommendations</div>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">01</span>
+          <div>
+            <div class="cm-text"><strong>Restrict high-risk attachment types.</strong> Block or sandbox LNK, CHM, and ISO/archive attachments at the mail gateway; these are Mustang Panda's dominant delivery format across every campaign reviewed.</div>
+            <div class="cm-ttp">Counters: T1566.001, T1204.002</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">02</span>
+          <div>
+            <div class="cm-text"><strong>Constrain DLL sideloading.</strong> Deploy application control (WDAC/AppLocker) to flag DLL loads from non-standard paths alongside otherwise-trusted signed executables (Solid PDF Creator, Citrix Receiver, etc.).</div>
+            <div class="cm-ttp">Counters: T1574.001, T1588.003</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">03</span>
+          <div>
+            <div class="cm-text"><strong>Enforce USB device controls.</strong> Disable autorun and restrict removable-media write access on air-gapped and network-segmented systems, particularly in Southeast Asian government deployments matching SnakeDisk's historical targeting.</div>
+            <div class="cm-ttp">Counters: T1091</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">04</span>
+          <div>
+            <div class="cm-text"><strong>Monitor SaaS/cloud-storage API abuse.</strong> Baseline and alert on anomalous OAuth token usage and outbound traffic to cloud storage platforms (Zoho WorkDrive, Dropbox, Google Drive) inconsistent with the account's normal usage pattern.</div>
+            <div class="cm-ttp">Counters: T1102, T1567.002</div>
+          </div>
+        </div>
+      </div>
+      <div class="cm-list">
+        <div class="cm-item">
+          <span class="cm-num">05</span>
+          <div>
+            <div class="cm-text"><strong>Control unauthorized DoH resolvers.</strong> Restrict endpoint DNS-over-HTTPS to approved corporate resolvers to preserve DNS-layer detection visibility against DoH-based C2 domain resolution.</div>
+            <div class="cm-ttp">Counters: T1573.001 / DNS evasion</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">06</span>
+          <div>
+            <div class="cm-text"><strong>Enforce kernel driver allow-listing.</strong> Combine Microsoft's vulnerable/malicious driver blocklist with custom entries for observed signing certificates (e.g., Nanjing Ranyi Technology Co., Ltd.) to block the CoolClient rootkit driver from loading.</div>
+            <div class="cm-ttp">Counters: T1014</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">07</span>
+          <div>
+            <div class="cm-text"><strong>Harden credential exposure.</strong> Enable Credential Guard/LSA Protection, enforce tiered administration, and alert on DCSync-pattern replication requests from non-domain-controller hosts.</div>
+            <div class="cm-ttp">Counters: T1003.001, T1003.003, T1003.006</div>
+          </div>
+        </div>
+        <div class="cm-item">
+          <span class="cm-num">08</span>
+          <div>
+            <div class="cm-text"><strong>Baseline persistence mechanisms.</strong> Audit and alert on new registry Run-key entries and scheduled task creation outside change-managed baselines.</div>
+            <div class="cm-ttp">Counters: T1547.001, T1053.005</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div style="font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Detection Content</div>
+      <div class="prose" style="margin-bottom: 10px;">
+        <p>No vendor-published Suricata/Snort or Sigma rule set specific to Mustang Panda's 2026 toolset (ZOHOMURK, Havencode, the CoolClient kernel rootkit) was identified as publicly available during this compile. The two queries below are illustrative detections authored for this card from the documented behavior above — validate and tune against your own environment before deployment.</p>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Sigma — LNK-Triggered PowerShell Loader Chain (illustrative) · Sysmon / Windows Process Creation</div>
+        <div class="query-code">title: Suspicious PowerShell Spawned from LNK-Opened Explorer Process
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        ParentImage|endswith: '\explorer.exe'
+        Image|endswith: '\powershell.exe'
+        CommandLine|contains|all:
+            - '-WindowStyle Hidden'
+            - '-EncodedCommand'
+    condition: selection
+level: high</div>
+      </div>
+      <div class="query-block">
+        <div class="query-label">Sigma — Anomalous OAuth Traffic to Zoho WorkDrive API (illustrative) · Proxy / Zeek / EDR Network</div>
+        <div class="query-code">title: Non-Browser Process Communicating with Zoho WorkDrive API
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection:
+        DestinationHostname|contains: 'workdrive.zoho.com'
+    filter_known_browsers:
+        Image|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\firefox.exe'
+    condition: selection and not filter_known_browsers
+level: medium</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 10 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">OPSEC Procedures <small>Observed infrastructure hygiene, rotation patterns, anti-forensics</small></div>
+  </div>
+  <div class="section-body">
+    <div class="opsec-list">
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Infrastructure Rotation</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">C2 domain churn is evident across campaigns — distinct domains (coastallasercompany[.]com, dalerocks[.]com, couldinstallup[.]com, editor.gleeze[.]com) appear tied to different 2026 operations rather than reused infrastructure. The group increasingly favors legitimate cloud services (Zoho WorkDrive, Cloudflare fronting) over dedicated bulletproof VPS hosting, which both blends with normal enterprise traffic and reduces the operational impact of any single domain takedown.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Living-off-the-Land Ratio</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Mustang Panda leans heavily toward custom-developed implants (PlugX, TONESHELL, LOTUSLITE, ZOHOMURK, Havencode) rather than pure LOLBin tradecraft, but consistently sideloads its loader stage through legitimate signed binaries (Solid PDF Creator, Citrix Receiver) to inherit trust during execution. Classic LOLBins such as mshta or rundll32 were not prominently documented in the sources reviewed for this card.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Anti-Forensics Routines</span>
+          <span class="opsec-confidence">[LOW]</span>
+        </div>
+        <div class="opsec-desc">Timestomping (T1070.006) and file/indicator deletion (T1070.004) are formally attributed on the MITRE G0129 page. Specific log-clearing command sequences or forensic artifact-removal procedures were not documented in the public sources reviewed for this compile — treat as a confirmed capability with undocumented specifics rather than an unsubstantiated claim.</div>
+      </div>
+      <div class="opsec-item">
+        <div class="opsec-header">
+          <span class="opsec-category">Tooling Hygiene</span>
+          <span class="opsec-confidence">[MEDIUM]</span>
+        </div>
+        <div class="opsec-desc">Use of a third-party code-signing certificate (issued to Nanjing Ranyi Technology Co., Ltd.) to sign the CoolClient kernel driver indicates deliberate acquisition or compromise of signing capability to defeat driver-signature enforcement. Per-build customization is also evident — the January 2026 PlugX sample carries a distinct RC4 key ("AcLgMF") and mutex ("WSDpqXEdu") not reused in other documented samples — consistent with build-level variation intended to defeat static hash-based detection.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 11 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Detection Evasion <small>Specific techniques, LOLBin sequences, EDR bypass patterns</small></div>
+  </div>
+  <div class="section-body">
+    <div class="evasion-list">
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Signed Kernel-Mode Rootkit</span>
+          <span class="evasion-ttp">T1014</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">msagent.sys</span>
+        </div>
+        <div class="evasion-desc">CoolClient's kernel-mode driver, installed as a Windows service, communicates with its usermode component via 33 documented IOCTL request handlers to hide processes, files, registry keys, and C2 network artifacts from EDR visibility (Securelist, Aug 2026).</div>
+        <div class="evasion-detail">Driver: msagent.sys
+Signed by: certificate issued to Nanjing Ranyi Technology Co., Ltd.
+IOCTL handler count: 33 (documented)
+Specific IOCTL codes/argument formats not publicly documented as of 2026-09-22.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">DLL Sideloading via Trusted Signed Binaries</span>
+          <span class="evasion-ttp">T1574.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag edr">EDR BYPASS</span>
+          <span class="evasion-tag">Solid PDF Creator / Citrix Receiver</span>
+        </div>
+        <div class="evasion-desc">SHARDLOADER and TONESHELL-family loaders sideload a malicious DLL alongside a legitimately signed executable, inheriting trust and blending with expected process trees for the host application (Acronis TRU, Jun 2026).</div>
+        <div class="evasion-detail">Observed vehicles: Solid PDF Creator executable (Campaign 1); Citrix Receiver binary (Campaign 2)
+Specific file/DLL names and load-order arguments not publicly documented as of 2026-09-22.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Legitimate SaaS C2 Blending</span>
+          <span class="evasion-ttp">T1102</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">ZOHOMURK operates an attacker-controlled Zoho WorkDrive account as a C2 dead-drop using hardcoded OAuth credentials — reading operator commands from an "inbox" folder and writing exfiltrated output to an "outbox" folder — rendering C2 traffic indistinguishable from legitimate enterprise SaaS use to domain-reputation-based network and SIEM detections (Acronis TRU, Jun 2026).</div>
+        <div class="evasion-detail">C2 mechanism: Zoho WorkDrive folder-based dead-drop (inbox/outbox convention)
+Specific folder-naming and polling-interval values not publicly documented as of 2026-09-22.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">DNS-over-HTTPS C2 Resolution</span>
+          <span class="evasion-ttp">T1573.001</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag network">NETWORK</span>
+        </div>
+        <div class="evasion-desc">PlugX variants increasingly resolve C2 domains via DNS-over-HTTPS rather than traditional DNS, defeating passive DNS monitoring and DNS-based sinkholing/blocking controls (Zscaler ThreatLabz, 2026).</div>
+        <div class="evasion-detail">Specific DoH resolver endpoints used by the malware not publicly documented as of 2026-09-22.</div>
+      </div>
+      <div class="evasion-item">
+        <div class="evasion-header">
+          <span class="evasion-technique">Multi-Stage Configuration Obfuscation</span>
+          <span class="evasion-ttp">T1027.013</span>
+        </div>
+        <div class="evasion-tags">
+          <span class="evasion-tag siem">SIEM EVASION</span>
+        </div>
+        <div class="evasion-desc">PlugX configuration data undergoes RC4 decryption followed by an additional XOR-based transformation layer, delaying static extraction of operational C2 parameters and complicating automated config-parsing detection pipelines (Zscaler ThreatLabz, 2026).</div>
+        <div class="evasion-detail">Observed sample-specific RC4 key: AcLgMF (Jan 2026 sample; Bluecyber)
+Key rotation cadence across builds not publicly documented as of 2026-09-22.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 12 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Emulation Resources <small>MITRE CTID &amp; Published Adversary Emulation Plans</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ctid-block not-available">
+      <div class="ctid-header">
+        <span class="ctid-tag not-available">MITRE CTID — NOT AVAILABLE</span>
+        <span class="ctid-title">No CTID Adversary Emulation Plan Published</span>
+      </div>
+      <div class="ctid-body">No MITRE Center for Threat-Informed Defense adversary emulation plan for Mustang Panda was found in the CTID Adversary Emulation Library (ctid.mitre.org/resources/adversary-emulation-library) as of 2026-09-22.</div>
+    </div>
+    <div style="margin-top: 14px; font-family: var(--mono); font-size: 13.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Additional Emulation Resources</div>
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">AttackIQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.attackiq.com/2023/03/23/emulating-the-politically-motivated-chinese-apt-mustang-panda/" target="_blank">Emulating the Politically Motivated Chinese APT Mustang Panda</a></div>
+          <div class="ref-date">Vendor-authored attack graph (not CTID-affiliated) covering a European Commission-themed PlugX delivery chain and a global phishing campaign using TONESHELL, mapped to T1055, T1547.002, T1053.005, and related techniques · Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GAP NOTE</div>
+        <div>
+          <div class="ref-detail">No curated Atomic Red Team test bundle or SigmaHQ rule set explicitly tagged to Mustang Panda was identified during this compile.</div>
+          <div class="ref-date">General technique-level Atomic Red Team tests exist individually for several mapped techniques (e.g., T1105); none are curated as a Mustang Panda-specific set as of 2026-09-22.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTION 13 ══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">References <small>URLs are NOT defanged — navigate directly</small></div>
+  </div>
+  <div class="section-body">
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-source">MITRE ATT&amp;CK</div>
+        <div>
+          <div class="ref-detail"><a href="https://attack.mitre.org/groups/G0129/" target="_blank">G0129 — Mustang Panda</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">DOJ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.justice.gov/archives/opa/pr/justice-department-and-fbi-conduct-international-operation-delete-malware-used-china-backed" target="_blank">Justice Department and FBI Conduct International Operation to Delete Malware Used by China-Backed Hackers</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">BleepingComputer</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.bleepingcomputer.com/news/security/fbi-deletes-chinese-plugx-malware-from-thousands-of-us-computers/" target="_blank">FBI Deletes Chinese PlugX Malware From Thousands of US Computers</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Recorded Future</div>
+        <div>
+          <div class="ref-detail"><a href="https://assets.recordedfuture.com/insikt-report-pdfs/2025/cta-cn-2025-0109.pdf" target="_blank">Insikt Group — Chinese State-Sponsored RedDelta Targeted Taiwan, Mongolia, and Southeast Asia With Adapted PlugX Infection Chain</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Check Point Research</div>
+        <div>
+          <div class="ref-detail"><a href="https://research.checkpoint.com/2023/chinese-threat-actors-targeting-europe-in-smugx-campaign/" target="_blank">Chinese Threat Actors Targeting Europe in SmugX Campaign</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Proofpoint</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.proofpoint.com/us/blog/threat-insight/id-come-running-back-eu-again-ta416-resumes-european-government-espionage" target="_blank">TA416 Resumes European Government Espionage Campaigns</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/06/mustang-panda-uses-zoho-workdrive-as.html" target="_blank">Mustang Panda Uses Zoho WorkDrive as Command Channel in Indian Government Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Acronis TRU</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.acronis.com/en/tru/posts/mustang-panda-targets-indias-government-and-energy-sectors/" target="_blank">Mustang Panda Targets India's Government and Energy Sectors With ZOHOMURK and MINIRECON</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">IBM X-Force</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ibm.com/think/x-force/trapping-a-mustang-panda" target="_blank">Trapping a Mustang Panda</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">IBM X-Force</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.ibm.com/think/x-force/hive0154-drops-updated-toneshell-backdoor" target="_blank">Hive0154, aka Mustang Panda, Drops Updated Toneshell Backdoor and Novel SnakeDisk USB Worm</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2025/09/mustang-panda-deploys-snakedisk-usb.html" target="_blank">Mustang Panda Deploys SnakeDisk USB Worm to Deliver Yokai Backdoor on Thailand IPs</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Securelist</div>
+        <div>
+          <div class="ref-detail"><a href="https://securelist.com/honeymyte-coolclient-driver-rootkit/121028/" target="_blank">CoolClient Backdoor Goes Deeper: HoneyMyte Adds Windows Kernel Rootkit</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/08/mustang-panda-adds-signed-windows.html" target="_blank">Mustang Panda Adds Signed Windows Rootkit to CoolClient Backdoor for Stealth</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Zscaler ThreatLabz</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.zscaler.com/blogs/security-research/china-nexus-threat-actor-targets-arabian-gulf-region-plugx" target="_blank">China-Nexus Group Targets Arabian Gulf Region</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Talos Intelligence</div>
+        <div>
+          <div class="ref-detail"><a href="https://blog.talosintelligence.com/mustang-panda-targets-europe/" target="_blank">Mustang Panda Deploys a New Wave of Malware Targeting Europe</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Bluecyber</div>
+        <div>
+          <div class="ref-detail"><a href="https://bluecyber.hashnode.dev/mustang-panda-x-plugx-analysis-of-the-january-2026-sample-a-multi-layer-execution-chain" target="_blank">Mustang Panda x PlugX — Analysis of the January 2026 Sample: A Multi-Layer Execution Chain</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">AttackIQ</div>
+        <div>
+          <div class="ref-detail"><a href="https://www.attackiq.com/2023/03/23/emulating-the-politically-motivated-chinese-apt-mustang-panda/" target="_blank">Emulating the Politically Motivated Chinese APT Mustang Panda</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/03/three-china-linked-clusters-target.html" target="_blank">Three China-Linked Clusters Target Southeast Asian Government in 2025 Cyber Campaign</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">The Hacker News</div>
+        <div>
+          <div class="ref-detail"><a href="https://thehackernews.com/2026/01/mustang-panda-deploys-updated.html" target="_blank">Mustang Panda Deploys Updated COOLCLIENT Backdoor in Government Cyber Attacks</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">GitHub / vcs-ti</div>
+        <div>
+          <div class="ref-detail"><a href="https://github.com/vcs-ti/indicator/blob/main/Mustang%20Panda/iocs.md" target="_blank">Mustang Panda — Community Indicator Repository</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-source">Aviatrix</div>
+        <div>
+          <div class="ref-detail"><a href="https://aviatrix.ai/threat-research-center/chinese-apt-indian-banks-korean-policy-2026/" target="_blank">Chinese APT Mustang Panda Targets Indian Banks and Korean Policy Circles</a></div>
+          <div class="ref-date">Accessed: 2026-09-22</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══ -->
+<div class="footer">
+  <div>// THREAT ACTOR PROFILE · <span class="draft-warn">DRAFT — REQUIRES HUMAN REVIEW BEFORE DISSEMINATION</span></div>
+  <div>TLP:CLEAR · COMPILED: 2026-09-22 · 21 sources</div>
+  <div>MITRE ATT&amp;CK G0129 · Enterprise Framework</div>
+</div>
+
+</body>
+</html>
